@@ -14,6 +14,7 @@ import {
   ObjectDetector,
 } from "@mediapipe/tasks-vision";
 import { useModelLoader } from "../hooks/useModelLoader";
+import { ModelLoadingScreen } from "../components/model-loading-screen";
 
 export function FindTheLookWeb() {
   return (
@@ -211,6 +212,10 @@ function Main() {
   const handleSelection = () => {
     setSelectionMade(true);
   };
+
+  if (modelLoading) {
+    return <ModelLoadingScreen progress={progress} />;
+  }
 
   return (
     <>
