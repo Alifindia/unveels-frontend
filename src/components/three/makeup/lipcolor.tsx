@@ -69,7 +69,7 @@ const LipColorInner: React.FC<LipColorProps> = ({
     const material = new MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 0.36,
+      opacity: 0.5,
       alphaMap: standardTexture,
       alphaTest: 0,
     });
@@ -81,7 +81,7 @@ const LipColorInner: React.FC<LipColorProps> = ({
     const material = new MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 0.36,
+      opacity: 0.5,
       alphaMap: standardTexture,
       alphaTest: 0,
     });
@@ -93,7 +93,7 @@ const LipColorInner: React.FC<LipColorProps> = ({
     const material = new MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 0.36,
+      opacity: 0.5,
       alphaMap: highTexture,
       alphaTest: 0,
     });
