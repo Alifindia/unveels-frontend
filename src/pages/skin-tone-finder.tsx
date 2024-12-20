@@ -88,7 +88,7 @@ function Main() {
           baseOptions: {
             modelAssetPath:
               "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-            delegate: "GPU",
+            delegate: "CPU",
           },
           outputFaceBlendshapes: true,
           runningMode: "IMAGE",
@@ -120,8 +120,7 @@ function Main() {
             left: 0,
             right: 0,
             bottom: 0,
-            zIndex: 9999,
-            pointerEvents: "none",
+            zIndex: 10,
           }}
         >
           <ScreenshotPreview />
