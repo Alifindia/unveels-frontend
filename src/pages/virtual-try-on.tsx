@@ -10,7 +10,13 @@ import {
   StopCircle,
   X,
 } from "lucide-react";
-import { cloneElement, CSSProperties, Fragment, useState } from "react";
+import {
+  cloneElement,
+  CSSProperties,
+  Fragment,
+  useEffect,
+  useState,
+} from "react";
 import { Icons } from "../components/icons";
 
 import { Link, Outlet, useNavigate } from "react-router-dom";
@@ -149,41 +155,22 @@ function Main() {
   const { criterias } = useCamera();
 
   return (
-    <>
-      {criterias.screenshotImage && (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 10,
-          }}
-        >
-          <ScreenshotPreview />
-        </div>
-      )}
-      <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
-        <div className="absolute inset-0">
-          <VirtualTryOnScene />
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-            }}
-          ></div>
-        </div>
-        {/* <RecorderStatus /> */}
-        <TopNavigation item={false} cart={false} />
+    <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+      <div className="absolute inset-0">
+        <VirtualTryOnScene />
+        <div className="pointer-events-none absolute inset-0"></div>
+      </div>
+      {/* <RecorderStatus /> */}
+      <TopNavigation item={false} cart={false} />
 
-        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          <Sidebar />
+      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
+        <Sidebar />
+        <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
           <MainContent />
           <Footer />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -221,17 +208,18 @@ function MainContent() {
 
   return (
     <>
-      {collapsed ? null : <BottomContent />}
       <div className="flex justify-center">
         <button
           type="button"
           onClick={() => {
             navigate("/virtual-try-on/makeups");
           }}
+          className="flex h-3 w-full items-center justify-center bg-transparent"
         >
-          <ChevronDown className="size-6 text-white" />
+          <div className="h-1 w-10 rounded-full bg-gray-400" />
         </button>
       </div>
+      {collapsed ? null : <BottomContent />}
     </>
   );
 }
