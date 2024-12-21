@@ -61,6 +61,7 @@ import { TiaraProvider } from "./vto/head-accesories/tiaras/tiaras-context";
 import { HeadbandProvider } from "./vto/head-accesories/headband/headband-context";
 import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-context";
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
+import { ScreenshotPreview } from "../components/screenshot-preview";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -145,26 +146,44 @@ export function VirtualTryOn() {
 }
 
 function Main() {
-  return (
-    <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
-      <div className="absolute inset-0">
-        <VirtualTryOnScene />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-          }}
-        ></div>
-      </div>
-      {/* <RecorderStatus /> */}
-      <TopNavigation item={false} cart={false} />
+  const { criterias } = useCamera();
 
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-        <Sidebar />
-        <MainContent />
-        <Footer />
+  return (
+    <>
+      {criterias.screenshotImage && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 10,
+          }}
+        >
+          <ScreenshotPreview />
+        </div>
+      )}
+      <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+        <div className="absolute inset-0">
+          <VirtualTryOnScene />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
+            }}
+          ></div>
+        </div>
+        {/* <RecorderStatus /> */}
+        <TopNavigation item={false} cart={false} />
+
+        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
+          <Sidebar />
+          <MainContent />
+          <Footer />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -550,6 +569,8 @@ export function TopNavigation({
 }
 
 function Sidebar() {
+  const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
+
   return (
     <div className="pointer-events-none flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
       <div className="relative p-0.5">
@@ -567,7 +588,7 @@ function Sidebar() {
         />
 
         <div className="flex flex-col gap-4 rounded-full bg-black/25 px-1.5 py-2 backdrop-blur-md">
-          <button className="">
+          <button className="" onClick={screenShoot}>
             <Icons.camera className="size-4 text-white sm:size-6" />
           </button>
           <button className="">
