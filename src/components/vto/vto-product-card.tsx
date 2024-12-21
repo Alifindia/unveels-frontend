@@ -29,7 +29,7 @@ export function VTOProductCard({
   return (
     <div
       style={cardStyle}
-      className="w-[70px] shadow sm:w-[100px]"
+      className="w-[70px] shadow sm:w-[100px] cursor-pointer"
       onClick={onClick} // Memanggil onClick saat produk diklik
     >
       <div className="relative h-[47.6px] w-[70px] overflow-hidden sm:h-[70px] sm:w-[100px]">

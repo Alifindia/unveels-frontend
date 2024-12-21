@@ -25,14 +25,17 @@ export function LenseSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useLenseContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useLenseContext();
 
   return (
     <div
       className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
       data-mode="lip-color"
     >
-      {colors.map((item, index) => (
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
         <button
           type="button"
           className={clsx(
@@ -45,7 +48,7 @@ function FamilyColorSelector() {
             if (colorFamily === item.value) {
               setColorFamily(null);
             } else {
-              setColorFamily(item.value);
+              setColorFamily(colorFamily === item.value ? null : item.value);
             }
           }}
         >
@@ -123,13 +126,42 @@ function ColorSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { colorFamily } = useLenseContext();
+  const {
+    colorFamily,
+    setColorFamily,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+  } = useLenseContext();
 
   const { data, isLoading } = useLenseQuery({
     color: colorFamily,
     // TODO: API doesn't have pattern for lenses
     pattern: null,
   });
+
+  if (colorFamilyToInclude == null && data?.items != null) {
+    setColorFamilyToInclude(
+      data.items.map(
+        (d) =>
+          d.custom_attributes.find((c) => c.attribute_code === "color")?.value,
+      ),
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+  };
 
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
@@ -143,6 +175,7 @@ function ProductList() {
               key={product.id}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}
+              onClick={() => handleProductClick(product)}
             />
           );
         })

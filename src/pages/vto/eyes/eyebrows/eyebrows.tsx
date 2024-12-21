@@ -11,7 +11,7 @@ import { getPatternByIndex } from "../../../../api/attributes/pattern";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { filterColors } from "../../../../api/attributes/color";
 import { ColorPalette } from "../../../../components/color-palette";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
 
 const colorFamilies = filterColors(["Brown", "Black"]);
@@ -50,7 +50,9 @@ function FamilyColorSelector() {
               "border-white/80": colorFamily === item.value,
             },
           )}
-          onClick={() => setColorFamily(item.value)}
+          onClick={() =>
+            setColorFamily(colorFamily === item.value ? null : item.value)
+          }
         >
           <div
             className="size-2.5 shrink-0 rounded-full"
@@ -187,7 +189,13 @@ function BrightnessSlider() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { colorFamily, selectedPattern } = useEyebrowsContext();
+  const {
+    colorFamily,
+    setColorFamily,
+    selectedColor,
+    setSelectedColor,
+    selectedPattern,
+  } = useEyebrowsContext();
 
   const { data, isLoading } = useEyebrowsQuery({
     color: colorFamily,
@@ -195,6 +203,28 @@ function ProductList() {
       ? getPatternByIndex("eyebrows", parseInt(selectedPattern)).value
       : null,
   });
+
+  const { setEyebrowsColor, setEyebrowsPattern, setShowEyebrows } = useMakeup();
+
+  useEffect(() => {
+    setEyebrowsColor(selectedColor || "#ffffff");
+    setEyebrowsPattern(parseInt(selectedPattern || "0"));
+    setShowEyebrows(selectedColor != null && selectedPattern != null);
+  }, [selectedColor, selectedPattern]);
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+  };
 
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
@@ -208,6 +238,7 @@ function ProductList() {
               key={product.id}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}
+              onClick={() => handleProductClick(product)}
             />
           );
         })

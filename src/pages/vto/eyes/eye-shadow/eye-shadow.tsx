@@ -10,6 +10,7 @@ import { EyeShadowProvider, useEyeShadowContext } from "./eye-shadow-context";
 import { useEyeshadowsQuery } from "./eye-shadow-query";
 import { ColorPalette } from "../../../../components/color-palette";
 import { Product } from "../../../../api/shared";
+import { useMakeup } from "../../../../context/makeup-context";
 
 export function EyeShadowSelector() {
   return (
@@ -219,13 +220,50 @@ function ModeSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { selectedTexture, selectedColors } = useEyeShadowContext();
+  const {
+    selectedTexture,
+    selectedColors,
+    setSelectedColors,
+    setSelectedTexture,
+    selectedMode,
+    modeIndex,
+  } = useEyeShadowContext();
 
   const { data, isLoading } = useEyeshadowsQuery({
     color: null,
     hexcodes: selectedColors,
     texture: selectedTexture,
   });
+
+  const {
+    setEyeShadowColor,
+    setEyeShadowPattern,
+    setEyeShadowMaterial,
+    setEyeShadowMode,
+  } = useMakeup();
+
+  useEffect(() => {
+    setEyeShadowColor(selectedColors);
+    setEyeShadowPattern(modeIndex);
+    var materialIndex = textures.findIndex((e) => e.value == selectedTexture);
+    setEyeShadowMaterial(materialIndex != -1 ? materialIndex : 0);
+    setEyeShadowMode(selectedMode as "One" | "Dual" | "Tri" | "Quad" | "Penta");
+  }, [selectedColors, modeIndex, selectedMode, selectedTexture]);
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setSelectedColors(
+      product.custom_attributes
+        .find((item) => item.attribute_code === "hexacode")
+        ?.value.split(",")[0],
+    );
+    setSelectedTexture(
+      product.custom_attributes
+        .find((item) => item.attribute_code === "texture")
+        ?.value.split(",")[0],
+    );
+  };
 
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
@@ -239,6 +277,7 @@ function ProductList() {
               key={product.id}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}
+              onClick={() => handleProductClick(product)}
             />
           );
         })

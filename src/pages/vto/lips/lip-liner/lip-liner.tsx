@@ -9,7 +9,7 @@ import { useLipLinerContext } from "./lip-liner-context";
 import { useLipLinerQuery } from "./lip-liner-query";
 import { ColorPalette } from "../../../../components/color-palette";
 import { Product } from "../../../../api/shared";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function LipLinerSelector() {
   return (
@@ -28,32 +28,37 @@ export function LipLinerSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useLipLinerContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useLipLinerContext();
   return (
     <div
       className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
       data-mode="lip-color"
     >
-      {colors.map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() => setColorFamily(item.value)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.hex,
-            }}
-          />
-          <span className="text-[0.625rem]">{item.label}</span>
-        </button>
-      ))}
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily === item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
@@ -163,13 +168,53 @@ function SizeSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { colorFamily, selectedSize: selectedShade } = useLipLinerContext();
+  const {
+    colorFamily,
+    setColorFamily,
+    selectedColor,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+    selectedSize: selectedShade,
+  } = useLipLinerContext();
 
   const { data, isLoading } = useLipLinerQuery({
     color: colorFamily,
     sub_color: null,
     texture: null,
   });
+
+  const { setLiplinerColor, setLiplinerPattern, setShowLipliner } = useMakeup();
+
+  useEffect(() => {
+    setLiplinerColor(selectedColor || "#ffffff");
+    const pattern = lipLinerSizes.findIndex((s) => s == selectedShade);
+    setLiplinerPattern(pattern != -1 ? pattern : 1);
+    setShowLipliner(selectedColor != null);
+  }, [selectedColor, selectedShade]);
+
+  if (colorFamilyToInclude == null && data?.items != null) {
+    setColorFamilyToInclude(
+      data.items.map(
+        (d) =>
+          d.custom_attributes.find((c) => c.attribute_code === "color")?.value,
+      ),
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+  };
 
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
@@ -183,6 +228,7 @@ function ProductList() {
               key={product.id}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}
+              onClick={() => handleProductClick(product)}
             />
           );
         })

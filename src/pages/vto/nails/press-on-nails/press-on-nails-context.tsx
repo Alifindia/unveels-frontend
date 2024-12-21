@@ -5,6 +5,8 @@ interface PressOnNailsContextType {
   setColorFamily: (color: string | null) => void;
   selectedColor: string | null;
   setSelectedColor: (color: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
   selectedShape: string | null;
   setSelectedShape: (shape: string | null) => void;
 }
@@ -22,6 +24,7 @@ export function PressOnNailsProvider({
 }) {
   const [colorFamily, setColorFamily] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
   const [selectedTexture, setSelectedTexture] = useState<string | null>(null);
   const [selectedShape, setSelectedShape] = useState<string | null>(null);
 
@@ -32,6 +35,8 @@ export function PressOnNailsProvider({
         setColorFamily,
         selectedColor,
         setSelectedColor,
+        colorFamilyToInclude,
+        setColorFamilyToInclude,
         selectedShape,
         setSelectedShape,
       }}

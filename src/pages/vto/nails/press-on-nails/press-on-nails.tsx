@@ -33,14 +33,16 @@ export function PressOnNailsSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = usePressOnNailsContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } = usePressOnNailsContext();
 
   return (
     <div
       className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
       data-mode="lip-color"
     >
-      {colors.map((item, index) => (
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
         <button
           type="button"
           className={clsx(
@@ -49,7 +51,7 @@ function FamilyColorSelector() {
               "border-white/80": colorFamily === item.value,
             },
           )}
-          onClick={() => setColorFamily(item.value)}
+          onClick={() => setColorFamily(colorFamily === item.value ? null : item.value)}
         >
           <div
             className="size-2.5 shrink-0 rounded-full"
@@ -156,12 +158,40 @@ function ShapeSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { colorFamily, selectedShape } = usePressOnNailsContext();
+  const { colorFamily, setColorFamily, setSelectedColors, setSelectedTexture, colorFamilyToInclude, setColorFamilyToInclude, selectedShape } = usePressOnNailsContext();
 
   const { data, isLoading } = usePressOnNailsQuery({
     color: colorFamily,
     shape: selectedShape,
   });
+
+  if (colorFamilyToInclude == null && data?.items != null) {
+    setColorFamilyToInclude(
+      data.items.map(
+        (d) =>
+          d.custom_attributes.find((c) => c.attribute_code === "color")?.value,
+      ),
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColors([
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    ]);
+    setSelectedTexture(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "texture",
+      )?.value,
+    );
+  };
 
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
@@ -175,6 +205,7 @@ function ProductList() {
               key={product.id}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}
+              onClick={() => handleProductClick(product)}
             />
           );
         })

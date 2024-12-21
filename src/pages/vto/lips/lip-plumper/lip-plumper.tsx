@@ -9,7 +9,7 @@ import { useLipPlumperContext } from "./lip-plumper-context";
 import { useLipPlumperQuery } from "./lip-plumper-query";
 import { ColorPalette } from "../../../../components/color-palette";
 import { Product } from "../../../../api/shared";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function LipPlumperSelector() {
   return (
@@ -123,12 +123,34 @@ function TextureSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { selectedColor, selectedTexture } = useLipPlumperContext();
+  const { selectedColor, setSelectedColor, selectedTexture, setSelectedTexture } = useLipPlumperContext();
 
   const { data, isLoading } = useLipPlumperQuery({
     hexacode: selectedColor,
     texture: selectedTexture,
   });
+
+  const { setShowLipplumper, setLipplumperColor } = useMakeup();
+
+  useEffect(() => {
+    setLipplumperColor(selectedColor || "#ffffff");
+    setShowLipplumper(selectedColor != null);
+  }, [selectedColor]);
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+    setSelectedTexture(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "texture",
+      )?.value,
+    );
+  };
 
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
@@ -142,6 +164,7 @@ function ProductList() {
               key={product.id}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}
+              onClick={() => handleProductClick(product)}
             />
           );
         })

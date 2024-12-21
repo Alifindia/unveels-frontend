@@ -21,7 +21,7 @@ export function SingleMascaraSelector({ product }: { product: Product }) {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useMascaraContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } = useMascaraContext();
 
   return (
     <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
@@ -35,7 +35,7 @@ function FamilyColorSelector() {
               "border-white/80": colorFamily === item.value,
             },
           )}
-          onClick={() => setColorFamily(item.value)}
+          onClick={() => setColorFamily(colorFamily === item.value ? null : item.value)}
         >
           <div
             className="size-2.5 shrink-0 rounded-full"

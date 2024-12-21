@@ -9,7 +9,8 @@ import { patterns } from "../../../../api/attributes/pattern";
 import { LoadingProducts } from "../../../../components/loading";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { Product } from "../../../../api/shared";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useMakeup } from "../../../../context/makeup-context";
 
 export function EyeLinerSelector() {
   return (
@@ -28,33 +29,38 @@ export function EyeLinerSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useEyeLinerContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useEyeLinerContext();
 
   return (
     <div
       className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
       data-mode="lip-color"
     >
-      {colors.map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() => setColorFamily(item.value)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.hex,
-            }}
-          />
-          <span className="text-[0.625rem]">{item.label}</span>
-        </button>
-      ))}
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily === item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
@@ -153,12 +159,54 @@ function ShapeSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { colorFamily, selectedShape } = useEyeLinerContext();
+  const {
+    colorFamily,
+    setColorFamily,
+    selectedColor,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+    selectedShape,
+  } = useEyeLinerContext();
 
   const { data, isLoading } = useEyelinerQuery({
     color: colorFamily,
-    pattern: selectedShape,
+    pattern: null,
   });
+
+  const { setEyelinerColor, setEyelinerPattern, setShowEyeliner } = useMakeup();
+
+  useEffect(() => {
+    setEyelinerColor(selectedColor || "#ffffff");
+    var pattern = patterns["eyeliners"].findIndex(
+      (e) => e.value == selectedShape,
+    );
+    setEyelinerPattern(pattern != -1 ? pattern : 0);
+    setShowEyeliner(selectedColor != null);
+  }, [selectedColor, selectedShape]);
+
+  if (colorFamilyToInclude == null && data?.items != null) {
+    setColorFamilyToInclude(
+      data.items.map(
+        (d) =>
+          d.custom_attributes.find((c) => c.attribute_code === "color")?.value,
+      ),
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+  };
 
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
@@ -172,6 +220,7 @@ function ProductList() {
               key={product.id}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}
+              onClick={() => handleProductClick(product)}
             />
           );
         })

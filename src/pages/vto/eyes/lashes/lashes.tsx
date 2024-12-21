@@ -157,6 +157,11 @@ function ProductList() {
     pattern: selectedPattern,
   });
 
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+  };
+
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
       {isLoading ? (
@@ -169,6 +174,7 @@ function ProductList() {
               key={product.id}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}
+              onClick={() => handleProductClick(product)}
             />
           );
         })

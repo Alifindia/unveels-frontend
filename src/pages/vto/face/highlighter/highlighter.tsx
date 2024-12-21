@@ -23,6 +23,7 @@ import { LoadingProducts } from "../../../../components/loading";
 import { filterTextures } from "../../../../api/attributes/texture";
 import { useFaceHighlighterQuery } from "./highlighter-query";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
+import { SetStateAction, useState } from "react";
 
 export function HighlighterSelector() {
   return (
@@ -188,12 +189,29 @@ function ShapeSelector() {
 }
 
 function ProductList() {
-  const { selectedTexture, selectedColor } = useHighlighterContext();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const { selectedTexture, selectedColor, setSelectedColor, setSelectedTexture } = useHighlighterContext();
 
   const { data, isLoading } = useFaceHighlighterQuery({
     hexacode: selectedColor,
     texture: selectedTexture,
   });
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+    setSelectedTexture(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "texture",
+      )?.value,
+    );
+  };
 
   return (
     <div className="flex w-full gap-2 overflow-x-auto no-scrollbar active:cursor-grabbing sm:gap-4">
@@ -201,7 +219,15 @@ function ProductList() {
         <LoadingProducts />
       ) : (
         data?.items.map((product, index) => {
-          return <VTOProductCard product={product} key={product.id} />;
+          return (
+            <VTOProductCard
+              product={product}
+              key={product.id}
+              selectedProduct={selectedProduct}
+              setSelectedProduct={setSelectedProduct}
+              onClick={() => handleProductClick(product)}
+            />
+          );
         })
       )}
     </div>
