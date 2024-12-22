@@ -27,12 +27,14 @@ import { Rnd } from "react-rnd";
 
 interface BeforeAfterCanvasProps {
   image: HTMLImageElement | HTMLVideoElement;
-  mode: "IMAGE" | "VIDEO";
+  mode: "IMAGE" | "VIDEO" | "LIVE";
   canvasRef: React.RefObject<HTMLCanvasElement>;
 }
 
 function BeforeAfterCanvas({ image, canvasRef, mode }: BeforeAfterCanvasProps) {
   useEffect(() => {
+    console.log("Canvas mode:", mode, "Image element:", image);
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -58,9 +60,14 @@ function BeforeAfterCanvas({ image, canvasRef, mode }: BeforeAfterCanvasProps) {
       let imgAspect = 0;
       if (mode === "IMAGE" && image instanceof HTMLImageElement) {
         imgAspect = image.naturalWidth / image.naturalHeight;
-      } else if (mode === "VIDEO" && image instanceof HTMLVideoElement) {
+      } else if (
+        (mode === "VIDEO" || mode == "LIVE") &&
+        image instanceof HTMLVideoElement
+      ) {
         imgAspect = image.videoWidth / image.videoHeight;
       }
+
+      console.log(imgAspect);
 
       const canvasAspect = width / height;
 
@@ -93,7 +100,10 @@ function BeforeAfterCanvas({ image, canvasRef, mode }: BeforeAfterCanvasProps) {
       );
       ctx.restore();
 
-      if (mode === "VIDEO" && image instanceof HTMLVideoElement) {
+      if (
+        (mode === "VIDEO" || mode === "LIVE") &&
+        image instanceof HTMLVideoElement
+      ) {
         animationFrameId = requestAnimationFrame(draw);
       }
     };
@@ -113,7 +123,7 @@ function BeforeAfterCanvas({ image, canvasRef, mode }: BeforeAfterCanvasProps) {
     startRendering();
 
     return () => {
-      if (mode === "VIDEO") {
+      if (mode === "VIDEO" || mode === "LIVE") {
         cancelAnimationFrame(animationFrameId);
       }
       if (mode === "IMAGE") {
@@ -125,11 +135,18 @@ function BeforeAfterCanvas({ image, canvasRef, mode }: BeforeAfterCanvasProps) {
   return null;
 }
 
-export function VirtualTryOnScene() {
+export function VirtualTryOnScene({
+  mediaFile,
+  mode = "LIVE",
+}: {
+  mediaFile: File | null;
+  mode: "IMAGE" | "VIDEO" | "LIVE";
+}) {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const beforeAfterCanvasRef = useRef<HTMLCanvasElement>(null);
-  const mode = "VIDEO";
+  const imageUploadRef = useRef<HTMLImageElement>(null);
+  const videoUploadRef = useRef<HTMLVideoElement>(null);
 
   const [error, setError] = useState<Error | null>(null);
 
@@ -368,8 +385,53 @@ export function VirtualTryOnScene() {
   return (
     <div className="fixed inset-0 flex items-center justify-center">
       {webcamRef.current &&
-      webcamRef.current.video &&
-      webcamRef.current.video.readyState === 4 ? (
+        webcamRef.current.video &&
+        webcamRef.current.video.readyState === 4 &&
+        mode == "LIVE" && (
+          <Rnd
+            style={{
+              display: criterias.isCompare ? "flex" : "none",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#f0f0f0",
+              zIndex: 9999,
+              position: "absolute",
+              left: 0,
+              top: 0,
+              height: "100%",
+              width: "50%",
+              overflow: "hidden",
+              borderRight: "2px solid black",
+            }}
+            default={{
+              x: 0,
+              y: 0,
+              width: "50%",
+              height: "100%",
+            }}
+            enableResizing={{
+              top: false,
+              right: true,
+              bottom: false,
+              left: false,
+            }}
+            disableDragging={true}
+          >
+            <canvas
+              ref={beforeAfterCanvasRef}
+              className="pointer-events-none absolute left-0 top-0 h-full w-screen"
+              style={{ zIndex: 50 }}
+            >
+              <BeforeAfterCanvas
+                mode={mode}
+                image={webcamRef.current.video}
+                canvasRef={beforeAfterCanvasRef}
+              />
+            </canvas>
+          </Rnd>
+        )}
+
+      {videoUploadRef.current && mode == "VIDEO" && (
         <Rnd
           style={{
             display: criterias.isCompare ? "flex" : "none",
@@ -404,16 +466,78 @@ export function VirtualTryOnScene() {
             className="pointer-events-none absolute left-0 top-0 h-full w-screen"
             style={{ zIndex: 50 }}
           >
-            {/* Komponen untuk menggambar gambar di overlay canvas */}
             <BeforeAfterCanvas
               mode={mode}
-              image={webcamRef.current.video}
+              image={videoUploadRef.current}
               canvasRef={beforeAfterCanvasRef}
             />
           </canvas>
         </Rnd>
-      ) : (
-        <></>
+      )}
+
+      {imageUploadRef.current && mode == "IMAGE" && (
+        <Rnd
+          style={{
+            display: criterias.isCompare ? "flex" : "none",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#f0f0f0",
+            zIndex: 9999,
+            position: "absolute",
+            left: 0,
+            top: 0,
+            height: "100%",
+            width: "50%",
+            overflow: "hidden",
+            borderRight: "2px solid black",
+          }}
+          default={{
+            x: 0,
+            y: 0,
+            width: "50%",
+            height: "100%",
+          }}
+          enableResizing={{
+            top: false,
+            right: true,
+            bottom: false,
+            left: false,
+          }}
+          disableDragging={true}
+        >
+          <canvas
+            ref={beforeAfterCanvasRef}
+            className="pointer-events-none absolute left-0 top-0 h-full w-screen"
+            style={{ zIndex: 50 }}
+          >
+            <BeforeAfterCanvas
+              mode={mode}
+              image={imageUploadRef.current}
+              canvasRef={beforeAfterCanvasRef}
+            />
+          </canvas>
+        </Rnd>
+      )}
+
+      {mode == "IMAGE" && mediaFile && (
+        <img
+          className="hidden"
+          ref={imageUploadRef}
+          src={URL.createObjectURL(mediaFile)}
+          onLoad={() => console.log("Image loaded")}
+        />
+      )}
+
+      {mode == "VIDEO" && mediaFile && (
+        <video
+          className="hidden"
+          ref={videoUploadRef}
+          src={URL.createObjectURL(mediaFile)}
+          controls
+          autoPlay
+          loop
+          onLoad={() => console.log("Image loaded")}
+        />
       )}
 
       {/* 3D Canvas */}
@@ -437,12 +561,18 @@ export function VirtualTryOnScene() {
         <HDREnvironment hdrPath={HDR_MAKEUP} onLoaded={setEnvMapMakeup} />
 
         <VirtualTryOnThreeScene
-          videoRef={webcamRef}
+          videoRef={
+            mode === "IMAGE"
+              ? imageUploadRef
+              : mode === "VIDEO"
+                ? videoUploadRef
+                : webcamRef
+          }
           landmarks={landmarksRef}
           handlandmarks={handLandmarksRef}
           faceTransform={faceTransformRef}
           blendshape={blendshapeRef}
-          //hairMask={hairMaskRef}
+          sourceType={mode}
         />
       </Canvas>
 

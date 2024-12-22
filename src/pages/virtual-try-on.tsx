@@ -153,8 +153,9 @@ export function VirtualTryOn() {
 
 function Main() {
   const { criterias } = useCamera();
-
   const [isMainContentVisible, setMainContentVisible] = useState(true);
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
 
   return (
     <>
@@ -174,7 +175,7 @@ function Main() {
       )}
       <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
         <div className="absolute inset-0">
-          <VirtualTryOnScene />
+          <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
           <div className="pointer-events-none absolute inset-0"></div>
         </div>
         <TopNavigation item={false} cart={false} />
@@ -182,6 +183,8 @@ function Main() {
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
           <Sidebar
             onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
+            setMediaFile={setMediaFile}
+            setMode={setMode}
           />
           <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
             {isMainContentVisible && <MainContent />}
@@ -532,24 +535,17 @@ export function TopNavigation({
 
 interface SidebarProps {
   onExpandClick: () => void;
+  setMediaFile: (file: File | null) => void;
+  setMode: (mode: "IMAGE" | "VIDEO" | "LIVE") => void;
 }
 
-function Sidebar({ onExpandClick }: SidebarProps) {
+function Sidebar({ onExpandClick, setMediaFile, setMode }: SidebarProps) {
   const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
 
   return (
     <div className="pointer-events-none flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
       <div className="relative p-0.5">
-        <div
-          className="absolute inset-0 rounded-full border-2 border-transparent"
-          style={{
-            background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
-            "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-            mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-            "-webkit-mask-composite": "destination-out",
-            "mask-composite": "exclude",
-          }}
-        />
+        <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 
         <div className="flex flex-col gap-4 rounded-full bg-black/25 px-1.5 py-2 backdrop-blur-md">
           <button className="" onClick={screenShoot}>
@@ -564,10 +560,8 @@ function Sidebar({ onExpandClick }: SidebarProps) {
           <button className="" onClick={compareCapture}>
             <Icons.compare className="size-4 text-white sm:size-6" />
           </button>
-          <button className="">
-            <Icons.reset className="size-4 text-white sm:size-6" />
-          </button>
-          <UploadMediaDialog />
+          <UploadMediaDialog setMediaFile={setMediaFile} setMode={setMode} />{" "}
+          {/* Pass setMediaFile */}
           <button>
             <Icons.share className="size-4 text-white sm:size-6" />
           </button>
@@ -577,7 +571,29 @@ function Sidebar({ onExpandClick }: SidebarProps) {
   );
 }
 
-function UploadMediaDialog() {
+function UploadMediaDialog({
+  setMediaFile,
+  setMode,
+}: {
+  setMediaFile: (file: File | null) => void;
+  setMode: (mode: string) => void;
+}) {
+  const handleUploadPhoto = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      setMode("IMAGE");
+      setMediaFile(file);
+    }
+  };
+
+  const handleUploadVideo = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      setMode("VIDEO");
+      setMediaFile(file);
+    }
+  };
+
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
@@ -590,12 +606,19 @@ function UploadMediaDialog() {
         <Dialog.Content className="data-[state=open]:animate-contentShow fixed left-1/2 top-1/2 flex max-h-[85vh] w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col justify-center rounded-lg bg-[#0000002E] px-2 py-4 text-white backdrop-blur">
           <div className="flex w-full flex-col justify-center">
             <Dialog.Title className="mb-2 text-center text-[14px] text-white">
-              How would you like to try on the makeup ?
+              How would you like to try on the makeup?
             </Dialog.Title>
             <div className="grid grid-cols-3 gap-2">
-              <button className="upload-photo flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur">
+              <button
+                className="upload-photo flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur"
+                onClick={() => {
+                  const photoInput = document.getElementById("photoInput");
+                  if (photoInput) {
+                    photoInput.click();
+                  }
+                }}
+              >
                 <Icons.uploadPhoto className="size-5 text-white" />
-
                 <p className="mt-2 text-center text-[12px] text-white">
                   Upload Photo
                 </p>
@@ -603,9 +626,24 @@ function UploadMediaDialog() {
                   Upload a photo of yourself to see how different makeup shades
                   look on you.
                 </p>
+                <input
+                  id="photoInput"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadPhoto}
+                  style={{ display: "none" }}
+                />
               </button>
 
-              <button className="upload-video flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur">
+              <button
+                className="upload-video flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur"
+                onClick={() => {
+                  const videoInput = document.getElementById("videoInput");
+                  if (videoInput) {
+                    videoInput.click();
+                  }
+                }}
+              >
                 <Icons.uploadVideo className="size-5 text-white" />
                 <p className="mt-2 text-center text-[12px] text-white">
                   Upload Video
@@ -614,6 +652,13 @@ function UploadMediaDialog() {
                   Upload a video to apply makeup dynamically and see how they
                   look in motion.
                 </p>
+                <input
+                  id="videoInput"
+                  type="file"
+                  accept="video/*"
+                  onChange={handleUploadVideo}
+                  style={{ display: "none" }}
+                />
               </button>
 
               <button className="choose-model flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur">
