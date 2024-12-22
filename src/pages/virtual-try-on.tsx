@@ -154,23 +154,42 @@ export function VirtualTryOn() {
 function Main() {
   const { criterias } = useCamera();
 
-  return (
-    <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
-      <div className="absolute inset-0">
-        <VirtualTryOnScene />
-        <div className="pointer-events-none absolute inset-0"></div>
-      </div>
-      {/* <RecorderStatus /> */}
-      <TopNavigation item={false} cart={false} />
+  const [isMainContentVisible, setMainContentVisible] = useState(true);
 
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-        <Sidebar />
-        <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
-          <MainContent />
-          <Footer />
+  return (
+    <>
+      {criterias.screenshotImage && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 10,
+          }}
+        >
+          <ScreenshotPreview />
+        </div>
+      )}
+      <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+        <div className="absolute inset-0">
+          <VirtualTryOnScene />
+          <div className="pointer-events-none absolute inset-0"></div>
+        </div>
+        <TopNavigation item={false} cart={false} />
+
+        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
+          <Sidebar
+            onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
+          />
+          <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
+            {isMainContentVisible && <MainContent />}
+            <Footer />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -458,51 +477,6 @@ function BottomContent() {
   return <Outlet />;
 }
 
-function RecorderStatus() {
-  const { isRecording, formattedTime, handleStartPause, handleStop, isPaused } =
-    useRecordingControls();
-  const { finish } = useCamera();
-
-  return (
-    <div className="absolute inset-x-0 top-14 flex items-center justify-center gap-4">
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={handleStartPause}
-      >
-        {isPaused ? (
-          <CirclePlay className="size-6 text-white" />
-        ) : isRecording ? (
-          <PauseCircle className="size-6 text-white" />
-        ) : null}
-      </button>
-      <span className="relative flex size-4">
-        {isRecording ? (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-        ) : null}
-        <span className="relative inline-flex size-4 rounded-full bg-red-500"></span>
-      </span>
-      <div className="font-serif text-white">{formattedTime}</div>
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={
-          isRecording
-            ? () => {
-                handleStop();
-                finish();
-              }
-            : handleStartPause
-        }
-      >
-        {isRecording || isPaused ? (
-          <StopCircle className="size-6 text-white" />
-        ) : (
-          <CirclePlay className="size-6 text-white" />
-        )}
-      </button>
-    </div>
-  );
-}
-
 export function TopNavigation({
   item = false,
   cart = false,
@@ -556,7 +530,11 @@ export function TopNavigation({
   );
 }
 
-function Sidebar() {
+interface SidebarProps {
+  onExpandClick: () => void;
+}
+
+function Sidebar({ onExpandClick }: SidebarProps) {
   const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
 
   return (
@@ -564,15 +542,13 @@ function Sidebar() {
       <div className="relative p-0.5">
         <div
           className="absolute inset-0 rounded-full border-2 border-transparent"
-          style={
-            {
-              background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
-              "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-              mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-              "-webkit-mask-composite": "destination-out",
-              "mask-composite": "exclude",
-            } as CSSProperties
-          }
+          style={{
+            background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
+            "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+            mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+            "-webkit-mask-composite": "destination-out",
+            "mask-composite": "exclude",
+          }}
         />
 
         <div className="flex flex-col gap-4 rounded-full bg-black/25 px-1.5 py-2 backdrop-blur-md">
@@ -582,10 +558,10 @@ function Sidebar() {
           <button className="">
             <Icons.flipCamera className="size-4 text-white sm:size-6" />
           </button>
-          <button className="">
+          <button className="" onClick={onExpandClick}>
             <Icons.expand className="size-4 text-white sm:size-6" />
           </button>
-          <button className="">
+          <button className="" onClick={compareCapture}>
             <Icons.compare className="size-4 text-white sm:size-6" />
           </button>
           <button className="">

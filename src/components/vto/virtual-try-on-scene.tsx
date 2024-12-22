@@ -23,10 +23,114 @@ import { useAccesories } from "../../context/accesories-context";
 import HDREnvironment from "../three/hdr-environment";
 import { Blendshape } from "../../types/blendshape";
 import { useMakeup } from "../../context/makeup-context";
+import { Rnd } from "react-rnd";
+
+interface BeforeAfterCanvasProps {
+  image: HTMLImageElement | HTMLVideoElement;
+  mode: "IMAGE" | "VIDEO";
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+}
+
+function BeforeAfterCanvas({ image, canvasRef, mode }: BeforeAfterCanvasProps) {
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      console.error("Gagal mendapatkan konteks 2D untuk overlay canvas.");
+      return;
+    }
+
+    let animationFrameId: number;
+
+    const setupCanvasSize = () => {
+      const { innerWidth: width, innerHeight: height } = window;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+    };
+
+    const draw = () => {
+      const { innerWidth: width, innerHeight: height } = window;
+
+      let imgAspect = 0;
+      if (mode === "IMAGE" && image instanceof HTMLImageElement) {
+        imgAspect = image.naturalWidth / image.naturalHeight;
+      } else if (mode === "VIDEO" && image instanceof HTMLVideoElement) {
+        imgAspect = image.videoWidth / image.videoHeight;
+      }
+
+      const canvasAspect = width / height;
+
+      let drawWidth: number;
+      let drawHeight: number;
+      let offsetX: number;
+      let offsetY: number;
+
+      if (imgAspect < canvasAspect) {
+        drawWidth = width;
+        drawHeight = width / imgAspect;
+        offsetX = 0;
+        offsetY = (height - drawHeight) / 2;
+      } else {
+        drawWidth = height * imgAspect;
+        drawHeight = height;
+        offsetX = (width - drawWidth) / 2;
+        offsetY = 0;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.scale(-1, 1);
+      ctx.drawImage(
+        image,
+        -offsetX - drawWidth,
+        offsetY,
+        drawWidth,
+        drawHeight,
+      );
+      ctx.restore();
+
+      if (mode === "VIDEO" && image instanceof HTMLVideoElement) {
+        animationFrameId = requestAnimationFrame(draw);
+      }
+    };
+
+    const startRendering = () => {
+      setupCanvasSize();
+      draw();
+
+      if (mode === "IMAGE") {
+        window.addEventListener("resize", () => {
+          setupCanvasSize();
+          draw();
+        });
+      }
+    };
+
+    startRendering();
+
+    return () => {
+      if (mode === "VIDEO") {
+        cancelAnimationFrame(animationFrameId);
+      }
+      if (mode === "IMAGE") {
+        window.removeEventListener("resize", setupCanvasSize);
+      }
+    };
+  }, [image, canvasRef, mode]);
+
+  return null;
+}
 
 export function VirtualTryOnScene() {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const beforeAfterCanvasRef = useRef<HTMLCanvasElement>(null);
+  const mode = "VIDEO";
+
   const [error, setError] = useState<Error | null>(null);
 
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
@@ -263,6 +367,55 @@ export function VirtualTryOnScene() {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center">
+      {webcamRef.current &&
+      webcamRef.current.video &&
+      webcamRef.current.video.readyState === 4 ? (
+        <Rnd
+          style={{
+            display: criterias.isCompare ? "flex" : "none",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#f0f0f0",
+            zIndex: 9999,
+            position: "absolute",
+            left: 0,
+            top: 0,
+            height: "100%",
+            width: "50%",
+            overflow: "hidden",
+            borderRight: "2px solid black",
+          }}
+          default={{
+            x: 0,
+            y: 0,
+            width: "50%",
+            height: "100%",
+          }}
+          enableResizing={{
+            top: false,
+            right: true,
+            bottom: false,
+            left: false,
+          }}
+          disableDragging={true}
+        >
+          <canvas
+            ref={beforeAfterCanvasRef}
+            className="pointer-events-none absolute left-0 top-0 h-full w-screen"
+            style={{ zIndex: 50 }}
+          >
+            {/* Komponen untuk menggambar gambar di overlay canvas */}
+            <BeforeAfterCanvas
+              mode={mode}
+              image={webcamRef.current.video}
+              canvasRef={beforeAfterCanvasRef}
+            />
+          </canvas>
+        </Rnd>
+      ) : (
+        <></>
+      )}
+
       {/* 3D Canvas */}
       <Canvas
         className="absolute left-0 top-0 h-full w-full"

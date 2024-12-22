@@ -259,10 +259,10 @@ function App() {
 
   const router = import.meta.env.DEV
     ? createMemoryRouter(routes, {
-        initialEntries: [window.__INITIAL_ROUTE__ || "/"],
+        initialEntries: [window.__INITIAL_ROUTE__ || "/virtual-try-on"],
       })
     : createMemoryRouter(routes, {
-        initialEntries: [window.__INITIAL_ROUTE__ || "/"],
+        initialEntries: [window.__INITIAL_ROUTE__ || "/virtual-try-on"],
       });
   return <RouterProvider router={router} />;
 }
