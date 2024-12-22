@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { Icons } from "../../../../components/icons";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { filterTextures } from "../../../../api/attributes/texture";
 import { ColorPalette } from "../../../../components/color-palette";
 import { LoadingProducts } from "../../../../components/loading";
@@ -271,19 +271,35 @@ function ShadesSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { selectedTexture, setSelectedColors, setSelectedTexture } = useBlushContext();
+  const {
+    selectedColors,
+    selectedTexture,
+    setSelectedColors,
+    setSelectedTexture,
+    selectedMode,
+  } = useBlushContext();
 
-  const { data, isLoading } = useBlushQuery({
+  const { setShowBlush, setBlushColor, setBlushMode, setBlushMaterial } =
+    useMakeup();
+
+    const { data, isLoading } = useBlushQuery({
     texture: selectedTexture,
   });
+
+  useEffect(() => {
+    setBlushColor(selectedColors);
+    setBlushMode(selectedMode as "One" | "Dual" | "Tri");
+    setBlushMaterial(textures.findIndex((item) => item.value === selectedTexture));
+    setShowBlush(selectedColors.length > 0);
+  }, [selectedColors, selectedMode, selectedColors]);
 
   const handleProductClick = (product: Product) => {
     console.log(product);
     setSelectedProduct(product);
     setSelectedColors([
-      product.custom_attributes.find(
-        (item) => item.attribute_code === "hexacode",
-      )?.value,
+      product.custom_attributes
+        .find((item) => item.attribute_code === "hexacode")
+        ?.value.split(",")[0],
     ]);
     setSelectedTexture(
       product.custom_attributes.find(

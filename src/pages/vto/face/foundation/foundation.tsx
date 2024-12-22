@@ -11,7 +11,7 @@ import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useFoundationContext } from "./foundation-context";
 import { useFoundationQuery } from "./foundation-query";
 import { Product } from "../../../../api/shared";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function FoundationSelector() {
   return (
@@ -30,33 +30,36 @@ export function FoundationSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useFoundationContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useFoundationContext();
 
   return (
     <div
       className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
       data-mode="lip-color"
     >
-      {skin_tones.map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
-            {
-              "border-white/80": colorFamily === item.id,
-            },
-          )}
-          onClick={() => setColorFamily(item.id)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.color,
-            }}
-          />
-          <span className="text-[9.8px] sm:text-sm">{item.name}</span>
-        </button>
-      ))}
+      {skin_tones
+        .filter((c) => colorFamilyToInclude?.includes(c.id))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
+              {
+                "border-white/80": colorFamily === item.id,
+              },
+            )}
+            onClick={() => setColorFamily(colorFamily == item.id ? null : item.id)}
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.color,
+              }}
+            />
+            <span className="text-[9.8px] sm:text-sm">{item.name}</span>
+          </button>
+        ))}
     </div>
   );
 }
@@ -163,22 +166,43 @@ function ProductList() {
   const {
     colorFamily,
     setColorFamily,
+    selectedColor,
     setSelectedColor,
     setSelectedTexture,
     selectedTexture,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
   } = useFoundationContext();
+
+  const { setShowFoundation, setFoundationColor } = useMakeup();
+
+  useEffect(() => {
+    setFoundationColor(selectedColor ?? "#ffffff");
+    setShowFoundation(selectedColor != null);
+  }, [selectedColor]);
 
   const { data, isLoading } = useFoundationQuery({
     skin_tone: colorFamily,
     texture: selectedTexture,
   });
 
+  if (colorFamilyToInclude == null && data?.items != null) {
+    setColorFamilyToInclude(
+      data.items.map(
+        (d) =>
+          d.custom_attributes.find((c) => c.attribute_code === "skin_tone")
+            ?.value,
+      ),
+    );
+  }
+
   const handleProductClick = (product: Product) => {
     console.log(product);
     setSelectedProduct(product);
     setColorFamily(
-      product.custom_attributes.find((item) => item.attribute_code === "color")
-        ?.value,
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "skin_tone",
+      )?.value,
     );
     setSelectedColor(
       product.custom_attributes.find(

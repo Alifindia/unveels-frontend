@@ -122,6 +122,11 @@ export async function fetchConfigurableProducts(
     items: Array<Product>;
   };
 
+  configrableResponse.items.forEach((item) => {
+    const parentProduct = productFound.find((p) => p.extension_attributes.configurable_product_links?.includes(item.id))
+    item.custom_attributes = [...parentProduct?.custom_attributes ?? [], ...item.custom_attributes,]
+  });
+
   return {
     items: [...filteredResults, ...configrableResponse.items],
   };
@@ -210,6 +215,11 @@ export async function fetchAllProducts(
   const configrableResponse = (await response.json()) as {
     items: Array<Product>;
   };
+
+  configrableResponse.items.forEach((item) => {
+    const parentProduct = productFound.find((p) => p.extension_attributes.configurable_product_links?.includes(item.id))
+    item.custom_attributes = [...parentProduct?.custom_attributes ?? [], ...item.custom_attributes,]
+  });
 
   // Gabungkan hasil produk simple dan configurable menjadi satu array
   const allResults = [...configrableResponse.items];

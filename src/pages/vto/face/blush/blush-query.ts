@@ -69,17 +69,17 @@ export function useBlushQuery({ texture }: { texture: string | null }) {
 
       const filters = [];
 
-      if (texture) {
-        filters.push({
-          filters: [
-            {
-              field: "texture",
-              value: texture,
-              condition_type: "eq",
-            },
-          ],
-        });
-      }
+      // if (texture) {
+      //   filters.push({
+      //     filters: [
+      //       {
+      //         field: "texture",
+      //         value: texture,
+      //         condition_type: "eq",
+      //       },
+      //     ],
+      //   });
+      // }
 
       return fetchConfigurableProducts(
         {

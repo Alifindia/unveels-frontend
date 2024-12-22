@@ -51,7 +51,7 @@ export function useLipPlumperQuery({
       }
 
       if (texture) {
-        simpleFilters.push({
+        configurableFilters.push({
           filters: [
             {
               field: "texture",
@@ -101,18 +101,6 @@ export function useLipPlumperQuery({
               field: "hexacode",
               value: hexacode,
               condition_type: "im",
-            },
-          ],
-        });
-      }
-
-      if (texture) {
-        filters.push({
-          filters: [
-            {
-              field: "texture",
-              value: texture,
-              condition_type: "eq",
             },
           ],
         });

@@ -41,7 +41,7 @@ function FamilyColorSelector() {
               "border-white/80": colorFamily === item.id,
             },
           )}
-          onClick={() => setColorFamily(item.id)}
+          onClick={() => setColorFamily(colorFamily == item.id ? null : item.id)}
         >
           <div
             className="size-2.5 shrink-0 rounded-full"

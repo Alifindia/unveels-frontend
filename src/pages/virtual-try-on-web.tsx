@@ -343,9 +343,6 @@ function Main() {
         <VirtualTryOnScene />
         <div
           className="pointer-events-none absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-          }}
         ></div>
       </div>
     </div>

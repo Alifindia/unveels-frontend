@@ -108,18 +108,6 @@ export function useFaceHighlighterQuery({
         });
       }
 
-      if (texture) {
-        filters.push({
-          filters: [
-            {
-              field: "texture",
-              value: texture,
-              condition_type: "eq",
-            },
-          ],
-        });
-      }
-
       return fetchConfigurableProducts(
         {
           items: combinedResults,

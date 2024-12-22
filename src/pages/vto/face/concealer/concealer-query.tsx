@@ -33,7 +33,7 @@ export function useConcealerQuery({ skin_tone }: { skin_tone: string | null }) {
         simpleFilters.push({
           filters: [
             {
-              field: "skin_tone",
+              field: "color",
               value: skin_tone,
               condition_type: "eq",
             },
@@ -77,7 +77,7 @@ export function useConcealerQuery({ skin_tone }: { skin_tone: string | null }) {
         filters.push({
           filters: [
             {
-              field: "skin_tone",
+              field: "color",
               value: skin_tone,
               condition_type: "eq",
             },

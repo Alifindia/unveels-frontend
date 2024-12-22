@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { Icons } from "../../../../components/icons";
 import { ColorPalette } from "../../../../components/color-palette";
 import { ContourProvider, useContourContext } from "./contour-context";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMakeup } from "../../../../context/makeup-context";
 import { useQuery } from "@tanstack/react-query";
 import { faceMakeupProductTypesFilter } from "../../../../api/attributes/makeups";
@@ -252,11 +252,25 @@ function TextureSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { selectedTexture, setSelectedColors, setSelectedTexture } = useContourContext();
+  const {
+    selectedColors,
+    selectedMode,
+    selectedTexture,
+    setSelectedColors,
+    setSelectedTexture,
+  } = useContourContext();
 
+  const { setContourColors, setContourShape, setShowContour, setContourMode } =
+    useMakeup();
   const { data, isLoading } = useContourQuery({
     texture: selectedTexture,
   });
+
+  useEffect(() => {
+    setContourColors(selectedColors);
+    setContourMode(selectedMode as "One" | "Dual");
+    setShowContour(selectedColors.length > 0);
+  }, [selectedColors, selectedMode, selectedColors]);
 
   const handleProductClick = (product: Product) => {
     console.log(product);
@@ -264,7 +278,7 @@ function ProductList() {
     setSelectedColors([
       product.custom_attributes.find(
         (item) => item.attribute_code === "hexacode",
-      )?.value,
+      )?.value.split(',')[0],
     ]);
     setSelectedTexture(
       product.custom_attributes.find(
