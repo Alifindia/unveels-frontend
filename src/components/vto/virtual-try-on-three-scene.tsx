@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { MeshProps, useFrame, useThree } from "@react-three/fiber";
 import {
   LinearFilter,
@@ -40,6 +40,7 @@ import FoundationNew from "../three/makeup/foundation-new";
 import { Blendshape } from "../../types/blendshape";
 import EyeShadow from "../three/makeup/eyeshadow";
 import Eyeliner from "../three/makeup/eyeliner";
+import { useCamera } from "../../context/recorder-context";
 
 interface VirtualTryOnThreeSceneProps extends MeshProps {
   videoRef: React.RefObject<Webcam>;
@@ -59,10 +60,13 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   //hairMask,
   ...props
 }) => {
+  const { gl } = useThree();
   const flipped = true;
   const { viewport } = useThree();
   const [planeSize, setPlaneSize] = useState<[number, number]>([1, 1]);
   const [videoTexture, setVideoTexture] = useState<VideoTexture | null>(null);
+  const { skinToneThreeSceneRef, setScreenshotImage } = useCamera();
+
   const hairMaskTextureRef = useRef<Texture | null>(null);
 
   const [maskOpacity, setMaskOpacity] = useState(0.5);
@@ -191,6 +195,26 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
       setPlaneSize([planeWidth, planeHeight]);
     }
   }, [videoTexture, viewport, videoRef]);
+
+  // Take screenshoot
+  const handleScreenshot = () => {
+    requestAnimationFrame(() => {
+      const canvas = gl.domElement as HTMLCanvasElement;
+      console.log(canvas);
+      if (canvas) {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const imageUrl = URL.createObjectURL(blob);
+            setScreenshotImage(imageUrl);
+          }
+        });
+      }
+    });
+  };
+
+  useImperativeHandle(skinToneThreeSceneRef, () => ({
+    callFunction: handleScreenshot,
+  }));
 
   // Dispose textures on unmount
   useEffect(() => {
