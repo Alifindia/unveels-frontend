@@ -11,6 +11,8 @@ interface GlassesContextType {
   setSelectedShape: (shape: string | null) => void;
   selectedMaterial: string | null;
   setSelectedMaterial: (material: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
 }
 
 // Create the context
@@ -23,6 +25,7 @@ export function GlassesProvider({ children }: { children: React.ReactNode }) {
   const [selectedMode, setSelectedMode] = useState<string | null>("shapes");
   const [selectedShape, setSelectedShape] = useState<string | null>(null);
   const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
 
   return (
     <GlassesContext.Provider
@@ -37,6 +40,8 @@ export function GlassesProvider({ children }: { children: React.ReactNode }) {
         setSelectedShape,
         selectedMaterial,
         setSelectedMaterial,
+        colorFamilyToInclude,
+        setColorFamilyToInclude,
       }}
     >
       {children}

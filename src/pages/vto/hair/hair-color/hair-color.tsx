@@ -24,7 +24,8 @@ export function HairColorSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily, colorFamilyToInclude } = useHairColorContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useHairColorContext();
 
   return (
     <div
@@ -34,25 +35,27 @@ function FamilyColorSelector() {
       {colors
         .filter((c) => colorFamilyToInclude?.includes(c.value))
         .map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-sm text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() => setColorFamily(colorFamily === item.value ? null : item.value)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.hex,
-            }}
-          />
-          <span className="text-[0.625rem]">{item.label}</span>
-        </button>
-      ))}
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-sm text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily === item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
@@ -121,7 +124,13 @@ function ColorSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { colorFamily } = useHairColorContext();
+  const {
+    colorFamily,
+    setColorFamily,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+  } = useHairColorContext();
 
   const { data, isLoading } = useHairColorQuery({
     color: colorFamily,
@@ -144,15 +153,10 @@ function ProductList() {
       product.custom_attributes.find((item) => item.attribute_code === "color")
         ?.value,
     );
-    setSelectedColors([
+    setSelectedColor(
       product.custom_attributes.find(
         (item) => item.attribute_code === "hexacode",
-      )?.value,
-    ]);
-    setSelectedTexture(
-      product.custom_attributes.find(
-        (item) => item.attribute_code === "texture",
-      )?.value,
+      )?.value.split(",")[0],
     );
   };
 

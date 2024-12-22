@@ -43,27 +43,27 @@ function FamilyColorSelector() {
       {colors
         .filter((c) => colorFamilyToInclude?.includes(c.value))
         .map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() =>
-            setColorFamily(colorFamily === item.value ? null : item.value)
-          }
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.hex,
-            }}
-          />
-          <span className="text-[0.625rem]">{item.label}</span>
-        </button>
-      ))}
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily === item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
@@ -96,24 +96,13 @@ function ColorSelector() {
         </button>
 
         {extracted_sub_colors.map((color, index) => (
-          <button
+          <ColorPalette
             key={color}
-            type="button"
-            className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80",
-              {
-                "border-white/80": selectedColor === color,
-              },
-            )}
-            style={{ background: color }}
-            onClick={() => {
-              if (selectedColor === color) {
-                setSelectedColor(null);
-              } else {
-                setSelectedColor(color);
-              }
-            }}
-          ></button>
+            size="large"
+            palette={{ color }}
+            selected={selectedColor == color}
+            onClick={() => setSelectedColor(color)}
+          />
         ))}
       </div>
     </div>

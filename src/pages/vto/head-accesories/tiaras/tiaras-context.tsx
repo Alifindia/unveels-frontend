@@ -11,6 +11,8 @@ interface TiaraContextType {
   setSelectedOccasion: (shape: string | null) => void;
   selectedMaterial: string | null;
   setSelectedMaterial: (shape: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
 }
 
 // Create the context
@@ -23,6 +25,7 @@ export function TiaraProvider({ children }: { children: React.ReactNode }) {
   const [selectedMode, setSelectedMode] = useState<string | null>("occasions");
   const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
   const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
 
   return (
     <TiaraContext.Provider
@@ -37,6 +40,8 @@ export function TiaraProvider({ children }: { children: React.ReactNode }) {
         setSelectedMaterial,
         selectedOccasion,
         setSelectedOccasion,
+        colorFamilyToInclude,
+        setColorFamilyToInclude,
       }}
     >
       {children}
