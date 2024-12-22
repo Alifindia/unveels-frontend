@@ -10,8 +10,9 @@ import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useFoundationContext } from "../foundation/foundation-context";
 import { LoadingProducts } from "../../../../components/loading";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
+import { colors } from "../../../../api/attributes/color";
 
 export function ConcealerSelector() {
   return (
@@ -34,27 +35,30 @@ function FamilyColorSelector() {
       className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
       data-mode="lip-color"
     >
-      {skin_tones.map((item, index) => (
-        <button
-          key={item.id}
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
-            {
-              "border-white/80": colorFamily === item.id,
-            },
-          )}
-          onClick={() => setColorFamily(item.id)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.color,
-            }}
-          />
-          <span className="text-[9.8px] sm:text-sm">{item.name}</span>
-        </button>
-      ))}
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily === item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
@@ -121,6 +125,7 @@ function ProductList() {
 
   const {
     colorFamily,
+    selectedColor,
     colorFamilyToInclude,
     setColorFamilyToInclude,
     setSelectedColor,
@@ -130,6 +135,14 @@ function ProductList() {
   const { data, isLoading } = useConcealerQuery({
     skin_tone: colorFamily,
   });
+
+  const { setShowConcealer, setConcealerColor } = useMakeup();
+
+  useEffect(() => {
+    setConcealerColor(selectedColor ?? "#ffffff");
+    setShowConcealer(selectedColor != null);
+  }, [selectedColor]);
+
   if (colorFamilyToInclude == null && data?.items != null) {
     setColorFamilyToInclude(
       data.items.map(

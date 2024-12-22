@@ -46,6 +46,18 @@ export function useBronzerQuery({
         });
       }
 
+      if (texture) {
+        configurableFilters.push({
+          filters: [
+            {
+              field: "texture",
+              value: texture,
+              condition_type: "eq",
+            },
+          ],
+        });
+      }
+
       const [simpleResponse, configurableResponse] = await Promise.all([
         fetch(
           baseUrl + "/rest/V1/products?" + buildSearchParams(simpleFilters),
@@ -90,17 +102,6 @@ export function useBronzerQuery({
         });
       }
 
-      if (texture) {
-        filters.push({
-          filters: [
-            {
-              field: "texture",
-              value: texture,
-              condition_type: "eq",
-            },
-          ],
-        });
-      }
 
       return fetchConfigurableProducts(
         {

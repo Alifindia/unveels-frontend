@@ -22,9 +22,9 @@ export function useLenseQuery({
           {
             filters: [
               {
-                field: "lense_makeup_product_type",
+                field: "lenses_product_type",
                 value: "Lenses",
-                condition_type: "eq",
+                condition_type: "notnull",
               },
             ],
           },

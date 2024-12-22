@@ -34,18 +34,6 @@ export function useFoundationQuery({
           },
         ]);
 
-      if (skin_tone) {
-        simpleFilters.push({
-          filters: [
-            {
-              field: "skin_tone",
-              value: skin_tone,
-              condition_type: "eq",
-            },
-          ],
-        });
-      }
-
       if (texture) {
         simpleFilters.push({
           filters: [
@@ -102,17 +90,6 @@ export function useFoundationQuery({
         });
       }
 
-      if (texture) {
-        filters.push({
-          filters: [
-            {
-              field: "texture",
-              value: texture,
-              condition_type: "eq",
-            },
-          ],
-        });
-      }
 
       return fetchConfigurableProducts(
         {

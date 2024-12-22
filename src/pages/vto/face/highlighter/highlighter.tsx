@@ -23,7 +23,7 @@ import { LoadingProducts } from "../../../../components/loading";
 import { filterTextures } from "../../../../api/attributes/texture";
 import { useFaceHighlighterQuery } from "./highlighter-query";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 
 export function HighlighterSelector() {
   return (
@@ -191,12 +191,29 @@ function ShapeSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { selectedTexture, selectedColor, setSelectedColor, setSelectedTexture } = useHighlighterContext();
+  const {
+    selectedTexture,
+    selectedColor,
+    setSelectedColor,
+    setSelectedTexture,
+    selectedShape,
+  } = useHighlighterContext();
 
   const { data, isLoading } = useFaceHighlighterQuery({
     hexacode: selectedColor,
     texture: selectedTexture,
   });
+
+  const { setShowHighlighter, setHighlighterColor, setHighlighterPattern, setHighlighterMaterial } = useMakeup();
+
+  useEffect(() => {
+    setShowHighlighter(selectedColor != null && selectedProduct != null);
+    setHighlighterColor(selectedColor ?? "#ffffff");
+    if (selectedShape == null) {
+      setHighlighterPattern(0);
+    }
+    setHighlighterMaterial(selectedTexture != null ? textures.findIndex((item) => item.value === selectedTexture) : 0);
+  }, [selectedProduct]);
 
   const handleProductClick = (product: Product) => {
     console.log(product);
@@ -204,7 +221,7 @@ function ProductList() {
     setSelectedColor(
       product.custom_attributes.find(
         (item) => item.attribute_code === "hexacode",
-      )?.value,
+      )?.value.split(",")[0],
     );
     setSelectedTexture(
       product.custom_attributes.find(

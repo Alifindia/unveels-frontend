@@ -20,7 +20,7 @@ import { BrandName } from "../../../../components/product/brand";
 import { LoadingProducts } from "../../../../components/loading";
 import { useBronzerQuery } from "./bronzer-query";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function BronzerSelector() {
   return (
@@ -180,12 +180,27 @@ function TextureSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { selectedTexture, selectedColor, setSelectedColor, setSelectedTexture } = useBronzerContext();
+  const {
+    selectedTexture,
+    selectedColor,
+    setSelectedColor,
+    setSelectedTexture,
+    selectedShape,
+  } = useBronzerContext();
 
+  const { setBronzerColor, setShowBronzer, setBronzerPattern } = useMakeup();
   const { data, isLoading } = useBronzerQuery({
     hexacode: selectedColor,
     texture: selectedTexture,
   });
+
+  useEffect(() => {
+    setBronzerColor(selectedColor ?? "#ffffff");
+    if (selectedShape == null) {
+      setBronzerPattern(0);
+    }
+    setShowBronzer(selectedColor != null);
+  }, [selectedColor]);
 
   const handleProductClick = (product: Product) => {
     console.log(product);
