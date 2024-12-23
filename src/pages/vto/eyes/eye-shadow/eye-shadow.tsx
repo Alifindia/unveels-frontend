@@ -240,6 +240,7 @@ function ProductList() {
     setEyeShadowPattern,
     setEyeShadowMaterial,
     setEyeShadowMode,
+    setShowEyeShadow,
   } = useMakeup();
 
   useEffect(() => {
@@ -248,6 +249,7 @@ function ProductList() {
     var materialIndex = textures.findIndex((e) => e.value == selectedTexture);
     setEyeShadowMaterial(materialIndex != -1 ? materialIndex : 0);
     setEyeShadowMode(selectedMode as "One" | "Dual" | "Tri" | "Quad" | "Penta");
+    setShowEyeShadow(true);
   }, [selectedColors, modeIndex, selectedMode, selectedTexture]);
 
   const handleProductClick = (product: Product) => {

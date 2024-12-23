@@ -551,7 +551,7 @@ function Sidebar({ onExpandClick, setMediaFile, setMode }: SidebarProps) {
           <button className="" onClick={screenShoot}>
             <Icons.camera className="size-4 text-white sm:size-6" />
           </button>
-          <button className="">
+          <button className="" onClick={flipCamera}>
             <Icons.flipCamera className="size-4 text-white sm:size-6" />
           </button>
           <button className="" onClick={onExpandClick}>
@@ -561,10 +561,6 @@ function Sidebar({ onExpandClick, setMediaFile, setMode }: SidebarProps) {
             <Icons.compare className="size-4 text-white sm:size-6" />
           </button>
           <UploadMediaDialog setMediaFile={setMediaFile} setMode={setMode} />{" "}
-          {/* Pass setMediaFile */}
-          <button>
-            <Icons.share className="size-4 text-white sm:size-6" />
-          </button>
         </div>
       </div>
     </div>
@@ -576,7 +572,7 @@ function UploadMediaDialog({
   setMode,
 }: {
   setMediaFile: (file: File | null) => void;
-  setMode: (mode: string) => void;
+  setMode: (mode: "IMAGE" | "VIDEO" | "LIVE") => void;
 }) {
   const handleUploadPhoto = (event: any) => {
     const file = event.target.files[0];
