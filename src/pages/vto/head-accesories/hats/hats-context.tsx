@@ -11,6 +11,8 @@ interface HatsContextType {
   setSelectedOccasion: (shape: string | null) => void;
   selectedFabric: string | null;
   setSelectedFabric: (shape: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
 }
 
 // Create the context
@@ -23,6 +25,7 @@ export function HatsProvider({ children }: { children: React.ReactNode }) {
   const [selectedMode, setSelectedMode] = useState<string | null>("occasions");
   const [selectedFabric, setSelectedFabric] = useState<string | null>(null);
   const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
 
   return (
     <HatsContext.Provider
@@ -37,6 +40,8 @@ export function HatsProvider({ children }: { children: React.ReactNode }) {
         setSelectedFabric,
         selectedOccasion,
         setSelectedOccasion,
+        colorFamilyToInclude,
+        setColorFamilyToInclude,
       }}
     >
       {children}
