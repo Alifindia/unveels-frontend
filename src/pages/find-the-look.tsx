@@ -643,6 +643,7 @@ function BottomContent() {
     if (findTheLookItems) {
       const grouped = groupedItems(findTheLookItems);
       setGroupedItemsData(grouped);
+      console.log(groupedItemsData);
     }
   }, [findTheLookItems]);
 
@@ -650,29 +651,25 @@ function BottomContent() {
     setTab(label);
   };
 
-  // Narrowing section type for initialSection
   const initialSection: "makeup" | "accessories" | undefined =
     section === "makeup" || section === "accessories" ? section : undefined;
 
-  // Render different views based on the criteria and view
   if (criterias.isCaptured) {
-    // If `tab` and `section` are both not null, render ProductRecommendationsTabs with initial section
     if (tab && section) {
       return (
         <ProductRecommendationsTabs
           groupedItemsData={groupedItemsData}
-          initialSection={initialSection} // Using narrowed type here
-          activeTab={tab} // Pass activeTab to set the initial active category
+          initialSection={initialSection}
+          activeTab={tab}
           onClose={() => {
             setTab(null);
             setSection(null);
-            setView("face"); // Reset to face view
+            setView("face");
           }}
         />
       );
     }
 
-    // Render the views based on `view`
     if (view === "face") {
       return (
         <InferenceResults
@@ -690,7 +687,7 @@ function BottomContent() {
       return (
         <ProductRecommendationsTabs
           groupedItemsData={groupedItemsData}
-          initialSection="makeup" // Default to makeup section when entering recommendations view
+          initialSection="makeup"
           onClose={() => setView("face")}
         />
       );
@@ -1138,12 +1135,12 @@ function SingleCategoryView({
                   <div
                     key={product.id}
                     className="w-full rounded shadow"
-                    onClick={() => {
-                      window.open(
-                        `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                        "_blank",
-                      );
-                    }}
+                    // onClick={() => {
+                    //   window.open(
+                    //     `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                    //     "_blank",
+                    //   );
+                    // }}
                   >
                     <div className="relative aspect-square overflow-hidden">
                       <img
@@ -1195,51 +1192,6 @@ function SingleCategoryView({
             : null}
         </div>
       </div>
-    </div>
-  );
-}
-
-function RecorderStatus() {
-  const { isRecording, formattedTime, handleStartPause, handleStop, isPaused } =
-    useRecordingControls();
-  const { finish } = useCamera();
-
-  return (
-    <div className="absolute inset-x-0 top-14 flex items-center justify-center gap-4">
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={handleStartPause}
-      >
-        {isPaused ? (
-          <CirclePlay className="size-6 text-white" />
-        ) : isRecording ? (
-          <PauseCircle className="size-6 text-white" />
-        ) : null}
-      </button>
-      <span className="relative flex size-4">
-        {isRecording ? (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-        ) : null}
-        <span className="relative inline-flex size-4 rounded-full bg-red-500"></span>
-      </span>
-      <div className="font-serif text-white">{formattedTime}</div>
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={
-          isRecording
-            ? () => {
-                handleStop();
-                finish();
-              }
-            : handleStartPause
-        }
-      >
-        {isRecording || isPaused ? (
-          <StopCircle className="size-6 text-white" />
-        ) : (
-          <CirclePlay className="size-6 text-white" />
-        )}
-      </button>
     </div>
   );
 }

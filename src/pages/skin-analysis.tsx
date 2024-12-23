@@ -323,6 +323,15 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
           {tab && <DescriptionText text={labelsDescription[tab]} />}
         </div>
 
+        <div className="w-full text-right">
+          <button
+            className="text-[0.625rem] text-white sm:py-2"
+            onClick={() => {}}
+          >
+            View all
+          </button>
+        </div>
+
         {tab && <ProductList skinConcern={tab} />}
       </div>
     </>
