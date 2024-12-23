@@ -87,11 +87,11 @@ export function FindTheLookCanvas({
   const [faceLandmark, setFaceLandmark] = useState<Landmark[] | null>(null);
 
   useEffect(() => {
-    let isInferenceRunning = false;
+    let isInferenceRunning = false; // Flag untuk memastikan inferensi tidak berjalan dua kali
 
     const detectObjects = async () => {
       if (
-        !isInferenceRunning &&
+        !isInferenceRunning && // Periksa apakah inferensi sudah berjalan
         handDetector &&
         ringDetector &&
         neckDetector &&
@@ -106,69 +106,23 @@ export function FindTheLookCanvas({
           // Tambahkan delay 2 detik
           await new Promise((resolve) => setTimeout(resolve, 2000));
 
-          if (glassResult == null) {
-            console.log("Start Glasses Detection");
-            const resultsGlass = await glassDetector.detect(image);
-            setGlassResult(resultsGlass);
-            glassDetector.close();
-            console.log("Stop Glasses Detection");
-          }
+          const resultsHand = await handDetector.detect(image);
+          const resultsRing = await ringDetector.detect(image);
+          const resultsNeck = await neckDetector.detect(image);
+          const resultsEarring = await earringDetector.detect(image);
+          const resultsGlass = await glassDetector.detect(image);
+          const resultsHead = await headDetector.detect(image);
+          const resultsMakeup = await makeupDetector.detect(image);
+          const resultsFaceLandmark = await faceLandmarker.detect(image);
 
-          if (handResult == null) {
-            console.log("Start Hand Detection");
-            const resultsHand = await handDetector.detect(image);
-            setHandResult(resultsHand);
-            handDetector.close();
-            console.log("Stop Hand Detection");
-          }
-
-          if (ringResult == null) {
-            console.log("Start Ring Detection");
-            const resultsRing = await ringDetector.detect(image);
-            setRingResult(resultsRing);
-            ringDetector.close();
-            console.log("Stop Ring Detection");
-          }
-
-          if (neckResult == null) {
-            console.log("Start Neck Detection");
-            const resultsNeck = await neckDetector.detect(image);
-            setNeckResult(resultsNeck);
-            neckDetector.close();
-            console.log("Stop Neck Detection");
-          }
-
-          if (earringResult == null) {
-            console.log("Start Earring Detection");
-            const resultsEarring = await earringDetector.detect(image);
-            setEarringResult(resultsEarring);
-            earringDetector.close();
-            console.log("Stop Earring Detection");
-          }
-
-          if (headResult == null) {
-            console.log("Start Head Detection");
-            const resultsHead = await headDetector.detect(image);
-            setHeadResult(resultsHead);
-            headDetector.close();
-            console.log("Stop Head Detection");
-          }
-
-          if (makeupResult == null) {
-            console.log("Start Makeup Detection");
-            const resultsMakeup = await makeupDetector.detect(image);
-            setMakeupResult(resultsMakeup);
-            makeupDetector.close();
-            console.log("Stop Makeup Detection");
-          }
-
-          if (faceLandmark == null) {
-            console.log("Start Face Landmark Detection");
-            const resultsFaceLandmark = await faceLandmarker.detect(image);
-            setFaceLandmark(resultsFaceLandmark.faceLandmarks[0] || null);
-            faceLandmarker.close();
-            console.log("Stop Face Landmark Detection");
-          }
+          setHandResult(resultsHand);
+          setRingResult(resultsRing);
+          setNeckResult(resultsNeck);
+          setEarringResult(resultsEarring);
+          setGlassResult(resultsGlass);
+          setHeadResult(resultsHead);
+          setMakeupResult(resultsMakeup);
+          setFaceLandmark(resultsFaceLandmark.faceLandmarks[0] || null);
 
           setIsInferenceCompleted(true);
 
@@ -180,15 +134,6 @@ export function FindTheLookCanvas({
             }
           }, 1000);
         } catch (error) {
-          setIsInferenceCompleted(true);
-
-          setTimeout(() => {
-            setShowScannerAfterInference(false);
-            if (onDetectDone) {
-              onDetectDone(true);
-              console.log("Inference Finished");
-            }
-          }, 1000);
           console.error("Error during detection: ", error);
         } finally {
           isInferenceRunning = false; // Reset flag jika inferensi selesai atau terjadi error

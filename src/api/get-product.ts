@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { baseUrl, buildSearchParams } from "../utils/apiUtils";
+import {
+  baseUrl,
+  buildSearchParams,
+  fetchAllProducts,
+} from "../utils/apiUtils";
 import { defaultHeaders, Product } from "./shared";
 
 const lipsKey = {
@@ -100,15 +104,6 @@ export function useProducts({
     queryKey: ["products", product_type_key, type_ids],
     queryFn: async () => {
       const filters = [
-        // {
-        //   filters: [
-        //     {
-        //       field: "type_id",
-        //       value: "simple",
-        //       condition_type: "eq",
-        //     },
-        //   ],
-        // },
         {
           filters: [
             {
@@ -118,18 +113,32 @@ export function useProducts({
             },
           ],
         },
+        {
+          filters: [
+            {
+              field: "type_id",
+              value: "configurable,simple",
+              condition_type: "in",
+            },
+          ],
+        },
       ];
 
-      const response = await fetch(
-        baseUrl + "/rest/V1/products?" + buildSearchParams(filters),
-        {
+      const [productsList] = await Promise.all([
+        fetch(baseUrl + "/rest/V1/products?" + buildSearchParams(filters), {
           headers: defaultHeaders,
-        },
-      );
+        }),
+      ]);
 
-      return response.json() as Promise<{
+      const products = (await productsList.json()) as {
         items: Array<Product>;
-      }>;
+      };
+
+      const combinedResults = [...products.items];
+
+      return fetchAllProducts({
+        items: combinedResults,
+      });
     },
   });
 }
