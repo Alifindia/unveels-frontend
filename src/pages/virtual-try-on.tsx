@@ -68,6 +68,8 @@ import { HeadbandProvider } from "./vto/head-accesories/headband/headband-contex
 import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-context";
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
 import { ScreenshotPreview } from "../components/screenshot-preview";
+import ChangeModel from "../components/change-model";
+import { set } from "lodash";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -156,7 +158,11 @@ function Main() {
   const [isMainContentVisible, setMainContentVisible] = useState(true);
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
+  const [showChangeModel, setShowChangeModel] = useState(false);
 
+  if (showChangeModel) {
+    return <ChangeModel onClose={() => setShowChangeModel(false)} />
+  }
   return (
     <>
       {criterias.screenshotImage && (
@@ -185,6 +191,7 @@ function Main() {
             onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
             setMediaFile={setMediaFile}
             setMode={setMode}
+            setShowChangeModel={setShowChangeModel}
           />
           <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
             {isMainContentVisible && <MainContent />}
@@ -537,9 +544,15 @@ interface SidebarProps {
   onExpandClick: () => void;
   setMediaFile: (file: File | null) => void;
   setMode: (mode: "IMAGE" | "VIDEO" | "LIVE") => void;
+  setShowChangeModel: (isShow: boolean) => void;
 }
 
-function Sidebar({ onExpandClick, setMediaFile, setMode }: SidebarProps) {
+function Sidebar({
+  onExpandClick,
+  setMediaFile,
+  setMode,
+  setShowChangeModel,
+}: SidebarProps) {
   const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
 
   return (
@@ -560,7 +573,11 @@ function Sidebar({ onExpandClick, setMediaFile, setMode }: SidebarProps) {
           <button className="" onClick={compareCapture}>
             <Icons.compare className="size-4 text-white sm:size-6" />
           </button>
-          <UploadMediaDialog setMediaFile={setMediaFile} setMode={setMode} />{" "}
+          <UploadMediaDialog
+            setMediaFile={setMediaFile}
+            setMode={setMode}
+            setShowChangeModel={setShowChangeModel}
+          />{" "}
           {/* Pass setMediaFile */}
           <button>
             <Icons.share className="size-4 text-white sm:size-6" />
@@ -574,9 +591,11 @@ function Sidebar({ onExpandClick, setMediaFile, setMode }: SidebarProps) {
 function UploadMediaDialog({
   setMediaFile,
   setMode,
+  setShowChangeModel,
 }: {
   setMediaFile: (file: File | null) => void;
   setMode: (mode: string) => void;
+  setShowChangeModel: (isShow: boolean) => void;
 }) {
   const handleUploadPhoto = (event: any) => {
     const file = event.target.files[0];
@@ -592,6 +611,10 @@ function UploadMediaDialog({
       setMode("VIDEO");
       setMediaFile(file);
     }
+  };
+
+  const handleChangeModel = () => {
+    setShowChangeModel(true);
   };
 
   return (
@@ -661,7 +684,10 @@ function UploadMediaDialog({
                 />
               </button>
 
-              <button className="choose-model flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur">
+              <button
+                onClick={handleChangeModel}
+                className="choose-model flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur"
+              >
                 <Icons.chooseModel className="size-5 text-white" />
                 <p className="mt-2 text-center text-[12px] text-white">
                   Choose model
