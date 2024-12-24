@@ -67,8 +67,6 @@ function BeforeAfterCanvas({ image, canvasRef, mode }: BeforeAfterCanvasProps) {
         imgAspect = image.videoWidth / image.videoHeight;
       }
 
-      console.log(imgAspect);
-
       const canvasAspect = width / height;
 
       let drawWidth: number;
