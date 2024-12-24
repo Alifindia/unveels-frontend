@@ -42,16 +42,48 @@ function ColorSelector() {
   const { selectedMode, colorFamily, selectedColors, setSelectedColors } =
     useEyeShadowContext();
 
+  function getCombinations(arr: string[], size: number): string[][] {
+    const result: string[][] = [];
+
+    function combine(start: number, current: string[]) {
+      if (current.length === size) {
+        result.push([...current]);
+        return;
+      }
+      for (let i = start; i < arr.length; i++) {
+        combine(i + 1, [...current, arr[i]]);
+      }
+    }
+
+    combine(0, []);
+    return result;
+  }
+
   const { data } = useEyeshadowsQuery({
     color: null,
     hexcodes: null,
     texture: null,
   });
 
-  const extracted_sub_colors = extractUniqueCustomAttributes(
-    data?.items ?? [],
-    "hexacode",
-  ).flatMap((item) => item.split(","));
+  const extracted_sub_colors =
+    selectedMode == "One" || selectedMode == "Tetra"
+      ? extractUniqueCustomAttributes(data?.items ?? [], "hexacode").flatMap(
+          (item) => item.split(","),
+        )
+      : extractUniqueCustomAttributes(data?.items ?? [], "hexacode");
+
+  const combinations: string[][] = [];
+
+  extracted_sub_colors.forEach((set) => {
+    const colorArrays = set.split(",");
+    if (colorArrays.length < 100) {
+      const combinationsForSet = getCombinations(
+        colorArrays,
+        maxColorsMap[selectedMode] || 1,
+      );
+      combinations.push(...combinationsForSet);
+    }
+  });
 
   const maxColors = maxColorsMap[selectedMode] || 1;
 
@@ -70,6 +102,20 @@ function ColorSelector() {
 
     setSelectedColors(newColors);
   };
+
+  const handleColorsClick = (color: string[]) => {
+    console.log("clicked", color);
+    setSelectedColors(color);
+  };
+
+  function isSelected(colors: string[]) {
+    if (colors.length !== selectedColors.length) return false;
+
+    const sorted1 = [...colors].sort();
+    const sorted2 = [...selectedColors].sort();
+
+    return sorted1.every((value, index) => value === sorted2[index]);
+  }
 
   useEffect(() => {
     const maxColors = maxColorsMap[selectedMode] || 1;
@@ -91,8 +137,8 @@ function ColorSelector() {
         >
           <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
-        {/* {renderPaletteItems()} */}
-        {extracted_sub_colors
+        {(selectedMode == "One" || selectedMode == "Tetra") &&
+        extracted_sub_colors
           ? extracted_sub_colors.map((color, index) => (
               <ColorPalette
                 key={color}
@@ -102,7 +148,17 @@ function ColorSelector() {
                 onClick={() => handleColorClick(color)}
               />
             ))
-          : null}
+          : combinations.map((colors, index) => (
+              <ColorPalette
+                key={index}
+                size="large"
+                selected={isSelected(colors)}
+                palette={
+                  selectedMode == "Dual" ? { gradient: colors } : { colors }
+                }
+                onClick={() => handleColorsClick(colors)}
+              />
+            ))}
       </div>
     </div>
   );
@@ -258,7 +314,7 @@ function ProductList() {
     setSelectedColors(
       product.custom_attributes
         .find((item) => item.attribute_code === "hexacode")
-        ?.value.split(",")[0],
+        ?.value.split(","),
     );
     setSelectedTexture(
       product.custom_attributes
