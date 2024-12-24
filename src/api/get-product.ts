@@ -2,7 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import {
   baseUrl,
   buildSearchParams,
+  buildSearchParamsWithOrder,
   fetchAllProducts,
+  fetchAllProductsWithSort,
 } from "../utils/apiUtils";
 import { defaultHeaders, Product } from "./shared";
 
@@ -139,6 +141,173 @@ export function useProducts({
       return fetchAllProducts({
         items: combinedResults,
       });
+    },
+  });
+}
+
+type SortOrder = {
+  field: string;
+  direction: "ASC" | "DESC"; // Add the possible values for sorting direction
+};
+
+export function useProductsVTOAll({
+  product_type_key,
+  type_ids,
+  order,
+  selectedFormation,
+  selectedBrand,
+  selectedCountry,
+  selectedSizeOne,
+  selectedSizeTwo,
+  minPrice,
+  maxPrice,
+}: {
+  product_type_key: string;
+  type_ids: string[];
+  order: boolean;
+  selectedFormation: string;
+  selectedBrand: string;
+  selectedCountry: string;
+  selectedSizeOne: string;
+  selectedSizeTwo: string;
+  minPrice: number;
+  maxPrice: number;
+}) {
+  return useQuery({
+    queryKey: ["products", product_type_key, type_ids],
+    queryFn: async () => {
+      const filters = [
+        {
+          filters: [
+            {
+              field: product_type_key,
+              value: type_ids.join(","),
+              condition_type: "in",
+            },
+          ],
+        },
+        {
+          filters: [
+            {
+              field: "type_id",
+              value: "configurable,simple",
+              condition_type: "in",
+            },
+          ],
+        },
+      ];
+
+      console.log(selectedFormation);
+      console.log(selectedBrand);
+      console.log(selectedCountry);
+      console.log(selectedSizeOne);
+      console.log(selectedSizeTwo);
+      console.log(minPrice);
+      console.log(maxPrice);
+
+      if (selectedFormation !== "") {
+        filters.push({
+          filters: [
+            {
+              field: "formation",
+              value: selectedFormation,
+              condition_type: "eq",
+            },
+          ],
+        });
+      }
+
+      if (selectedBrand !== "") {
+        filters.push({
+          filters: [
+            {
+              field: "brand",
+              value: selectedBrand,
+              condition_type: "eq",
+            },
+          ],
+        });
+      }
+
+      if (selectedCountry !== "") {
+        filters.push({
+          filters: [
+            {
+              field: "formation",
+              value: selectedFormation,
+              condition_type: "eq",
+            },
+          ],
+        });
+      }
+
+      if (selectedSizeOne !== "") {
+        filters.push({
+          filters: [
+            {
+              field: "size",
+              value: selectedSizeOne,
+              condition_type: "eq",
+            },
+          ],
+        });
+      }
+
+      if (selectedSizeTwo !== "") {
+        filters.push({
+          filters: [
+            {
+              field: "size",
+              value: selectedSizeTwo,
+              condition_type: "eq",
+            },
+          ],
+        });
+      }
+
+      filters.push({
+        filters: [
+          {
+            field: "price",
+            value: minPrice.toString(),
+            condition_type: "from",
+          },
+        ],
+      });
+
+      filters.push({
+        filters: [
+          {
+            field: "price",
+            value: maxPrice.toString(),
+            condition_type: "to",
+          },
+        ],
+      });
+
+      // Fetch products with the appropriate filters and sorting
+      const [productsList] = await Promise.all([
+        fetch(baseUrl + "/rest/V1/products?" + buildSearchParams(filters), {
+          headers: defaultHeaders,
+        }),
+      ]);
+
+      const products = (await productsList.json()) as {
+        items: Array<Product>;
+      };
+
+      const combinedResults = [...products.items];
+      // Apply sorting based on 'order' (ternary condition)
+      const sortOrder = order ? "asc" : "desc";
+
+      return fetchAllProductsWithSort(
+        {
+          items: combinedResults,
+        },
+        [],
+        "name",
+        sortOrder,
+      );
     },
   });
 }

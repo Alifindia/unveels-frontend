@@ -77,6 +77,7 @@ import {
 import { FindTheLookItems } from "../types/findTheLookItems";
 import { CartProvider, useCartContext } from "../context/cart-context";
 import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
+import { FilterProvider } from "../context/filter-context";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -151,9 +152,11 @@ export function VirtualTryOn() {
             <VirtualTryOnProvider>
               <FindTheLookProvider>
                 <CartProvider>
-                  <div className="h-full min-h-dvh">
-                    <Main />
-                  </div>
+                  <FilterProvider>
+                    <div className="h-full min-h-dvh">
+                      <Main />
+                    </div>
+                  </FilterProvider>
                 </CartProvider>
               </FindTheLookProvider>
             </VirtualTryOnProvider>
