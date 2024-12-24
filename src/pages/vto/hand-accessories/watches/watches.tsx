@@ -16,6 +16,8 @@ import { Product } from "../../../../api/shared";
 import { useGlassesContext } from "../../head-accesories/glasses/glasses-context";
 import { getHexCodeSubColor } from "../../../../api/attributes/sub_color";
 import { useAccesories } from "../../../../context/accesories-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { handAccessoriesProductTypeFilter } from "../../../../api/attributes/accessories";
 
 export function WatchesSelector() {
   return (
@@ -234,6 +236,9 @@ function MaterialSelector() {
 function WatchesProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
+
   const {
     colorFamilyToInclude,
     setColorFamilyToInclude,
@@ -293,7 +298,20 @@ function WatchesProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Watches: {
+                attributeName: "hand_accessories_product_type",
+                values: handAccessoriesProductTypeFilter(["Watches"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Watches", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Watch");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

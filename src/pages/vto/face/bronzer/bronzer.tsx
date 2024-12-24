@@ -6,7 +6,10 @@ import { BronzerProvider, useBronzerContext } from "./bronzer-context";
 import { useLashesContext } from "../../eyes/lashes/lashes-context";
 import { useMakeup } from "../../../../context/makeup-context";
 import { useQuery } from "@tanstack/react-query";
-import { faceMakeupProductTypesFilter } from "../../../../api/attributes/makeups";
+import {
+  faceMakeupProductTypesFilter,
+  getFaceMakeupProductTypeIds,
+} from "../../../../api/attributes/makeups";
 import {
   baseUrl,
   buildSearchParams,
@@ -21,6 +24,7 @@ import { LoadingProducts } from "../../../../components/loading";
 import { useBronzerQuery } from "./bronzer-query";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useEffect, useState } from "react";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 
 export function BronzerSelector() {
   return (
@@ -179,6 +183,8 @@ function TextureSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     selectedTexture,
@@ -222,7 +228,20 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Bronzers: {
+                attributeName: "face_makeup_product_types",
+                values: getFaceMakeupProductTypeIds(["Bronzers"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Bronzers", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Bronzers");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

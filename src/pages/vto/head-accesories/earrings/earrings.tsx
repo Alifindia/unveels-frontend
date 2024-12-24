@@ -16,6 +16,11 @@ import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { Product } from "../../../../api/shared";
 import { getHexCodeSubColor } from "../../../../api/attributes/sub_color";
 import { useAccesories } from "../../../../context/accesories-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import {
+  handAccessoriesProductTypeFilter,
+  headAccessoriesProductTypeFilter,
+} from "../../../../api/attributes/accessories";
 
 export function EarringsSelector() {
   return (
@@ -151,6 +156,8 @@ function ShapeSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -208,7 +215,20 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Earrings: {
+                attributeName: "head_accessories_product_type",
+                values: headAccessoriesProductTypeFilter(["Earrings"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Earrings", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Earring");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

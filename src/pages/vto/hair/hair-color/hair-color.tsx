@@ -8,6 +8,8 @@ import { useHairColorQuery } from "./hair-color-query";
 import { useMakeup } from "../../../../context/makeup-context";
 import { useState } from "react";
 import { Product } from "../../../../api/shared";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getHairColorProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function HairColorSelector() {
   return (
@@ -123,6 +125,8 @@ function ColorSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -165,7 +169,24 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Hair: {
+                attributeName: "hair_color_product_type",
+                values: getHairColorProductTypeIds([
+                  "Permanent Color",
+                  "Semi Permanent Color",
+                  "Free Ammonia Color",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Hair", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Hair Color");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

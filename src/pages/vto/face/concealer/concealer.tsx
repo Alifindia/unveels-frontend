@@ -13,6 +13,8 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
 import { colors } from "../../../../api/attributes/color";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getEyeMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function ConcealerSelector() {
   return (
@@ -122,6 +124,8 @@ function ColorSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -171,7 +175,20 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Concealers: {
+                attributeName: "eye_makeup_product_type",
+                values: getEyeMakeupProductTypeIds(["Concealers"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Concealers", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Concealers");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

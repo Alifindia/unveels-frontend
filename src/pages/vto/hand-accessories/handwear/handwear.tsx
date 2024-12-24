@@ -14,6 +14,8 @@ import { Product } from "../../../../api/shared";
 import { getHexCodeSubColor } from "../../../../api/attributes/sub_color";
 import { ColorPalette } from "../../../../components/color-palette";
 import { useAccesories } from "../../../../context/accesories-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { handAccessoriesProductTypeFilter } from "../../../../api/attributes/accessories";
 
 function useActiveHandwear(): "Rings" | "Bracelets" | "Bangles" {
   const location = useLocation();
@@ -175,6 +177,9 @@ function HandwearProductList() {
     "Rings" | "Bracelets" | "Bangles" | null
   >(null);
 
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
+
   const {
     setColorFamilyToInclude,
     setColorFamily,
@@ -247,7 +252,33 @@ function HandwearProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Bracelet: {
+                attributeName: "hand_accessories_product_type",
+                values: handAccessoriesProductTypeFilter(["Bracelets"]),
+              },
+              Rings: {
+                attributeName: "hand_accessories_product_type",
+                values: handAccessoriesProductTypeFilter(["Rings"]),
+              },
+
+              Bangles: {
+                attributeName: "hand_accessories_product_type",
+                values: handAccessoriesProductTypeFilter(["Bangles"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [
+                { label: "Bracelet", section: "makeup" },
+                { label: "Ring", section: "makeup" },
+                { label: "Bangles", section: "makeup" },
+              ],
+              accessories: [],
+            });
+            setSectionName("Handwear");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

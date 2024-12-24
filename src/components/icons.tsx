@@ -535,6 +535,105 @@ export const Icons = {
       />
     </svg>
   ),
+  sort: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path
+        d="M10 8L7 5L4 8"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M7 19V5"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M14 16L17 19L20 16"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M17 5V19"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  ),
+  filter: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 29 24" fill="none" {...props}>
+      <path
+        d="M21.2812 5H24.8283"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M3.54688 5H13.0057"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M15.3711 12H24.8299"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M3.54688 12H7.09393"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M21.2812 19H24.8283"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M3.54688 19H13.0057"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M20.589 3.58575C21.5124 4.36675 21.5124 5.63275 20.589 6.41375C19.6656 7.19475 18.1687 7.19475 17.2453 6.41375C16.3219 5.63275 16.3219 4.36675 17.2453 3.58575C18.1687 2.80475 19.6656 2.80475 20.589 3.58575"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.13 10.5858C12.0534 11.3668 12.0534 12.6328 11.13 13.4138C10.2066 14.1948 8.70973 14.1948 7.78631 13.4138C6.8629 12.6328 6.8629 11.3668 7.78631 10.5858C8.70973 9.80475 10.2066 9.80475 11.13 10.5858"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M20.589 17.5858C21.5124 18.3668 21.5124 19.6328 20.589 20.4138C19.6656 21.1948 18.1687 21.1948 17.2453 20.4138C16.3219 19.6328 16.3219 18.3668 17.2453 17.5858C18.1687 16.8047 19.6656 16.8047 20.589 17.5858"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  ),
 
   facebook: (props: React.SVGProps<SVGSVGElement>) => (
     <svg role="img" viewBox="0 0 24 24" {...props}>

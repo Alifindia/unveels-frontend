@@ -14,6 +14,8 @@ import { useEffect, useState } from "react";
 import { getHexCodeSubColor } from "../../../../api/attributes/sub_color";
 import { ColorPalette } from "../../../../components/color-palette";
 import { useAccesories } from "../../../../context/accesories-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { headAccessoriesProductTypeFilter } from "../../../../api/attributes/accessories";
 
 export function HatsSelector() {
   return (
@@ -199,6 +201,8 @@ function FabricSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -263,7 +267,20 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Hats: {
+                attributeName: "head_accessories_product_type",
+                values: headAccessoriesProductTypeFilter(["Hats"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Hats", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Hats");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

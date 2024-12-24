@@ -10,6 +10,8 @@ import { useLipLinerQuery } from "./lip-liner-query";
 import { ColorPalette } from "../../../../components/color-palette";
 import { Product } from "../../../../api/shared";
 import { useEffect, useState } from "react";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getLipsMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function LipLinerSelector() {
   return (
@@ -167,6 +169,8 @@ function SizeSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -221,7 +225,20 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Lipliners: {
+                attributeName: "lips_makeup_product_type",
+                values: getLipsMakeupProductTypeIds(["Lip Liners"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Lipliners", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Lipliners");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

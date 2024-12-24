@@ -10,6 +10,9 @@ import { useLipPlumperQuery } from "./lip-plumper-query";
 import { ColorPalette } from "../../../../components/color-palette";
 import { Product } from "../../../../api/shared";
 import { useEffect, useState } from "react";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import Lipplumper from "../../../../components/three/makeup/lipplumper";
+import { getLipsMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function LipPlumperSelector() {
   return (
@@ -122,6 +125,8 @@ function TextureSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     selectedColor,
@@ -162,7 +167,23 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Lipplumper: {
+                attributeName: "lips_makeup_product_type",
+                values: getLipsMakeupProductTypeIds([
+                  "Lip Plumpers",
+                  "Lip Glosses",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Lipplumper", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Lip Plumper");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

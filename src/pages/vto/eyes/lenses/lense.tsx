@@ -11,6 +11,8 @@ import { LoadingProducts } from "../../../../components/loading";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useMakeup } from "../../../../context/makeup-context";
 import { Product } from "../../../../api/shared";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getLensesProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function LenseSelector() {
   return (
@@ -125,6 +127,8 @@ function ColorSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -168,7 +172,23 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Lenses: {
+                attributeName: "lenses_product_type",
+                values: getLensesProductTypeIds([
+                  "Daily Lenses",
+                  "Monthly Lenses",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Lenses", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Lenses");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

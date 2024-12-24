@@ -11,6 +11,8 @@ import { useEyeshadowsQuery } from "./eye-shadow-query";
 import { ColorPalette } from "../../../../components/color-palette";
 import { Product } from "../../../../api/shared";
 import { useMakeup } from "../../../../context/makeup-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getEyeMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function EyeShadowSelector() {
   return (
@@ -219,6 +221,8 @@ function ModeSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     selectedTexture,
@@ -272,7 +276,20 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Eyeshadows: {
+                attributeName: "eye_makeup_product_type",
+                values: getEyeMakeupProductTypeIds(["Eyeshadows"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Eyeshadows", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Eyeshadows");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

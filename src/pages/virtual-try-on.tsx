@@ -70,6 +70,13 @@ import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context"
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
 import { set } from "lodash";
+import {
+  FindTheLookProvider,
+  useFindTheLookContext,
+} from "../context/find-the-look-context";
+import { FindTheLookItems } from "../types/findTheLookItems";
+import { CartProvider, useCartContext } from "../context/cart-context";
+import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -142,9 +149,13 @@ export function VirtualTryOn() {
         <MakeupProvider>
           <AccesoriesProvider>
             <VirtualTryOnProvider>
-              <div className="h-full min-h-dvh">
-                <Main />
-              </div>
+              <FindTheLookProvider>
+                <CartProvider>
+                  <div className="h-full min-h-dvh">
+                    <Main />
+                  </div>
+                </CartProvider>
+              </FindTheLookProvider>
             </VirtualTryOnProvider>
           </AccesoriesProvider>
         </MakeupProvider>
@@ -159,48 +170,67 @@ function Main() {
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
   const [showChangeModel, setShowChangeModel] = useState(false);
+  const { view, setView, sectionName, mapTypes, groupedItemsData } =
+    useFindTheLookContext();
 
-  if (showChangeModel) {
-    return <ChangeModel onClose={() => setShowChangeModel(false)} />
+  if (view === "all_categories") {
+    return (
+      <VTOAllProductsPage
+        onClose={() => {
+          setView("face");
+        }}
+        groupedItemsData={groupedItemsData}
+        name={sectionName}
+        mapTypes={mapTypes}
+      />
+    );
   }
-  return (
-    <>
-      {criterias.screenshotImage && (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 10,
-          }}
-        >
-          <ScreenshotPreview />
-        </div>
-      )}
-      <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
-        <div className="absolute inset-0">
-          <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
-          <div className="pointer-events-none absolute inset-0"></div>
-        </div>
-        <TopNavigation item={false} cart={false} />
 
-        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          <Sidebar
-            onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
-            setMediaFile={setMediaFile}
-            setMode={setMode}
-            setShowChangeModel={setShowChangeModel}
-          />
-          <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
-            {isMainContentVisible && <MainContent />}
-            <Footer />
+  if (view === "face") {
+    if (showChangeModel) {
+      return <ChangeModel onClose={() => setShowChangeModel(false)} />;
+    }
+    return (
+      <>
+        {criterias.screenshotImage && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 10,
+            }}
+          >
+            <ScreenshotPreview />
+          </div>
+        )}
+        <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+          <div className="absolute inset-0">
+            <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+            <div className="pointer-events-none absolute inset-0"></div>
+          </div>
+          <TopNavigation item={false} cart={false} />
+
+          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
+            <Sidebar
+              onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
+              setMediaFile={setMediaFile}
+              setMode={setMode}
+              setShowChangeModel={setShowChangeModel}
+            />
+            <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
+              {isMainContentVisible && <MainContent />}
+              <Footer />
+            </div>
           </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  }
+
+  return <></>;
 }
 
 function MainContent() {

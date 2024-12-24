@@ -13,6 +13,8 @@ import { filterColors } from "../../../../api/attributes/color";
 import { ColorPalette } from "../../../../components/color-palette";
 import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getBrowMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 const colorFamilies = filterColors(["Brown", "Black"]);
 
@@ -188,6 +190,8 @@ function BrightnessSlider() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -231,7 +235,24 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Eyebrows: {
+                attributeName: "brow_makeup_product_type",
+                values: getBrowMakeupProductTypeIds([
+                  "Brow Gels",
+                  "Brow Pencils",
+                  "Brow Waxes",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Eyebrows", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Eyebrows");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

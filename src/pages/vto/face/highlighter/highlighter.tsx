@@ -9,7 +9,10 @@ import {
 } from "./highlighter-context";
 import { useMakeup } from "../../../../context/makeup-context";
 import { useQuery } from "@tanstack/react-query";
-import { faceMakeupProductTypesFilter } from "../../../../api/attributes/makeups";
+import {
+  faceMakeupProductTypesFilter,
+  getFaceMakeupProductTypeIds,
+} from "../../../../api/attributes/makeups";
 import {
   baseUrl,
   buildSearchParams,
@@ -24,6 +27,7 @@ import { filterTextures } from "../../../../api/attributes/texture";
 import { useFaceHighlighterQuery } from "./highlighter-query";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { SetStateAction, useEffect, useState } from "react";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 
 export function HighlighterSelector() {
   return (
@@ -190,6 +194,8 @@ function ShapeSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     selectedTexture,
@@ -244,7 +250,20 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Highlighters: {
+                attributeName: "face_makeup_product_types",
+                values: getFaceMakeupProductTypeIds(["Highlighters"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Highlighters", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Highlighter");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

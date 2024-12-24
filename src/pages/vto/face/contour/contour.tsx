@@ -5,7 +5,10 @@ import { ContourProvider, useContourContext } from "./contour-context";
 import { useEffect, useRef, useState } from "react";
 import { useMakeup } from "../../../../context/makeup-context";
 import { useQuery } from "@tanstack/react-query";
-import { faceMakeupProductTypesFilter } from "../../../../api/attributes/makeups";
+import {
+  faceMakeupProductTypesFilter,
+  getFaceMakeupProductTypeIds,
+} from "../../../../api/attributes/makeups";
 import {
   baseUrl,
   buildSearchParams,
@@ -21,6 +24,7 @@ import { filterTextures } from "../../../../api/attributes/texture";
 import Textures from "three/src/renderers/common/Textures.js";
 import { useContourQuery } from "./contour-query";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 
 export function ContourSelector() {
   return (
@@ -251,6 +255,8 @@ function TextureSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     selectedColors,
@@ -292,7 +298,20 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Contouring: {
+                attributeName: "face_makeup_product_types",
+                values: getFaceMakeupProductTypeIds(["Contouring"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Contouring", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Contour");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

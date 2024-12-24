@@ -11,6 +11,8 @@ import { MascaraProvider, useMascaraContext } from "./mascara-context";
 import { useMascaraQuery } from "./mascara-query";
 import { Product } from "../../../../api/shared";
 import { useState } from "react";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getLashMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function MascaraSelector() {
   return (
@@ -117,6 +119,8 @@ function ColorSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -159,7 +163,20 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Mascara: {
+                attributeName: "brow_makeup_product_type",
+                values: getLashMakeupProductTypeIds(["Mascaras"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Mascara", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Lashes");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

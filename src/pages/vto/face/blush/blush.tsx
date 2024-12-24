@@ -11,6 +11,8 @@ import { useBlushContext } from "./blush-context";
 import { useBlushQuery } from "./blush-query";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { Product } from "../../../../api/shared";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getFaceMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function BlushSelector() {
   return (
@@ -270,6 +272,8 @@ function ShadesSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     selectedColors,
@@ -315,7 +319,20 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Blushes: {
+                attributeName: "face_makeup_product_types",
+                values: getFaceMakeupProductTypeIds(["Blushes"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Blushes", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Blushes");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

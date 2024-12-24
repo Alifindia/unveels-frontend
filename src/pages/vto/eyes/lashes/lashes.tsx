@@ -10,6 +10,8 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { patterns } from "../../../../api/attributes/pattern";
 import { Product } from "../../../../api/shared";
 import { useState } from "react";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getLashMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 const colorFamilies = [{ name: "Black", value: "#000000" }];
 
@@ -149,6 +151,8 @@ function ShapeSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const { colorFamily, selectedPattern } = useLashesContext();
 
@@ -167,7 +171,24 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Lash: {
+                attributeName: "brow_makeup_product_type",
+                values: getLashMakeupProductTypeIds([
+                  "Individual False Lashes",
+                  "Full Line Lashes",
+                  "Lash Curlers",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Lash", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Lashes");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

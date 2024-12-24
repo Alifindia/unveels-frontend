@@ -11,6 +11,8 @@ import { useLipColorQuery } from "./lip-color-query";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getLipsMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function LipColorSelector() {
   return (
@@ -245,6 +247,8 @@ function ShadesSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -313,7 +317,25 @@ function ProductList() {
       <div className="w-full text-right">
         <button
           className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {}}
+          onClick={() => {
+            setMapTypes({
+              Lipstick: {
+                attributeName: "lips_makeup_product_type",
+                values: getLipsMakeupProductTypeIds([
+                  "Lipsticks",
+                  "Lip Stains",
+                  "Lip Tints",
+                  "Lip Glosses",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Lipstick", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Lipstick");
+            setView("all_categories");
+          }}
         >
           View all
         </button>

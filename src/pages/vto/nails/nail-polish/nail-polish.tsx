@@ -14,6 +14,8 @@ import { filterTextures } from "../../../../api/attributes/texture";
 import { LoadingProducts } from "../../../../components/loading";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { Product } from "../../../../api/shared";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getNailPolishProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function NailPolishSelector() {
   return (
@@ -145,6 +147,8 @@ function TextureSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -191,22 +195,49 @@ function ProductList() {
   };
 
   return (
-    <div className="flex w-full gap-4 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return (
-            <VTOProductCard
-              product={product}
-              key={product.id}
-              selectedProduct={selectedProduct}
-              setSelectedProduct={setSelectedProduct}
-              onClick={() => handleProductClick(product)}
-            />
-          );
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Nail: {
+                attributeName: "nail_polish_product_types",
+                values: getNailPolishProductTypeIds([
+                  "Nail Color",
+                  "Gel Color",
+                  "Glossy Top Coats",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Nail", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Nails Polish");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-4 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

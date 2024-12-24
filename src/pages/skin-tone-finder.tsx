@@ -719,23 +719,6 @@ function AllProductsPage({
       ) : (
         <AccessoriesAllView accessories={groupedItemsData.accessories} />
       )}
-
-      <div className="h-20">
-        <div className="mx-auto flex max-w-sm space-x-2.5 pb-6 pt-4 lg:space-x-6">
-          <button
-            type="button"
-            className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
-          >
-            TRY NOW
-          </button>
-          <button
-            type="button"
-            className="flex h-10 w-full items-center justify-center border border-white bg-white text-xs font-semibold text-black"
-          >
-            ADD ALL TO CART
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
