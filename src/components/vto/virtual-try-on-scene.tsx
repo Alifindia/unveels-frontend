@@ -183,7 +183,7 @@ export function VirtualTryOnScene({
                 "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
               delegate: "CPU",
             },
-            runningMode: "STREAM",
+            runningMode: mode == "LIVE" || mode == "VIDEO" ? "VIDEO" : "IMAGE",
             numFaces: 1,
             minFaceDetectionConfidence: 0.2,
             minTrackingConfidence: 0.1,
@@ -198,10 +198,10 @@ export function VirtualTryOnScene({
                 "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
               delegate: "GPU",
             },
-            runningMode: "STREAM",
+            runningMode: mode == "LIVE" || mode == "VIDEO" ? "VIDEO" : "IMAGE",
             numHands: 1,
             minHandDetectionConfidence: 0.2,
-            minHandTrackingConfidence: 0.1,
+            minTrackingConfidence: 0.1,
           },
         );
 
@@ -213,7 +213,7 @@ export function VirtualTryOnScene({
                 "/media/unveels/models/hair/hair_segmenter.tflite",
               delegate: "GPU",
             },
-            runningMode: "VIDEO",
+            runningMode: mode == "LIVE" || mode == "VIDEO" ? "VIDEO" : "IMAGE",
             outputCategoryMask: true,
             outputConfidenceMasks: false,
           },
@@ -250,134 +250,341 @@ export function VirtualTryOnScene({
     };
   }, []);
 
+  const detectLiveStream = async () => {
+    if (
+      faceLandmarkerRef.current &&
+      handLandmarkerRef.current &&
+      hairSegmenterRef.current &&
+      webcamRef.current &&
+      webcamRef.current.video &&
+      webcamRef.current.video.readyState === 4
+    ) {
+      const video = webcamRef.current.video;
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          const { innerWidth: width, innerHeight: height } = window;
+          const dpr = window.devicePixelRatio || 1;
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          ctx.scale(dpr, dpr);
+
+          const imgAspect = video.videoWidth / video.videoHeight;
+          const canvasAspect = width / height;
+
+          let drawWidth: number;
+          let drawHeight: number;
+          let offsetX: number;
+          let offsetY: number;
+
+          if (imgAspect < canvasAspect) {
+            drawWidth = width;
+            drawHeight = width / imgAspect;
+            offsetX = 0;
+            offsetY = (height - drawHeight) / 2;
+          } else {
+            drawWidth = height * imgAspect;
+            drawHeight = height;
+            offsetX = (width - drawWidth) / 2;
+            offsetY = 0;
+          }
+
+          ctx.clearRect(0, 0, width, height);
+
+          const startTimeMs = performance.now();
+          try {
+            const results = faceLandmarkerRef.current.detectForVideo(
+              video,
+              startTimeMs,
+            );
+
+            const handResults = handLandmarkerRef.current.detectForVideo(
+              video,
+              startTimeMs,
+            );
+
+            // const hairResults = hairSegmenterRef.current.segmentForVideo(
+            //   video,
+            //   startTimeMs,
+            // );
+
+            // if (hairResults?.categoryMask) {
+            //   hairRef.current = hairResults.categoryMask.getAsFloat32Array();
+            //   let imageData = ctx.getImageData(
+            //     0,
+            //     0,
+            //     video.videoWidth,
+            //     video.videoHeight,
+            //   ).data;
+
+            //   let j = 0;
+            //   for (let i = 0; i < hairRef.current.length; ++i) {
+            //     const maskVal = Math.round(hairRef.current[i] * 255.0);
+
+            //     // Proses hanya untuk label index 1
+            //     if (maskVal === 1) {
+            //       const legendColor =
+            //         legendColors[maskVal % legendColors.length];
+            //       imageData[j] = (legendColor[0] + imageData[j]) / 2;
+            //       imageData[j + 1] = (legendColor[1] + imageData[j + 1]) / 2;
+            //       imageData[j + 2] = (legendColor[2] + imageData[j + 2]) / 2;
+            //       imageData[j + 3] = (legendColor[3] + imageData[j + 3]) / 2;
+            //     }
+            //     j += 4;
+            //   }
+
+            //   const uint8Array = new Uint8ClampedArray(imageData.buffer);
+            //   const dataNew = new ImageData(
+            //     uint8Array,
+            //     video.videoWidth,
+            //     video.videoHeight,
+            //   );
+
+            //   hairMaskRef.current = dataNew;
+            // }
+
+            if (results.facialTransformationMatrixes.length > 0) {
+              faceTransformRef.current =
+                results.facialTransformationMatrixes[0].data;
+            }
+
+            if (results.faceBlendshapes.length > 0) {
+              blendshapeRef.current = results.faceBlendshapes[0].categories;
+            }
+
+            if (handResults.landmarks && handResults.landmarks.length > 0) {
+              handLandmarksRef.current = handResults.landmarks[0];
+            }
+            if (results.faceLandmarks && results.faceLandmarks.length > 0) {
+              landmarksRef.current = results.faceLandmarks[0];
+            }
+          } catch (err) {
+            console.error("Detection error:", err);
+            setError(err as Error);
+          }
+        }
+      }
+    }
+
+    if (isDetectingRef.current) {
+      requestAnimationFrame(detectLiveStream);
+    }
+  };
+
+  // Video Detection Function
+  const detectUploadedVideo = async () => {
+    if (
+      faceLandmarkerRef.current &&
+      handLandmarkerRef.current &&
+      hairSegmenterRef.current &&
+      videoUploadRef.current &&
+      videoUploadRef.current.readyState === 3
+    ) {
+      const video = videoUploadRef.current;
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          const { innerWidth: width, innerHeight: height } = window;
+          const dpr = window.devicePixelRatio || 1;
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          ctx.scale(dpr, dpr);
+
+          const imgAspect = video.videoWidth / video.videoHeight;
+          const canvasAspect = width / height;
+
+          let drawWidth: number;
+          let drawHeight: number;
+          let offsetX: number;
+          let offsetY: number;
+
+          if (imgAspect < canvasAspect) {
+            drawWidth = width;
+            drawHeight = width / imgAspect;
+            offsetX = 0;
+            offsetY = (height - drawHeight) / 2;
+          } else {
+            drawWidth = height * imgAspect;
+            drawHeight = height;
+            offsetX = (width - drawWidth) / 2;
+            offsetY = 0;
+          }
+
+          ctx.clearRect(0, 0, width, height);
+
+          const startTimeMs = performance.now();
+          try {
+            const results = faceLandmarkerRef.current.detectForVideo(
+              video,
+              startTimeMs,
+            );
+
+            const handResults = handLandmarkerRef.current.detectForVideo(
+              video,
+              startTimeMs,
+            );
+
+            // const hairResults = hairSegmenterRef.current.segmentForVideo(
+            //   video,
+            //   startTimeMs,
+            // );
+
+            // if (hairResults?.categoryMask) {
+            //   hairRef.current = hairResults.categoryMask.getAsFloat32Array();
+            //   let imageData = ctx.getImageData(
+            //     0,
+            //     0,
+            //     video.videoWidth,
+            //     video.videoHeight,
+            //   ).data;
+
+            //   let j = 0;
+            //   for (let i = 0; i < hairRef.current.length; ++i) {
+            //     const maskVal = Math.round(hairRef.current[i] * 255.0);
+
+            //     // Proses hanya untuk label index 1
+            //     if (maskVal === 1) {
+            //       const legendColor =
+            //         legendColors[maskVal % legendColors.length];
+            //       imageData[j] = (legendColor[0] + imageData[j]) / 2;
+            //       imageData[j + 1] = (legendColor[1] + imageData[j + 1]) / 2;
+            //       imageData[j + 2] = (legendColor[2] + imageData[j + 2]) / 2;
+            //       imageData[j + 3] = (legendColor[3] + imageData[j + 3]) / 2;
+            //     }
+            //     j += 4;
+            //   }
+
+            //   const uint8Array = new Uint8ClampedArray(imageData.buffer);
+            //   const dataNew = new ImageData(
+            //     uint8Array,
+            //     video.videoWidth,
+            //     video.videoHeight,
+            //   );
+
+            //   hairMaskRef.current = dataNew;
+            // }
+
+            if (results.facialTransformationMatrixes.length > 0) {
+              faceTransformRef.current =
+                results.facialTransformationMatrixes[0].data;
+            }
+
+            if (results.faceBlendshapes.length > 0) {
+              blendshapeRef.current = results.faceBlendshapes[0].categories;
+            }
+
+            if (handResults.landmarks && handResults.landmarks.length > 0) {
+              handLandmarksRef.current = handResults.landmarks[0];
+            }
+            if (results.faceLandmarks && results.faceLandmarks.length > 0) {
+              landmarksRef.current = results.faceLandmarks[0];
+            }
+          } catch (err) {
+            console.error("Detection error:", err);
+            setError(err as Error);
+          }
+        }
+      }
+    }
+
+    if (isDetectingRef.current && mode === "VIDEO") {
+      requestAnimationFrame(detectUploadedVideo);
+    }
+  };
+
+  // Image Detection Function
+  const detectImage = async () => {
+    if (
+      faceLandmarkerRef.current &&
+      handLandmarkerRef.current &&
+      imageUploadRef.current
+    ) {
+      const img = imageUploadRef.current;
+      const canvas = canvasRef.current;
+
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          const dpr = window.devicePixelRatio || 1;
+
+          // Get the dimensions of the canvas and image
+          const canvasWidth = canvas.clientWidth;
+          const canvasHeight = canvas.clientHeight;
+          canvas.width = canvasWidth * dpr;
+          canvas.height = canvasHeight * dpr;
+          ctx.scale(dpr, dpr);
+
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          try {
+            const results = faceLandmarkerRef.current.detect(img);
+
+            const handResults = handLandmarkerRef.current.detect(img);
+
+            if (results.facialTransformationMatrixes.length > 0) {
+              faceTransformRef.current =
+                results.facialTransformationMatrixes[0].data;
+            }
+
+            if (results.faceBlendshapes.length > 0) {
+              blendshapeRef.current = results.faceBlendshapes[0].categories;
+            }
+
+            if (handResults.landmarks && handResults.landmarks.length > 0) {
+              handLandmarksRef.current = handResults.landmarks[0];
+            }
+            if (results.faceLandmarks && results.faceLandmarks.length > 0) {
+              landmarksRef.current = results.faceLandmarks[0];
+            }
+          } catch (err) {
+            console.error("Detection error:", err);
+            setError(err as Error);
+          }
+        } else {
+          console.error("Canvas element is not properly initialized");
+        }
+      }
+    }
+  };
+
   // Function to start the detection loop
   const startDetection = useCallback(() => {
     if (isDetectingRef.current) return;
     isDetectingRef.current = true;
 
-    const detect = async () => {
-      if (
-        faceLandmarkerRef.current &&
-        handLandmarkerRef.current &&
-        hairSegmenterRef.current &&
-        webcamRef.current &&
-        webcamRef.current.video &&
-        webcamRef.current.video.readyState === 4
-      ) {
-        const video = webcamRef.current.video;
-        const canvas = canvasRef.current;
-        if (canvas) {
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            const { innerWidth: width, innerHeight: height } = window;
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = width * dpr;
-            canvas.height = height * dpr;
-            ctx.scale(dpr, dpr);
+    if (mode === "LIVE") {
+      faceLandmarkerRef.current?.setOptions({ runningMode: "VIDEO" });
+      handLandmarkerRef.current?.setOptions({ runningMode: "VIDEO" });
+      hairSegmenterRef.current?.setOptions({ runningMode: "VIDEO" });
+      console.log("detect live");
+      detectLiveStream();
+    } else if (mode === "VIDEO") {
+      faceLandmarkerRef.current?.setOptions({ runningMode: "VIDEO" });
+      handLandmarkerRef.current?.setOptions({ runningMode: "VIDEO" });
+      hairSegmenterRef.current?.setOptions({ runningMode: "VIDEO" });
+      console.log("detect video");
+      detectUploadedVideo();
+    } else if (mode === "IMAGE") {
+      faceLandmarkerRef.current?.setOptions({ runningMode: "IMAGE" });
+      handLandmarkerRef.current?.setOptions({ runningMode: "IMAGE" });
+      hairSegmenterRef.current?.setOptions({ runningMode: "IMAGE" });
+      console.log("detect image");
+      detectImage();
+    }
+  }, [mode]);
 
-            const imgAspect = video.videoWidth / video.videoHeight;
-            const canvasAspect = width / height;
+  // Function to stop detection
+  const stopDetection = () => {
+    isDetectingRef.current = false;
+  };
 
-            let drawWidth: number;
-            let drawHeight: number;
-            let offsetX: number;
-            let offsetY: number;
-
-            if (imgAspect < canvasAspect) {
-              drawWidth = width;
-              drawHeight = width / imgAspect;
-              offsetX = 0;
-              offsetY = (height - drawHeight) / 2;
-            } else {
-              drawWidth = height * imgAspect;
-              drawHeight = height;
-              offsetX = (width - drawWidth) / 2;
-              offsetY = 0;
-            }
-
-            ctx.clearRect(0, 0, width, height);
-
-            const startTimeMs = performance.now();
-            try {
-              const results = faceLandmarkerRef.current.detectForVideo(
-                video,
-                startTimeMs,
-              );
-
-              const handResults = handLandmarkerRef.current.detectForVideo(
-                video,
-                startTimeMs,
-              );
-
-              // const hairResults = hairSegmenterRef.current.segmentForVideo(
-              //   video,
-              //   startTimeMs,
-              // );
-
-              // if (hairResults?.categoryMask) {
-              //   hairRef.current = hairResults.categoryMask.getAsFloat32Array();
-              //   let imageData = ctx.getImageData(
-              //     0,
-              //     0,
-              //     video.videoWidth,
-              //     video.videoHeight,
-              //   ).data;
-
-              //   let j = 0;
-              //   for (let i = 0; i < hairRef.current.length; ++i) {
-              //     const maskVal = Math.round(hairRef.current[i] * 255.0);
-
-              //     // Proses hanya untuk label index 1
-              //     if (maskVal === 1) {
-              //       const legendColor =
-              //         legendColors[maskVal % legendColors.length];
-              //       imageData[j] = (legendColor[0] + imageData[j]) / 2;
-              //       imageData[j + 1] = (legendColor[1] + imageData[j + 1]) / 2;
-              //       imageData[j + 2] = (legendColor[2] + imageData[j + 2]) / 2;
-              //       imageData[j + 3] = (legendColor[3] + imageData[j + 3]) / 2;
-              //     }
-              //     j += 4;
-              //   }
-
-              //   const uint8Array = new Uint8ClampedArray(imageData.buffer);
-              //   const dataNew = new ImageData(
-              //     uint8Array,
-              //     video.videoWidth,
-              //     video.videoHeight,
-              //   );
-
-              //   hairMaskRef.current = dataNew;
-              // }
-
-              if (results.facialTransformationMatrixes.length > 0) {
-                faceTransformRef.current =
-                  results.facialTransformationMatrixes[0].data;
-              }
-
-              if (results.faceBlendshapes.length > 0) {
-                blendshapeRef.current = results.faceBlendshapes[0].categories;
-              }
-
-              if (handResults.landmarks && handResults.landmarks.length > 0) {
-                handLandmarksRef.current = handResults.landmarks[0];
-              }
-              if (results.faceLandmarks && results.faceLandmarks.length > 0) {
-                landmarksRef.current = results.faceLandmarks[0];
-              }
-            } catch (err) {
-              console.error("Detection error:", err);
-              setError(err as Error);
-            }
-          }
-        }
-      }
-
-      if (isDetectingRef.current) {
-        requestAnimationFrame(detect);
-      }
+  // Cleanup when component unmounts
+  useEffect(() => {
+    return () => {
+      stopDetection();
     };
-
-    detect();
   }, []);
 
   return (
@@ -522,7 +729,11 @@ export function VirtualTryOnScene({
           className="hidden"
           ref={imageUploadRef}
           src={URL.createObjectURL(mediaFile)}
-          onLoad={() => console.log("Image loaded")}
+          onLoad={() => {
+            isDetectingRef.current = false;
+            console.log("Image loaded");
+            startDetection();
+          }}
         />
       )}
 
@@ -534,7 +745,37 @@ export function VirtualTryOnScene({
           controls
           autoPlay
           loop
-          onLoad={() => console.log("Image loaded")}
+          onLoad={() => {
+            isDetectingRef.current = false;
+            console.log("Image loaded");
+            startDetection();
+          }}
+        />
+      )}
+
+      {mode == "LIVE" && (
+        <Webcam
+          className="hidden"
+          audio={false}
+          ref={webcamRef}
+          screenshotFormat="image/jpeg"
+          mirrored={false}
+          videoConstraints={{
+            width: VIDEO_WIDTH,
+            height: VIDEO_HEIGHT,
+            facingMode: criterias.flipped ? "environment" : "user",
+            frameRate: { ideal: 30 },
+          }}
+          onUserMediaError={(err) =>
+            setError(
+              err instanceof Error ? err : new Error("Webcam error occurred."),
+            )
+          }
+          onLoadedData={() => {
+            isDetectingRef.current = false;
+            console.log("Webcam loaded");
+            startDetection();
+          }}
         />
       )}
 
@@ -573,25 +814,6 @@ export function VirtualTryOnScene({
           sourceType={mode}
         />
       </Canvas>
-
-      <Webcam
-        className="hidden"
-        audio={false}
-        ref={webcamRef}
-        screenshotFormat="image/jpeg"
-        mirrored={false}
-        videoConstraints={{
-          width: VIDEO_WIDTH,
-          height: VIDEO_HEIGHT,
-          facingMode: criterias.flipped ? "environment" : "user",
-          frameRate: { ideal: 30 },
-        }}
-        onUserMediaError={(err) =>
-          setError(
-            err instanceof Error ? err : new Error("Webcam error occurred."),
-          )
-        }
-      />
 
       {/* Overlay Canvas */}
       <canvas
