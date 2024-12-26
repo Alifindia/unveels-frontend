@@ -12,6 +12,8 @@ import { ColorPalette } from "../../../../components/color-palette";
 import { Product } from "../../../../api/shared";
 import { useMakeup } from "../../../../context/makeup-context";
 import { useSelecProductNumberContext } from "../../select-product-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getEyeMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function EyeShadowSelector() {
   return (
@@ -43,16 +45,48 @@ function ColorSelector() {
   const { selectedMode, colorFamily, selectedColors, setSelectedColors } =
     useEyeShadowContext();
 
+  function getCombinations(arr: string[], size: number): string[][] {
+    const result: string[][] = [];
+
+    function combine(start: number, current: string[]) {
+      if (current.length === size) {
+        result.push([...current]);
+        return;
+      }
+      for (let i = start; i < arr.length; i++) {
+        combine(i + 1, [...current, arr[i]]);
+      }
+    }
+
+    combine(0, []);
+    return result;
+  }
+
   const { data } = useEyeshadowsQuery({
     color: null,
     hexcodes: null,
     texture: null,
   });
 
-  const extracted_sub_colors = extractUniqueCustomAttributes(
-    data?.items ?? [],
-    "hexacode",
-  ).flatMap((item) => item.split(","));
+  const extracted_sub_colors =
+    selectedMode == "One" || selectedMode == "Tetra"
+      ? extractUniqueCustomAttributes(data?.items ?? [], "hexacode").flatMap(
+          (item) => item.split(","),
+        )
+      : extractUniqueCustomAttributes(data?.items ?? [], "hexacode");
+
+  const combinations: string[][] = [];
+
+  extracted_sub_colors.forEach((set) => {
+    const colorArrays = set.split(",");
+    if (colorArrays.length < 100) {
+      const combinationsForSet = getCombinations(
+        colorArrays,
+        maxColorsMap[selectedMode] || 1,
+      );
+      combinations.push(...combinationsForSet);
+    }
+  });
 
   const maxColors = maxColorsMap[selectedMode] || 1;
 
@@ -69,10 +103,22 @@ function ColorSelector() {
         ? [...selectedColors, color]
         : [...selectedColors.slice(1), color]; // Remove oldest, add new
 
-        console.log(newColors, "newColors");
-        
     setSelectedColors(newColors);
   };
+
+  const handleColorsClick = (color: string[]) => {
+    console.log("clicked", color);
+    setSelectedColors(color);
+  };
+
+  function isSelected(colors: string[]) {
+    if (colors.length !== selectedColors.length) return false;
+
+    const sorted1 = [...colors].sort();
+    const sorted2 = [...selectedColors].sort();
+
+    return sorted1.every((value, index) => value === sorted2[index]);
+  }
 
   useEffect(() => {
     const maxColors = maxColorsMap[selectedMode] || 1;
@@ -94,8 +140,8 @@ function ColorSelector() {
         >
           <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
-        {/* {renderPaletteItems()} */}
-        {extracted_sub_colors
+        {(selectedMode == "One" || selectedMode == "Tetra") &&
+        extracted_sub_colors
           ? extracted_sub_colors.map((color, index) => (
               <ColorPalette
                 key={color}
@@ -105,7 +151,17 @@ function ColorSelector() {
                 onClick={() => handleColorClick(color)}
               />
             ))
-          : null}
+          : combinations.map((colors, index) => (
+              <ColorPalette
+                key={index}
+                size="large"
+                selected={isSelected(colors)}
+                palette={
+                  selectedMode == "Dual" ? { gradient: colors } : { colors }
+                }
+                onClick={() => handleColorsClick(colors)}
+              />
+            ))}
       </div>
     </div>
   );
@@ -204,10 +260,7 @@ function ModeSelector() {
                       modeIndex.toString() === index.toString(),
                   },
                 )}
-                onClick={() => {
-                  console.log(index);
-                  setSelectModeIndex(index);
-                }}
+                onClick={() => setSelectModeIndex(index)}
               >
                 <img
                   src={`/media/unveels/vto/eyeshadows/eyeshadow-${currentMode.name.toLowerCase()}-${index + 1}.png`}
@@ -226,6 +279,8 @@ function ModeSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     selectedTexture,
@@ -303,23 +358,45 @@ function ProductList() {
   };
 
   return (
-    <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return (
-            <VTOProductCard
-              product={product}
-              productNumber={index+1}
-              key={product.id}
-              selectedProduct={selectedProduct}
-              setSelectedProduct={setSelectedProduct}
-              onClick={() => handleProductClick(product)}
-            />
-          )
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Eyeshadows: {
+                attributeName: "eye_makeup_product_type",
+                values: getEyeMakeupProductTypeIds(["Eyeshadows"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Eyeshadows", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Eyeshadows");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

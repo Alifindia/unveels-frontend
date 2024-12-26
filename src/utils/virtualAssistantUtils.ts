@@ -10,6 +10,7 @@ import { shapes } from "../api/virtual-assistant-attributes/shape";
 import { fabrics } from "../api/virtual-assistant-attributes/fabric";
 import { ProductRequest } from "../types/productRequest";
 import { product_types } from "../api/virtual-assistant-attributes/product_type";
+import axios from "axios";
 
 // Fungsi untuk mencari label dan ID berdasarkan product_type
 function findCategoryFieldAndIds(
@@ -184,3 +185,11 @@ export const generateMagentoQueries = (
     return createMagentoQuery(product, categoryIds); // Generate Magento query with multiple category IDs
   });
 };
+
+// Virtual assistant api
+export const talkingAvatarHost = "https://talking-avatar.evorty.id";
+
+export function makeSpeech(text: string, language = "en-US") {
+  console.log(text, language);
+  return axios.post(talkingAvatarHost + "/talk", { text, language });
+}

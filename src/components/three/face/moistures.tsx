@@ -30,6 +30,7 @@ const MoisturesInner: React.FC<MoisturesProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={moisturesMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={true}
     />
   );
 };

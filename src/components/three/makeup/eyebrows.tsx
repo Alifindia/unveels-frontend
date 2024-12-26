@@ -10,11 +10,6 @@ import FaceMesh from "../face-mesh";
 import { Landmark } from "../../../types/landmark";
 import { useMakeup } from "../../../context/makeup-context";
 import {
-  BLUSH_TEXTURE_FIVE,
-  BLUSH_TEXTURE_FOUR,
-  BLUSH_TEXTURE_ONE,
-  BLUSH_TEXTURE_THREE,
-  BLUSH_TEXTURE_TWO,
   EYEBROW_TEXTURE_EIGHT,
   EYEBROW_TEXTURE_FIVE,
   EYEBROW_TEXTURE_FOUR,

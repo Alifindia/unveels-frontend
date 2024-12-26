@@ -9,6 +9,8 @@ import { useMakeup } from "../../../../context/makeup-context";
 import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
 import { useSelecProductNumberContext } from "../../select-product-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getHairColorProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function HairColorSelector() {
   return (
@@ -25,33 +27,38 @@ export function HairColorSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useHairColorContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useHairColorContext();
 
   return (
     <div
       className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
       data-mode="lip-color"
     >
-      {colors.map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-sm text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() => setColorFamily(item.value)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.hex,
-            }}
-          />
-          <span className="text-[0.625rem]">{item.label}</span>
-        </button>
-      ))}
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-sm text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily === item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
@@ -108,7 +115,7 @@ function ColorSelector() {
             <img
               src={path}
               alt="Hair Color"
-              className="h-[31.5px] w-[41.3px] rounded sm:h-[45px] sm:w-[59px] lg:h-[58.5px] lg:w-[76.7px] object-cover"
+              className="h-[31.5px] w-[41.3px] rounded object-cover sm:h-[45px] sm:w-[59px] lg:h-[58.5px] lg:w-[76.7px]"
             />
           </button>
         ))}
@@ -120,6 +127,8 @@ function ColorSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -186,23 +195,49 @@ function ProductList() {
   };
 
   return (
-    <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return (
-            <VTOProductCard
-              product={product}
-              productNumber={index+1}
-              key={product.id}
-              selectedProduct={selectedProduct}
-              setSelectedProduct={setSelectedProduct}
-              onClick={() => handleProductClick(product)}
-            />
-          );
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Hair: {
+                attributeName: "hair_color_product_type",
+                values: getHairColorProductTypeIds([
+                  "Permanent Color",
+                  "Semi Permanent Color",
+                  "Free Ammonia Color",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Hair", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Hair Color");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

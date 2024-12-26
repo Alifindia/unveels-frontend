@@ -29,7 +29,6 @@ const HighlighterInner: React.FC<HighlighterProps> = ({
 }) => {
   const { highlighterColor, highlighterPattern } = useMakeup();
 
-  // Memuat semua tekstur sekaligus
   const highlighterTextures = useLoader(TextureLoader, [
     HIGHLIGHTER_TEXTURE_ONE,
     HIGHLIGHTER_TEXTURE_TWO,
@@ -37,20 +36,18 @@ const HighlighterInner: React.FC<HighlighterProps> = ({
     HIGHLIGHTER_TEXTURE_FOUR,
   ]);
 
-  // Memilih tekstur yang sesuai berdasarkan HighlighterPattern
   const alphaMap = highlighterTextures[highlighterPattern] || null;
 
-  // Inisialisasi material dengan useMemo
   const HighlighterMaterial = useMemo(() => {
     const materialOptions: Partial<MeshBasicMaterialParameters> = {
       color: new Color(highlighterColor),
-      transparent: !!alphaMap, // Menjadikan transparan jika alphaMap digunakan
-      opacity: 1,
+      transparent: !!alphaMap,
+      opacity: 0.36,
     };
 
     if (alphaMap) {
       materialOptions.alphaMap = alphaMap;
-      materialOptions.alphaTest = 0; // Sesuaikan alphaTest jika diperlukan
+      materialOptions.alphaTest = 0;
     }
 
     return new MeshBasicMaterial(materialOptions);

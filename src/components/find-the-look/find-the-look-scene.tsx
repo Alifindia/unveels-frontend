@@ -8,12 +8,7 @@ import { Scanner } from "../scanner";
 interface FindTheLookSceneProps {
   models: {
     faceLandmarker: FaceLandmarker | null;
-    handDetector: ObjectDetector | null;
-    ringDetector: ObjectDetector | null;
-    neckDetector: ObjectDetector | null;
-    earringDetector: ObjectDetector | null;
-    glassDetector: ObjectDetector | null;
-    headDetector: ObjectDetector | null;
+    accesoriesDetector: ObjectDetector | null;
     makeupDetector: ObjectDetector | null;
   };
 }
@@ -71,6 +66,8 @@ export function FindTheLookScene({ models }: FindTheLookSceneProps) {
   };
 
   const handleDetectDone = (isDetectFinished: boolean) => {
+    console.log(isDetectFinished);
+
     setIsInferenceCompleted(isDetectFinished);
   };
 

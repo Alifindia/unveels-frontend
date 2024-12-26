@@ -108,7 +108,7 @@ const ContourInner: React.FC<ContourProps> = ({
     const material = new MeshBasicMaterial({
       color: contourColors[0], // Fallback to white if no color selected
       transparent: true,
-      opacity: 2,
+      opacity: 0.36,
       alphaMap: oneModeTexture,
       alphaTest: 0,
     });
@@ -119,7 +119,7 @@ const ContourInner: React.FC<ContourProps> = ({
     const material = new MeshBasicMaterial({
       color: contourColors[0],
       transparent: true,
-      opacity: 2,
+      opacity: 0.36,
       alphaMap: dualStandardTexture,
       alphaTest: 0,
     });
@@ -130,7 +130,7 @@ const ContourInner: React.FC<ContourProps> = ({
     const material = new MeshBasicMaterial({
       color: contourColors[1],
       transparent: true,
-      opacity: 2,
+      opacity: 0.36,
       alphaMap: dualHighTexture,
       alphaTest: 0,
     });

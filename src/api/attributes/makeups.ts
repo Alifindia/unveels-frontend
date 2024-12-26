@@ -286,3 +286,85 @@ export const nailsProductTypesMap = nails_product_types.reduce(
 export function getNailsProductTypeIds(labels: string[]): string[] {
   return labels.map((label) => nailsProductTypesMap[label]);
 }
+
+export const brow_makeup_product_type = [
+  {
+    label: "Brow Gels",
+    value: "5693",
+  },
+  {
+    label: "Brow Pigments",
+    value: "5694",
+  },
+  {
+    label: "Brow Pencils",
+    value: "5695",
+  },
+  {
+    label: "Brow Powders",
+    value: "5696",
+  },
+  {
+    label: "Brow Tools",
+    value: "5697",
+  },
+  {
+    label: "Brow Setter",
+    value: "5698",
+  },
+  {
+    label: "Brow Serums & Oils",
+    value: "5699",
+  },
+  {
+    label: "Brow Waxes",
+    value: "5700",
+  },
+  {
+    label: "Brow Pens",
+    value: "5701",
+  },
+];
+
+export const browMakeupProductTypesMap = brow_makeup_product_type.reduce(
+  (acc, { label, value }) => {
+    acc[label] = value;
+    return acc;
+  },
+  {} as Record<string, string>,
+);
+
+export function getBrowMakeupProductTypeIds(labels: string[]): string[] {
+  return labels.map((label) => browMakeupProductTypesMap[label]);
+}
+
+export const hair_color_product_type = [
+  {
+    label: "Permanent Color",
+    value: "5778",
+  },
+  {
+    label: "Semi Permanent Color",
+    value: "5779",
+  },
+  {
+    label: "Free Ammonia Color",
+    value: "5780",
+  },
+  {
+    label: "Root Concealers",
+    value: "6649",
+  },
+];
+
+export const hairColorProductTypesMap = hair_color_product_type.reduce(
+  (acc, { label, value }) => {
+    acc[label] = value;
+    return acc;
+  },
+  {} as Record<string, string>,
+);
+
+export function getHairColorProductTypeIds(labels: string[]): string[] {
+  return labels.map((label) => hairColorProductTypesMap[label]);
+}

@@ -234,6 +234,67 @@ function getAverageColor(
   return rgbToHex(avgR, avgG, avgB);
 }
 
+// Fungsi untuk mengambil rata-rata warna dengan area yang lebih besar (termasuk rambut):
+function getHairColor(
+  landmarkIndices: number[],
+  landmarks: any,
+  imageData: ImageData,
+  imageWidth: number,
+  imageHeight: number,
+  sampleRadius: number = 2, // Radius sampling diperbesar untuk mencakup lebih banyak area
+): string {
+  let totalR = 0;
+  let totalG = 0;
+  let totalB = 0;
+  let totalWeight = 0;
+
+  landmarkIndices.forEach((index) => {
+    const landmark = landmarks[index];
+    if (landmark) {
+      // Ambil koordinat landmark (dahi) dan geser ke atas sedikit untuk mencakup area rambut
+      const x = Math.round(landmark.x * imageWidth);
+      let y = Math.round(landmark.y * imageHeight) - 50; // Geser ke atas 10 piksel
+
+      // Ambil pixel di sekitar landmark dengan sampling circular
+      for (let dx = -sampleRadius; dx <= sampleRadius; dx++) {
+        for (let dy = -sampleRadius; dy <= sampleRadius; dy++) {
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance > sampleRadius) continue; // Hanya ambil pixel dalam lingkaran
+
+          const px = x + dx;
+          const py = y + dy;
+
+          // Pastikan koordinat berada dalam batas gambar
+          if (px >= 0 && px < imageWidth && py >= 0 && py < imageHeight) {
+            const pixelIndex = (py * imageWidth + px) * 4; // 4 untuk RGBA
+            const r = imageData.data[pixelIndex];
+            const g = imageData.data[pixelIndex + 1];
+            const b = imageData.data[pixelIndex + 2];
+
+            // Weight berdasarkan jarak (semakin dekat, semakin besar weight)
+            const weight = (sampleRadius - distance + 1) / (sampleRadius + 1); // Normalisasi weight
+
+            totalR += r * weight;
+            totalG += g * weight;
+            totalB += b * weight;
+            totalWeight += weight;
+          }
+        }
+      }
+    }
+  });
+
+  if (totalWeight === 0) {
+    return "#000000"; // Hitam jika tidak ada weight
+  }
+
+  const avgR = Math.round(totalR / totalWeight);
+  const avgG = Math.round(totalG / totalWeight);
+  const avgB = Math.round(totalB / totalWeight);
+
+  return rgbToHex(avgR, avgG, avgB); // Mengembalikan warna dalam format hex
+}
+
 export const personalityInference = async (
   faceLandmarker: FaceLandmarker,
   pred: tf.Tensor<tf.Rank> | tf.Tensor<tf.Rank>[] | tf.NamedTensorMap,
@@ -300,6 +361,8 @@ export const personalityInference = async (
 
     const irisIndices = [468, 473];
 
+    const foreheadIndices = [10, 109, 338];
+
     const extractedSkinColor = extractSkinColor(image, landmarks, indices, 5);
 
     const averageEyebrowColor = getAverageColor(
@@ -325,6 +388,22 @@ export const personalityInference = async (
       canvas.width,
       canvas.height,
     );
+
+    const hairColor = getHairColor(
+      foreheadIndices,
+      landmarks,
+      imageDataCanvas,
+      canvas.width,
+      canvas.height,
+    );
+
+    classifiers.push({
+      name: "Hair Color",
+      outputName: "",
+      labels: [],
+      outputLabel: hairColor,
+      outputColor: hairColor,
+    });
 
     classifiers.push({
       name: "Skin Type",

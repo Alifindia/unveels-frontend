@@ -40,6 +40,7 @@ import { loadTFLiteModel } from "../utils/tfliteInference";
 import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { Scanner } from "../components/scanner";
+import { useCartContext } from "../context/cart-context";
 
 export function SkinAnalysis() {
   return (
@@ -191,7 +192,6 @@ function Main() {
             )}
           </>
         </div>
-        <RecorderStatus />
         <TopNavigation cart={isInferenceCompleted} />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
@@ -262,9 +262,19 @@ const tabs = [
 
 function SkinProblems({ onClose }: { onClose: () => void }) {
   const { tab, setTab, getTotalScoreByLabel } = useSkinAnalysis();
+  const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
   const activeClassNames =
     "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text";
+
+  useEffect(() => {
+    if (tabRefs.current[tab]) {
+      tabRefs.current[tab]?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [tab]);
 
   return (
     <>
@@ -281,7 +291,7 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
             return (
               <Fragment key={problemTab}>
                 <button
-                  key={problemTab}
+                  ref={(el) => (tabRefs.current[problemTab] = el)}
                   className={clsx(
                     "relative flex h-6 shrink-0 items-center rounded-full border border-white px-3 py-1 text-xs capitalize text-white sm:text-sm",
                     {
@@ -292,26 +302,6 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
                   onClick={() => setTab(problemTab)}
                 >
                   {problemTab}
-
-                  {isActive ? (
-                    <>
-                      <div
-                        className={clsx(
-                          "absolute inset-0 flex items-center justify-center blur-sm",
-                          activeClassNames,
-                        )}
-                      >
-                        <span className="text-center text-sm capitalize md:text-lg">
-                          {problemTab}
-                        </span>
-                      </div>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-center text-sm capitalize text-white/70 md:text-lg">
-                          {problemTab}
-                        </span>
-                      </div>
-                    </>
-                  ) : null}
 
                   <div
                     className={clsx(
@@ -331,6 +321,15 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
 
         <div className="px-8">
           {tab && <DescriptionText text={labelsDescription[tab]} />}
+        </div>
+
+        <div className="w-full text-right">
+          <button
+            className="text-[0.625rem] text-white sm:py-2"
+            onClick={() => {}}
+          >
+            View all
+          </button>
         </div>
 
         {tab && <ProductList skinConcern={tab} />}
@@ -368,6 +367,17 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
   const { data } = useSkincareProductQuery({
     skinConcern,
   });
+
+  const { addItemToCart } = useCartContext();
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
 
   return (
     <div className="flex w-full gap-4 overflow-x-auto no-scrollbar active:cursor-grabbing">
@@ -419,6 +429,10 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                   className="flex h-4 w-full items-center justify-center border border-white text-[0.28875rem] font-semibold text-white sm:h-5 sm:text-[0.375rem]"
                   onClick={(event) => {
                     event.stopPropagation();
+                    handleAddToCart(
+                      product.id.toString(),
+                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                    );
                   }}
                 >
                   ADD TO CART

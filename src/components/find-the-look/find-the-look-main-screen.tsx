@@ -111,7 +111,6 @@ export function FindTheLookMainScreen({
         style={{ display: "none" }}
         onChange={handleUploadImage}
       />
-      <RecorderStatus />
       <TopNavigation />
       <div className="px-4 text-center font-extrabold text-white xl:text-start xl:text-2xl">
         How do you want to find the look

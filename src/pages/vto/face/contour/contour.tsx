@@ -5,7 +5,10 @@ import { ContourProvider, useContourContext } from "./contour-context";
 import { useEffect, useRef, useState } from "react";
 import { useMakeup } from "../../../../context/makeup-context";
 import { useQuery } from "@tanstack/react-query";
-import { faceMakeupProductTypesFilter } from "../../../../api/attributes/makeups";
+import {
+  faceMakeupProductTypesFilter,
+  getFaceMakeupProductTypeIds,
+} from "../../../../api/attributes/makeups";
 import {
   baseUrl,
   buildSearchParams,
@@ -22,6 +25,7 @@ import Textures from "three/src/renderers/common/Textures.js";
 import { useContourQuery } from "./contour-query";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useSelecProductNumberContext } from "../../select-product-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 
 export function ContourSelector() {
   return (
@@ -253,6 +257,8 @@ function TextureSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     selectedColors,
@@ -316,25 +322,47 @@ function ProductList() {
       )?.value,
     );
   };
-  
+
   return (
-    <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return (
-            <VTOProductCard
-              product={product}
-              productNumber={index+1}
-              key={product.id}
-              selectedProduct={selectedProduct}
-              setSelectedProduct={setSelectedProduct}
-              onClick={() => handleProductClick(product)}
-            />
-          );
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Contouring: {
+                attributeName: "face_makeup_product_types",
+                values: getFaceMakeupProductTypeIds(["Contouring"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Contouring", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Contour");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

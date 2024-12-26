@@ -11,6 +11,8 @@ import { patterns } from "../../../../api/attributes/pattern";
 import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
 import { useSelecProductNumberContext } from "../../select-product-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getLashMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 const colorFamilies = [{ name: "Black", value: "#000000" }];
 
@@ -21,8 +23,11 @@ export function LashesSelector() {
 
       <ColorSelector />
 
-      <div className="flex h-[35px] sm:h-10 w-full items-center justify-between text-center">
-        <Link className={`relative grow text-[11.2px] sm:text-base lg:text-[20.8px]`} to="/virtual-try-on/lashes">
+      <div className="flex h-[35px] w-full items-center justify-between text-center sm:h-10">
+        <Link
+          className={`relative grow text-[11.2px] sm:text-base lg:text-[20.8px]`}
+          to="/virtual-try-on/lashes"
+        >
           <span className={"text-white"}>Lashes</span>
         </Link>
         <div className="h-5 border-r border-white"></div>
@@ -149,6 +154,9 @@ function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
   
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
+
   const { colorFamily, selectedPattern } = useLashesContext();
 
   const { data, isLoading } = useLashesQuery({
@@ -178,23 +186,49 @@ function ProductList() {
   };
 
   return (
-    <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return (
-            <VTOProductCard
-              product={product}
-              productNumber={index+1}
-              key={product.id}
-              selectedProduct={selectedProduct}
-              setSelectedProduct={setSelectedProduct}
-              onClick={() => handleProductClick(product)}
-            />
-          );
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Lash: {
+                attributeName: "brow_makeup_product_type",
+                values: getLashMakeupProductTypeIds([
+                  "Individual False Lashes",
+                  "Full Line Lashes",
+                  "Lash Curlers",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Lash", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Lashes");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

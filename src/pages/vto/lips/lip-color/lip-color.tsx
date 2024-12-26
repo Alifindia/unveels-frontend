@@ -6,7 +6,6 @@ import { Icons } from "../../../../components/icons";
 import { LoadingProducts } from "../../../../components/loading";
 import { useMakeup } from "../../../../context/makeup-context";
 import { LipColorProvider, useLipColorContext } from "./lip-color-context";
-
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useLipColorQuery } from "./lip-color-query";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";

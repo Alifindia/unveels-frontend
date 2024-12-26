@@ -7,6 +7,8 @@ interface HandwearContextType {
   setSelectedColor: (color: string | null) => void;
   selectedMaterial: string | null;
   setSelectedMaterial: (material: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
 }
 
 // Create the context
@@ -17,6 +19,7 @@ export function HandwearProvider({ children }: { children: React.ReactNode }) {
   const [colorFamily, setColorFamily] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
 
   return (
     <HandwearContext.Provider
@@ -27,6 +30,8 @@ export function HandwearProvider({ children }: { children: React.ReactNode }) {
         setSelectedColor,
         selectedMaterial,
         setSelectedMaterial,
+        colorFamilyToInclude,
+        setColorFamilyToInclude,
       }}
     >
       {children}

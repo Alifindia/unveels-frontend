@@ -54,16 +54,17 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
 
   // Gambar gambar awal dengan transformasi dan offset
   const drawImageWithTransform = () => {
-    ctx.save(); // Simpan state canvas
-    // Gambar tanpa flip
+    ctx.clearRect(0, 0, width, height);
+    ctx.save(); // Simpan kondisi canvas saat ini
+    ctx.scale(-1, 1); // Membalikkan gambar secara horizontal
     ctx.drawImage(
       imageData,
-      offsetX, // Offset X langsung digunakan
+      -offsetX - drawWidth,
       offsetY,
       drawWidth,
       drawHeight,
     );
-    ctx.restore(); // Pulihkan state canvas
+    ctx.restore(); // Kembalikan kondisi canvas ke semula
   };
 
   const animateScanner = () => {

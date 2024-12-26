@@ -26,7 +26,7 @@ const LipplumperInner: React.FC<LipplumperProps> = ({
       new MeshBasicMaterial({
         color: lipplumperColor,
         transparent: true,
-        opacity: 2,
+        opacity: 0.36,
         alphaMap: lipplumperTexture,
         alphaTest: 0,
       }),

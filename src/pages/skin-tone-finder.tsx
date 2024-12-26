@@ -53,16 +53,36 @@ import { TopNavigation } from "../components/top-navigation";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
+import { ScreenshotPreview } from "../components/screenshot-preview";
+import {
+  FindTheLookProvider,
+  useFindTheLookContext,
+} from "../context/find-the-look-context";
+import { FindTheLookItems } from "../types/findTheLookItems";
+import { getFaceMakeupProductTypeIds } from "../api/attributes/makeups";
+import { useProducts } from "../api/get-product";
+import { useCartContext } from "../context/cart-context";
+import { Rating } from "../components/rating";
+import { BrandName } from "../components/product/brand";
+import { useTranslation } from "react-i18next";
 
 export function SkinToneFinder() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    i18n.changeLanguage("ar"); // Mengatur bahasa ke Arab saat komponen di-mount
+  }, [i18n]);
+
   return (
     <CameraProvider>
       <InferenceProvider>
         <SkinColorProvider>
           <MakeupProvider>
-            <div className="h-full min-h-dvh">
-              <Main />
-            </div>
+            <FindTheLookProvider>
+              <div className="h-full min-h-dvh">
+                <Main />
+              </div>
+            </FindTheLookProvider>
           </MakeupProvider>
         </SkinColorProvider>
       </InferenceProvider>
@@ -87,7 +107,7 @@ function Main() {
           baseOptions: {
             modelAssetPath:
               "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-            delegate: "GPU",
+            delegate: "CPU",
           },
           outputFaceBlendshapes: true,
           runningMode: "IMAGE",
@@ -111,6 +131,20 @@ function Main() {
   return (
     <>
       {modelLoading && <ModelLoadingScreen progress={progress} />}
+      {criterias.screenshotImage && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 10,
+          }}
+        >
+          <ScreenshotPreview />
+        </div>
+      )}
       <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
         <div className="absolute inset-0">
           <VideoStream debugMode={false} />
@@ -122,7 +156,6 @@ function Main() {
             }}
           ></div>
         </div>
-        <RecorderStatus />
         <TopNavigation cart={isInferenceFinished} />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
@@ -265,6 +298,7 @@ const isShadeSelected = (product: Product, selectedShade: string) => {
 function MatchedShades() {
   const [selectedTne, setSelectedTone] = useState(tone_types[0]);
   const { skinType, hexSkin } = useSkinColor();
+  const { setView } = useFindTheLookContext();
 
   const skinToneId = skin_tones.find((tone) => tone.name === skinType)?.id;
 
@@ -302,7 +336,12 @@ function MatchedShades() {
         </div>
 
         <div className="w-full text-left">
-          <button className="text-[0.625rem] text-white sm:py-2">
+          <button
+            className="text-[0.625rem] text-white sm:py-2"
+            onClick={() => {
+              setView("all_categories");
+            }}
+          >
             View all
           </button>
         </div>
@@ -327,6 +366,8 @@ function OtherShades() {
   const { setHexColor } = useSkinColor();
 
   const { setFoundationColor, setShowFoundation } = useMakeup();
+
+  const { setView } = useFindTheLookContext();
 
   const { data } = useSkinToneProductQuery({
     skintone: selectedTone.id,
@@ -406,7 +447,14 @@ function OtherShades() {
         ))}
       </div>
       <div className="w-full text-left">
-        <button className="text-[0.625rem] text-white sm:py-2">View all</button>
+        <button
+          className="text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
       </div>
 
       {data ? (
@@ -500,57 +548,32 @@ function BottomContent() {
   const { criterias } = useCamera();
   const { skinType } = useSkinColor();
 
-  if (criterias.isCaptured && skinType != null) {
+  const { view, setView } = useFindTheLookContext();
+
+  const [groupedItemsData, setGroupedItemsData] = useState<{
+    makeup: FindTheLookItems[];
+    accessories: FindTheLookItems[];
+  }>({
+    makeup: [{ label: "Foundation", section: "makeup" }],
+    accessories: [],
+  });
+
+  if (criterias.isCaptured && skinType != null && view === "face") {
     return <ShadesSelector />;
   }
 
+  if (view === "all_categories") {
+    return (
+      <AllProductsPage
+        onClose={() => {
+          setView("face");
+        }}
+        groupedItemsData={groupedItemsData}
+      />
+    );
+  }
+
   return <div></div>;
-}
-
-function RecorderStatus() {
-  const { startRecording, stopRecording } = useCamera();
-  const { isRecording, formattedTime, handleStartPause, handleStop, isPaused } =
-    useRecordingControls();
-  const { finish } = useCamera();
-
-  return (
-    <div className="absolute inset-x-0 top-14 flex items-center justify-center gap-4">
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={handleStartPause}
-      >
-        {isPaused ? (
-          <CirclePlay className="size-6 text-white" />
-        ) : isRecording ? (
-          <PauseCircle className="size-6 text-white" />
-        ) : null}
-      </button>
-      <span className="relative flex size-4">
-        {isRecording ? (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-        ) : null}
-        <span className="relative inline-flex size-4 rounded-full bg-red-500"></span>
-      </span>
-      <div className="font-serif text-white">{formattedTime}</div>
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={
-          isRecording
-            ? () => {
-                handleStop();
-                finish();
-              }
-            : handleStartPause
-        }
-      >
-        {isRecording || isPaused ? (
-          <StopCircle className="size-6 text-white" />
-        ) : (
-          <CirclePlay className="size-6 text-white" />
-        )}
-      </button>
-    </div>
-  );
 }
 
 interface SidebarProps {
@@ -604,6 +627,250 @@ function Sidebar({ setCollapsed }: SidebarProps) {
             <Icons.share className="size-4 text-white sm:size-6" />
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+const mapTypes: {
+  [key: string]: {
+    attributeName: string;
+    values: string[];
+  };
+} = {
+  Foundation: {
+    attributeName: "face_makeup_product_type",
+    values: getFaceMakeupProductTypeIds(["Foundations"]),
+  },
+};
+
+function AllProductsPage({
+  onClose,
+  groupedItemsData,
+}: {
+  onClose: () => void;
+  groupedItemsData: {
+    makeup: FindTheLookItems[];
+    accessories: FindTheLookItems[];
+  };
+}) {
+  const [tab, setTab] = useState<"makeup" | "accessories">("makeup");
+  const { selectedItems: cart, dispatch } = useFindTheLookContext();
+
+  return (
+    <div
+      className={clsx(
+        "fixed inset-0 flex h-dvh flex-col bg-black font-sans text-white",
+      )}
+    >
+      {/* Navigation */}
+      <div className="flex items-center justify-between px-4 py-2">
+        <button type="button" className="size-6" onClick={() => onClose()}>
+          <ChevronLeft className="h-6 w-6" />
+        </button>
+        <div className="flex items-center justify-end space-x-2.5">
+          <Heart className="size-6" />
+          <Icons.bag className="size-6" />
+        </div>
+      </div>
+
+      {cart.items.length > 0 ? (
+        <div className="mx-auto my-4 flex w-fit space-x-2.5 rounded-lg bg-white/25 p-4">
+          {cart.items.map((product) => {
+            const imageUrl = mediaUrl(
+              product.media_gallery_entries[0].file,
+            ) as string;
+            return (
+              <div className="relative size-9">
+                <img src={imageUrl} className="h-full w-full object-cover" />
+
+                <div className="absolute right-0 top-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      dispatch({ type: "remove", payload: product });
+                    }}
+                  >
+                    <X className="size-5 text-black" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+
+      <div className="mx-auto flex w-full max-w-[480px] px-4 py-3">
+        {["makeup", "accessories"].map((item) => (
+          <button
+            key={item}
+            type="button"
+            className={clsx(
+              "flex h-8 w-full items-center justify-center border text-xs uppercase",
+              item === tab
+                ? "border-white bg-white text-black"
+                : "border-white text-white",
+            )}
+            onClick={() => {
+              dispatch({ type: "reset" });
+              setTab(item as "makeup" | "accessories");
+            }}
+          >
+            Similar {item}
+          </button>
+        ))}
+      </div>
+
+      {tab === "makeup" ? (
+        <MakeupAllView makeups={groupedItemsData.makeup} />
+      ) : (
+        <AccessoriesAllView accessories={groupedItemsData.accessories} />
+      )}
+    </div>
+  );
+}
+
+function MakeupAllView({ makeups }: { makeups: FindTheLookItems[] }) {
+  const validMakeups = makeups.filter((category) => mapTypes[category.label]);
+
+  return (
+    <div className="h-full flex-1 overflow-y-auto px-5">
+      <div className="space-y-14">
+        {validMakeups.map((category) => (
+          <ProductHorizontalList
+            category={category.label}
+            key={category.section}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AccessoriesAllView({
+  accessories,
+}: {
+  accessories: FindTheLookItems[];
+}) {
+  const validAccessories = accessories.filter(
+    (category) => mapTypes[category.label],
+  );
+
+  return (
+    <div className="h-full flex-1 overflow-y-auto px-5">
+      <div className="space-y-14">
+        {validAccessories.map((category) => (
+          <ProductHorizontalList
+            category={category.label}
+            key={category.section}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProductHorizontalList({ category }: { category: string }) {
+  const { selectedItems: cart, dispatch } = useFindTheLookContext(); // Assuming dispatch is here
+
+  if (!mapTypes[category]) {
+    console.warn(`Category "${category}" is not defined in mapTypes.`);
+    return null;
+  }
+
+  const { attributeName, values } = mapTypes[category];
+  const { data } = useProducts({
+    product_type_key: attributeName,
+    type_ids: values,
+  });
+
+  const { addItemToCart } = useCartContext();
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
+
+  return (
+    <div key={category}>
+      <div className="py-4">
+        <h2 className="text-base text-[#E6E5E3]">{category}</h2>
+      </div>
+      <div className="flex w-full gap-4 overflow-x-auto no-scrollbar active:cursor-grabbing">
+        {data ? (
+          data.items.map((product, index) => {
+            const imageUrl =
+              mediaUrl(product.media_gallery_entries[0].file) ??
+              "https://picsum.photos/id/237/200/300";
+
+            return (
+              <div
+                key={product.id}
+                className="w-[calc(50%-0.5rem)] shrink-0 rounded shadow lg:w-[calc(16.667%-0.5rem)]"
+                onClick={() => {
+                  window.open(
+                    `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                    "_blank",
+                  );
+                }}
+              >
+                <div className="relative aspect-square w-full overflow-hidden">
+                  <img
+                    src={imageUrl}
+                    alt="Product"
+                    className="h-full w-full rounded object-cover"
+                  />
+                </div>
+
+                <h3 className="line-clamp-2 h-10 pt-2.5 text-xs font-semibold text-white">
+                  {product.name}
+                </h3>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-white/60">
+                    <BrandName
+                      brandId={getProductAttributes(product, "brand")}
+                    />
+                  </p>
+                  <div className="flex flex-wrap items-center justify-end gap-x-1">
+                    <span className="text-sm font-bold text-white">
+                      ${product.price.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <Rating rating={4} />
+                <div className="flex space-x-1 pt-1">
+                  <button
+                    type="button"
+                    className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
+                    onClick={() => {
+                      handleAddToCart(
+                        product.id.toString(),
+                        `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      );
+                    }}
+                  >
+                    ADD TO CART
+                  </button>
+                  <button
+                    type="button"
+                    className="flex h-10 w-full items-center justify-center border border-white bg-white text-xs font-semibold text-black"
+                    onClick={() => {
+                      dispatch({ type: "add", payload: product });
+                    }}
+                  >
+                    SELECT
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <LoadingProducts />
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useCamera } from "../context/recorder-context";
-import ScannerWorker from "../workers/scannerWorker.ts?worker";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 
 export function Scanner() {
@@ -9,6 +8,12 @@ export function Scanner() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const workerRef = useRef<Worker | null>(null);
   const [landmarker, setLandmarker] = useState<FaceLandmarker | null>(null);
+
+  // Path Web Worker berdasarkan environment
+  const workerPath =
+    import.meta.env.MODE === "development"
+      ? new URL("../workers/scannerWorker.ts", import.meta.url) // Path relatif untuk dev
+      : "/static/frontend/Smartwave/porto/en_US/Unveels_Tech/js/scannerWorker-C0zh0GnA.js"; // Path untuk build/produksi
 
   // Initialize MediaPipe Face Landmarker
   useEffect(() => {
@@ -77,7 +82,8 @@ export function Scanner() {
     createImageBitmap(imageLoaded).then((imageBitmap) => {
       const result = landmarker.detect(imageBitmap);
 
-      const worker = new ScannerWorker();
+      const worker = new Worker(workerPath, { type: "module" });
+
       workerRef.current = worker;
 
       worker.postMessage(

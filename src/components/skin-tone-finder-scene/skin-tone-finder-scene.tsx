@@ -12,7 +12,6 @@ import { Rnd } from "react-rnd";
 import { useInferenceContext } from "../../context/inference-context";
 import { Scanner } from "../scanner";
 
-// Komponen Canvas untuk menggambar gambar di atas
 interface ImageCanvasProps {
   image: HTMLImageElement;
   canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -29,7 +28,6 @@ function ImageCanvas({ image, canvasRef }: ImageCanvasProps) {
       return;
     }
 
-    // Fungsi untuk menggambar gambar dengan skala "cover" dan flip horizontal
     const drawImage = () => {
       const { innerWidth: width, innerHeight: height } = window;
       const dpr = window.devicePixelRatio || 1;
@@ -58,12 +56,15 @@ function ImageCanvas({ image, canvasRef }: ImageCanvasProps) {
       }
 
       ctx.clearRect(0, 0, width, height);
-
-      // Simpan keadaan awal konteks
       ctx.save();
-
-      ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
-      // Kembalikan keadaan awal konteks
+      ctx.scale(-1, 1);
+      ctx.drawImage(
+        image,
+        -offsetX - drawWidth,
+        offsetY,
+        drawWidth,
+        drawHeight,
+      );
       ctx.restore();
     };
 
@@ -122,12 +123,11 @@ function SkinToneFinderInnerScene({
   const [showScannerAfterInference, setShowScannerAfterInference] =
     useState(true);
 
-  // Memuat gambar ketika capturedImage berubah
   useEffect(() => {
     if (criterias.capturedImage) {
       const image = new Image();
       image.src = criterias.capturedImage;
-      image.crossOrigin = "anonymous"; // Menghindari masalah CORS
+      image.crossOrigin = "anonymous";
       image.onload = () => {
         setImageLoaded(image);
       };
@@ -194,16 +194,13 @@ function SkinToneFinderInnerScene({
             setIsInferenceFinished(true);
             setIsInferenceCompleted(true);
 
-            // for flutter webView
             if (extractedSkinColor) {
               console.log("Skin Tone Finder Result:", extractedSkinColor);
 
-              // Coba stringify hasilnya
               const resultString = JSON.stringify(extractedSkinColor);
               console.log("Skon Tone Finder Result as JSON:", resultString);
 
               if ((window as any).flutter_inappwebview) {
-                // Kirim data sebagai JSON string
                 (window as any).flutter_inappwebview
                   .callHandler("detectionResult", resultString)
                   .then((result: any) => {

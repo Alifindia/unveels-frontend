@@ -1,25 +1,16 @@
-import { Environment, Loader, OrthographicCamera } from "@react-three/drei";
+import { Loader, OrthographicCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import Avatar from "./avatar";
+import { BlendData } from "../../types/blendData";
 
 interface ModelSceneProps {
   speak: boolean;
-  text: string;
   playing: boolean;
-  setAudioSource: (source: string | null) => void;
-  setSpeak: (speak: boolean) => void;
-  language: string | "en-US";
+  blendshape: BlendData[];
 }
 
-const ModelScene = ({
-  speak,
-  text,
-  playing,
-  setAudioSource,
-  setSpeak,
-  language,
-}: ModelSceneProps) => {
+const ModelScene = ({ speak, playing, blendshape }: ModelSceneProps) => {
   return (
     <>
       <Canvas dpr={2}>
@@ -52,11 +43,8 @@ const ModelScene = ({
           <Avatar
             avatar_url="/media/unveels/3d/sarahkarakter.glb"
             speak={speak}
-            text={text}
             playing={playing}
-            setAudioSource={setAudioSource}
-            setSpeak={setSpeak}
-            language={language}
+            blendshape={blendshape}
           />
         </Suspense>
       </Canvas>

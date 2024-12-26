@@ -6,7 +6,10 @@ import { BronzerProvider, useBronzerContext } from "./bronzer-context";
 import { useLashesContext } from "../../eyes/lashes/lashes-context";
 import { useMakeup } from "../../../../context/makeup-context";
 import { useQuery } from "@tanstack/react-query";
-import { faceMakeupProductTypesFilter } from "../../../../api/attributes/makeups";
+import {
+  faceMakeupProductTypesFilter,
+  getFaceMakeupProductTypeIds,
+} from "../../../../api/attributes/makeups";
 import {
   baseUrl,
   buildSearchParams,
@@ -22,6 +25,7 @@ import { useBronzerQuery } from "./bronzer-query";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useEffect, useState } from "react";
 import { useSelecProductNumberContext } from "../../select-product-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 
 export function BronzerSelector() {
   return (
@@ -181,6 +185,8 @@ function TextureSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     selectedTexture,
@@ -248,23 +254,45 @@ function ProductList() {
   };
 
   return (
-    <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return (
-            <VTOProductCard
-              product={product}
-              productNumber={index+1}
-              key={product.id}
-              selectedProduct={selectedProduct}
-              setSelectedProduct={setSelectedProduct}
-              onClick={() => handleProductClick(product)}
-            />
-          );
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Bronzers: {
+                attributeName: "face_makeup_product_types",
+                values: getFaceMakeupProductTypeIds(["Bronzers"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Bronzers", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Bronzers");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

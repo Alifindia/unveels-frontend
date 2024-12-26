@@ -20,6 +20,30 @@ interface FindThelookContextType {
       "face" | "single_category" | "recommendations" | "all_categories"
     >
   >;
+  sectionName: string;
+  setSectionName: (name: string) => void;
+  mapTypes: {
+    [key: string]: {
+      attributeName: string;
+      values: string[];
+    };
+  };
+  setMapTypes: (types: {
+    [key: string]: {
+      attributeName: string;
+      values: string[];
+    };
+  }) => void;
+  groupedItemsData: {
+    makeup: FindTheLookItems[];
+    accessories: FindTheLookItems[];
+  };
+  setGroupedItemsData: React.Dispatch<
+    React.SetStateAction<{
+      makeup: FindTheLookItems[];
+      accessories: FindTheLookItems[];
+    }>
+  >;
 }
 
 // Create the context
@@ -84,6 +108,23 @@ export function FindTheLookProvider({
   const [tab, setTab] = useState<string | null>(null);
   const [section, setSection] = useState<string | null>(null);
 
+  const [sectionName, setSectionName] = useState<string>("");
+  const [mapTypes, setMapTypes] = useState<{
+    [key: string]: {
+      attributeName: string;
+      values: string[];
+    };
+  }>({});
+
+  // Initialize groupedItemsData
+  const [groupedItemsData, setGroupedItemsData] = useState<{
+    makeup: FindTheLookItems[];
+    accessories: FindTheLookItems[];
+  }>({
+    makeup: [{ label: "Lipstick", section: "makeup" }],
+    accessories: [],
+  });
+
   return (
     <FindTheLookContext.Provider
       value={{
@@ -98,6 +139,12 @@ export function FindTheLookProvider({
         dispatch,
         view,
         setView,
+        sectionName,
+        setSectionName,
+        mapTypes,
+        setMapTypes,
+        groupedItemsData,
+        setGroupedItemsData,
       }}
     >
       {children}

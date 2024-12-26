@@ -13,7 +13,7 @@ export function TopNavigation({
   cart?: boolean;
 }) {
   const { flipCamera } = useCamera();
-  const { cartItemCount } = useCartContext();
+  const { summaryCount } = useCartContext();
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
@@ -83,7 +83,7 @@ export function TopNavigation({
           >
             <Icons.myCart className="size-6 text-white" />
             <span className="absolute bottom-[5px] right-[5px] flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-              {cartItemCount}
+              {summaryCount}
             </span>
           </button>
         )}

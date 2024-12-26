@@ -1,10 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import Webcam from "react-webcam";
-import {
-  FaceDetector,
-  FaceLandmarker,
-  FilesetResolver,
-} from "@mediapipe/tasks-vision";
+import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { useCamera } from "../../context/recorder-context";
 import {
   BRIGHTNESS_THRESHOLD,
@@ -33,12 +29,15 @@ import {
 
 interface VideoStreamProps {
   debugMode?: boolean;
+  onCanvasReady?: (ready: boolean | false) => void;
 }
 
-export function VideoStream({ debugMode = false }: VideoStreamProps) {
+export function VideoStream({
+  debugMode = false,
+  onCanvasReady,
+}: VideoStreamProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<Error | null>(null);
-  const faceDetectorRef = useRef<FaceDetector | null>(null);
   const isDetectingRef = useRef<boolean>(false);
   const faceLandmarRef = useRef<FaceLandmarker | null>(null);
 
@@ -54,8 +53,6 @@ export function VideoStream({ debugMode = false }: VideoStreamProps) {
     criterias,
     setCriterias,
     captureImage,
-    setBoundingBox,
-    captureImageCut,
     resetCapture,
   } = useCamera();
 
@@ -84,7 +81,7 @@ export function VideoStream({ debugMode = false }: VideoStreamProps) {
           baseOptions: {
             modelAssetPath:
               "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-            delegate: "GPU",
+            delegate: "CPU",
           },
           runningMode:
             runningMode == "LIVE_CAMERA" || runningMode == "VIDEO"
@@ -104,7 +101,7 @@ export function VideoStream({ debugMode = false }: VideoStreamProps) {
 
     return () => {
       if (faceLandmarRef.current) {
-        faceLandmarRef.current.close;
+        faceLandmarRef.current.close();
       }
       isDetectingRef.current = false;
     };
@@ -120,7 +117,14 @@ export function VideoStream({ debugMode = false }: VideoStreamProps) {
     ) {
       const video = webcamRef.current.video;
       const canvas = canvasRef.current;
-      if (canvas) {
+      if (
+        canvas &&
+        faceLandmarRef.current &&
+        video &&
+        video.readyState === 4 &&
+        video.videoWidth > 0 &&
+        video.videoHeight > 0
+      ) {
         const ctx = canvas.getContext("2d");
         if (ctx) {
           const { innerWidth: width, innerHeight: height } = window;
@@ -149,8 +153,22 @@ export function VideoStream({ debugMode = false }: VideoStreamProps) {
             offsetY = 0;
           }
 
+          // Membalik gambar secara horizontal untuk menghilangkan efek mirror
           ctx.clearRect(0, 0, width, height);
-          ctx.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
+          ctx.save(); // Simpan kondisi canvas saat ini
+          ctx.scale(-1, 1); // Membalikkan gambar secara horizontal
+          ctx.drawImage(
+            video,
+            -offsetX - drawWidth,
+            offsetY,
+            drawWidth,
+            drawHeight,
+          );
+          ctx.restore(); // Kembalikan kondisi canvas ke semula
+
+          if (onCanvasReady) {
+            onCanvasReady(true);
+          }
 
           const startTimeMs = performance.now();
 
@@ -260,8 +278,18 @@ export function VideoStream({ debugMode = false }: VideoStreamProps) {
             offsetY = 0;
           }
 
+          // Membalik gambar secara horizontal untuk menghilangkan efek mirror
           ctx.clearRect(0, 0, width, height);
-          ctx.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
+          ctx.save(); // Simpan kondisi canvas saat ini
+          ctx.scale(-1, 1); // Membalikkan gambar secara horizontal
+          ctx.drawImage(
+            video,
+            -offsetX - drawWidth,
+            offsetY,
+            drawWidth,
+            drawHeight,
+          );
+          ctx.restore(); // Kembalikan kondisi canvas ke semula
 
           const startTimeMs = performance.now();
 
@@ -636,7 +664,7 @@ export function VideoStream({ debugMode = false }: VideoStreamProps) {
           <img
             src={capturedImageSrc}
             alt="Captured"
-            className="h-full w-full object-cover"
+            className={`h-full w-full scale-x-[-1] transform object-cover`}
           />
         </div>
       ) : (
@@ -662,6 +690,7 @@ export function VideoStream({ debugMode = false }: VideoStreamProps) {
                       : new Error("Webcam error occurred."),
                   )
                 }
+                style={{ opacity: 0 }} // Menyembunyikan tampilan webcam dengan transparansi
               />
             </>
           )}

@@ -10,7 +10,13 @@ import {
   StopCircle,
   X,
 } from "lucide-react";
-import { cloneElement, CSSProperties, Fragment, useState } from "react";
+import {
+  cloneElement,
+  CSSProperties,
+  Fragment,
+  useEffect,
+  useState,
+} from "react";
 import { Icons } from "../components/icons";
 
 import { Link, Outlet, useNavigate } from "react-router-dom";
@@ -61,10 +67,19 @@ import { TiaraProvider } from "./vto/head-accesories/tiaras/tiaras-context";
 import { HeadbandProvider } from "./vto/head-accesories/headband/headband-context";
 import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-context";
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
-import VoiceCommand from "../components/voice-command/voice-command";
-import { VirtualTryOnMakeupsVoiceProvider } from "../context/virtual-try-on-makeups-voice-context";
+import { ScreenshotPreview } from "../components/screenshot-preview";
+import ChangeModel from "../components/change-model";
+import { set } from "lodash";
+import {
+  FindTheLookProvider,
+  useFindTheLookContext,
+} from "../context/find-the-look-context";
+import { FindTheLookItems } from "../types/findTheLookItems";
+import { CartProvider, useCartContext } from "../context/cart-context";
+import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
+import { FilterProvider } from "../context/filter-context";
 import { SelecProductNumberProvider } from "./vto/select-product-context";
-import { FindTheLookProvider } from "../context/find-the-look-context";
+import VoiceCommand from "../components/voice-command/voice-command";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -72,63 +87,63 @@ interface VirtualTryOnProvider {
 
 export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
   return (
-    <SelecProductNumberProvider>
-      <WatchesProvider>
-        <HandwearProvider>
-          <ScarvesProvider>
-            <NeckwearProvider>
-              <TiaraProvider>
-                <HeadbandProvider>
-                  <HatsProvider>
-                    <GlassesProvider>
-                      <EarringsProvider>
-                        <HairColorProvider>
-                          <PressOnNailsProvider>
-                            <NailPolishProvider>
-                              <MascaraProvider>
-                                <LenseProvider>
-                                  <LashesProvider>
-                                    <EyebrowsProvider>
-                                      <EyeShadowProvider>
-                                        <EyeLinerProvider>
-                                          <ConcealerProvider>
-                                            <ContourProvider>
-                                              <BronzerProvider>
-                                                <HighlighterProvider>
-                                                  <FoundationProvider>
-                                                    <BlushProvider>
-                                                      <LipColorProvider>
-                                                        <LipLinerProvider>
-                                                          <LipPlumperProvider>
-                                                            {children}
-                                                          </LipPlumperProvider>
-                                                        </LipLinerProvider>
-                                                      </LipColorProvider>
-                                                    </BlushProvider>
-                                                  </FoundationProvider>
-                                                </HighlighterProvider>
-                                              </BronzerProvider>
-                                            </ContourProvider>
-                                          </ConcealerProvider>
-                                        </EyeLinerProvider>
-                                      </EyeShadowProvider>
-                                    </EyebrowsProvider>
-                                  </LashesProvider>
-                                </LenseProvider>
-                              </MascaraProvider>
-                            </NailPolishProvider>
-                          </PressOnNailsProvider>
-                        </HairColorProvider>
-                      </EarringsProvider>
-                    </GlassesProvider>
-                  </HatsProvider>
-                </HeadbandProvider>
-              </TiaraProvider>
-            </NeckwearProvider>
-          </ScarvesProvider>
-        </HandwearProvider>
-      </WatchesProvider>
-    </SelecProductNumberProvider>
+  <SelecProductNumberProvider>
+    <WatchesProvider>
+      <HandwearProvider>
+        <ScarvesProvider>
+          <NeckwearProvider>
+            <TiaraProvider>
+              <HeadbandProvider>
+                <HatsProvider>
+                  <GlassesProvider>
+                    <EarringsProvider>
+                      <HairColorProvider>
+                        <PressOnNailsProvider>
+                          <NailPolishProvider>
+                            <MascaraProvider>
+                              <LenseProvider>
+                                <LashesProvider>
+                                  <EyebrowsProvider>
+                                    <EyeShadowProvider>
+                                      <EyeLinerProvider>
+                                        <ConcealerProvider>
+                                          <ContourProvider>
+                                            <BronzerProvider>
+                                              <HighlighterProvider>
+                                                <FoundationProvider>
+                                                  <BlushProvider>
+                                                    <LipColorProvider>
+                                                      <LipLinerProvider>
+                                                        <LipPlumperProvider>
+                                                          {children}
+                                                        </LipPlumperProvider>
+                                                      </LipLinerProvider>
+                                                    </LipColorProvider>
+                                                  </BlushProvider>
+                                                </FoundationProvider>
+                                              </HighlighterProvider>
+                                            </BronzerProvider>
+                                          </ContourProvider>
+                                        </ConcealerProvider>
+                                      </EyeLinerProvider>
+                                    </EyeShadowProvider>
+                                  </EyebrowsProvider>
+                                </LashesProvider>
+                              </LenseProvider>
+                            </MascaraProvider>
+                          </NailPolishProvider>
+                        </PressOnNailsProvider>
+                      </HairColorProvider>
+                    </EarringsProvider>
+                  </GlassesProvider>
+                </HatsProvider>
+              </HeadbandProvider>
+            </TiaraProvider>
+          </NeckwearProvider>
+        </ScarvesProvider>
+      </HandwearProvider>
+    </WatchesProvider>
+  </SelecProductNumberProvider>
   );
 }
 
@@ -138,15 +153,17 @@ export function VirtualTryOn() {
       <SkinColorProvider>
         <MakeupProvider>
           <AccesoriesProvider>
-            <VirtualTryOnMakeupsVoiceProvider>
-              <VirtualTryOnProvider>
-                <FindTheLookProvider>
-                <div className="h-full min-h-dvh">
-                  <Main />
-                </div>
-                </FindTheLookProvider>
-              </VirtualTryOnProvider>
-            </VirtualTryOnMakeupsVoiceProvider>
+            <VirtualTryOnProvider>
+              <FindTheLookProvider>
+                <CartProvider>
+                  <FilterProvider>
+                    <div className="h-full min-h-dvh">
+                      <Main />
+                    </div>
+                  </FilterProvider>
+                </CartProvider>
+              </FindTheLookProvider>
+            </VirtualTryOnProvider>
           </AccesoriesProvider>
         </MakeupProvider>
       </SkinColorProvider>
@@ -155,27 +172,72 @@ export function VirtualTryOn() {
 }
 
 function Main() {
-  return (
-    <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
-      <div className="absolute inset-0">
-        <VirtualTryOnScene />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-          }}
-        ></div>
-      </div>
-      {/* <RecorderStatus /> */}
-      <TopNavigation item={false} cart={false} />
+  const { criterias } = useCamera();
+  const [isMainContentVisible, setMainContentVisible] = useState(true);
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
+  const [showChangeModel, setShowChangeModel] = useState(false);
+  const { view, setView, sectionName, mapTypes, groupedItemsData } =
+    useFindTheLookContext();
 
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-        <Sidebar />
-        <MainContent />
-        <Footer />
-      </div>
-    </div>
-  );
+  if (view === "all_categories") {
+    return (
+      <VTOAllProductsPage
+        onClose={() => {
+          setView("face");
+        }}
+        groupedItemsData={groupedItemsData}
+        name={sectionName}
+        mapTypes={mapTypes}
+      />
+    );
+  }
+
+  if (view === "face") {
+    if (showChangeModel) {
+      return <ChangeModel onClose={() => setShowChangeModel(false)} />;
+    }
+    return (
+      <>
+        {criterias.screenshotImage && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 10,
+            }}
+          >
+            <ScreenshotPreview />
+          </div>
+        )}
+        <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+          <div className="absolute inset-0">
+            <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+            <div className="pointer-events-none absolute inset-0"></div>
+          </div>
+          <TopNavigation item={false} cart={false} />
+
+          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
+            <Sidebar
+              onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
+              setMediaFile={setMediaFile}
+              setMode={setMode}
+              setShowChangeModel={setShowChangeModel}
+            />
+            <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
+              {isMainContentVisible && <MainContent />}
+              <Footer />
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  return <></>;
 }
 
 function MainContent() {
@@ -212,17 +274,18 @@ function MainContent() {
 
   return (
     <>
-      {collapsed ? null : <BottomContent />}
       <div className="flex justify-center">
         <button
           type="button"
           onClick={() => {
             navigate("/virtual-try-on/makeups");
           }}
+          className="flex h-3 w-full items-center justify-center bg-transparent"
         >
-          <ChevronDown className="size-6 text-white" />
+          <div className="h-1 w-10 rounded-full bg-gray-400" />
         </button>
       </div>
+      {collapsed ? null : <BottomContent />}
     </>
   );
 }
@@ -559,7 +622,19 @@ export function TopNavigation({
   );
 }
 
-function Sidebar() {
+interface SidebarProps {
+  onExpandClick: () => void;
+  setMediaFile: (file: File | null) => void;
+  setMode: (mode: "IMAGE" | "VIDEO" | "LIVE") => void;
+  setShowChangeModel: (isShow: boolean) => void;
+}
+
+function Sidebar({
+  onExpandClick,
+  setMediaFile,
+  setMode,
+  setShowChangeModel,
+}: SidebarProps) {
   return (
     <div className="pointer-events-none flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
       <div className="relative p-0.5">
@@ -593,7 +668,11 @@ function Sidebar() {
           <button className="">
             <Icons.reset className="size-4 text-white sm:size-6" />
           </button>
-          <UploadMediaDialog />
+          <UploadMediaDialog
+            setMediaFile={setMediaFile}
+            setMode={setMode}
+            setShowChangeModel={setShowChangeModel}
+          />
           <button>
             <Icons.share className="size-4 text-white sm:size-6" />
           </button>
@@ -603,7 +682,35 @@ function Sidebar() {
   );
 }
 
-function UploadMediaDialog() {
+function UploadMediaDialog({
+  setMediaFile,
+  setMode,
+  setShowChangeModel,
+}: {
+  setMediaFile: (file: File | null) => void;
+  setMode: (mode: "IMAGE" | "VIDEO" | "LIVE") => void;
+  setShowChangeModel: (isShow: boolean) => void;
+}) {
+  const handleUploadPhoto = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      setMode("IMAGE");
+      setMediaFile(file);
+    }
+  };
+
+  const handleUploadVideo = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      setMode("VIDEO");
+      setMediaFile(file);
+    }
+  };
+
+  const handleChangeModel = () => {
+    setShowChangeModel(true);
+  };
+
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
@@ -616,12 +723,19 @@ function UploadMediaDialog() {
         <Dialog.Content className="data-[state=open]:animate-contentShow fixed left-1/2 top-1/2 flex max-h-[85vh] w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col justify-center rounded-lg bg-[#0000002E] px-2 py-4 text-white backdrop-blur">
           <div className="flex w-full flex-col justify-center">
             <Dialog.Title className="mb-2 text-center text-[14px] text-white">
-              How would you like to try on the makeup ?
+              How would you like to try on the makeup?
             </Dialog.Title>
             <div className="grid grid-cols-3 gap-2">
-              <button className="upload-photo flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur">
+              <button
+                className="upload-photo flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur"
+                onClick={() => {
+                  const photoInput = document.getElementById("photoInput");
+                  if (photoInput) {
+                    photoInput.click();
+                  }
+                }}
+              >
                 <Icons.uploadPhoto className="size-5 text-white" />
-
                 <p className="mt-2 text-center text-[12px] text-white">
                   Upload Photo
                 </p>
@@ -629,9 +743,24 @@ function UploadMediaDialog() {
                   Upload a photo of yourself to see how different makeup shades
                   look on you.
                 </p>
+                <input
+                  id="photoInput"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadPhoto}
+                  style={{ display: "none" }}
+                />
               </button>
 
-              <button className="upload-video flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur">
+              <button
+                className="upload-video flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur"
+                onClick={() => {
+                  const videoInput = document.getElementById("videoInput");
+                  if (videoInput) {
+                    videoInput.click();
+                  }
+                }}
+              >
                 <Icons.uploadVideo className="size-5 text-white" />
                 <p className="mt-2 text-center text-[12px] text-white">
                   Upload Video
@@ -640,9 +769,19 @@ function UploadMediaDialog() {
                   Upload a video to apply makeup dynamically and see how they
                   look in motion.
                 </p>
+                <input
+                  id="videoInput"
+                  type="file"
+                  accept="video/*"
+                  onChange={handleUploadVideo}
+                  style={{ display: "none" }}
+                />
               </button>
 
-              <button className="choose-model flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur">
+              <button
+                onClick={handleChangeModel}
+                className="choose-model flex w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-[#00000042] p-2 backdrop-blur"
+              >
                 <Icons.chooseModel className="size-5 text-white" />
                 <p className="mt-2 text-center text-[12px] text-white">
                   Choose model

@@ -13,6 +13,9 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
 import { useSelecProductNumberContext } from "../../select-product-context";
+import { colors } from "../../../../api/attributes/color";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getEyeMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function ConcealerSelector() {
   return (
@@ -27,36 +30,38 @@ export function ConcealerSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useConcealerContext();
-  console.log(skin_tones)
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useConcealerContext();
+
   return (
     <div
       className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
       data-mode="lip-color"
     >
-      {skin_tones.map((item, index) => (
-        <button
-          key={item.id}
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
-            {
-              "border-white/80": colorFamily === item.id,
-            },
-          )}
-          onClick={() =>
-            setColorFamily(colorFamily === item.id ? null : item.id)
-          }
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.color,
-            }}
-          />
-          <span className="text-[9.8px] sm:text-sm">{item.name}</span>
-        </button>
-      ))}
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily === item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
@@ -83,7 +88,6 @@ function ColorSelector() {
   }
 
   function setColor(color: string) {
-    console.log(color)
     if (!showConcealer) {
       setShowConcealer(true);
     }
@@ -122,6 +126,8 @@ function ColorSelector() {
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
   const {
     colorFamily,
@@ -198,25 +204,47 @@ function ProductList() {
       )?.value,
     );
   };
-  
+
   return (
-    <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return (
-            <VTOProductCard
-              product={product}
-              productNumber={index+1}
-              key={product.id}
-              selectedProduct={selectedProduct}
-              setSelectedProduct={setSelectedProduct}
-              onClick={() => handleProductClick(product)}
-            />
-          );
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Concealers: {
+                attributeName: "eye_makeup_product_type",
+                values: getEyeMakeupProductTypeIds(["Concealers"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Concealers", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Concealers");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

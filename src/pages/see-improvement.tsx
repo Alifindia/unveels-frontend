@@ -27,6 +27,7 @@ import {
   SkinImprovementProvider,
   useSkinImprovement,
 } from "../context/see-improvement-context";
+import { useCartContext } from "../context/cart-context";
 
 export function SeeImprovement() {
   return (
@@ -96,7 +97,6 @@ function Main() {
             }}
           ></div>
         </div>
-        <RecorderStatus />
         <TopNavigation cart={false} />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
@@ -235,6 +235,17 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
     skinConcern,
   });
 
+  const { addItemToCart } = useCartContext();
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
+
   return (
     <div className="flex w-full gap-4 overflow-x-auto no-scrollbar active:cursor-grabbing">
       {data ? (
@@ -284,6 +295,10 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                   className="flex h-7 w-full items-center justify-center border border-white text-[0.375rem] font-semibold text-white"
                   onClick={(event) => {
                     event.stopPropagation();
+                    handleAddToCart(
+                      product.id.toString(),
+                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                    );
                   }}
                 >
                   ADD TO CART

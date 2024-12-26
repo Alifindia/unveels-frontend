@@ -233,7 +233,6 @@ function MainContent() {
                   zIndex: 0,
                 }}
               ></div>
-              <RecorderStatus />
               <TopNavigation />
             </>
           )}
@@ -283,6 +282,8 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
           >
             <X className="size-6 text-white" />
           </Link>
+
+          <TopNavigation cart={inferenceResult.length > 0} />
         </div>
       </div>
 
@@ -670,16 +671,10 @@ function RecommendationsTab({ personality }: { personality: string }) {
 
   const { guestCartId, addItemToCart } = useCartContext(); // Mengakses CartContext
 
-  // Fungsi untuk menambahkan item ke keranjang
-  const handleAddToCart = async (sku: string) => {
-    if (!guestCartId) {
-      console.log("Guest Cart ID is not available. Please try again.");
-      return;
-    }
-
+  const handleAddToCart = async (id: string, url: string) => {
     try {
-      await addItemToCart(sku); // Memanggil fungsi dari CartContext
-      console.log(`Product ${sku} added to cart!`);
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
     }
@@ -743,7 +738,10 @@ function RecommendationsTab({ personality }: { personality: string }) {
                       className="flex h-7 w-full items-center justify-center border border-white text-[0.5rem] font-semibold"
                       onClick={(event) => {
                         event.stopPropagation();
-                        handleAddToCart(product.sku);
+                        handleAddToCart(
+                          product.id.toString(),
+                          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                        );
                       }}
                     >
                       ADD TO CART
@@ -875,7 +873,10 @@ function RecommendationsTab({ personality }: { personality: string }) {
                       className="flex h-7 w-full items-center justify-center border border-white text-[0.5rem] font-semibold"
                       onClick={(event) => {
                         event.stopPropagation();
-                        handleAddToCart(product.sku);
+                        handleAddToCart(
+                          product.id.toString(),
+                          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                        );
                       }}
                     >
                       ADD TO CART
@@ -914,7 +915,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         title="Face"
         features={[
           { name: "Face Shape", value: data[14].outputLabel },
-          { name: "Skin Tone", value: data[16].outputLabel },
+          { name: "Skin Tone", value: data[17].outputLabel },
         ]}
       />
       <FeatureSection

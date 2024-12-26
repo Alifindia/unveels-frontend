@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { MeshProps, useFrame, useThree } from "@react-three/fiber";
 import {
   LinearFilter,
@@ -38,14 +38,17 @@ import Ring from "../three/accesories/ring";
 import { LoopNode } from "three/webgpu";
 import FoundationNew from "../three/makeup/foundation-new";
 import { Blendshape } from "../../types/blendshape";
+import EyeShadow from "../three/makeup/eyeshadow";
+import Eyeliner from "../three/makeup/eyeliner";
+import { useCamera } from "../../context/recorder-context";
 
 interface VirtualTryOnThreeSceneProps extends MeshProps {
-  videoRef: React.RefObject<Webcam>;
+  videoRef: React.RefObject<Webcam | HTMLVideoElement | HTMLImageElement>;
   landmarks: React.RefObject<Landmark[]>;
   handlandmarks: React.RefObject<Landmark[]>;
   faceTransform: React.RefObject<number[]>;
   blendshape: React.RefObject<Blendshape[]>;
-  //hairMask: React.RefObject<ImageData>; // Tambahkan prop dataNew
+  sourceType: "LIVE" | "VIDEO" | "IMAGE";
 }
 
 const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
@@ -54,14 +57,17 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   handlandmarks,
   faceTransform,
   blendshape,
-  //hairMask,
+  sourceType,
   ...props
 }) => {
+  const { gl } = useThree();
   const flipped = true;
   const { viewport } = useThree();
   const [planeSize, setPlaneSize] = useState<[number, number]>([1, 1]);
-  const [videoTexture, setVideoTexture] = useState<VideoTexture | null>(null);
-  const hairMaskTextureRef = useRef<Texture | null>(null);
+  const [videoTexture, setVideoTexture] = useState<
+    VideoTexture | Texture | null
+  >(null);
+  const { skinToneThreeSceneRef, setScreenshotImage } = useCamera();
 
   const [maskOpacity, setMaskOpacity] = useState(0.5);
 
@@ -80,6 +86,8 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
     showLens,
     showEyebrows,
     showHair,
+    showEyeShadow,
+    showEyeliner,
   } = useMakeup();
 
   const {
@@ -96,126 +104,119 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   const filterRef = useRef<ShaderMaterial>(null);
 
   // State for slider-controlled factors
-  const [archFactor, setArchFactor] = useState(0.1);
-  const [pinchFactor, setPinchFactor] = useState(0.1);
+  const [archFactor, setArchFactor] = useState(0.0);
+  const [pinchFactor, setPinchFactor] = useState(0.0);
   const [horizontalShiftFactor, setHorizontalShiftFactor] = useState(0);
   const [verticalShiftFactor, setVerticalShiftFactor] = useState(0);
 
-  // Konversi ImageData menjadi RGBA dengan transparansi
-  // const processImageDataWithTransparency = (
-  //   imageData: ImageData,
-  // ): ImageData => {
-  //   const data = new Uint8ClampedArray(imageData.data); // Salin data
-  //   for (let i = 0; i < data.length; i += 4) {
-  //     const maskValue = data[i]; // Nilai mask disimpan di channel Red
-  //     if (maskValue === 0) {
-  //       // Jika bukan bagian mask, buat transparan
-  //       data[i + 3] = 0; // Alpha = 0
-  //     } else {
-  //       // Jika bagian mask, pastikan alpha penuh
-  //       data[i + 3] = 255; // Alpha = 255
-  //     }
-  //   }
-  //   return new ImageData(data, imageData.width, imageData.height);
-  // };
-
-  // const imageDataToImage = (imageData: ImageData): HTMLImageElement => {
-  //   const processedImageData = processImageDataWithTransparency(imageData);
-  //   const canvas = document.createElement("canvas");
-  //   canvas.width = processedImageData.width;
-  //   canvas.height = processedImageData.height;
-
-  //   const ctx = canvas.getContext("2d");
-  //   if (ctx) {
-  //     ctx.putImageData(processedImageData, 0, 0);
-  //     const img = new Image();
-  //     img.src = canvas.toDataURL();
-  //     return img;
-  //   }
-  //   return new Image();
-  // };
-
-  // Handle video readiness and create texture
+  // Handle source changes and create texture
   useEffect(() => {
-    const video = videoRef.current?.video;
-    if (!video) return;
+    const source = videoRef.current;
+
+    if (!source) {
+      setVideoTexture(null);
+      return;
+    }
+
+    const videoElement = source instanceof Webcam ? source.video : source;
+
+    // Cleanup previous texture
+    if (videoTexture) {
+      videoTexture.dispose();
+      setVideoTexture(null);
+    }
 
     const handleCanPlay = () => {
-      video.play();
-      const texture = new VideoTexture(video);
-      texture.minFilter = LinearFilter;
-      texture.magFilter = LinearFilter;
-      texture.format = RGBFormat;
-      texture.needsUpdate = true;
-      setVideoTexture(texture);
-      console.log("VideoTexture created");
+      if (videoElement instanceof HTMLVideoElement) {
+        videoElement.play();
+        const texture = new VideoTexture(videoElement);
+        texture.minFilter = LinearFilter;
+        texture.magFilter = LinearFilter;
+        texture.format = RGBFormat;
+        setVideoTexture(texture);
+        console.log("VideoTexture created");
+      } else if (source instanceof HTMLImageElement) {
+        const loader = new TextureLoader();
+        loader.load(source.src, (texture) => {
+          setVideoTexture(texture);
+          console.log("ImageTexture created");
+        });
+      }
     };
 
-    if (video.readyState >= 2) {
-      // HAVE_CURRENT_DATA
+    if (
+      videoElement instanceof HTMLVideoElement &&
+      videoElement.readyState >= 2
+    ) {
       handleCanPlay();
-    } else {
-      video.addEventListener("canplay", handleCanPlay);
+    } else if (videoElement instanceof HTMLVideoElement) {
+      videoElement.addEventListener("canplay", handleCanPlay);
       return () => {
-        video.removeEventListener("canplay", handleCanPlay);
+        videoElement.removeEventListener("canplay", handleCanPlay);
       };
+    } else if (source instanceof HTMLImageElement) {
+      handleCanPlay();
     }
-  }, [videoRef]);
+  }, [videoRef, sourceType]); // Depend on `videoRef` and `sourceType`
 
-  // Update plane size based on video aspect ratio and viewport
+  // Update plane size based on source aspect ratio and viewport
   useEffect(() => {
-    if (!videoTexture) return;
+    if (!videoTexture || !videoRef.current) return;
 
-    const video = videoRef.current?.video;
-    if (video) {
-      const imageAspect = video.videoWidth / video.videoHeight;
-      const viewportAspect = viewport.width / viewport.height;
+    const source = videoRef.current;
+    let imageAspect = 1;
 
-      let planeWidth: number;
-      let planeHeight: number;
+    const videoElement = source instanceof Webcam ? source.video : source;
 
-      if (imageAspect > viewportAspect) {
-        // Video is wider than viewport
-        planeHeight = viewport.height;
-        planeWidth = viewport.height * imageAspect;
-      } else {
-        // Video is taller or same aspect as viewport
-        planeWidth = viewport.width;
-        planeHeight = viewport.width / imageAspect;
-      }
-
-      setPlaneSize([planeWidth, planeHeight]);
+    if (videoElement instanceof HTMLVideoElement) {
+      imageAspect = videoElement.videoWidth / videoElement.videoHeight;
+    } else if (source instanceof HTMLImageElement) {
+      imageAspect = source.naturalWidth / source.naturalHeight;
     }
+
+    const viewportAspect = viewport.width / viewport.height;
+    let planeWidth: number;
+    let planeHeight: number;
+
+    if (imageAspect > viewportAspect) {
+      planeHeight = viewport.height;
+      planeWidth = viewport.height * imageAspect;
+    } else {
+      planeWidth = viewport.width;
+      planeHeight = viewport.width / imageAspect;
+    }
+
+    setPlaneSize([planeWidth, planeHeight]);
   }, [videoTexture, viewport, videoRef]);
+
+  // Take screenshoot
+  const handleScreenshot = () => {
+    requestAnimationFrame(() => {
+      const canvas = gl.domElement as HTMLCanvasElement;
+      console.log(canvas);
+      if (canvas) {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const imageUrl = URL.createObjectURL(blob);
+            setScreenshotImage(imageUrl);
+          }
+        });
+      }
+    });
+  };
+
+  useImperativeHandle(skinToneThreeSceneRef, () => ({
+    callFunction: handleScreenshot,
+  }));
 
   // Dispose textures on unmount
   useEffect(() => {
     return () => {
       videoTexture?.dispose();
-      hairMaskTextureRef.current?.dispose();
     };
   }, [videoTexture]);
 
   useFrame(() => {
-    // if (hairMask.current) {
-    //   const image = imageDataToImage(hairMask.current);
-    //   const loader = new TextureLoader();
-
-    //   loader.load(image.src, (texture) => {
-    //     if (!hairMaskTextureRef.current) {
-    //       hairMaskTextureRef.current = texture;
-    //     } else {
-    //       hairMaskTextureRef.current.image = texture.image;
-    //       hairMaskTextureRef.current.needsUpdate = true;
-    //     }
-    //   });
-    // }
-
-    // Pastikan material diperbarui
-    if (hairMaskTextureRef.current) {
-      hairMaskTextureRef.current.needsUpdate = true;
-    }
-
     if (filterRef.current && landmarks.current) {
       const uniforms = filterRef.current.uniforms;
 
@@ -287,33 +288,6 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
               }}
             />
           </mesh>
-
-          {/* <FoundationNew
-            planeSize={planeSize}
-            landmarks={landmarks}
-            blendshape={blendshape}
-          /> */}
-
-          {showHair && (
-            <>
-              {hairMaskTextureRef.current && (
-                <mesh
-                  position={[0, 0, -499]}
-                  scale={[-1, 1, 1]} // Flip horizontal menggunakan scale
-                  {...props}
-                  renderOrder={3}
-                >
-                  <planeGeometry args={[planeSize[0], planeSize[1]]} />
-                  <meshBasicMaterial
-                    map={hairMaskTextureRef.current}
-                    side={DoubleSide} // Pastikan kedua sisi terlihat
-                    transparent
-                    opacity={maskOpacity}
-                  />
-                </mesh>
-              )}
-            </>
-          )}
 
           {showFoundation && (
             <Foundation
@@ -393,6 +367,22 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
 
           {showEyebrows && (
             <Eyebrows
+              planeSize={planeSize}
+              landmarks={landmarks}
+              isFlipped={isFlipped}
+            />
+          )}
+
+          {showEyeShadow && (
+            <EyeShadow
+              planeSize={planeSize}
+              landmarks={landmarks}
+              isFlipped={isFlipped}
+            />
+          )}
+
+          {showEyeliner && (
+            <Eyeliner
               planeSize={planeSize}
               landmarks={landmarks}
               isFlipped={isFlipped}

@@ -57,14 +57,14 @@ export const drawConnectorsFromFaces = (
     const pointB = faceLandmarks[indexB];
     const pointC = faceLandmarks[indexC];
 
-    // Hitung posisi tiap titik relatif terhadap gambar di canvas
-    const ax = offsetX + pointA.x * drawWidth;
+    // Membalikkan posisi X karena kita telah membalik canvas secara horizontal
+    const ax = offsetX + (1 - pointA.x) * drawWidth; // Menggunakan (1 - x) untuk membalikkan koordinat
     const ay = offsetY + pointA.y * drawHeight;
 
-    const bx = offsetX + pointB.x * drawWidth;
+    const bx = offsetX + (1 - pointB.x) * drawWidth;
     const by = offsetY + pointB.y * drawHeight;
 
-    const cx = offsetX + pointC.x * drawWidth;
+    const cx = offsetX + (1 - pointC.x) * drawWidth;
     const cy = offsetY + pointC.y * drawHeight;
 
     // Gambar segitiga

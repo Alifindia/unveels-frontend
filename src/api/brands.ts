@@ -12,12 +12,9 @@ const brandsKey = {
 };
 
 async function fetchBrands() {
-  const response = await fetch(
-    baseUrl + baseUrl + "/rest/V1/products/attributes/brand",
-    {
-      headers: defaultHeaders,
-    },
-  );
+  const response = await fetch(baseUrl + "/rest/V1/products/attributes/brand", {
+    headers: defaultHeaders,
+  });
   if (!response.ok) {
     throw new Error("Failed to fetch brands");
   }

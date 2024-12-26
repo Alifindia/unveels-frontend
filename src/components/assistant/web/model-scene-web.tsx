@@ -2,23 +2,20 @@ import { Environment, Loader, OrthographicCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import Avatar from "./avatar-web";
+import { BlendData } from "../../../types/blendData";
 
 interface ModelSceneWebProps {
   speak: boolean;
-  text: string;
   playing: boolean;
-  setAudioSource: (source: string | null) => void;
-  setSpeak: (speak: boolean) => void;
-  language: string | "en-US";
+  blendshape: BlendData[];
+  setFinishTalking: (finishTalking: boolean) => void;
 }
 
 const ModelSceneWeb = ({
   speak,
-  text,
   playing,
-  setAudioSource,
-  setSpeak,
-  language,
+  blendshape,
+  setFinishTalking,
 }: ModelSceneWebProps) => {
   return (
     <>
@@ -52,11 +49,9 @@ const ModelSceneWeb = ({
           <Avatar
             avatar_url="/media/unveels/3d/sarahkarakter.glb"
             speak={speak}
-            text={text}
             playing={playing}
-            setAudioSource={setAudioSource}
-            setSpeak={setSpeak}
-            language={language}
+            blendshape={blendshape}
+            setFinishTalking={setFinishTalking}
           />
         </Suspense>
       </Canvas>

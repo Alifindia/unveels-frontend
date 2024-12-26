@@ -3,6 +3,7 @@ import {
   ObjectDetector,
   ObjectDetectorResult,
   FaceLandmarker,
+  BoundingBox,
 } from "@mediapipe/tasks-vision";
 import { Landmark } from "../../types/landmark";
 import { extractSkinColor } from "../../utils/imageProcessing";
@@ -16,12 +17,7 @@ interface FindTheLookCanvasProps {
   onDetectDone?: (isDetectFinished: boolean) => void;
   models: {
     faceLandmarker: FaceLandmarker | null;
-    handDetector: ObjectDetector | null;
-    ringDetector: ObjectDetector | null;
-    neckDetector: ObjectDetector | null;
-    earringDetector: ObjectDetector | null;
-    glassDetector: ObjectDetector | null;
-    headDetector: ObjectDetector | null;
+    accesoriesDetector: ObjectDetector | null;
     makeupDetector: ObjectDetector | null;
   };
 }
@@ -53,16 +49,7 @@ export function FindTheLookCanvas({
     useState(true);
 
   // Gunakan models dari props
-  const {
-    faceLandmarker,
-    handDetector,
-    ringDetector,
-    neckDetector,
-    earringDetector,
-    glassDetector,
-    headDetector,
-    makeupDetector,
-  } = models;
+  const { faceLandmarker, accesoriesDetector, makeupDetector } = models;
 
   const [handResult, setHandResult] = useState<ObjectDetectorResult | null>(
     null,
@@ -86,18 +73,96 @@ export function FindTheLookCanvas({
   );
   const [faceLandmark, setFaceLandmark] = useState<Landmark[] | null>(null);
 
+  const categoriesMap = {
+    head: ["Cap", "Hat", "Headband"],
+    hand: ["Bracelet", "Watch"],
+    neck: ["Necklace", "Neckless", "Scarf"],
+    ring: ["rings"],
+    earring: ["earring"],
+    glasses: ["Glasses"],
+  };
+
+  const categorizeResults = (detections: any) => {
+    const categorizedResults = {
+      handResult: null,
+      ringResult: null,
+      neckResult: null,
+      earringResult: null,
+      glassResult: null,
+      headResult: null,
+    };
+
+    // Periksa apakah detections adalah array dan memiliki data
+    if (Array.isArray(detections.detections)) {
+      // Untuk tiap kategori, simpan objek dengan skor tertinggi
+      const categoryScores = {
+        hand: { maxScore: -Infinity, bestDetection: null },
+        ring: { maxScore: -Infinity, bestDetection: null },
+        neck: { maxScore: -Infinity, bestDetection: null },
+        earring: { maxScore: -Infinity, bestDetection: null },
+        glasses: { maxScore: -Infinity, bestDetection: null },
+        head: { maxScore: -Infinity, bestDetection: null },
+      };
+
+      detections.detections.forEach((detection: any) => {
+        const categoryName = detection.categories[0].categoryName;
+        const score = detection.categories[0].score;
+
+        // Periksa apakah skor lebih tinggi dari skor tertinggi yang sudah ditemukan untuk kategori tersebut
+        if (categoriesMap.head.includes(categoryName)) {
+          if (score > categoryScores.head.maxScore) {
+            categoryScores.head.maxScore = score;
+            categoryScores.head.bestDetection = detection;
+          }
+        } else if (categoriesMap.hand.includes(categoryName)) {
+          if (score > categoryScores.hand.maxScore) {
+            categoryScores.hand.maxScore = score;
+            categoryScores.hand.bestDetection = detection;
+          }
+        } else if (categoriesMap.neck.includes(categoryName)) {
+          if (score > categoryScores.neck.maxScore) {
+            categoryScores.neck.maxScore = score;
+            categoryScores.neck.bestDetection = detection;
+          }
+        } else if (categoriesMap.ring.includes(categoryName)) {
+          if (score > categoryScores.ring.maxScore) {
+            categoryScores.ring.maxScore = score;
+            categoryScores.ring.bestDetection = detection;
+          }
+        } else if (categoriesMap.earring.includes(categoryName)) {
+          if (score > categoryScores.earring.maxScore) {
+            categoryScores.earring.maxScore = score;
+            categoryScores.earring.bestDetection = detection;
+          }
+        } else if (categoriesMap.glasses.includes(categoryName)) {
+          if (score > categoryScores.glasses.maxScore) {
+            categoryScores.glasses.maxScore = score;
+            categoryScores.glasses.bestDetection = detection;
+          }
+        }
+      });
+
+      // Menetapkan hasil deteksi untuk setiap kategori berdasarkan nilai tertinggi
+      categorizedResults.headResult = categoryScores.head.bestDetection;
+      categorizedResults.handResult = categoryScores.hand.bestDetection;
+      categorizedResults.neckResult = categoryScores.neck.bestDetection;
+      categorizedResults.ringResult = categoryScores.ring.bestDetection;
+      categorizedResults.earringResult = categoryScores.earring.bestDetection;
+      categorizedResults.glassResult = categoryScores.glasses.bestDetection;
+    } else {
+      console.error("Detections is not an array or is empty:", detections);
+    }
+
+    return categorizedResults;
+  };
+
   useEffect(() => {
     let isInferenceRunning = false; // Flag untuk memastikan inferensi tidak berjalan dua kali
 
     const detectObjects = async () => {
       if (
         !isInferenceRunning && // Periksa apakah inferensi sudah berjalan
-        handDetector &&
-        ringDetector &&
-        neckDetector &&
-        earringDetector &&
-        glassDetector &&
-        headDetector &&
+        accesoriesDetector &&
         makeupDetector &&
         faceLandmarker
       ) {
@@ -106,21 +171,31 @@ export function FindTheLookCanvas({
           // Tambahkan delay 2 detik
           await new Promise((resolve) => setTimeout(resolve, 2000));
 
-          const resultsHand = await handDetector.detect(image);
-          const resultsRing = await ringDetector.detect(image);
-          const resultsNeck = await neckDetector.detect(image);
-          const resultsEarring = await earringDetector.detect(image);
-          const resultsGlass = await glassDetector.detect(image);
-          const resultsHead = await headDetector.detect(image);
+          const resultsAccesories = await accesoriesDetector.detect(image);
           const resultsMakeup = await makeupDetector.detect(image);
           const resultsFaceLandmark = await faceLandmarker.detect(image);
 
-          setHandResult(resultsHand);
-          setRingResult(resultsRing);
-          setNeckResult(resultsNeck);
-          setEarringResult(resultsEarring);
-          setGlassResult(resultsGlass);
-          setHeadResult(resultsHead);
+          console.log(resultsAccesories);
+
+          // Mengkategorikan hasil deteksi
+          const categorizedResults = categorizeResults(resultsAccesories);
+          console.log(categorizedResults);
+
+          // Memperbarui state berdasarkan kategori yang sesuai
+          setHandResult(categorizedResults.handResult);
+          setRingResult(categorizedResults.ringResult);
+          setNeckResult(categorizedResults.neckResult);
+          setEarringResult(categorizedResults.earringResult);
+          setGlassResult(categorizedResults.glassResult);
+          setHeadResult(categorizedResults.headResult);
+
+          console.log(handResult);
+          console.log(ringResult);
+          console.log(neckResult);
+          console.log(earringResult);
+          console.log(glassResult);
+          console.log(headResult);
+
           setMakeupResult(resultsMakeup);
           setFaceLandmark(resultsFaceLandmark.faceLandmarks[0] || null);
 
@@ -146,17 +221,7 @@ export function FindTheLookCanvas({
     return () => {
       isInferenceRunning = false; // Reset flag saat komponen di-unmount
     };
-  }, [
-    handDetector,
-    ringDetector,
-    neckDetector,
-    earringDetector,
-    glassDetector,
-    headDetector,
-    makeupDetector,
-    faceLandmarker,
-    image,
-  ]);
+  }, [accesoriesDetector, makeupDetector, faceLandmarker, image]);
 
   // send detection to webview
   useEffect(() => {
@@ -178,17 +243,6 @@ export function FindTheLookCanvas({
 
   // Draw detections on canvas
   useEffect(() => {
-    if (
-      !handResult ||
-      !ringResult ||
-      !neckResult ||
-      !earringResult ||
-      !glassResult ||
-      !headResult ||
-      !makeupResult
-    )
-      return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -199,6 +253,8 @@ export function FindTheLookCanvas({
     }
 
     const drawImage = () => {
+      console.log("draw Image");
+
       const { innerWidth: width, innerHeight: height } = window;
       const dpr = window.devicePixelRatio || 1;
       canvas.width = width * dpr;
@@ -229,6 +285,9 @@ export function FindTheLookCanvas({
       ctx.clearRect(0, 0, width, height);
 
       if (isFlip) {
+        // Draw image normally
+        ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
+      } else {
         // Apply horizontal flip
         ctx.save();
         ctx.scale(-1, 1);
@@ -240,9 +299,6 @@ export function FindTheLookCanvas({
           drawHeight,
         );
         ctx.restore();
-      } else {
-        // Draw image normally
-        ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
       }
 
       // Reset hitboxes for each draw
@@ -263,377 +319,384 @@ export function FindTheLookCanvas({
         return isFlip ? centerX - 50 : centerX + 50;
       };
 
-      // Common function to draw detections
       const drawDetections = (
-        detections: ObjectDetectorResult,
+        detections: any, // Gunakan 'any' agar tidak perlu mendefinisikan tipe secara eksplisit
         section: string,
       ) => {
-        detections.detections.forEach((det) => {
-          const { boundingBox, categories } = det;
-          if (!boundingBox) return;
+        if (!detections) return; // Jika detections null, keluar dari fungsi
 
-          const centerX = calculateCenterX(
-            boundingBox.originX,
-            boundingBox.width,
-          );
-          const centerY =
-            boundingBox.originY * scaleY +
-            offsetY +
-            (boundingBox.height * scaleY) / 2;
+        const { categories, boundingBox } = detections; // Ambil categories dan boundingBox dari deteksi langsung
+        if (!categories || categories.length === 0 || !boundingBox) return; // Jika tidak ada kategori atau bounding box, keluar
 
-          // Draw the landmark circle at the center
-          ctx.beginPath();
-          ctx.arc(centerX, centerY, 10, 0, 2 * Math.PI);
-          ctx.fillStyle = "white"; // Red color
-          ctx.fill();
-          ctx.closePath();
+        // Ambil kategori dengan skor tertinggi (jika ada lebih dari satu kategori)
+        const category = categories.reduce((max: any, current: any) => {
+          return current.score > max.score ? current : max;
+        });
 
-          // Calculate label position
-          const labelX = calculateLabelX(centerX);
-          const labelY = centerY + 50;
+        const { categoryName } = category; // Nama kategori dengan skor tertinggi
 
-          // Draw a line from the center to the label
-          ctx.beginPath();
-          ctx.moveTo(centerX, centerY);
-          ctx.lineTo(labelX, labelY);
-          ctx.strokeStyle = "white";
-          ctx.stroke();
+        // Hitung pusat dari bounding box
+        const centerX = calculateCenterX(
+          boundingBox.originX,
+          boundingBox.width,
+        );
+        const centerY =
+          boundingBox.originY * scaleY +
+          offsetY +
+          (boundingBox.height * scaleY) / 2;
 
-          // Display the label
-          if (categories && categories.length > 0) {
-            const label = categories[0].categoryName;
-            ctx.font = "12px Arial";
-            ctx.fillStyle = "white";
-            ctx.fillText(label, labelX, labelY - 5);
+        // Gambar lingkaran di pusat deteksi
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 10, 0, 2 * Math.PI);
+        ctx.fillStyle = "white"; // Lingkaran putih
+        ctx.fill();
+        ctx.closePath();
 
-            // Draw underline for label text
-            const textWidth = ctx.measureText(label).width;
-            const underlineEndX = labelX + textWidth;
-            const underlineY = labelY + 5;
+        // Posisi label
+        const labelX = calculateLabelX(centerX);
+        const labelY = centerY + 50;
 
-            ctx.beginPath();
-            ctx.moveTo(labelX, labelY);
-            ctx.lineTo(underlineEndX, underlineY);
-            ctx.strokeStyle = "white";
-            ctx.stroke();
+        // Gambar garis dari pusat ke label
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(labelX, labelY);
+        ctx.strokeStyle = "white";
+        ctx.stroke();
 
-            addFindTheLookItem({
-              label: label,
-              section: "accessories",
-            });
+        // Gambar label
+        ctx.font = "12px Arial";
+        ctx.fillStyle = "white";
+        ctx.fillText(categoryName, labelX, labelY - 5);
 
-            hitboxesRef.current.push({
-              label: label,
-              section: section,
-              x: labelX,
-              y: labelY - 20,
-              width: textWidth,
-              height: 20,
-            });
-          }
+        // Gambar garis bawah pada label
+        const textWidth = ctx.measureText(categoryName).width;
+        const underlineEndX = labelX + textWidth;
+        const underlineY = labelY + 5;
+
+        ctx.beginPath();
+        ctx.moveTo(labelX, labelY);
+        ctx.lineTo(underlineEndX, underlineY);
+        ctx.strokeStyle = "white";
+        ctx.stroke();
+
+        // Menambahkan item pada 'FindTheLookItem' dan hitboxes
+        addFindTheLookItem({
+          label: categoryName,
+          section: "accessories",
+        });
+
+        hitboxesRef.current.push({
+          label: categoryName,
+          section: section,
+          x: labelX,
+          y: labelY - 20,
+          width: textWidth,
+          height: 20,
         });
       };
 
-      // Draw each detection type
-      drawDetections(handResult, "accessories");
-      drawDetections(ringResult, "accessories");
-      drawDetections(neckResult, "accessories");
-      drawDetections(earringResult, "accessories");
-      drawDetections(glassResult, "accessories");
-      drawDetections(headResult, "accessories");
+      // Draw each detection type only if the result is not null
+      if (handResult) drawDetections(handResult, "accessories");
+      if (ringResult) drawDetections(ringResult, "accessories");
+      if (neckResult) drawDetections(neckResult, "accessories");
+      if (earringResult) drawDetections(earringResult, "accessories");
+      if (glassResult) drawDetections(glassResult, "accessories");
+      if (headResult) drawDetections(headResult, "accessories");
 
-      // Handle Makeup Detections Separately
-      makeupResult.detections.forEach((result) => {
-        const { categories } = result;
+      if (makeupResult) {
+        // Handle Makeup Detections Separately
+        makeupResult.detections.forEach((result) => {
+          const { categories } = result;
 
-        categories.forEach((category) => {
-          let drawX: number, drawY: number, label: string;
+          categories.forEach((category) => {
+            let drawX: number, drawY: number, label: string;
 
-          // Define specific landmarks for each makeup category
-          if (
-            category.categoryName === "Lipstick" &&
-            faceLandmark &&
-            faceLandmark[407]
-          ) {
-            drawX = isFlip
-              ? width -
-                (faceLandmark[407].x * image.naturalWidth * scaleX + offsetX)
-              : faceLandmark[407].x * image.naturalWidth * scaleX + offsetX;
-            drawY =
-              faceLandmark[407].y * image.naturalHeight * scaleY + offsetY;
-            label = "Lipstick";
+            // Define specific landmarks for each makeup category
+            if (
+              category.categoryName === "Lipstick" &&
+              faceLandmark &&
+              faceLandmark[407]
+            ) {
+              drawX = isFlip
+                ? width -
+                  (faceLandmark[407].x * image.naturalWidth * scaleX + offsetX)
+                : faceLandmark[407].x * image.naturalWidth * scaleX + offsetX;
+              drawY =
+                faceLandmark[407].y * image.naturalHeight * scaleY + offsetY;
+              label = "Lipstick";
 
-            const averageLipColor = extractSkinColor(
-              image,
-              faceLandmark,
-              [
-                14, 15, 16, 17, 87, 86, 85, 84, 317, 316, 315, 314, 178, 179,
-                180, 317, 316, 315,
-              ],
-              2,
-            );
+              const averageLipColor = extractSkinColor(
+                image,
+                faceLandmark,
+                [
+                  14, 15, 16, 17, 87, 86, 85, 84, 317, 316, 315, 314, 178, 179,
+                  180, 317, 316, 315,
+                ],
+                2,
+              );
 
-            addFindTheLookItem({
-              label: label,
-              section: "makeup",
-              color: averageLipColor.hexColor,
-            });
+              addFindTheLookItem({
+                label: label,
+                section: "makeup",
+                color: averageLipColor.hexColor,
+              });
 
-            // Draw landmark point
-            ctx.beginPath();
-            ctx.arc(drawX, drawY, 10, 0, 2 * Math.PI);
-            ctx.fillStyle = "white)"; // Red color
-            ctx.fill();
-            ctx.closePath();
+              // Draw landmark point
+              ctx.beginPath();
+              ctx.arc(drawX, drawY, 10, 0, 2 * Math.PI);
+              ctx.fillStyle = "white)"; // Red color
+              ctx.fill();
+              ctx.closePath();
 
-            // Calculate label position
-            const labelX = calculateLabelX(drawX);
-            const labelY = drawY + 50;
+              // Calculate label position
+              const labelX = calculateLabelX(drawX);
+              const labelY = drawY + 50;
 
-            // Draw a line from the center to the label
-            ctx.beginPath();
-            ctx.moveTo(drawX, drawY);
-            ctx.lineTo(labelX, labelY);
-            ctx.strokeStyle = "white";
-            ctx.stroke();
+              // Draw a line from the center to the label
+              ctx.beginPath();
+              ctx.moveTo(drawX, drawY);
+              ctx.lineTo(labelX, labelY);
+              ctx.strokeStyle = "white";
+              ctx.stroke();
 
-            // Display the label
-            ctx.font = "12px Arial";
-            ctx.fillStyle = "white";
-            ctx.fillText(label, labelX, labelY - 5);
+              // Display the label
+              ctx.font = "12px Arial";
+              ctx.fillStyle = "white";
+              ctx.fillText(label, labelX, labelY - 5);
 
-            // Draw underline for label text
-            const textWidth = ctx.measureText(label).width;
-            const underlineEndX = labelX + textWidth;
-            const underlineY = labelY + 5;
+              // Draw underline for label text
+              const textWidth = ctx.measureText(label).width;
+              const underlineEndX = labelX + textWidth;
+              const underlineY = labelY + 5;
 
-            ctx.beginPath();
-            ctx.moveTo(labelX, labelY);
-            ctx.lineTo(underlineEndX, underlineY);
-            ctx.strokeStyle = "white";
-            ctx.stroke();
+              ctx.beginPath();
+              ctx.moveTo(labelX, labelY);
+              ctx.lineTo(underlineEndX, underlineY);
+              ctx.strokeStyle = "white";
+              ctx.stroke();
 
-            hitboxesRef.current.push({
-              label: label,
-              section: "makeup",
-              x: labelX,
-              y: labelY - 20,
-              width: textWidth,
-              height: 20,
-            });
-          }
+              hitboxesRef.current.push({
+                label: label,
+                section: "makeup",
+                x: labelX,
+                y: labelY - 20,
+                width: textWidth,
+                height: 20,
+              });
+            }
 
-          if (
-            category.categoryName === "Eyebrow" &&
-            faceLandmark &&
-            faceLandmark[225]
-          ) {
-            drawX = isFlip
-              ? width -
-                (faceLandmark[225].x * image.naturalWidth * scaleX + offsetX)
-              : faceLandmark[225].x * image.naturalWidth * scaleX + offsetX;
-            drawY =
-              faceLandmark[225].y * image.naturalHeight * scaleY + offsetY;
-            label = "Eyebrow";
+            if (
+              category.categoryName === "Eyebrow" &&
+              faceLandmark &&
+              faceLandmark[225]
+            ) {
+              drawX = isFlip
+                ? width -
+                  (faceLandmark[225].x * image.naturalWidth * scaleX + offsetX)
+                : faceLandmark[225].x * image.naturalWidth * scaleX + offsetX;
+              drawY =
+                faceLandmark[225].y * image.naturalHeight * scaleY + offsetY;
+              label = "Eyebrow";
 
-            const averageEyebrowsColor = extractSkinColor(
-              image,
-              faceLandmark,
-              [70, 63, 105, 66, 46, 53, 52, 65, 296, 334, 293, 295, 282, 283],
-              2,
-            );
+              const averageEyebrowsColor = extractSkinColor(
+                image,
+                faceLandmark,
+                [70, 63, 105, 66, 46, 53, 52, 65, 296, 334, 293, 295, 282, 283],
+                2,
+              );
 
-            addFindTheLookItem({
-              label: label,
-              section: "makeup",
-              color: averageEyebrowsColor.hexColor,
-            });
+              addFindTheLookItem({
+                label: label,
+                section: "makeup",
+                color: averageEyebrowsColor.hexColor,
+              });
 
-            // Draw landmark point
-            ctx.beginPath();
-            ctx.arc(drawX, drawY, 10, 0, 2 * Math.PI);
-            ctx.fillStyle = "white"; // Red color
-            ctx.fill();
-            ctx.closePath();
+              // Draw landmark point
+              ctx.beginPath();
+              ctx.arc(drawX, drawY, 10, 0, 2 * Math.PI);
+              ctx.fillStyle = "white"; // Red color
+              ctx.fill();
+              ctx.closePath();
 
-            // Calculate label position
-            const labelX = calculateLabelX(drawX);
-            const labelY = drawY + 50;
+              // Calculate label position
+              const labelX = calculateLabelX(drawX);
+              const labelY = drawY + 50;
 
-            // Draw a line from the center to the label
-            ctx.beginPath();
-            ctx.moveTo(drawX, drawY);
-            ctx.lineTo(labelX, labelY);
-            ctx.strokeStyle = "white";
-            ctx.stroke();
+              // Draw a line from the center to the label
+              ctx.beginPath();
+              ctx.moveTo(drawX, drawY);
+              ctx.lineTo(labelX, labelY);
+              ctx.strokeStyle = "white";
+              ctx.stroke();
 
-            // Display the label
-            ctx.font = "12px Arial";
-            ctx.fillStyle = "white";
-            ctx.fillText(label, labelX, labelY - 5);
+              // Display the label
+              ctx.font = "12px Arial";
+              ctx.fillStyle = "white";
+              ctx.fillText(label, labelX, labelY - 5);
 
-            // Draw underline for label text
-            const textWidth = ctx.measureText(label).width;
-            const underlineEndX = labelX + textWidth;
-            const underlineY = labelY + 5;
+              // Draw underline for label text
+              const textWidth = ctx.measureText(label).width;
+              const underlineEndX = labelX + textWidth;
+              const underlineY = labelY + 5;
 
-            ctx.beginPath();
-            ctx.moveTo(labelX, labelY);
-            ctx.lineTo(underlineEndX, underlineY);
-            ctx.strokeStyle = "white";
-            ctx.stroke();
+              ctx.beginPath();
+              ctx.moveTo(labelX, labelY);
+              ctx.lineTo(underlineEndX, underlineY);
+              ctx.strokeStyle = "white";
+              ctx.stroke();
 
-            hitboxesRef.current.push({
-              label: label,
-              section: "makeup",
-              x: labelX,
-              y: labelY - 20,
-              width: textWidth,
-              height: 20,
-            });
-          }
+              hitboxesRef.current.push({
+                label: label,
+                section: "makeup",
+                x: labelX,
+                y: labelY - 20,
+                width: textWidth,
+                height: 20,
+              });
+            }
 
-          if (
-            category.categoryName === "Blusher" &&
-            faceLandmark &&
-            faceLandmark[280]
-          ) {
-            drawX = isFlip
-              ? width -
-                (faceLandmark[280].x * image.naturalWidth * scaleX + offsetX)
-              : faceLandmark[280].x * image.naturalWidth * scaleX + offsetX;
-            drawY =
-              faceLandmark[280].y * image.naturalHeight * scaleY + offsetY;
-            label = "Blusher";
+            if (
+              category.categoryName === "Blusher" &&
+              faceLandmark &&
+              faceLandmark[280]
+            ) {
+              drawX = isFlip
+                ? width -
+                  (faceLandmark[280].x * image.naturalWidth * scaleX + offsetX)
+                : faceLandmark[280].x * image.naturalWidth * scaleX + offsetX;
+              drawY =
+                faceLandmark[280].y * image.naturalHeight * scaleY + offsetY;
+              label = "Blusher";
 
-            const averageBlushColor = extractSkinColor(
-              image,
-              faceLandmark,
-              [280, 80],
-              2,
-            );
+              const averageBlushColor = extractSkinColor(
+                image,
+                faceLandmark,
+                [280, 80],
+                2,
+              );
 
-            addFindTheLookItem({
-              label: label,
-              section: "makeup",
-              color: averageBlushColor.hexColor,
-            });
+              addFindTheLookItem({
+                label: label,
+                section: "makeup",
+                color: averageBlushColor.hexColor,
+              });
 
-            // Draw landmark point
-            ctx.beginPath();
-            ctx.arc(drawX, drawY, 10, 0, 2 * Math.PI);
-            ctx.fillStyle = "white"; // Red color
-            ctx.fill();
-            ctx.closePath();
+              // Draw landmark point
+              ctx.beginPath();
+              ctx.arc(drawX, drawY, 10, 0, 2 * Math.PI);
+              ctx.fillStyle = "white"; // Red color
+              ctx.fill();
+              ctx.closePath();
 
-            // Calculate label position
-            const labelX = calculateLabelX(drawX);
-            const labelY = drawY + 50;
+              // Calculate label position
+              const labelX = calculateLabelX(drawX);
+              const labelY = drawY + 50;
 
-            // Draw a line from the center to the label
-            ctx.beginPath();
-            ctx.moveTo(drawX, drawY);
-            ctx.lineTo(labelX, labelY);
-            ctx.strokeStyle = "white";
-            ctx.stroke();
+              // Draw a line from the center to the label
+              ctx.beginPath();
+              ctx.moveTo(drawX, drawY);
+              ctx.lineTo(labelX, labelY);
+              ctx.strokeStyle = "white";
+              ctx.stroke();
 
-            // Display the label
-            ctx.font = "12px Arial";
-            ctx.fillStyle = "white";
-            ctx.fillText(label, labelX, labelY - 5);
+              // Display the label
+              ctx.font = "12px Arial";
+              ctx.fillStyle = "white";
+              ctx.fillText(label, labelX, labelY - 5);
 
-            // Draw underline for label text
-            const textWidth = ctx.measureText(label).width;
-            const underlineEndX = labelX + textWidth;
-            const underlineY = labelY + 5;
+              // Draw underline for label text
+              const textWidth = ctx.measureText(label).width;
+              const underlineEndX = labelX + textWidth;
+              const underlineY = labelY + 5;
 
-            ctx.beginPath();
-            ctx.moveTo(labelX, labelY);
-            ctx.lineTo(underlineEndX, underlineY);
-            ctx.strokeStyle = "white";
-            ctx.stroke();
+              ctx.beginPath();
+              ctx.moveTo(labelX, labelY);
+              ctx.lineTo(underlineEndX, underlineY);
+              ctx.strokeStyle = "white";
+              ctx.stroke();
 
-            hitboxesRef.current.push({
-              label: label,
-              section: "makeup",
-              x: labelX,
-              y: labelY - 20,
-              width: textWidth,
-              height: 20,
-            });
-          }
+              hitboxesRef.current.push({
+                label: label,
+                section: "makeup",
+                x: labelX,
+                y: labelY - 20,
+                width: textWidth,
+                height: 20,
+              });
+            }
 
-          if (
-            category.categoryName === "Eyeshadow" &&
-            faceLandmark &&
-            faceLandmark[257]
-          ) {
-            drawX = isFlip
-              ? width -
-                (faceLandmark[257].x * image.naturalWidth * scaleX + offsetX)
-              : faceLandmark[257].x * image.naturalWidth * scaleX + offsetX;
-            drawY =
-              faceLandmark[257].y * image.naturalHeight * scaleY + offsetY;
-            label = "Eyeshadow";
+            if (
+              category.categoryName === "Eyeshadow" &&
+              faceLandmark &&
+              faceLandmark[257]
+            ) {
+              drawX = isFlip
+                ? width -
+                  (faceLandmark[257].x * image.naturalWidth * scaleX + offsetX)
+                : faceLandmark[257].x * image.naturalWidth * scaleX + offsetX;
+              drawY =
+                faceLandmark[257].y * image.naturalHeight * scaleY + offsetY;
+              label = "Eyeshadow";
 
-            const averageEyeshadowColor = extractSkinColor(
-              image,
-              faceLandmark,
-              [29, 27],
-              2,
-            );
+              const averageEyeshadowColor = extractSkinColor(
+                image,
+                faceLandmark,
+                [29, 27],
+                2,
+              );
 
-            addFindTheLookItem({
-              label: label,
-              section: "makeup",
-              color: averageEyeshadowColor.hexColor,
-            });
+              addFindTheLookItem({
+                label: label,
+                section: "makeup",
+                color: averageEyeshadowColor.hexColor,
+              });
 
-            // Draw landmark point
-            ctx.beginPath();
-            ctx.arc(drawX, drawY, 10, 0, 2 * Math.PI);
-            ctx.fillStyle = "white"; // Red color
-            ctx.fill();
-            ctx.closePath();
+              // Draw landmark point
+              ctx.beginPath();
+              ctx.arc(drawX, drawY, 10, 0, 2 * Math.PI);
+              ctx.fillStyle = "white"; // Red color
+              ctx.fill();
+              ctx.closePath();
 
-            // Calculate label position
-            const labelX = calculateLabelX(drawX);
-            const labelY = drawY + 50;
+              // Calculate label position
+              const labelX = calculateLabelX(drawX);
+              const labelY = drawY + 50;
 
-            // Draw a line from the center to the label
-            ctx.beginPath();
-            ctx.moveTo(drawX, drawY);
-            ctx.lineTo(labelX, labelY);
-            ctx.strokeStyle = "white";
-            ctx.stroke();
+              // Draw a line from the center to the label
+              ctx.beginPath();
+              ctx.moveTo(drawX, drawY);
+              ctx.lineTo(labelX, labelY);
+              ctx.strokeStyle = "white";
+              ctx.stroke();
 
-            // Display the label
-            ctx.font = "12px Arial";
-            ctx.fillStyle = "white";
-            ctx.fillText(label, labelX, labelY - 5);
+              // Display the label
+              ctx.font = "12px Arial";
+              ctx.fillStyle = "white";
+              ctx.fillText(label, labelX, labelY - 5);
 
-            // Draw underline for label text
-            const textWidth = ctx.measureText(label).width;
-            const underlineEndX = labelX + textWidth;
-            const underlineY = labelY + 5;
+              // Draw underline for label text
+              const textWidth = ctx.measureText(label).width;
+              const underlineEndX = labelX + textWidth;
+              const underlineY = labelY + 5;
 
-            ctx.beginPath();
-            ctx.moveTo(labelX, labelY);
-            ctx.lineTo(underlineEndX, underlineY);
-            ctx.strokeStyle = "white";
-            ctx.stroke();
+              ctx.beginPath();
+              ctx.moveTo(labelX, labelY);
+              ctx.lineTo(underlineEndX, underlineY);
+              ctx.strokeStyle = "white";
+              ctx.stroke();
 
-            hitboxesRef.current.push({
-              label: label,
-              section: "makeup",
-              x: labelX,
-              y: labelY - 20,
-              width: textWidth,
-              height: 20,
-            });
-          }
+              hitboxesRef.current.push({
+                label: label,
+                section: "makeup",
+                x: labelX,
+                y: labelY - 20,
+                width: textWidth,
+                height: 20,
+              });
+            }
+          });
         });
-      });
+      }
     };
 
     drawImage();

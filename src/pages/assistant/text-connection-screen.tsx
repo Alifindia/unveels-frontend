@@ -15,6 +15,7 @@ import { fetchVirtualAssistantProduct } from "../../api/fetch-virtual-asistant-p
 import { Product } from "../../api/shared";
 import { getCurrentTimestamp } from "../../utils/getCurrentTimeStamp";
 import { mediaUrl } from "../../utils/apiUtils";
+import { set } from "lodash";
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_BARD_API_KEY);
 
@@ -63,8 +64,10 @@ const TextConnectionScreen = ({ onBack }: { onBack: () => void }) => {
 
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
+  const [language, setLanguage] = useState("en-US");
 
   const [fetchProducts, setFetchProducts] = useState(false);
+  const [fetchComplete, setFetchComplete] = useState(false);
   const [products, setProducts] = useState<ProductRequest[]>([]);
   const [productData, setProductData] = useState<Product[]>([]);
 
@@ -75,30 +78,73 @@ const TextConnectionScreen = ({ onBack }: { onBack: () => void }) => {
         .then((fetchedProducts) => {
           setProductData(fetchedProducts);
           setFetchProducts(false);
-
-          fetchedProducts.forEach((item) => {
-            const imageUrl =
-              mediaUrl(item.media_gallery_entries[0]?.file) ??
-              "https://picsum.photos/id/237/200/300";
-            setChats((prevChats) => [
-              ...prevChats,
-              {
-                id: item.id,
-                type: "product",
-                sender: "agent",
-                name: item.name,
-                price: item.price,
-                originalPrice: item.price,
-                image: imageUrl,
-                brand: "Tom Ford",
-                timestamp: getCurrentTimestamp(),
-              },
-            ]);
-          });
+          setFetchComplete(true);
         })
         .finally(() => setLoading(false));
     }
-  }, [fetchProducts, products]); // Hapus chats dari sini!
+  }, [fetchProducts, products]);
+
+  useEffect(() => {
+    if (fetchComplete) {
+      if (productData.length < 1) {
+        // Tambahkan respons ke chats
+        setChats((prevChats) => [
+          ...prevChats,
+          {
+            id: Date.now() + 1,
+            text:
+              language === "en-US"
+                ? "sorry, the product is out of stock"
+                : "عذرا المنتج غير متوفر",
+            sender: "agent",
+            type: "chat",
+            mode: "text-connection",
+            timestamp: getCurrentTimestamp(),
+          },
+        ]);
+
+        setFetchComplete(false);
+      } else {
+        // Tambahkan respons ke chats
+        setChats((prevChats) => [
+          ...prevChats,
+          {
+            id: Date.now() + 1,
+            text:
+              language === "en-US"
+                ? "Here is the product you are looking for"
+                : "إليك توصيات المنتج التي تبحث عنها",
+            sender: "agent",
+            type: "chat",
+            mode: "text-connection",
+            timestamp: getCurrentTimestamp(),
+          },
+        ]);
+
+        productData.forEach((item) => {
+          const imageUrl =
+            mediaUrl(item.media_gallery_entries[0]?.file) ??
+            "https://picsum.photos/id/237/200/300";
+          setChats((prevChats) => [
+            ...prevChats,
+            {
+              id: item.id,
+              type: "product",
+              sender: "agent",
+              name: item.name,
+              price: item.price,
+              originalPrice: item.price,
+              image: imageUrl,
+              brand: "Tom Ford",
+              timestamp: getCurrentTimestamp(),
+            },
+          ]);
+        });
+
+        setFetchComplete(false);
+      }
+    }
+  }, [fetchComplete]);
 
   const getResponse = async (userMsg: string) => {
     const timestamp = getCurrentTimestamp();
@@ -129,24 +175,25 @@ const TextConnectionScreen = ({ onBack }: { onBack: () => void }) => {
       console.log(jsonLabel);
       const respond = JSON.parse(jsonLabel);
 
-      // Tambahkan respons ke chats
-      setChats((prevChats) => [
-        ...prevChats,
-        {
-          id: Date.now() + 1,
-          text: respond.chat,
-          sender: "agent",
-          type: "chat",
-          mode: "text-connection",
-          timestamp,
-        },
-      ]);
-
       if (respond.isFinished) {
         setProducts(respond.product);
         setLoading(true);
         setFetchProducts(true);
+      } else {
+        setChats((prevChats) => [
+          ...prevChats,
+          {
+            id: Date.now() + 1,
+            text: respond.chat,
+            sender: "agent",
+            type: "chat",
+            mode: "text-connection",
+            timestamp,
+          },
+        ]);
       }
+
+      setLanguage(respond.lang);
     } catch (error) {
       console.error("Error fetching AI response:", error);
     } finally {

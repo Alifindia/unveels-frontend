@@ -9,34 +9,16 @@ import blinkData from "../../assets/blendDataBlink.json";
 import { useLoadTextures } from "../../utils/textures";
 import axios from "axios";
 import { applyAvatarMaterials } from "../../utils/avatarMaterialUtils";
-
-const host = "https://talking-avatar.evorty.id";
-
-function makeSpeech(text: string, language = "en-US") {
-  console.log(text, language);
-
-  return axios.post(host + "/talk", { text, language });
-}
+import { BlendData } from "../../types/blendData";
 
 interface AvatarProps {
   avatar_url: string;
   speak: boolean;
-  text: string;
-  setAudioSource: (audioSource: string) => void;
   playing: boolean;
-  setSpeak: (speak: boolean) => void;
-  language: string | "en-US";
+  blendshape: BlendData[];
 }
 
-const Avatar = ({
-  avatar_url,
-  speak,
-  text,
-  playing,
-  setAudioSource,
-  setSpeak,
-  language,
-}: AvatarProps) => {
+const Avatar = ({ avatar_url, speak, playing, blendshape }: AvatarProps) => {
   const gltf = useGLTF(avatar_url);
   const textures = useLoadTextures();
   const mixer = useMemo(
@@ -44,8 +26,6 @@ const Avatar = ({
     [gltf.scene],
   );
   const { animations } = gltf;
-  const { actions } = useAnimations(animations, gltf.scene);
-
   const idleAnimation = animations.find((clip) => clip.name === "idle");
   const talkAnimation = animations.find((clip) => clip.name === "talk");
 
@@ -92,40 +72,20 @@ const Avatar = ({
 
         idleAction.crossFadeTo(talkAction, 0.5, false).play();
 
-        // Pass 'ar' for Arabic language here
-        makeSpeech(text, language) // Pass "ar" for Arabic
-          .then((response) => {
-            console.log("Response Headers:", response.headers);
-            console.log("Response Data:", response.data);
-            const { blendData, filename } = response.data;
-            if (morphTargetDictionaryBody) {
-              const newClips = [
-                createAnimation(
-                  blendData,
-                  morphTargetDictionaryBody,
-                  "HG_Body",
-                ),
-                createAnimation(
-                  blendData,
-                  morphTargetDictionaryLowerTeeth || {},
-                  "HG_TeethLower",
-                ),
-              ];
-              setClips(newClips);
-              // Tambahkan delay 1 detik sebelum menetapkan audio source
-              setTimeout(() => {
-                const audioSource = host + filename;
-                setAudioSource(audioSource);
+        if (morphTargetDictionaryBody) {
+          const newClips = [
+            createAnimation(blendshape, morphTargetDictionaryBody, "HG_Body"),
+            createAnimation(
+              blendshape,
+              morphTargetDictionaryLowerTeeth || {},
+              "HG_TeethLower",
+            ),
+          ];
 
-                talkAction.reset().setLoop(THREE.LoopRepeat, Infinity);
-                talkAction.clampWhenFinished = true;
-              }, 1000); // Delay 1 detik (1000 milidetik)
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            setSpeak(false);
-          });
+          setClips(newClips);
+          talkAction.reset().setLoop(THREE.LoopRepeat, Infinity);
+          talkAction.clampWhenFinished = true;
+        }
       }
     } else {
       if (talkAnimation) {
@@ -138,11 +98,8 @@ const Avatar = ({
     }
   }, [
     speak,
-    text,
     morphTargetDictionaryBody,
     morphTargetDictionaryLowerTeeth,
-    setAudioSource,
-    setSpeak,
     mixer,
     idleAnimation,
     talkAnimation,

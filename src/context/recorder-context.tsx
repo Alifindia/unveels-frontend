@@ -30,7 +30,8 @@ interface CameraState {
   capturedImageCut: string | null;
   isCompare: boolean;
   lastBoundingBox: BoundingBox | null;
-  runningMode: RunningMode; // New Property
+  runningMode: RunningMode;
+  screenshotImage: string | null;
 }
 
 interface SkinToneThreeSceneRef {
@@ -58,10 +59,11 @@ interface CameraContextType {
   stopRecording: () => void;
   downloadVideo: () => void;
   exit: () => void;
+  setScreenshotImage: (image: string) => void;
   status: string;
   mediaBlobUrl: string | undefined;
-  runningMode: RunningMode; // New Property
-  setRunningMode: (mode: RunningMode) => void; // New Setter
+  runningMode: RunningMode;
+  setRunningMode: (mode: RunningMode) => void;
 }
 
 const CameraContext = createContext<CameraContextType | undefined>(undefined);
@@ -98,7 +100,8 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
     capturedImageCut: null,
     isCompare: false,
     lastBoundingBox: null,
-    runningMode: "LIVE_CAMERA", // Default Mode
+    runningMode: "LIVE_CAMERA",
+    screenshotImage: null, // Add screenshotImage to state
   });
 
   function setCriterias(newState: Partial<CameraState>) {
@@ -185,6 +188,14 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
     setState((prevState) => ({ ...prevState, runningMode: mode }));
   }
 
+  // Function to set screenshot image
+  function setScreenshotImage(image: string) {
+    setState((prevState) => ({
+      ...prevState,
+      screenshotImage: image,
+    }));
+  }
+
   return (
     <CameraContext.Provider
       value={{
@@ -210,8 +221,9 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
         exit,
         status,
         mediaBlobUrl,
-        runningMode: state.runningMode, // Provide runningMode
-        setRunningMode, // Provide setRunningMode
+        runningMode: state.runningMode,
+        setRunningMode,
+        setScreenshotImage, // Provide setScreenshotImage to context
       }}
     >
       {children}

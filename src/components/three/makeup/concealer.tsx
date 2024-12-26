@@ -26,7 +26,7 @@ const ConcealerInner: React.FC<ConcealerProps> = ({
       new MeshBasicMaterial({
         color: concealerColor,
         transparent: true,
-        opacity: 0.15,
+        opacity: 0.36,
         alphaMap: concealerTexture,
         alphaTest: 0,
       }),

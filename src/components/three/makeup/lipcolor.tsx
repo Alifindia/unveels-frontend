@@ -31,7 +31,6 @@ const LipColorInner: React.FC<LipColorProps> = ({
     console.log("Lip Colors:", lipColors);
   }, [lipColorMode, lipColors]);
 
-  // Definisikan peta tekstur berdasarkan mode
   const texturePaths = useMemo(() => {
     if (lipColorMode === "One") {
       return {
@@ -70,7 +69,7 @@ const LipColorInner: React.FC<LipColorProps> = ({
     const material = new MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 1,
+      opacity: 0.36,
       alphaMap: standardTexture,
       alphaTest: 0,
     });
@@ -82,7 +81,7 @@ const LipColorInner: React.FC<LipColorProps> = ({
     const material = new MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 1,
+      opacity: 0.36,
       alphaMap: standardTexture,
       alphaTest: 0,
     });
@@ -94,14 +93,13 @@ const LipColorInner: React.FC<LipColorProps> = ({
     const material = new MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 1,
+      opacity: 0.36,
       alphaMap: highTexture,
       alphaTest: 0,
     });
     return material;
   }, [lipColors, highTexture]);
 
-  // Cleanup materials untuk mencegah kebocoran memori
   useEffect(() => {
     return () => {
       singleMaterial.dispose();
@@ -110,7 +108,6 @@ const LipColorInner: React.FC<LipColorProps> = ({
     };
   }, [singleMaterial, dualStandardMaterial, dualHighMaterial]);
 
-  // Render FaceMesh dengan material yang sesuai berdasarkan mode
   return (
     <>
       {lipColorMode === "One" && lipColors[0] && (

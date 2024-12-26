@@ -10,8 +10,7 @@ type FilterGroup = {
   filters: Filter[];
 };
 
-export const baseApiUrl =
-  "http://ec2-13-53-99-251.eu-north-1.compute.amazonaws.com/";
+export const baseApiUrl = "https://unveels.com/";
 export const baseUrl = import.meta.env.PROD ? baseApiUrl : "";
 export const baseMediaUrl =
   "https://unveels.com/media/catalog/product/cache/df714aaa5e59335a5bf39a17764906ba";
@@ -44,6 +43,44 @@ export function buildSearchParams(filterGroups: FilterGroup[]): string {
   return params.toString();
 }
 
+type SortOrder = {
+  field: string;
+  direction: "ASC" | "DESC"; // Add the possible values for sorting direction
+};
+
+export function buildSearchParamsWithOrder(
+  filterGroups: FilterGroup[],
+  sortOrders: SortOrder[],
+): string {
+  const params = new URLSearchParams();
+
+  // Add filters from filterGroups
+  filterGroups.forEach((group, groupIndex) => {
+    group.filters.forEach((filter, filterIndex) => {
+      Object.entries(filter).forEach(([key, value]) => {
+        const paramName = `searchCriteria[filter_groups][${groupIndex}][filters][${filterIndex}][${key}]`;
+        params.append(paramName, String(value));
+      });
+    });
+  });
+
+  // Add sortOrders if provided
+  if (sortOrders && sortOrders.length > 0) {
+    sortOrders.forEach((sortOrder, index) => {
+      params.append(
+        `searchCriteria[sortOrders][${index}][field]`,
+        sortOrder.field,
+      );
+      params.append(
+        `searchCriteria[sortOrders][${index}][direction]`,
+        sortOrder.direction,
+      );
+    });
+  }
+
+  return params.toString();
+}
+
 export function extractUniqueCustomAttributes(
   products: Product[],
   attributeCode: string,
@@ -56,6 +93,8 @@ export function extractUniqueCustomAttributes(
       }
     }
   }
+  console.log(Array.from(uniqueAttributes));
+
   return Array.from(uniqueAttributes);
 }
 
@@ -235,5 +274,95 @@ export async function fetchAllProducts(
 
   return {
     items: allResults,
+  };
+}
+
+type SortField = "id" | "name" | "price"; // Explicitly define the sort fields
+
+export async function fetchAllProductsWithSort(
+  results: {
+    items: Array<Product>;
+  },
+  parentFilters: FilterGroup[] = [],
+  sortField: SortField = "name", // Default sorting field
+  sortOrder: "asc" | "desc" = "asc", // Default sorting order
+) {
+  // Filter produk dengan type_id configurable dan simple
+  const productFound = results.items.filter(
+    (p) => p.type_id === "configurable" || p.type_id === "simple",
+  );
+
+  if (productFound.length === 0) {
+    return {
+      items: results.items,
+    };
+  }
+
+  // Dapatkan entity_id dari produk yang bertipe configurable atau simple
+  const configurableProductIds = productFound
+    .map((p) => p.extension_attributes.configurable_product_links ?? [])
+    .flat();
+
+  // Dapatkan entity_id untuk produk simple juga
+  const simpleProductIds = productFound
+    .filter((p) => p.type_id === "simple")
+    .map((p) => p.id);
+
+  // Gabungkan configurableProductIds dan simpleProductIds
+  const allProductIds = [...configurableProductIds, ...simpleProductIds];
+
+  const filters = [
+    ...parentFilters,
+    {
+      filters: [
+        {
+          field: "entity_id",
+          value: allProductIds.join(","),
+          condition_type: "in",
+        },
+      ],
+    },
+  ];
+
+  const response = await fetch(
+    baseUrl + "/rest/V1/products?" + buildSearchParams(filters),
+    {
+      headers: defaultHeaders,
+    },
+  );
+
+  const configrableResponse = (await response.json()) as {
+    items: Array<Product>;
+  };
+
+  configrableResponse.items.forEach((item) => {
+    const parentProduct = productFound.find((p) =>
+      p.extension_attributes.configurable_product_links?.includes(item.id),
+    );
+    item.custom_attributes = [
+      ...(parentProduct?.custom_attributes ?? []),
+      ...item.custom_attributes,
+    ];
+  });
+
+  // Gabungkan hasil produk simple dan configurable menjadi satu array
+  const allResults = [...configrableResponse.items];
+
+  // Apply sorting logic
+  const sortedResults = allResults.sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+
+    if (aValue < bValue) {
+      return sortOrder === "asc" ? -1 : 1;
+    }
+    if (aValue > bValue) {
+      return sortOrder === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+
+  return {
+    items: sortedResults,
   };
 }

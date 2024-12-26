@@ -67,7 +67,7 @@ export function useBlushQuery({ texture }: { texture: string | null }) {
         ...configurableResults.items,
       ];
 
-      const filters: { filters: { field: string; value: string | number; condition_type: string; }[]; }[] | undefined = [];
+      const filters = [];
 
       // if (texture) {
       //   filters.push({

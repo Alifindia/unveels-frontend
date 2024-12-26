@@ -10,20 +10,20 @@ const baseRoutes = [
   "/face-analyzer",
   "/skin-analysis",
   "/find-the-look",
-  "/personality-finder-web",
-  "/find-the-look-web",
-  "/skin-tone-finder-web",
   "/virtual-assistant",
-  "/virtual-avatar-web",
-  "/skin-analysis-web",
   "/virtual-try-on-product",
   "/virtual-try-on",
-  "/see-improvement-web",
   "/see-improvement",
-  "/virtual-try-on-web",
   "/virtual-try-on-accesories",
   "/virtual-try-on-makeup",
   "/virtual-try-on-product",
+  "/virtual-try-on-web",
+  "/find-the-look-web",
+  "/skin-tone-finder-web",
+  "/virtual-avatar-web",
+  "/skin-analysis-web",
+  "/see-improvement-web",
+  "/personality-finder-web",
 ];
 
 function generateHtmlFromTemplate(route: string) {
@@ -82,6 +82,7 @@ export default defineConfig({
   },
   build: {
     manifest: true,
+    assetsDir: "media/unveels",
     rollupOptions: {
       input: inputObjects,
     },

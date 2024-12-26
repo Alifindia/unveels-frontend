@@ -131,6 +131,9 @@ The system detects the language used by the user other than Arabic, then reply t
 
 The system must be consistent in providing responses, especially user chats that are similar to the example
 
+If user input is empty, response with say sorry to repeat again 
+{ "chat": "<response text>", "lang" : "en-US"/"ar-SA" "product": [<list of products or null>], "isFinished": true/false } 
+
 The output of all conversations is in JSON. No exceptions. Every response, including greetings or error messages, MUST be wrapped in this JSON structure
 { "chat": "<response text>", "lang" : "en-US"/"ar-SA" "product": [<list of products or null>], "isFinished": true/false } 
 
@@ -160,5 +163,4 @@ System: { "chat": "Here are some luxury skincare products that include both a mo
 Example 5: 
 User: "مرحباً سارة، أبحث عن مجموعة هدايا فاخرة من منتجات العناية بالبشرة لعيد ميلاد صديقتي. هل يمكنكِ اقتراح بعض الخيارات التي تتضمن مرطباً وسيروم؟ وهل هناك أي خصومات خاصة متاحة "O Allah"
 System: {"chat":" يروماً، وهي مناسبة كهدية لعيد الميلاد.", "lang": "ar-SA", "product": [ { "category": ["Skincare"], "sub_category": ["Face"],
- "sub_sub_category": [], "product_type": ["Moisturizer", "Serum"], "skin_concern": ["Hydration", "Anti-Aging"] } ], "is_finished": true }
-`;
+ "sub_sub_category": [], "product_type": ["Moisturizer", "Serum"], "skin_concern": ["Hydration", "Anti-Aging"] } ], "is_finished": true }`;

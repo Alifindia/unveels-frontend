@@ -50,6 +50,7 @@ import { useRecordingControls } from "../hooks/useRecorder";
 import { FindTheLookItems } from "../types/findTheLookItems";
 import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
 import { VTOProductCard } from "../components/vto/vto-product-card";
+import { useCartContext } from "../context/cart-context";
 
 export function FindTheLook() {
   return (
@@ -68,24 +69,15 @@ export function FindTheLook() {
 function Main() {
   const { criterias } = useCamera();
   const [selectionMade, setSelectionMade] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
   const modelsRef = useRef<{
     faceLandmarker: FaceLandmarker | null;
-    handDetector: ObjectDetector | null;
-    ringDetector: ObjectDetector | null;
-    neckDetector: ObjectDetector | null;
-    earringDetector: ObjectDetector | null;
-    glassDetector: ObjectDetector | null;
-    headDetector: ObjectDetector | null;
+    accesoriesDetector: ObjectDetector | null;
     makeupDetector: ObjectDetector | null;
   }>({
     faceLandmarker: null,
-    handDetector: null,
-    ringDetector: null,
-    neckDetector: null,
-    earringDetector: null,
-    glassDetector: null,
-    headDetector: null,
+    accesoriesDetector: null,
     makeupDetector: null,
   });
 
@@ -112,107 +104,22 @@ function Main() {
       modelsRef.current.faceLandmarker = faceLandmarkerInstance;
     },
     async () => {
-      const handDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/hand.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 2,
-          scoreThreshold: 0.63,
-        },
-      );
-      modelsRef.current.handDetector = handDetectorInstance;
-    },
-    async () => {
-      const ringDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/rings.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.8,
-        },
-      );
-      modelsRef.current.ringDetector = ringDetectorInstance;
-    },
-    async () => {
-      const neckDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/neck.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.8,
-        },
-      );
-      modelsRef.current.neckDetector = neckDetectorInstance;
-    },
-    async () => {
-      const earringDetectorInstance = await ObjectDetector.createFromOptions(
+      const accesoriesDetectorInstance = await ObjectDetector.createFromOptions(
         await FilesetResolver.forVisionTasks(
           "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
         ),
         {
           baseOptions: {
             modelAssetPath:
-              "/media/unveels/models/find-the-look/earrings.tflite",
+              "/media/unveels/models/find-the-look/accesories_model.tflite",
             delegate: "GPU",
           },
           runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.8,
+          maxResults: 10,
+          scoreThreshold: 0.1,
         },
       );
-      modelsRef.current.earringDetector = earringDetectorInstance;
-    },
-    async () => {
-      const glassDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/glass.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.6,
-        },
-      );
-      modelsRef.current.glassDetector = glassDetectorInstance;
-    },
-    async () => {
-      const headDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/head.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.8,
-        },
-      );
-      modelsRef.current.headDetector = headDetectorInstance;
+      modelsRef.current.accesoriesDetector = accesoriesDetectorInstance;
     },
     async () => {
       const makeupDetectorInstance = await ObjectDetector.createFromOptions(
@@ -274,7 +181,6 @@ function Main() {
               </>
             )}
           </div>
-          <RecorderStatus />
           <TopNavigation cart={true} />
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
@@ -542,6 +448,17 @@ function ProductList({ product_type }: { product_type: string }) {
     type_ids: mapTypes[product_type].values,
   });
 
+  const { addItemToCart } = useCartContext();
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
+
   return (
     <div className="flex w-full gap-4 overflow-x-auto no-scrollbar active:cursor-grabbing">
       {data ? (
@@ -586,6 +503,10 @@ function ProductList({ product_type }: { product_type: string }) {
                   className="flex h-5 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-2.5 text-[0.5rem] font-semibold text-white sm:h-7"
                   onClick={(event) => {
                     event.stopPropagation();
+                    handleAddToCart(
+                      product.id.toString(),
+                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                    );
                   }}
                 >
                   Add to cart
@@ -627,36 +548,29 @@ function BottomContent() {
     if (findTheLookItems) {
       const grouped = groupedItems(findTheLookItems);
       setGroupedItemsData(grouped);
+      console.log(groupedItemsData);
     }
   }, [findTheLookItems]);
 
-  const handleTabChange = (label: string) => {
-    setTab(label);
-  };
-
-  // Narrowing section type for initialSection
   const initialSection: "makeup" | "accessories" | undefined =
     section === "makeup" || section === "accessories" ? section : undefined;
 
-  // Render different views based on the criteria and view
   if (criterias.isCaptured) {
-    // If `tab` and `section` are both not null, render ProductRecommendationsTabs with initial section
     if (tab && section) {
       return (
         <ProductRecommendationsTabs
           groupedItemsData={groupedItemsData}
-          initialSection={initialSection} // Using narrowed type here
-          activeTab={tab} // Pass activeTab to set the initial active category
+          initialSection={initialSection}
+          activeTab={tab}
           onClose={() => {
             setTab(null);
             setSection(null);
-            setView("face"); // Reset to face view
+            setView("face");
           }}
         />
       );
     }
 
-    // Render the views based on `view`
     if (view === "face") {
       return (
         <InferenceResults
@@ -674,7 +588,7 @@ function BottomContent() {
       return (
         <ProductRecommendationsTabs
           groupedItemsData={groupedItemsData}
-          initialSection="makeup" // Default to makeup section when entering recommendations view
+          initialSection="makeup"
           onClose={() => setView("face")}
         />
       );
@@ -742,15 +656,20 @@ function ProductRecommendationsTabs({
   initialSection?: "makeup" | "accessories"; // New prop to initialize the section
   activeTab?: string; // Active tab for initializing the selected tab in categories
 }) {
-  const [tab, setTab] = useState<"makeup" | "accessories">(initialSection); // Set initial tab based on initialSection
+  const [tab, setTab] = useState<"makeup" | "accessories">(initialSection);
+  const [localActiveTab, setLocalActiveTab] = useState<string | null>(
+    activeTab ?? null,
+  );
 
-  console.log({
-    activeTab,
-  });
-
+  // Update localActiveTab when activeTab changes
   useEffect(() => {
-    setTab(initialSection); // Update tab if initialSection changes
-  }, [initialSection]);
+    setLocalActiveTab(activeTab ?? null);
+  }, [activeTab]);
+
+  // Reset active tab when the category changes
+  useEffect(() => {
+    setLocalActiveTab(null);
+  }, [tab]); // This will reset activeTab when the user switches between makeup and accessories
 
   const activeClassNames =
     "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text";
@@ -808,14 +727,14 @@ function ProductRecommendationsTabs({
       {tab === "makeup" ? (
         <MakeupCategories
           makeups={groupedItemsData.makeup}
-          activeTab={activeTab} // Pass activeTab to MakeupCategories
-          onTabChange={(label) => setTab("makeup")}
+          activeTab={localActiveTab} // Pass localActiveTab to MakeupCategories
+          onTabChange={(label) => setLocalActiveTab(label)}
         />
       ) : (
         <AccessoriesCategories
           accessories={groupedItemsData.accessories}
-          activeTab={activeTab} // Pass activeTab to AccessoriesCategories
-          onTabChange={(label) => setTab("accessories")}
+          activeTab={localActiveTab} // Pass localActiveTab to AccessoriesCategories
+          onTabChange={(label) => setLocalActiveTab(label)}
         />
       )}
     </>
@@ -979,6 +898,17 @@ function ProductHorizontalList({ category }: { category: string }) {
     type_ids: values,
   });
 
+  const { addItemToCart } = useCartContext();
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
+
   return (
     <div key={category}>
       <div className="py-4">
@@ -1030,6 +960,12 @@ function ProductHorizontalList({ category }: { category: string }) {
                   <button
                     type="button"
                     className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
+                    onClick={() => {
+                      handleAddToCart(
+                        product.id.toString(),
+                        `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      );
+                    }}
                   >
                     ADD TO CART
                   </button>
@@ -1063,6 +999,17 @@ function SingleCategoryView({
 }) {
   const { data } = useLipsProductQuery({});
 
+  const { addItemToCart } = useCartContext();
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
+
   return (
     <div
       className={clsx(
@@ -1094,12 +1041,12 @@ function SingleCategoryView({
                   <div
                     key={product.id}
                     className="w-full rounded shadow"
-                    onClick={() => {
-                      window.open(
-                        `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                        "_blank",
-                      );
-                    }}
+                    // onClick={() => {
+                    //   window.open(
+                    //     `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                    //     "_blank",
+                    //   );
+                    // }}
                   >
                     <div className="relative aspect-square overflow-hidden">
                       <img
@@ -1129,6 +1076,12 @@ function SingleCategoryView({
                       <button
                         type="button"
                         className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
+                        onClick={() => {
+                          handleAddToCart(
+                            product.id.toString(),
+                            `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                          );
+                        }}
                       >
                         ADD TO CART
                       </button>
@@ -1145,51 +1098,6 @@ function SingleCategoryView({
             : null}
         </div>
       </div>
-    </div>
-  );
-}
-
-function RecorderStatus() {
-  const { isRecording, formattedTime, handleStartPause, handleStop, isPaused } =
-    useRecordingControls();
-  const { finish } = useCamera();
-
-  return (
-    <div className="absolute inset-x-0 top-14 flex items-center justify-center gap-4">
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={handleStartPause}
-      >
-        {isPaused ? (
-          <CirclePlay className="size-6 text-white" />
-        ) : isRecording ? (
-          <PauseCircle className="size-6 text-white" />
-        ) : null}
-      </button>
-      <span className="relative flex size-4">
-        {isRecording ? (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-        ) : null}
-        <span className="relative inline-flex size-4 rounded-full bg-red-500"></span>
-      </span>
-      <div className="font-serif text-white">{formattedTime}</div>
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={
-          isRecording
-            ? () => {
-                handleStop();
-                finish();
-              }
-            : handleStartPause
-        }
-      >
-        {isRecording || isPaused ? (
-          <StopCircle className="size-6 text-white" />
-        ) : (
-          <CirclePlay className="size-6 text-white" />
-        )}
-      </button>
     </div>
   );
 }
