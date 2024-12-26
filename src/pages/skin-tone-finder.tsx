@@ -64,6 +64,7 @@ import { useProducts } from "../api/get-product";
 import { useCartContext } from "../context/cart-context";
 import { Rating } from "../components/rating";
 import { BrandName } from "../components/product/brand";
+import { useTranslation } from "react-i18next";
 
 export function SkinToneFinder() {
   const { i18n } = useTranslation();

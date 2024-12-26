@@ -6,7 +6,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { VirtualTryOnProductProvider } from "./context/virtual-try-on-product-context.tsx";
 import { CartProvider } from "./context/cart-context.tsx";
-import "./i18n.ts";
+import "./i18n.tsx";
 
 const queryClient = new QueryClient();
 
