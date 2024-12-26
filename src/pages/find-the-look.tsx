@@ -73,21 +73,11 @@ function Main() {
 
   const modelsRef = useRef<{
     faceLandmarker: FaceLandmarker | null;
-    handDetector: ObjectDetector | null;
-    ringDetector: ObjectDetector | null;
-    neckDetector: ObjectDetector | null;
-    earringDetector: ObjectDetector | null;
-    glassDetector: ObjectDetector | null;
-    headDetector: ObjectDetector | null;
+    accesoriesDetector: ObjectDetector | null;
     makeupDetector: ObjectDetector | null;
   }>({
     faceLandmarker: null,
-    handDetector: null,
-    ringDetector: null,
-    neckDetector: null,
-    earringDetector: null,
-    glassDetector: null,
-    headDetector: null,
+    accesoriesDetector: null,
     makeupDetector: null,
   });
 
@@ -114,107 +104,22 @@ function Main() {
       modelsRef.current.faceLandmarker = faceLandmarkerInstance;
     },
     async () => {
-      const handDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/hand.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 2,
-          scoreThreshold: 0.63,
-        },
-      );
-      modelsRef.current.handDetector = handDetectorInstance;
-    },
-    async () => {
-      const ringDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/rings.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.8,
-        },
-      );
-      modelsRef.current.ringDetector = ringDetectorInstance;
-    },
-    async () => {
-      const neckDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/neck.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.8,
-        },
-      );
-      modelsRef.current.neckDetector = neckDetectorInstance;
-    },
-    async () => {
-      const earringDetectorInstance = await ObjectDetector.createFromOptions(
+      const accesoriesDetectorInstance = await ObjectDetector.createFromOptions(
         await FilesetResolver.forVisionTasks(
           "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
         ),
         {
           baseOptions: {
             modelAssetPath:
-              "/media/unveels/models/find-the-look/earrings.tflite",
+              "/media/unveels/models/find-the-look/accesories_model.tflite",
             delegate: "GPU",
           },
           runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.8,
+          maxResults: 10,
+          scoreThreshold: 0.1,
         },
       );
-      modelsRef.current.earringDetector = earringDetectorInstance;
-    },
-    async () => {
-      const glassDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/glass.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.6,
-        },
-      );
-      modelsRef.current.glassDetector = glassDetectorInstance;
-    },
-    async () => {
-      const headDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/head.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.8,
-        },
-      );
-      modelsRef.current.headDetector = headDetectorInstance;
+      modelsRef.current.accesoriesDetector = accesoriesDetectorInstance;
     },
     async () => {
       const makeupDetectorInstance = await ObjectDetector.createFromOptions(
@@ -647,10 +552,6 @@ function BottomContent() {
     }
   }, [findTheLookItems]);
 
-  const handleTabChange = (label: string) => {
-    setTab(label);
-  };
-
   const initialSection: "makeup" | "accessories" | undefined =
     section === "makeup" || section === "accessories" ? section : undefined;
 
@@ -755,15 +656,20 @@ function ProductRecommendationsTabs({
   initialSection?: "makeup" | "accessories"; // New prop to initialize the section
   activeTab?: string; // Active tab for initializing the selected tab in categories
 }) {
-  const [tab, setTab] = useState<"makeup" | "accessories">(initialSection); // Set initial tab based on initialSection
+  const [tab, setTab] = useState<"makeup" | "accessories">(initialSection);
+  const [localActiveTab, setLocalActiveTab] = useState<string | null>(
+    activeTab ?? null,
+  );
 
-  console.log({
-    activeTab,
-  });
-
+  // Update localActiveTab when activeTab changes
   useEffect(() => {
-    setTab(initialSection); // Update tab if initialSection changes
-  }, [initialSection]);
+    setLocalActiveTab(activeTab ?? null);
+  }, [activeTab]);
+
+  // Reset active tab when the category changes
+  useEffect(() => {
+    setLocalActiveTab(null);
+  }, [tab]); // This will reset activeTab when the user switches between makeup and accessories
 
   const activeClassNames =
     "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text";
@@ -821,14 +727,14 @@ function ProductRecommendationsTabs({
       {tab === "makeup" ? (
         <MakeupCategories
           makeups={groupedItemsData.makeup}
-          activeTab={activeTab} // Pass activeTab to MakeupCategories
-          onTabChange={(label) => setTab("makeup")}
+          activeTab={localActiveTab} // Pass localActiveTab to MakeupCategories
+          onTabChange={(label) => setLocalActiveTab(label)}
         />
       ) : (
         <AccessoriesCategories
           accessories={groupedItemsData.accessories}
-          activeTab={activeTab} // Pass activeTab to AccessoriesCategories
-          onTabChange={(label) => setTab("accessories")}
+          activeTab={localActiveTab} // Pass localActiveTab to AccessoriesCategories
+          onTabChange={(label) => setLocalActiveTab(label)}
         />
       )}
     </>
