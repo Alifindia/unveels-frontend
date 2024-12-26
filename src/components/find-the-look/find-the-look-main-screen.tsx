@@ -179,10 +179,7 @@ export function FindTheLookMainScreen({
                   {t(`camera_select.snap.title`)}
                 </h3>{" "}
               </div>
-              <p>
-                Unveil the potential of your favorite images with our photo
-                upload feature.
-              </p>
+              <p>{t(`camera_select.snap.desc.text`)}</p>
               {activeSection === "takeSnapshot" && (
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
