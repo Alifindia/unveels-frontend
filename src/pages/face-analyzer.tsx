@@ -39,6 +39,7 @@ import {
   preprocessTFLiteImage,
   runTFLiteInference,
 } from "../utils/tfliteInference";
+import { useTranslation } from "react-i18next";
 import { useCartContext } from "../context/cart-context";
 
 export function FaceAnalyzer() {
@@ -248,17 +249,15 @@ function MainContent() {
   );
 }
 
-function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
+const Result = ({ inferenceResult }: { inferenceResult: Classifier[] }) => {
+  const { t } = useTranslation();
   const tabs = [
-    {
-      title: "Attributes",
-    },
-    {
-      title: "Recommendations",
-    },
+    { title: t("tabsmenupf.attributes"), key: "Attributes" },
+    { title: t("tabsmenupf.recommendations"), key: "Recommendations" },
   ];
 
-  const [selectedTab, setTab] = useState(tabs[0].title);
+  // Use state to keep track of selected tab key for consistency
+  const [selectedTab, setTab] = useState(tabs[0].key);
 
   const navigate = useNavigate();
   const { criterias } = useCamera();
@@ -306,13 +305,14 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
         <div>
           <div className="flex items-center gap-x-1">
             <Icons.hashtagCircle className="size-4" />
-            <div className="text-sm">AI Face Analzer :</div>
+            <div className="text-sm">
+              {t("viewpersonality.aiFaceAnalyzer")}:
+            </div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-
       <div className="mx-auto w-full max-w-[430px] px-5">
         <div className="flex border-b-2 border-white/50">
           {tabs.map((tab, index) => (
@@ -320,11 +320,11 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
               key={index}
               className={clsx(
                 "w-full translate-y-0.5 border-b-2 py-2",
-                tab.title === selectedTab
+                tab.key === selectedTab
                   ? "border-[#CA9C43] bg-gradient-to-r from-[#92702D] to-[#CA9C43] bg-clip-text text-transparent"
                   : "border-transparent text-[#9E9E9E]",
               )}
-              onClick={() => setTab(tab.title)}
+              onClick={() => setTab(tab.key)}
             >
               {tab.title}
             </button>
@@ -333,19 +333,61 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
       </div>
 
       {/* Main Content */}
-      {selectedTab === "Attributes" ? (
-        <AttributesTab data={inferenceResult} />
-      ) : null}
-      {selectedTab === "Recommendations" ? (
+      {selectedTab === "Attributes" && <AttributesTab data={inferenceResult} />}
+      {selectedTab === "Recommendations" && (
         <RecommendationsTab
-          faceShape={inferenceResult ? inferenceResult[14].outputLabel : ""}
+          faceShape={
+            inferenceResult ? inferenceResult[14]?.outputLabel || "" : ""
+          }
         />
-      ) : null}
+      )}
+    </div>
+  );
+};
+
+function PersonalitySection({
+  title,
+  description,
+  score,
+}: {
+  title: string;
+  description: string;
+  score: number;
+}) {
+  // High -> 70% - 100%
+  // Moderate -> above 40% - 69%
+  // low -> 0% - 39%
+  const scoreType = score < 40 ? "Low" : score < 70 ? "Moderate" : "High";
+  return (
+    <div className="py-5">
+      <div className="flex items-center space-x-2 pb-6">
+        <Icons.personalityTriangle className="size-8" />
+
+        <h2 className="text-3xl font-bold text-white">{title}</h2>
+      </div>
+
+      <span className="text-xl font-bold">Description</span>
+      <p className="pb-6 pt-1 text-sm">{description}</p>
+
+      <span className="text-xl font-bold">Score</span>
+      <div
+        className={clsx(
+          "text-sm",
+          score < 40
+            ? "text-[#FF0000]"
+            : score < 70
+              ? "text-[#FAFF00]"
+              : "text-[#5ED400]",
+        )}
+      >
+        {scoreType} {score}%
+      </div>
     </div>
   );
 }
 
 function RecommendationsTab({ faceShape }: { faceShape: string }) {
+  const { t } = useTranslation();
   const { data: fragrances } = useFragrancesProductQuery({
     faceShape,
   });
@@ -372,7 +414,7 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
     <div className="w-full overflow-auto px-4 py-8">
       <div className="pb-14">
         <h2 className="pb-4 text-xl font-bold lg:text-2xl">
-          Perfumes Recommendations
+          {t("viewpersonality.perfumerec")}
         </h2>
         {fragrances ? (
           <div className="flex w-full gap-4 overflow-x-auto no-scrollbar">
@@ -432,7 +474,13 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                         );
                       }}
                     >
-                      ADD TO CART
+                      {t("viewpersonality.addcart")}
+                    </button>
+                    <button
+                      type="button"
+                      className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
+                    >
+                      {t("viewpersonality.seeimprovement")}
                     </button>
                   </div>
                 </div>
@@ -444,11 +492,8 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
         )}
       </div>
       <div className="pb-14">
-        <h2 className="text-xl font-bold">Look Recommendations</h2>
-        <p className="pb-4 text-sm font-bold">
-          A bold red lipstick and defined brows, mirror your strong, vibrant
-          personality
-        </p>
+        <h2 className="text-xl font-bold">{t("viewpersonality.lookrec")}</h2>
+        <p className="pb-4 text-sm font-bold">{t("viewpersonality.lookdec")}</p>
         {items ? (
           <div className="flex w-full gap-4 overflow-x-auto no-scrollbar">
             {items.profiles.map((profile, index) => {
@@ -487,13 +532,13 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                       type="button"
                       className="flex h-7 w-full items-center justify-center border border-white text-[0.5rem] font-semibold"
                     >
-                      ADD TO CART
+                      {t("viewpersonality.addcart")}
                     </button>
                     <button
                       type="button"
                       className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
                     >
-                      TRY ON
+                      {t("viewpersonality.seeimprovement")}
                     </button>
                   </div>
                 </div>
@@ -505,9 +550,11 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
         )}
       </div>
       <div className="pb-14">
-        <h2 className="text-xl font-bold">Lip Color Recommendations</h2>
+        <h2 className="text-xl font-bold">
+          {t("viewpersonality.lipcolorrec")}
+        </h2>
         <p className="pb-4 text-sm font-bold">
-          The best lip color for you are orange shades
+          {t("viewpersonality.lipcolordec")}
         </p>
         {lips ? (
           <div className="flex w-full gap-4 overflow-x-auto no-scrollbar">
@@ -558,13 +605,13 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                         );
                       }}
                     >
-                      ADD TO CART
+                      {t("viewpersonality.addcart")}
                     </button>
                     <button
                       type="button"
                       className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
                     >
-                      TRY ON
+                      {t("viewpersonality.seeimprovement")}
                     </button>
                   </div>
                 </div>
@@ -580,6 +627,8 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
 }
 
 function AttributesTab({ data }: { data: Classifier[] | null }) {
+  const { t } = useTranslation();
+
   if (!data) {
     return <div></div>;
   }
@@ -588,23 +637,52 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
     <div className="grid flex-1 grid-cols-1 gap-4 space-y-6 overflow-auto px-10 py-6 md:grid-cols-2 md:space-y-0">
       <FeatureSection
         icon={<Icons.face className="size-12" />}
-        title="Face"
+        title={t("attributepf.face.title")}
         features={[
-          { name: "Face Shape", value: data[14].outputLabel },
-          { name: "Skin Tone", value: data[17].outputLabel },
+          {
+            name: t("attributepf.face.faceattribute.faceshape"),
+            value: t(
+              `faceshapelabels.${data[14].outputLabel.toLocaleLowerCase()}`,
+            ),
+          },
+          {
+            name: t("attributepf.face.faceattribute.skintone"),
+            value: t(
+              `skin_tones.${data[17].outputLabel.toLowerCase().replace(" ", "_")}`,
+            ),
+          },
         ]}
       />
       <FeatureSection
         icon={<Icons.eye className="size-12" />}
-        title="Eyes"
+        title={t("attributepf.eyes.title")}
         features={[
-          { name: "Eye Shape", value: data[3].outputLabel },
-          { name: "Eye Size", value: data[4].outputLabel },
-          { name: "Eye Angle", value: data[1].outputLabel },
-          { name: "Eye Distance", value: data[2].outputLabel },
-          { name: "Eyelid", value: data[6].outputLabel },
           {
-            name: "Eye Color",
+            name: t("attributepf.eyes.eyesattribute.eyeshape"),
+            value: t(`eyeshapeLabels.${data[3].outputLabel.toLowerCase()}`),
+          },
+          {
+            name: t("attributepf.eyes.eyesattribute.eyesize"),
+            value: t(`eyesizeLabels.${data[4].outputLabel.toLowerCase()}`),
+          },
+          {
+            name: t("attributepf.eyes.eyesattribute.eyeangle"),
+            value: t(`eyeangleLabels.${data[1].outputLabel.toLowerCase()}`),
+          },
+          {
+            name: t("attributepf.eyes.eyesattribute.eyedistance"),
+            value: t(
+              `eyedistanceLabels.${data[2].outputLabel.toLowerCase().replace("-", "_")}`,
+            ),
+          },
+          {
+            name: t("attributepf.eyes.eyesattribute.eyelid"),
+            value: t(
+              `eyelidLabels.${data[6].outputLabel.toLowerCase().replace("-", "_")}`,
+            ),
+          },
+          {
+            name: t("attributepf.eyes.eyesattribute.eyecolor"),
             value: "",
             color: true,
             hex: data[18].outputColor,
@@ -613,13 +691,26 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
       />
       <FeatureSection
         icon={<Icons.brows className="size-12" />}
-        title="Brows"
+        title={t("attributepf.brows.title")}
         features={[
-          { name: "Eyebrow Shape", value: data[13].outputLabel },
-          { name: "Thickness", value: data[11].outputLabel },
-          { name: "Eyebrow Distance", value: data[5].outputLabel },
           {
-            name: "Eyebrow color",
+            name: t("attributepf.brows.browsattribute.eyebrowshape"),
+            value: t(
+              `eyebrowshapelabels.${data[13].outputLabel.toLowerCase().replace("-", "_")}`,
+            ),
+          },
+          {
+            name: t("attributepf.brows.browsattribute.thickness"),
+            value: t(`thickness.${data[11].outputLabel.toLowerCase()}`),
+          },
+          {
+            name: t("attributepf.brows.browsattribute.eyebrowdistance"),
+            value: t(
+              `eyebrowdistanceLabels.${data[5].outputLabel.toLowerCase()}`,
+            ),
+          },
+          {
+            name: t("attributepf.brows.browsattribute.eyebrowcolor"),
             value: "",
             color: true,
             hex: data[18].outputColor,
@@ -628,11 +719,16 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
       />
       <FeatureSection
         icon={<Icons.lips className="size-12" />}
-        title="Lips"
+        title={t("attributepf.lips.title")}
         features={[
-          { name: "Lip shape", value: data[14].outputLabel },
           {
-            name: "Lip color",
+            name: t("attributepf.lips.lipsattribute.lipshape"),
+            value: t(
+              `liplabels.${data[7].outputLabel.toLowerCase().replace("-", "_")}`,
+            ),
+          },
+          {
+            name: t("attributepf.lips.lipsattribute.lipcolor"),
             value: "",
             color: true,
             hex: data[17].outputColor,
@@ -641,18 +737,39 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
       />
       <FeatureSection
         icon={<Icons.cheekbones className="size-12" />}
-        title="Cheekbones"
-        features={[{ name: "Cheekbones", value: data[0].outputLabel }]}
+        title={t("attributepf.cheekbones.title")}
+        features={[
+          {
+            name: t("attributepf.cheekbones.cheekbonesattribute.cheeckbones"),
+            value: t(
+              `cheeksbonesLabels.${data[0].outputLabel.toLowerCase().replace(" ", "_")}`,
+            ),
+          },
+        ]}
       />
       <FeatureSection
         icon={<Icons.nose className="size-12" />}
-        title="Nose"
-        features={[{ name: "Nose Shape", value: data[9].outputLabel }]}
+        title={t("attributepf.nose.title")}
+        features={[
+          {
+            name: t("attributepf.nose.noseattribute.noseshape"),
+            value: t(
+              `nosewidthlabels.${data[9].outputLabel.toLocaleLowerCase()}`,
+            ),
+          },
+        ]}
       />
       <FeatureSection
         icon={<Icons.hair className="size-12" />}
-        title="Hair"
-        features={[{ name: "Face Shape", value: data[10].outputLabel }]}
+        title={t("attributepf.hair.title")}
+        features={[
+          {
+            name: t("attributepf.hair.hairattribute.haircolor"),
+            value: t(
+              `hairLabels.${data[10].outputLabel.toLowerCase().replace(" ", "_")}`,
+            ),
+          },
+        ]}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import { BboxLandmark } from "../../types/bboxLandmark";
 import { adjustBoundingBoxes } from "../../utils/boundingBoxUtils";
 import { skinAnalysisDataItem } from "../../utils/constants";
 import { FaceResults } from "../../types/faceResults";
+import { useTranslation } from "react-i18next";
 
 interface OverlayCanvasProps {
   image: HTMLImageElement;
@@ -28,6 +29,7 @@ function OverlayCanvas({
   landmarks,
   onLabelClick,
 }: OverlayCanvasProps) {
+  const { t } = useTranslation();
   const featureColors: { [key: string]: string } = {
     spots: "255, 0, 0", // Merah
     acne: "9, 183, 26", // Hijau
@@ -232,7 +234,7 @@ function OverlayCanvas({
           // Draw label text
           ctx.font = "12px Arial";
           ctx.fillStyle = "white";
-          ctx.fillText(dataItem.label, labelX, labelY - 5);
+          ctx.fillText(t(`skinlabel.${dataItem.label}`), labelX, labelY - 5);
 
           // Draw underline for label text
           const textWidth = ctx.measureText(dataItem.label).width;

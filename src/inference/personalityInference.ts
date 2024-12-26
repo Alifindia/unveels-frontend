@@ -35,90 +35,105 @@ const classifiers: Classifier[] = [
     outputName: "StatefulPartitionedCall_1:0",
     labels: cheeksbonesLabels,
     outputLabel: "",
+    //0
   },
   {
     name: "Eye Angle",
     outputName: "StatefulPartitionedCall_1:1",
     labels: eyeangleLabels,
     outputLabel: "",
+    //1
   },
   {
     name: "Eye Distance",
     outputName: "StatefulPartitionedCall_1:2",
     labels: eyedistanceLabels,
     outputLabel: "",
+    //2
   },
   {
     name: "Eye Shape",
     outputName: "StatefulPartitionedCall_1:3",
     labels: eyeshapeLabels,
     outputLabel: "",
+    //3
   },
   {
     name: "Eye Size",
     outputName: "StatefulPartitionedCall_1:4",
     labels: eyesizeLabels,
     outputLabel: "",
+    //4
   },
   {
     name: "Eyebrow Distance",
     outputName: "StatefulPartitionedCall_1:5",
     labels: eyebrowDistanceLabels,
     outputLabel: "",
+    //5
   },
   {
     name: "Eye Lid",
     outputName: "StatefulPartitionedCall_1:6",
     labels: eyeLidLabels,
     outputLabel: "",
+    //6
   },
   {
     name: "Lip",
     outputName: "StatefulPartitionedCall_1:7",
     labels: lipLabels,
     outputLabel: "",
+    //7
   },
   {
     name: "Nose Length",
     outputName: "StatefulPartitionedCall_1:8",
     labels: noseLengthLabels,
     outputLabel: "",
+    //8
   },
   {
     name: "Nose Width",
     outputName: "StatefulPartitionedCall_1:9",
     labels: noseWidthLabels,
     outputLabel: "",
+    //9
   },
   {
     name: "Shortness",
     outputName: "StatefulPartitionedCall_1:10",
     labels: shortnessLabels,
     outputLabel: "",
+    //10
   },
   {
     name: "Thickness",
     outputName: "StatefulPartitionedCall_1:11",
     labels: thickNessLabels,
     outputLabel: "",
+    //11
   },
   {
     name: "Thinness",
     outputName: "StatefulPartitionedCall_1:12",
     labels: thinnessLabels,
     outputLabel: "",
+    //12
   },
   {
     name: "Eyebrow Shape",
     outputName: "StatefulPartitionedCall_1:13",
     labels: eyebrowShapeLabels,
     outputLabel: "",
+    //13
   },
   {
     name: "Face Shape",
     outputName: "StatefulPartitionedCall_1:14",
     labels: faceShapeLabels,
     outputLabel: "",
+    //14
   },
   {
     name: "Personality Finder",
@@ -127,6 +142,7 @@ const classifiers: Classifier[] = [
     outputLabel: "",
     outputScore: 0,
     outputData: [],
+    //15
   },
 ];
 

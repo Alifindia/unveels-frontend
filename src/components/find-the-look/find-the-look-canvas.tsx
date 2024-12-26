@@ -8,6 +8,7 @@ import {
 import { Landmark } from "../../types/landmark";
 import { extractSkinColor } from "../../utils/imageProcessing";
 import { useFindTheLookContext } from "../../context/find-the-look-context";
+import { useTranslation } from "react-i18next";
 
 interface FindTheLookCanvasProps {
   image: HTMLImageElement;
@@ -41,7 +42,7 @@ export function FindTheLookCanvas({
 }: FindTheLookCanvasProps) {
   const { selectedItems: cart } = useFindTheLookContext();
   const { findTheLookItems, addFindTheLookItem } = useFindTheLookContext();
-
+  const { t } = useTranslation();
   const hitboxesRef = useRef<Hitbox[]>([]);
 
   const [isInferenceCompleted, setIsInferenceCompleted] = useState(false);
@@ -363,10 +364,12 @@ export function FindTheLookCanvas({
         ctx.strokeStyle = "white";
         ctx.stroke();
 
-        // Gambar label
-        ctx.font = "12px Arial";
-        ctx.fillStyle = "white";
-        ctx.fillText(categoryName, labelX, labelY - 5);
+          // Display the label
+          if (categories && categories.length > 0) {
+            const label = categories[0].categoryName;
+            ctx.font = "12px Arial";
+            ctx.fillStyle = "white";
+            ctx.fillText(t(`categories_label.${label}`), labelX, labelY - 5);
 
         // Gambar garis bawah pada label
         const textWidth = ctx.measureText(categoryName).width;

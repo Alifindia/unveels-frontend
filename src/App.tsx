@@ -61,6 +61,7 @@ import {
   TryOnSelectorAccesories,
   VirtualTryOnAccesories,
 } from "./pages/virtual-try-on-accesories";
+import { useTranslation } from "react-i18next";
 
 // Define routes using object syntax
 const routes = [

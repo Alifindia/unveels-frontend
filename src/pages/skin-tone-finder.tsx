@@ -446,7 +446,7 @@ function OtherShades() {
             setView("all_categories");
           }}
         >
-          View all
+          {t("view_all")}
         </button>
       </div>
 
