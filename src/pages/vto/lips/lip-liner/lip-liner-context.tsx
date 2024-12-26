@@ -5,6 +5,8 @@ interface LipLinerContextType {
   setColorFamily: (color: string | null) => void;
   selectedColor: string | null;
   setSelectedColor: (color: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
   selectedSize: string;
   setSelectedSize: (shade: string) => void;
 }
@@ -18,6 +20,7 @@ const LipLinerContext = createContext<LipLinerContextType | undefined>(
 export function LipLinerProvider({ children }: { children: React.ReactNode }) {
   const [colorFamily, setColorFamily] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>("0");
 
   return (
@@ -27,6 +30,8 @@ export function LipLinerProvider({ children }: { children: React.ReactNode }) {
         setColorFamily,
         selectedColor,
         setSelectedColor,
+        colorFamilyToInclude,
+        setColorFamilyToInclude,
         selectedSize,
         setSelectedSize,
       }}

@@ -55,3 +55,28 @@ export function neckAccessoriesProductTypeFilter(product_types: string[]) {
     .filter((type) => product_types.includes(type.label))
     .map((product) => product.value);
 }
+
+export const hand_accessories_product_type = [
+  {
+    label: "Rings",
+    value: "6500",
+  },
+  {
+    label: "Watches",
+    value: "6501",
+  },
+  {
+    label: "Bracelets",
+    value: "6502",
+  },
+  {
+    label: "Bangles",
+    value: "6503",
+  },
+];
+
+export function handAccessoriesProductTypeFilter(product_types: string[]) {
+  return hand_accessories_product_type
+    .filter((type) => product_types.includes(type.label))
+    .map((product) => product.value);
+}

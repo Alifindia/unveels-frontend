@@ -2,7 +2,7 @@ import { mapPointToRenderedVideo } from "./mapping";
 
 export function drawKeypoints(
   keypoints: any[], // Replace with actual type
-  video: HTMLVideoElement,
+  video: HTMLVideoElement | HTMLImageElement,
   videoRect: DOMRect,
   flipped: boolean,
   canvas: HTMLCanvasElement,

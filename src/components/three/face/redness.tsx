@@ -30,6 +30,7 @@ const RednessInner: React.FC<RednessProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={rednessMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={true}
     />
   );
 };

@@ -1,8 +1,8 @@
 import { labels, skinAnalysisDataItem } from "../utils/constants";
-import { base64ToImage } from "../utils/imageProcessing";
+import { base64ToImage, preprocess } from "../utils/imageProcessing";
 import { FaceResults } from "../types/faceResults";
-import "@tensorflow/tfjs-backend-cpu";
 import * as tf from "@tensorflow/tfjs-core";
+import "@tensorflow/tfjs-backend-webgl";
 import * as tflite from "@tensorflow/tfjs-tflite";
 import { SkinAnalysisResult } from "../types/skinAnalysisResult";
 
@@ -51,43 +51,9 @@ class Colors {
   };
 }
 
-const preprocess = (
-  source: HTMLImageElement,
-  modelWidth: number,
-  modelHeight: number,
-): [tf.Tensor, number, number] => {
-  let xRatio: number = 0;
-  let yRatio: number = 0;
-
-  const input: tf.Tensor = tf.tidy(() => {
-    let input;
-    const img = tf.browser.fromPixels(source);
-
-    // padding image to square => [n, m] to [n, n], n > m
-    const [h, w] = img.shape.slice(0, 2); // get source width and height
-    const maxSize = Math.max(w, h); // get max size
-    input = tf.pad(img, [
-      [0, maxSize - h], // padding y [bottom only]
-      [0, maxSize - w], // padding x [right only]
-      [0, 0],
-    ]);
-
-    xRatio = maxSize / w; // update xRatio
-    yRatio = maxSize / h; // update yRatio
-
-    input = tf.image.resizeBilinear(input, [modelWidth, modelHeight]);
-    input = tf.cast(input, "float32");
-    input = tf.div(input, 255.0);
-    input = tf.expandDims(input);
-
-    return input;
-  });
-
-  return [input, xRatio, yRatio];
-};
-
 export const skinAnalysisInference = async (
   imageData: string,
+  model: tflite.TFLiteModel,
 ): Promise<[FaceResults[], SkinAnalysisResult[]]> => {
   try {
     let inBatch: number | undefined;
@@ -103,20 +69,8 @@ export const skinAnalysisInference = async (
     let yRatio: number | undefined;
     const toDraw: FaceResults[] = [];
     const results: SkinAnalysisResult[] = [];
-
-    tflite.setWasmPath(
-      "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.10/wasm/",
-    );
-
     const image = await base64ToImage(imageData);
-
     const colors = new Colors();
-
-    const model = await tflite.loadTFLiteModel(
-      "/models/skin-analysis/best_skin_float16.tflite",
-    );
-
-    console.log("load model");
 
     if (model.inputs[0].shape) {
       [inBatch, modelHeight, modelWidth, modelDepth] = model.inputs[0].shape;
@@ -152,8 +106,6 @@ export const skinAnalysisInference = async (
         | tf.Tensor<tf.Rank>
         | tf.Tensor<tf.Rank>[]
         | tf.NamedTensorMap = await model.predict(input);
-
-      console.log(result);
 
       const numClass: number = labels.length;
 
@@ -193,9 +145,9 @@ export const skinAnalysisInference = async (
       const nms = await tf.image.nonMaxSuppressionAsync(
         boxes,
         scores,
-        500,
+        100,
         0.25,
-        0.001,
+        0.01,
       ); // do nms to filter boxes
 
       const detReady = tf.tidy(() =>
@@ -230,13 +182,11 @@ export const skinAnalysisInference = async (
         return reshaped;
       }); // processing mask
 
-      let overlay = tf.zeros([modelHeight, modelWidth, 4]); // initialize overlay to draw mask
-
       console.log(detReady.shape[0]);
 
       for (let i = 0; i < detReady.shape[0]; i++) {
         const rowData = tf.slice(detReady, [i, 0], [1, 6]); // get every first 6 element from every row
-        let [y1, x1, y2, x2, score, label] = rowData.dataSync(); // [y1, x1, y2, x2, score, label]
+        let [y1, x1, y2, x2, score, label] = await rowData.data(); // [y1, x1, y2, x2, score, label]
         const color = colors.get(label); // get label color
 
         console.log("BBOX:", label, score, x1, y1, x2, y2);
@@ -255,60 +205,6 @@ export const skinAnalysisInference = async (
           Math.round((x2 - x1) * xRatio), // w
         ]; // upsampled box (box ratio to draw)
 
-        const proto: tf.Tensor4D = tf.tidy(() => {
-          const sliced = tf.slice(
-            masks,
-            [
-              i,
-              downSampleBox[0] >= 0 ? downSampleBox[0] : 0,
-              downSampleBox[1] >= 0 ? downSampleBox[1] : 0,
-            ],
-            [
-              1,
-              downSampleBox[0] + downSampleBox[2] <= modelSegHeight
-                ? downSampleBox[2]
-                : modelSegHeight - downSampleBox[0],
-              downSampleBox[1] + downSampleBox[3] <= modelSegWidth
-                ? downSampleBox[3]
-                : modelSegWidth - downSampleBox[1],
-            ],
-          );
-          return tf.expandDims(tf.squeeze(sliced), -1); // sliced proto [h, w, 1]
-        });
-
-        const upsampleProto = tf.image.resizeBilinear(proto, [
-          upSampleBox[2],
-          upSampleBox[3],
-        ]); // resizing proto to drawing size
-
-        const mask = tf.tidy(() => {
-          console.log("Upsample Box:", upSampleBox);
-
-          const [y, x, h, w] = upSampleBox;
-
-          const padded = tf.pad(upsampleProto, [
-            [y, modelHeight - h - y],
-            [x, modelWidth - w - x],
-            [0, 0], // not padded
-          ]); // padding proto to canvas size
-          console.log("Padded", padded);
-          console.log("Padded Data", padded.dataSync());
-
-          return tf.less(padded, 0.5); // make boolean mask from proto to indexing overlay
-        }); // final boolean mask
-
-        console.log("Mask", mask);
-        console.log("Mask Data:", mask.dataSync());
-
-        overlay = tf.tidy(() => {
-          const newOverlay = tf.where(mask, overlay, [
-            ...Colors.hexToRgba(color)!,
-            150,
-          ]); // indexing overlay from mask with RGBA code
-          overlay.dispose(); // dispose old overlay tensor (free memory)
-          return newOverlay; // return new overlay
-        }); // new overlay
-
         toDraw.push({
           box: upSampleBox,
           score: score,
@@ -317,7 +213,7 @@ export const skinAnalysisInference = async (
           color: color,
         }); // push box information to draw later
 
-        tf.dispose([rowData, proto, upsampleProto, mask]); // dispose unused tensor to free memory
+        tf.dispose([rowData]); // dispose unused tensor to free memory
       }
 
       console.log(toDraw);
@@ -335,7 +231,6 @@ export const skinAnalysisInference = async (
         classes,
         detReady,
         masks,
-        overlay,
         input,
       ]);
     }
@@ -356,6 +251,14 @@ export const skinAnalysisInference = async (
         score: data.score,
       });
     });
+
+    results.push({
+      class: 1000,
+      label: "imageData",
+      score: 0,
+      data: imageData,
+    });
+
     return [toDraw, results];
   } catch (e) {
     console.warn("Error occured durring inference : " + e);

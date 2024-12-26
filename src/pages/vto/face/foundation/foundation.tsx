@@ -1,105 +1,23 @@
 import clsx from "clsx";
 import { Icons } from "../../../../components/icons";
-import { ColorPalette } from "../../../../components/color-palette";
-import { useMakeup } from "../../../../context/makeup-context";
-import { FoundationProvider, useFoundationContext } from "./foundation-context";
-import { useQuery } from "@tanstack/react-query";
-import {
-  buildSearchParams,
-  getProductAttributes,
-  mediaUrl,
-} from "../../../../utils/apiUtils";
-import { defaultHeaders, Product } from "../../../../api/shared";
-import {
-  faceMakeupProductTypesFilter,
-  faceMakeupProductTypesMap,
-} from "../../../../api/attributes/makeups";
+
+import { skin_tones } from "../../../../api/attributes/skin_tone";
 import { textures } from "../../../../api/attributes/texture";
-import { BrandName } from "../../../../components/product/brand";
+import { ColorPalette } from "../../../../components/color-palette";
 import { LoadingProducts } from "../../../../components/loading";
-
-const colorFamilies = [
-  { name: "Light Skin", value: "#FAD4B4" },
-  { name: "Medium Skin", value: "#D18B59" },
-  { name: "Dark Skin", value: "#4B2F1B" },
-];
-
-function useFaceFoundationQuery({
-  texture,
-  color,
-}: {
-  texture: string | null;
-  color: string | null;
-}) {
-  return useQuery({
-    queryKey: ["products", "faceblush", color, texture],
-    queryFn: async () => {
-      const filters = [
-        {
-          filters: [
-            {
-              field: "type_id",
-              value: "simple",
-              condition_type: "eq",
-            },
-          ],
-        },
-        {
-          filters: [
-            {
-              field: "face_makeup_product_type",
-              value: faceMakeupProductTypesFilter(["Foundations"]),
-              condition_type: "in",
-            },
-          ],
-        },
-      ];
-
-      if (color) {
-        filters.push({
-          filters: [
-            {
-              field: "color",
-              value: color,
-              condition_type: "eq",
-            },
-          ],
-        });
-      }
-
-      if (texture) {
-        filters.push({
-          filters: [
-            {
-              field: "texture",
-              value: texture,
-              condition_type: "eq",
-            },
-          ],
-        });
-      }
-
-      console.log("filters", filters);
-
-      const response = await fetch(
-        "/rest/V1/products?" + buildSearchParams(filters),
-        {
-          headers: defaultHeaders,
-        },
-      );
-
-      const results = (await response.json()) as {
-        items: Array<Product>;
-      };
-
-      return results;
-    },
-  });
-}
+import { VTOProductCard } from "../../../../components/vto/vto-product-card";
+import { useMakeup } from "../../../../context/makeup-context";
+import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import { useFoundationContext } from "./foundation-context";
+import { useFoundationQuery } from "./foundation-query";
+import { Product } from "../../../../api/shared";
+import { useEffect, useState } from "react";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getFaceMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function FoundationSelector() {
   return (
-    <div className="mx-auto w-full divide-y px-4 lg:max-w-xl">
+    <div className="mx-auto w-full divide-y px-4">
       <div>
         <FamilyColorSelector />
 
@@ -114,52 +32,56 @@ export function FoundationSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useFoundationContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useFoundationContext();
 
   return (
     <div
       className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
       data-mode="lip-color"
     >
-      {colorFamilies.map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-white/80",
-            {
-              "border-white/80": colorFamily === item.name,
-            },
-          )}
-          onClick={() => setColorFamily(item.name)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.value,
-            }}
-          />
-          <span className="text-sm">{item.name}</span>
-        </button>
-      ))}
+      {skin_tones
+        .filter((c) => colorFamilyToInclude?.includes(c.id))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
+              {
+                "border-white/80": colorFamily === item.id,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily == item.id ? null : item.id)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.color,
+              }}
+            />
+            <span className="text-[9.8px] sm:text-sm">{item.name}</span>
+          </button>
+        ))}
     </div>
   );
 }
 
-const colors = [
-  "#342112",
-  "#3D2B1F",
-  "#483C32",
-  "#4A2912",
-  "#4F300D",
-  "#5C4033",
-  "#6A4B3A",
-  "#7B3F00",
-  "#8B4513",
-];
-
 function ColorSelector() {
-  const { selectedColor, setSelectedColor } = useFoundationContext();
+  const { colorFamily, selectedColor, setSelectedColor } =
+    useFoundationContext();
   const { setFoundationColor, showFoundation, setShowFoundation } = useMakeup();
+
+  const { data } = useFoundationQuery({
+    skin_tone: colorFamily,
+    texture: null,
+  });
+
+  const extracted_sub_colors = extractUniqueCustomAttributes(
+    data?.items ?? [],
+    "hexacode",
+  ).flatMap((item) => item.split(","));
 
   function setColor(color: string) {
     if (!showFoundation) {
@@ -175,28 +97,27 @@ function ColorSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-4 lg:max-w-xl">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4">
         <button
           type="button"
-          className="inline-flex size-10 shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
+          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
           onClick={() => {
             resetFoundation();
           }}
         >
-          <Icons.empty className="size-10" />
+          <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
-        {colors.map((color, index) => (
-          <button type="button" key={index} onClick={() => setColor(color)}>
-            <ColorPalette
-              key={index}
-              size="large"
-              palette={{
-                color: color,
-              }}
-              selected={selectedColor === color}
-            />
-          </button>
+        {extracted_sub_colors.map((color, index) => (
+          <ColorPalette
+            key={color}
+            size="large"
+            palette={{
+              color: color,
+            }}
+            selected={selectedColor === color}
+            onClick={() => setColor(color)}
+          />
         ))}
       </div>
     </div>
@@ -220,14 +141,14 @@ function TextureSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-4 lg:max-w-xl">
-      <div className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full">
+      <div className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar">
         {textures.map((texture, index) => (
           <button
             key={texture.value}
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-3 py-1 text-white/80",
+              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-2 py-0.5 text-white/80 sm:px-3 sm:py-1",
               {
                 "border-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                   selectedTexture === texture.value,
@@ -235,7 +156,7 @@ function TextureSelector() {
             )}
             onClick={() => setMaterial(index, texture)}
           >
-            <span className="text-sm">{texture.label}</span>
+            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
           </button>
         ))}
       </div>
@@ -244,92 +165,103 @@ function TextureSelector() {
 }
 
 function ProductList() {
-  const { colorFamily, selectedTexture } = useFoundationContext();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
-  const { data, isLoading } = useFaceFoundationQuery({
-    color: colorFamily,
+  const {
+    colorFamily,
+    setColorFamily,
+    selectedColor,
+    setSelectedColor,
+    setSelectedTexture,
+    selectedTexture,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+  } = useFoundationContext();
+
+  const { setShowFoundation, setFoundationColor } = useMakeup();
+
+  useEffect(() => {
+    setFoundationColor(selectedColor ?? "#ffffff");
+    setShowFoundation(selectedColor != null);
+  }, [selectedColor]);
+
+  const { data, isLoading } = useFoundationQuery({
+    skin_tone: colorFamily,
     texture: selectedTexture,
   });
-  const products = [
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Double Wear Stay-in-Place Foundation",
-      brand: "Estée Lauder",
-      price: 52,
-      originalPrice: 60,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-  ];
+
+  if (colorFamilyToInclude == null && data?.items != null) {
+    setColorFamilyToInclude(
+      data.items.map(
+        (d) =>
+          d.custom_attributes.find((c) => c.attribute_code === "skin_tone")
+            ?.value,
+      ),
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "skin_tone",
+      )?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+    setSelectedTexture(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "texture",
+      )?.value,
+    );
+  };
 
   return (
-    <div className="flex w-full gap-4 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          const imageUrl =
-            mediaUrl(product.media_gallery_entries[0].file) ??
-            "https://picsum.photos/id/237/200/300";
-
-          return (
-            <div key={index} className="w-[100px] rounded shadow">
-              <div className="relative h-[70px] w-[100px] overflow-hidden">
-                <img
-                  src={imageUrl}
-                  alt="Product"
-                  className="rounded object-cover"
-                />
-              </div>
-
-              <h3 className="line-clamp-2 h-10 py-2 text-[0.625rem] font-semibold text-white">
-                {product.name}
-              </h3>
-              <p className="text-[0.625rem] text-white/60">
-                <BrandName brandId={getProductAttributes(product, "brand")} />{" "}
-              </p>
-              <div className="flex items-end justify-between space-x-1 pt-1">
-                <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.625rem] text-transparent">
-                  $15
-                </div>
-                <button
-                  type="button"
-                  className="flex h-7 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-2.5 text-[0.5rem] font-semibold text-white"
-                >
-                  Add to cart
-                </button>
-              </div>
-            </div>
-          );
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Foundation: {
+                attributeName: "face_makeup_product_types",
+                values: getFaceMakeupProductTypeIds(["Foundation"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Foundation", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Foundation");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

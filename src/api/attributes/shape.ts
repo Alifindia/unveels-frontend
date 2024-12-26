@@ -144,3 +144,17 @@ export const shapes = [
     value: "6567",
   },
 ];
+
+export function filterShapes(selectedShapes: String[]) {
+  const filteredShapes = shapes.filter((shape) =>
+    selectedShapes.includes(shape.label),
+  );
+  return filteredShapes;
+}
+
+export function filterShapesByValue(selectedShapes: String[]) {
+  const filteredShapes = shapes.filter((shape) =>
+    selectedShapes.includes(shape.value),
+  );
+  return filteredShapes;
+}

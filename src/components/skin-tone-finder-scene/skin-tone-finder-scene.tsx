@@ -1,18 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useCamera } from "../../context/recorder-context";
-import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+import { FaceLandmarker } from "@mediapipe/tasks-vision";
 import { Canvas } from "@react-three/fiber";
 import { useSkinColor } from "./skin-color-context"; // Pastikan path ini benar
 import { Landmark } from "../../types/landmark";
 import { extractSkinColor } from "../../utils/imageProcessing";
 import SkinToneFinderThreeScene from "./skin-tone-finder-three-scene";
-import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
+import { SRGBColorSpace } from "three";
 import { useMakeup } from "../../context/makeup-context";
 import { Rnd } from "react-rnd";
-import html2canvas from "html2canvas";
 import { useInferenceContext } from "../../context/inference-context";
+import { Scanner } from "../scanner";
 
-// Komponen Canvas untuk menggambar gambar di atas
 interface ImageCanvasProps {
   image: HTMLImageElement;
   canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -29,7 +28,6 @@ function ImageCanvas({ image, canvasRef }: ImageCanvasProps) {
       return;
     }
 
-    // Fungsi untuk menggambar gambar dengan skala "cover" dan flip horizontal
     const drawImage = () => {
       const { innerWidth: width, innerHeight: height } = window;
       const dpr = window.devicePixelRatio || 1;
@@ -58,14 +56,8 @@ function ImageCanvas({ image, canvasRef }: ImageCanvasProps) {
       }
 
       ctx.clearRect(0, 0, width, height);
-
-      // Simpan keadaan awal konteks
       ctx.save();
-
-      // Terapkan flip horizontal
       ctx.scale(-1, 1);
-
-      // Sesuaikan posisi gambar setelah flip
       ctx.drawImage(
         image,
         -offsetX - drawWidth,
@@ -73,8 +65,6 @@ function ImageCanvas({ image, canvasRef }: ImageCanvasProps) {
         drawWidth,
         drawHeight,
       );
-
-      // Kembalikan keadaan awal konteks
       ctx.restore();
     };
 
@@ -91,29 +81,35 @@ function ImageCanvas({ image, canvasRef }: ImageCanvasProps) {
 
 interface SkinToneFinderSceneProps {
   debugMode?: boolean; // Opsional untuk mode debug
+  faceLandmarker: FaceLandmarker | null; // Model diterima sebagai prop
 }
 
 export function SkinToneFinderScene({
   debugMode = false,
+  faceLandmarker,
 }: SkinToneFinderSceneProps) {
-  return <SkinToneFinderInnerScene debugMode={debugMode} />;
+  return (
+    <SkinToneFinderInnerScene
+      debugMode={debugMode}
+      faceLandmarker={faceLandmarker}
+    />
+  );
 }
 
 interface SkinToneFinderInnerSceneProps {
   debugMode: boolean;
+  faceLandmarker: FaceLandmarker | null;
 }
 
 function SkinToneFinderInnerScene({
   debugMode,
+  faceLandmarker,
 }: SkinToneFinderInnerSceneProps) {
   const { criterias } = useCamera();
   const [imageLoaded, setImageLoaded] = useState<HTMLImageElement | null>(null);
-  const [faceLandmarker, setFaceLandmarker] = useState<FaceLandmarker | null>(
-    null,
-  );
+
   // Replace useState with useRef for landmarks
   const landmarksRef = useRef<Landmark[]>([]);
-  const [isLandmarkerReady, setIsLandmarkerReady] = useState<boolean>(false);
 
   const { setSkinColor, setHexColor } = useSkinColor();
   const { setFoundationColor } = useMakeup();
@@ -121,21 +117,17 @@ function SkinToneFinderInnerScene({
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const divRef = useRef<HTMLCanvasElement>(null);
 
-  const [isTextureLoaded, setIsTextureLoaded] = useState<boolean>(false);
-
   const { setIsInferenceFinished } = useInferenceContext();
 
-  // Handler untuk mengatur status pemuatan tekstur
-  const handleTextureLoaded = () => {
-    setIsTextureLoaded(true);
-  };
+  const [isInferenceCompleted, setIsInferenceCompleted] = useState(false);
+  const [showScannerAfterInference, setShowScannerAfterInference] =
+    useState(true);
 
-  // Memuat gambar ketika capturedImage berubah
   useEffect(() => {
     if (criterias.capturedImage) {
       const image = new Image();
       image.src = criterias.capturedImage;
-      image.crossOrigin = "anonymous"; // Menghindari masalah CORS
+      image.crossOrigin = "anonymous";
       image.onload = () => {
         setImageLoaded(image);
       };
@@ -144,48 +136,6 @@ function SkinToneFinderInnerScene({
       };
     }
   }, [criterias.capturedImage]);
-
-  // Inisialisasi FaceLandmarker
-  useEffect(() => {
-    let isMounted = true; // Untuk mencegah pembaruan state setelah unmount
-
-    const initializeFaceLandmarker = async () => {
-      try {
-        const filesetResolver = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm",
-        );
-        const landmarker = await FaceLandmarker.createFromOptions(
-          filesetResolver,
-          {
-            baseOptions: {
-              modelAssetPath:
-                "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-              delegate: "GPU", // Opsional: gunakan "GPU" jika didukung
-            },
-            outputFaceBlendshapes: true,
-            runningMode: "IMAGE",
-            numFaces: 1,
-          },
-        );
-        if (isMounted) {
-          setFaceLandmarker(landmarker);
-          setIsLandmarkerReady(true);
-        }
-      } catch (error) {
-        console.error("Gagal menginisialisasi FaceLandmarker:", error);
-      }
-    };
-
-    initializeFaceLandmarker();
-
-    // Cleanup pada unmount
-    return () => {
-      isMounted = false;
-      if (faceLandmarker) {
-        faceLandmarker.close();
-      }
-    };
-  }, []);
 
   // for flutter webView
   function changeHex(data: string) {
@@ -196,7 +146,7 @@ function SkinToneFinderInnerScene({
   // Memproses gambar dan mendeteksi landmark
   useEffect(() => {
     const processImage = async () => {
-      if (imageLoaded && faceLandmarker && isLandmarkerReady) {
+      if (imageLoaded && faceLandmarker) {
         // for flutter webview comunication
         console.log("Detection Running Skin Tone Finder");
         if ((window as any).flutter_inappwebview) {
@@ -210,6 +160,9 @@ function SkinToneFinderInnerScene({
             });
         }
         try {
+          // Tambahkan delay sebelum inferensi
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
           const results = await faceLandmarker.detect(imageLoaded);
           if (results && results.faceLandmarks.length > 0) {
             // Asumsikan wajah pertama
@@ -238,21 +191,16 @@ function SkinToneFinderInnerScene({
               extractedSkinColor.skinType,
             );
 
-            // set skin hex to show on three scene
-            setHexColor(extractedSkinColor.hexColor);
-
             setIsInferenceFinished(true);
+            setIsInferenceCompleted(true);
 
-            // for flutter webView
             if (extractedSkinColor) {
               console.log("Skin Tone Finder Result:", extractedSkinColor);
 
-              // Coba stringify hasilnya
               const resultString = JSON.stringify(extractedSkinColor);
               console.log("Skon Tone Finder Result as JSON:", resultString);
 
               if ((window as any).flutter_inappwebview) {
-                // Kirim data sebagai JSON string
                 (window as any).flutter_inappwebview
                   .callHandler("detectionResult", resultString)
                   .then((result: any) => {
@@ -262,6 +210,7 @@ function SkinToneFinderInnerScene({
                     console.error("Error calling Flutter handler:", error);
                   });
               }
+              setShowScannerAfterInference(false);
             }
           }
         } catch (error) {
@@ -283,7 +232,7 @@ function SkinToneFinderInnerScene({
     };
 
     processImage();
-  }, [imageLoaded, faceLandmarker, isLandmarkerReady]);
+  }, [imageLoaded, faceLandmarker]);
 
   // Jika tidak ada gambar yang ditangkap, render hanya canvas overlay
   if (!criterias.capturedImage || !imageLoaded) {
@@ -291,63 +240,83 @@ function SkinToneFinderInnerScene({
   }
 
   return (
-    <div className="fixed inset-0 flex">
-      {/* Render kondisional overlay canvas */}
-      {/* Overlay Canvas */}
-      <Rnd
-        style={{
-          display: criterias.isCompare ? "flex" : "none",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#f0f0f0",
-          zIndex: 9999,
-          position: "absolute",
-          left: 0,
-          top: 0,
-          height: "100%",
-          width: "50%",
-          overflow: "hidden",
-          borderRight: "2px solid black",
-        }}
-        default={{
-          x: 0,
-          y: 0,
-          width: "50%",
-          height: "100%",
-        }}
-        enableResizing={{
-          top: false,
-          right: true,
-          bottom: false,
-          left: false,
-        }}
-        disableDragging={true}
-      >
-        <canvas
-          ref={overlayCanvasRef}
-          className="pointer-events-none absolute left-0 top-0 h-full w-screen"
-          style={{ zIndex: 50 }}
-        >
-          {/* Komponen untuk menggambar gambar di overlay canvas */}
-          <ImageCanvas image={imageLoaded} canvasRef={overlayCanvasRef} />
-        </canvas>
-      </Rnd>
+    <>
+      {criterias.isCaptured ? (
+        <>
+          {showScannerAfterInference || !isInferenceCompleted ? (
+            <Scanner />
+          ) : (
+            <div className="fixed inset-0 flex">
+              {/* Render kondisional overlay canvas */}
+              {/* Overlay Canvas */}
+              <Rnd
+                style={{
+                  display: criterias.isCompare ? "flex" : "none",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "#f0f0f0",
+                  zIndex: 9999,
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  height: "100%",
+                  width: "50%",
+                  overflow: "hidden",
+                  borderRight: "2px solid black",
+                }}
+                default={{
+                  x: 0,
+                  y: 0,
+                  width: "50%",
+                  height: "100%",
+                }}
+                enableResizing={{
+                  top: false,
+                  right: true,
+                  bottom: false,
+                  left: false,
+                }}
+                disableDragging={true}
+              >
+                <canvas
+                  ref={overlayCanvasRef}
+                  className="pointer-events-none absolute left-0 top-0 h-full w-screen"
+                  style={{ zIndex: 50 }}
+                >
+                  {/* Komponen untuk menggambar gambar di overlay canvas */}
+                  <ImageCanvas
+                    image={imageLoaded}
+                    canvasRef={overlayCanvasRef}
+                  />
+                </canvas>
+              </Rnd>
 
-      {/* 3D Canvas */}
-      <Canvas
-        className="absolute left-0 top-0 h-full w-full"
-        ref={divRef}
-        style={{ zIndex: 0 }}
-        orthographic
-        camera={{ zoom: 1, position: [0, 0, 10], near: -1000, far: 1000 }}
-        gl={{ toneMapping: 1, outputColorSpace: SRGBColorSpace }}
-      >
-        <SkinToneFinderThreeScene
-          imageSrc={criterias.capturedImage}
-          landmarks={landmarksRef} // Pass landmarksRef.current
-        />
-      </Canvas>
-    </div>
+              {/* 3D Canvas */}
+              <Canvas
+                className="absolute left-0 top-0 h-full w-full"
+                ref={divRef}
+                style={{ zIndex: 0 }}
+                orthographic
+                camera={{
+                  zoom: 1,
+                  position: [0, 0, 10],
+                  near: -1000,
+                  far: 1000,
+                }}
+                gl={{ toneMapping: 1, outputColorSpace: SRGBColorSpace }}
+              >
+                <SkinToneFinderThreeScene
+                  imageSrc={criterias.capturedImage}
+                  landmarks={landmarksRef} // Pass landmarksRef.current
+                />
+              </Canvas>
+            </div>
+          )}
+        </>
+      ) : (
+        <></>
+      )}
+    </>
   );
 }
 

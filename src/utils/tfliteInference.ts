@@ -1,6 +1,6 @@
 // src/utils/tfliteInference.ts
-import "@tensorflow/tfjs-backend-cpu";
 import * as tf from "@tensorflow/tfjs-core";
+import "@tensorflow/tfjs-backend-webgl";
 import * as tflite from "@tensorflow/tfjs-tflite";
 
 export const loadTFLiteModel = async (

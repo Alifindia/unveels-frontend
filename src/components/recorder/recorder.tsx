@@ -61,8 +61,9 @@ function RecorderGuide() {
   }
 
   return (
-    <div className="select-none px-2 pb-4 text-center text-white">
-      <p className="pb-9">{filteredHints[currentHintIndex]}</p>
+    <div className="flex select-none justify-center px-4 pb-4 text-center text-white">
+      <div className="w-full max-w-md">
+        <p className="pb-4">{filteredHints[currentHintIndex]}</p>
 
       <div className="grid grid-cols-3 gap-5 text-xs text-white/50">
         <div

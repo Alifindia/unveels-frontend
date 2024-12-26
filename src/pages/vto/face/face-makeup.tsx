@@ -18,7 +18,7 @@ export function FaceMode() {
             type="button"
             className="inline-flex items-center px-3 py-1 border rounded-full gap-x-2 border-white/80 text-white/80 shrink-0 whitespace-nowrap"
           >
-            <span className="text-sm">{mode.name}</span>
+            <span className="text-[9.8px] sm:text-sm">{mode.name}</span>
           </button>
         </Link>
       ))}

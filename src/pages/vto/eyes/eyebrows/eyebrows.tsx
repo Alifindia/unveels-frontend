@@ -10,26 +10,29 @@ import { useEyebrowsQuery } from "./eyebrows-query";
 import { getPatternByIndex } from "../../../../api/attributes/pattern";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { filterColors } from "../../../../api/attributes/color";
+import { ColorPalette } from "../../../../components/color-palette";
+import { useEffect, useState } from "react";
+import { Product } from "../../../../api/shared";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getBrowMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 const colorFamilies = filterColors(["Brown", "Black"]);
 
 export function EyebrowsSelector() {
   return (
-    <EyebrowsProvider>
-      <div className="w-full px-4 mx-auto divide-y lg:max-w-xl">
-        <div>
-          <FamilyColorSelector />
+    <div className="mx-auto w-full divide-y px-4">
+      <div>
+        <FamilyColorSelector />
 
-          <ColorSelector />
-        </div>
-
-        <PatternSelector />
-
-        <BrightnessSlider />
-
-        <ProductList />
+        <ColorSelector />
       </div>
-    </EyebrowsProvider>
+
+      <PatternSelector />
+
+      <BrightnessSlider />
+
+      <ProductList />
+    </div>
   );
 }
 
@@ -37,19 +40,21 @@ function FamilyColorSelector() {
   const { colorFamily, setColorFamily } = useEyebrowsContext();
   return (
     <div
-      className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
       data-mode="lip-color"
     >
       {colorFamilies.map((item, index) => (
         <button
           type="button"
           className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-white/80",
+            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-white/80",
             {
               "border-white/80": colorFamily === item.value,
             },
           )}
-          onClick={() => setColorFamily(item.value)}
+          onClick={() =>
+            setColorFamily(colorFamily === item.value ? null : item.value)
+          }
         >
           <div
             className="size-2.5 shrink-0 rounded-full"
@@ -57,7 +62,7 @@ function FamilyColorSelector() {
               background: item.hex,
             }}
           />
-          <span className="text-sm">{item.label}</span>
+          <span className="text-[0.625rem]">{item.label}</span>
         </button>
       ))}
     </div>
@@ -91,37 +96,30 @@ function ColorSelector() {
   const extracted_sub_colors = extractUniqueCustomAttributes(
     data?.items ?? [],
     "hexacode",
-  );
+  ).flatMap((item) => item.split(","));
 
   return (
-    <div className="w-full py-2 mx-auto lg:max-w-xl">
-      <div className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-2">
+      <div className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar">
         <button
           type="button"
-          className="inline-flex items-center border border-transparent rounded-full size-10 shrink-0 gap-x-2 text-white/80"
+          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
           onClick={() => {
             reset();
           }}
         >
-          <Icons.empty className="size-10" />
+          <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
 
-        {extracted_sub_colors
-          ? extracted_sub_colors.map((color, index) => (
-              <button
-                key={color}
-                type="button"
-                className={clsx(
-                  "inline-flex size-10 shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80",
-                  {
-                    "border-white/80": selectedColor === color,
-                  },
-                )}
-                style={{ background: color }}
-                onClick={() => setColor(color)}
-              ></button>
-            ))
-          : null}
+        {extracted_sub_colors.map((color, index) => (
+          <ColorPalette
+            key={color}
+            size="large"
+            palette={{ color }}
+            selected={selectedColor === color}
+            onClick={() => setColor(color)}
+          />
+        ))}
       </div>
     </div>
   );
@@ -136,8 +134,8 @@ function PatternSelector() {
     setEyebrowsPattern(pattern);
   }
   return (
-    <div className="w-full py-4 mx-auto lg:max-w-xl">
-      <div className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-4">
+      <div className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar">
         {[...Array(14)].map((_, index) => (
           <button
             key={index}
@@ -151,9 +149,9 @@ function PatternSelector() {
             onClick={() => setPattern(index, index.toString())}
           >
             <img
-              src={`/eyebrows/${index % 8}.png`}
+              src={`/media/unveels/vto/eyebrows/${index % 8}.png`}
               alt="Eyebrow"
-              className="h-5 rounded w-14"
+              className="h-[14px] w-[38.5px] rounded sm:h-[20px] sm:w-[55px]"
             />
           </button>
         ))}
@@ -165,7 +163,7 @@ function PatternSelector() {
 function BrightnessSlider() {
   const { setEyebrowsVisibility, eyebrowsVisibility } = useMakeup();
   return (
-    <div className="pt-4 pb-2">
+    <div className="py-2">
       <input
         id="minmax-range"
         type="range"
@@ -191,7 +189,17 @@ function BrightnessSlider() {
 }
 
 function ProductList() {
-  const { colorFamily, selectedPattern } = useEyebrowsContext();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
+
+  const {
+    colorFamily,
+    setColorFamily,
+    selectedColor,
+    setSelectedColor,
+    selectedPattern,
+  } = useEyebrowsContext();
 
   const { data, isLoading } = useEyebrowsQuery({
     color: colorFamily,
@@ -200,15 +208,72 @@ function ProductList() {
       : null,
   });
 
+  const { setEyebrowsColor, setEyebrowsPattern, setShowEyebrows } = useMakeup();
+
+  useEffect(() => {
+    setEyebrowsColor(selectedColor || "#ffffff");
+    setEyebrowsPattern(parseInt(selectedPattern || "0"));
+    setShowEyebrows(selectedColor != null && selectedPattern != null);
+  }, [selectedColor, selectedPattern]);
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+  };
+
   return (
-    <div className="flex w-full gap-4 pt-4 pb-2 overflow-x-auto no-scrollbar active:cursor-grabbing">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return <VTOProductCard product={product} key={product.id} />;
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Eyebrows: {
+                attributeName: "brow_makeup_product_type",
+                values: getBrowMakeupProductTypeIds([
+                  "Brow Gels",
+                  "Brow Pencils",
+                  "Brow Waxes",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Eyebrows", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Eyebrows");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

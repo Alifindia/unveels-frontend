@@ -1,54 +1,34 @@
 import clsx from "clsx";
 import { Icons } from "../../../../components/icons";
 
-import { ColorPalette } from "../../../../components/color-palette";
-import { Link } from "react-router-dom";
+import { colors } from "../../../../api/attributes/color";
+import { LoadingProducts } from "../../../../components/loading";
+import { VTOProductCard } from "../../../../components/vto/vto-product-card";
+import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { GlassesProvider, useGlassesContext } from "./glasses-context";
-
-const colorFamilies = [
-  { name: "Yellow", value: "#FFFF00" },
-  { name: "Black", value: "#000000" },
-  { name: "Silver", value: "#C0C0C0" },
-  {
-    name: "Gold",
-    value:
-      "linear-gradient(90deg, #CA9C43 0%, #C79A42 33%, #BE923E 56%, #AE8638 77%, #98752F 96%, #92702D 100%)",
-  },
-  { name: "Rose Gold", value: "#B76E79" },
-  { name: "Brass", value: "#B5A642" },
-  { name: "Gray", value: "#808080" },
-  {
-    name: "Multicolor",
-    value:
-      "linear-gradient(270deg, #E0467C 0%, #E55300 25.22%, #00E510 47.5%, #1400FF 72%, #FFFA00 100%)",
-  },
-  { name: "Pink", value: "#FE3699" },
-  { name: "Beige", value: "#F2D3BC" },
-  { name: "Brown", value: "#3D0B0B" },
-  { name: "Red", value: "#FF0000" },
-  { name: "White", value: "#FFFFFF" },
-  { name: "Purple", value: "#800080" },
-  { name: "Blue", value: "#1400FF" },
-  { name: "Green", value: "#52FF00" },
-  { name: "Transparent", value: "none" },
-  { name: "Orange", value: "#FF7A00" },
-  { name: "Bronze", value: "#CD7F32" },
-  { name: "Nude", value: "#E1E1A3" },
-];
+import { useGlassesQuery } from "./glasses-query";
+import { filterShapes } from "../../../../api/attributes/shape";
+import { filterMaterials } from "../../../../api/attributes/material";
+import { Product } from "../../../../api/shared";
+import { useEffect, useState } from "react";
+import { getHexCodeSubColor } from "../../../../api/attributes/sub_color";
+import { ColorPalette } from "../../../../components/color-palette";
+import { useAccesories } from "../../../../context/accesories-context";
+import { set } from "lodash";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { headAccessoriesProductTypeFilter } from "../../../../api/attributes/accessories";
 
 export function GlassesSelector() {
   return (
-    <GlassesProvider>
-      <div className="w-full px-4 mx-auto divide-y lg:max-w-xl">
-        <FamilyColorSelector />
+    <div className="mx-auto w-full divide-y px-4">
+      <FamilyColorSelector />
 
-        <ColorSelector />
+      <ColorSelector />
 
-        <ModeSelector />
+      <ModeSelector />
 
-        <ProductList />
-      </div>
-    </GlassesProvider>
+      <ProductList />
+    </div>
   );
 }
 
@@ -57,22 +37,28 @@ function ModeSelector() {
 
   return (
     <>
-      <div className="flex items-center justify-between w-full h-10 text-center">
+      <div className="flex h-[35px] w-full items-center justify-between text-center sm:h-10">
         <button
-          className={clsx("relative h-10 grow text-lg", {
-            "text-white": selectedMode === "shapes",
-            "text-white/60": selectedMode !== "shapes",
-          })}
+          className={clsx(
+            "relative grow text-[11.2px] sm:text-base lg:text-[20.8px]",
+            {
+              "text-white": selectedMode === "shapes",
+              "text-white/60": selectedMode !== "shapes",
+            },
+          )}
           onClick={() => setSelectedMode("shapes")}
         >
           Shapes
         </button>
         <div className="h-5 border-r border-white"></div>
         <button
-          className={clsx("relative h-10 grow text-lg", {
-            "text-white": selectedMode === "material",
-            "text-white/60": selectedMode !== "material",
-          })}
+          className={clsx(
+            "relative grow text-[11.2px] sm:text-base lg:text-[20.8px]",
+            {
+              "text-white": selectedMode === "material",
+              "text-white/60": selectedMode !== "material",
+            },
+          )}
           onClick={() => setSelectedMode("material")}
         >
           Material
@@ -85,86 +71,89 @@ function ModeSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useGlassesContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useGlassesContext();
 
   return (
     <div
-      className="flex items-center w-full py-2 space-x-2 overflow-x-auto no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
       data-mode="lip-color"
     >
-      {colorFamilies.map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-white/80",
-            {
-              "border-white/80": colorFamily === item.name,
-            },
-          )}
-          onClick={() => setColorFamily(item.name)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.value,
-            }}
-          />
-          <span className="text-sm">{item.name}</span>
-        </button>
-      ))}
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily == item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
 
-const colors = [
-  "#FFFFFF",
-  "#342112",
-  "#3D2B1F",
-  "#483C32",
-  "#4A2912",
-  "#4F300D",
-  "#5C4033",
-  "#6A4B3A",
-  "#7B3F00",
-  "#8B4513",
-];
-
 function ColorSelector() {
-  const { selectedColor, setSelectedColor } = useGlassesContext();
+  const { colorFamily, selectedColor, setSelectedColor } = useGlassesContext();
+
+  const { data } = useGlassesQuery({
+    color: colorFamily,
+    material: null,
+    shape: null,
+  });
+
+  const extractHexa = extractUniqueCustomAttributes(
+    data?.items ?? [],
+    "hexacode",
+  ).flatMap((item) => item.split(","));
+
+  const extractSubColor = extractUniqueCustomAttributes(
+    data?.items ?? [],
+    "sub_color",
+  ).flatMap((item) => getHexCodeSubColor(item) ?? "");
+
+  const extracted_sub_colors =
+    extractHexa.length > 0 ? extractHexa : extractSubColor;
 
   return (
-    <div className="w-full py-4 mx-auto lg:max-w-xl">
-      <div className="flex items-center w-full space-x-4 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-1 sm:py-2">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
         <button
           type="button"
-          className="inline-flex items-center border border-transparent rounded-full size-10 shrink-0 gap-x-2 text-white/80"
-          onClick={() => {
-            setSelectedColor(null);
-          }}
+          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
+          onClick={() => setSelectedColor(null)}
         >
-          <Icons.empty className="size-10" />
+          <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
-        {colors.map((color, index) => (
-          <button
-            type="button"
-            key={index}
+        {extracted_sub_colors.map((color, index) => (
+          <ColorPalette
+            key={color}
+            size="large"
+            palette={{ color }}
+            selected={color == selectedColor}
             onClick={() => setSelectedColor(color)}
-          >
-            <ColorPalette
-              size="large"
-              palette={{
-                color: color,
-              }}
-              selected={selectedColor === color}
-            />
-          </button>
+          />
         ))}
       </div>
     </div>
   );
 }
 
-const shapes = [
+const shapes = filterShapes([
   "Square",
   "Clubmaster",
   "Rectangular",
@@ -179,54 +168,58 @@ const shapes = [
   "Wayfarer",
   "Triangle",
   "Shield",
-];
+]);
 
 function ShapeSelector() {
   const { selectedShape, setSelectedShape } = useGlassesContext();
 
   return (
-    <div className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar !border-t-0 py-2">
+    <div className="flex w-full items-center space-x-2 overflow-x-auto !border-t-0 py-2 no-scrollbar">
       {shapes.map((shape, index) => (
         <button
-          key={shape}
+          key={shape.value}
           type="button"
           className={clsx(
-            "inline-flex items-center gap-x-2 rounded-full border border-white/80 px-3 py-1 text-white/80 shrink-0",
+            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-2 py-0.5 text-white/80 sm:px-3 sm:py-1",
             {
               "selectedShape-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
-                selectedShape === shape,
+                selectedShape === shape.value,
             },
           )}
-          onClick={() => setSelectedShape(shape)}
+          onClick={() => setSelectedShape(shape.value)}
         >
-          <span className="text-sm">{shape}</span>
+          <span className="text-[9.8px] sm:text-sm">{shape.label}</span>
         </button>
       ))}
     </div>
   );
 }
 
-const materials = ["Metal", "Plastic"];
+const materials = filterMaterials(["Metal", "Plastic"]);
 
 function MaterialSelector() {
   const { selectedMaterial, setSelectedMaterial } = useGlassesContext();
 
   return (
-    <div className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar !border-t-0 py-2">
+    <div className="flex w-full items-center space-x-2 overflow-x-auto !border-t-0 py-2 no-scrollbar">
       {materials.map((material, index) => (
         <button
-          key={material}
+          key={material.value}
           type="button"
           className={clsx(
-            "inline-flex items-center gap-x-2 rounded-full border border-white/80 px-3 py-1 text-white/80 shrink-0",
+            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-2 py-0.5 text-white/80 sm:px-3 sm:py-1",
             {
               "selectedShape-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
-                selectedMaterial === material,
+                selectedMaterial === material.value,
             },
           )}
-          onClick={() => setSelectedMaterial(material)}
+          onClick={() =>
+            setSelectedMaterial(
+              selectedMaterial == material.value ? null : material.value,
+            )
+          }
         >
-          <span className="text-sm">{material}</span>
+          <span className="text-[9.8px] sm:text-sm">{material.label}</span>
         </button>
       ))}
     </div>
@@ -234,76 +227,109 @@ function MaterialSelector() {
 }
 
 function ProductList() {
-  const products = [
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Double Wear Stay-in-Place Foundation",
-      brand: "Estée Lauder",
-      price: 52,
-      originalPrice: 60,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-  ];
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
 
-  const { colorFamily } = useGlassesContext();
+  const {
+    colorFamily,
+    setColorFamily,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+    setSelectedMaterial,
+    selectedMaterial,
+    selectedShape,
+    setSelectedShape,
+  } = useGlassesContext();
+
+  const { setShowGlasess } = useAccesories();
+
+  const { data, isLoading } = useGlassesQuery({
+    color: colorFamily,
+    shape: selectedShape,
+    material: selectedMaterial,
+  });
+
+  useEffect(() => {
+    if (selectedProduct != null && colorFamily != null) {
+      setShowGlasess(true);
+    }
+  }, [selectedProduct]);
+
+  if (colorFamilyToInclude == null && data?.items != null) {
+    setColorFamilyToInclude(
+      data.items.map(
+        (d) =>
+          d.custom_attributes.find((c) => c.attribute_code === "color")?.value,
+      ),
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      getHexCodeSubColor(
+        product.custom_attributes.find(
+          (item) => item.attribute_code === "sub_color",
+        )?.value,
+      ) ?? null,
+    );
+    setSelectedMaterial(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "material",
+      )?.value,
+    );
+    setSelectedShape(
+      product.custom_attributes.find((item) => item.attribute_code === "shape")
+        ?.value,
+    );
+  };
 
   return (
-    <div className="flex w-full gap-4 pt-4 pb-2 overflow-x-auto no-scrollbar active:cursor-grabbing">
-      {products.map((product, index) => (
-        <div key={index} className="w-[100px] rounded shadow">
-          <div className="relative h-[70px] w-[100px] overflow-hidden">
-            <img
-              src={"https://picsum.photos/id/237/200/300"}
-              alt="Product"
-              className="object-cover rounded"
-            />
-          </div>
-
-          <h3 className="line-clamp-2 h-10 py-2 text-[0.625rem] font-semibold text-white">
-            {product.name}
-          </h3>
-          <p className="text-[0.625rem] text-white/60">{product.brand}</p>
-          <div className="flex items-end justify-between pt-1 space-x-1">
-            <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.625rem] text-transparent">
-              $15
-            </div>
-            <button
-              type="button"
-              className="flex h-7 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-2.5 text-[0.5rem] font-semibold text-white"
-            >
-              Add to cart
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Glasses: {
+                attributeName: "head_accessories_product_type",
+                values: headAccessoriesProductTypeFilter(["Glasses"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Glasses", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Glasses");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

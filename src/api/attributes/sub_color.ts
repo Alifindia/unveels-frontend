@@ -606,3 +606,7 @@ export function filterSubcolors(sub_color_values: string[]) {
     sub_color_values.includes(sub_color.value),
   );
 }
+
+export function getHexCodeSubColor(value: string) {
+  return sub_colors.find((sub_color) => sub_color.value === value)?.hexcode;
+}

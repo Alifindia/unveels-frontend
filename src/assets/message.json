@@ -1,0 +1,4895 @@
+{
+    "items": [
+        {
+            "id": 195,
+            "sku": "DIO000001",
+            "name": "Dior Addict Lip Tattoo",
+            "attribute_set_id": 4,
+            "price": 0,
+            "status": 1,
+            "visibility": 4,
+            "type_id": "configurable",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-09-14 07:10:13",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -39,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -38,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -23,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -1,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ],
+                "configurable_product_options": [
+                    {
+                        "id": 44,
+                        "attribute_id": "283",
+                        "label": "Sub Color",
+                        "position": 0,
+                        "values": [
+                            {
+                                "value_index": 5982
+                            },
+                            {
+                                "value_index": 5983
+                            },
+                            {
+                                "value_index": 5985
+                            },
+                            {
+                                "value_index": 5987
+                            },
+                            {
+                                "value_index": 5991
+                            },
+                            {
+                                "value_index": 5994
+                            },
+                            {
+                                "value_index": 6300
+                            }
+                        ],
+                        "product_id": 195
+                    }
+                ],
+                "configurable_product_links": [
+                    202,
+                    196,
+                    198,
+                    199,
+                    201,
+                    197,
+                    200
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 291,
+                    "media_type": "image",
+                    "label": null,
+                    "position": 2,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901366793_1.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "ar_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "gift_message_available",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901366793_1.jpg"
+                },
+                {
+                    "attribute_code": "allow_glb_in_child_products",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-addict-lip-tattoo"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901366793_1.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "description",
+                    "value": "Dior Lip Tattoo, the first long-wear lip tint by Dior, is about to shake up your makeup routine. With its 12-hour wear,* comfortable formula and weightless no-transfer finish, the colour fuses to the lips like a tattoo just seconds after application."
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901366793_1.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "model_variant_attribute",
+                    "value": "283"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "brand",
+                    "value": "6399"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "made_in",
+                    "value": "5562"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "color_type",
+                    "value": "5868,5869,5873"
+                },
+                {
+                    "attribute_code": "gender",
+                    "value": "5852"
+                },
+                {
+                    "attribute_code": "lips_makeup_product_type",
+                    "value": "5728"
+                },
+                {
+                    "attribute_code": "texture",
+                    "value": "5628"
+                }
+            ]
+        },
+        {
+            "id": 196,
+            "sku": "3348901366793",
+            "name": "Dior Addict Lip Tattoo-351 Natural Nude",
+            "attribute_set_id": 4,
+            "price": 11.75,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -40,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -39,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -24,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -2,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 205,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901366793.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901366793.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5616"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-addict-lip-tattoo"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901366793.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901366793.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5983"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6693,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6675,6676"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6669"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#d46b79"
+                }
+            ]
+        },
+        {
+            "id": 197,
+            "sku": "3348901366809",
+            "name": "Dior Addict Lip Tattoo-761 Natural Cherry",
+            "attribute_set_id": 4,
+            "price": 11.75,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -41,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -40,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -25,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -3,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 206,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901366809.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901366809.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5616"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-addict-lip-tattoo"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901366809.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901366809.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5994"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6693,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6675,6676"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6670"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#cc2c58"
+                }
+            ]
+        },
+        {
+            "id": 198,
+            "sku": "3348901366823",
+            "name": "Dior Addict Lip Tattoo-421 Natural Beige",
+            "attribute_set_id": 4,
+            "price": 11.75,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -42,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -41,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -26,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -4,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 207,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901366823.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901366823.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5608"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-addict-lip-tattoo"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901366823.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901366823.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5985"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6695,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6677,6678"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6671"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#a8584f"
+                }
+            ]
+        },
+        {
+            "id": 199,
+            "sku": "3348901366830",
+            "name": "Dior Addict Lip Tattoo-491 Natural Rosewood",
+            "attribute_set_id": 4,
+            "price": 11.75,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -43,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -42,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -27,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -5,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 208,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901366830.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901366830.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5610"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-addict-lip-tattoo"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901366830.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901366830.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5987"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6695,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6677,6678"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6672"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#9e5c5e"
+                }
+            ]
+        },
+        {
+            "id": 200,
+            "sku": "3348901367509",
+            "name": "Dior Addict Lip Tattoo-771 Natural Berry",
+            "attribute_set_id": 4,
+            "price": 11.75,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -44,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -43,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -28,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -6,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 209,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901367509.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901367509.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5617"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-addict-lip-tattoo"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901367509.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901367509.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "6300"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6694,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6680,6679"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6673"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#943c48"
+                }
+            ]
+        },
+        {
+            "id": 201,
+            "sku": "3348901416405",
+            "name": "Dior Addict Lip Tattoo-661 Natural Red",
+            "attribute_set_id": 4,
+            "price": 11.75,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -45,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -44,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -29,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -7,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 210,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901416405.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901416405.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "6"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-addict-lip-tattoo"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901416405.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901416405.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5991"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6693,6696"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6676,6677,6679"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6669"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#b02e2c"
+                }
+            ]
+        },
+        {
+            "id": 202,
+            "sku": "3348901601412",
+            "name": "Dior Addict Lip Tattoo-251 Natural Peach",
+            "attribute_set_id": 4,
+            "price": 11.75,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -46,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -45,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -30,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -8,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 211,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901601412.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901601412.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5615"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-addict-lip-tattoo"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901601412.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901601412.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5982"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Addict Lip Tattoo"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6695,6696"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6677,6679"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6674"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#ed7479"
+                }
+            ]
+        },
+        {
+            "id": 207,
+            "sku": "DIO000003",
+            "name": "Dior Contour",
+            "attribute_set_id": 4,
+            "price": 0,
+            "status": 1,
+            "visibility": 4,
+            "type_id": "configurable",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-09-14 07:10:13",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -51,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -50,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -35,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -13,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ],
+                "configurable_product_options": [
+                    {
+                        "id": 34,
+                        "attribute_id": "283",
+                        "label": "Sub Color",
+                        "position": 0,
+                        "values": [
+                            {
+                                "value_index": 5979
+                            },
+                            {
+                                "value_index": 5980
+                            },
+                            {
+                                "value_index": 5981
+                            },
+                            {
+                                "value_index": 5989
+                            },
+                            {
+                                "value_index": 5992
+                            },
+                            {
+                                "value_index": 5993
+                            },
+                            {
+                                "value_index": 6301
+                            },
+                            {
+                                "value_index": 6302
+                            },
+                            {
+                                "value_index": 6304
+                            }
+                        ],
+                        "product_id": 207
+                    }
+                ],
+                "configurable_product_links": [
+                    208,
+                    209,
+                    210,
+                    211,
+                    212,
+                    213,
+                    214,
+                    215,
+                    216
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 216,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901523615.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "ar_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901523615.jpg"
+                },
+                {
+                    "attribute_code": "allow_glb_in_child_products",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-contour"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901523615.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "description",
+                    "value": "With a formula enriched with floral lip care ingredients,** the Dior Contour lip liner pencil perfectly combines bold color, 8h* of no-transfer wear and optimal comfort. The lips are flawlessly defined, their natural shape enhanced in one swipe.\n\nResistant to life's ups and downs, Dior Contour prolongs lipstick wear by 2h*** and limits feathering and settling into lip lines. The color is flawless and even all day long."
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901523615.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "model_variant_attribute",
+                    "value": "283"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "brand",
+                    "value": "6399"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "made_in",
+                    "value": "5562"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "gender",
+                    "value": "5852"
+                },
+                {
+                    "attribute_code": "lips_makeup_product_type",
+                    "value": "5729"
+                }
+            ]
+        },
+        {
+            "id": 208,
+            "sku": "3348901523615",
+            "name": "Dior Contour-943 Euphoric",
+            "attribute_set_id": 4,
+            "price": 10,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -52,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -51,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -36,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -14,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 217,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901523615.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901523615.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5617"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-contour"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901523615.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901523615.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "6304"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6694,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6680,6679"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6672"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#5c1f2a"
+                }
+            ]
+        },
+        {
+            "id": 209,
+            "sku": "3348901523646",
+            "name": "Dior Contour-840 Rayonnante",
+            "attribute_set_id": 4,
+            "price": 10,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -53,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -52,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -37,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -15,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 218,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901523646.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901523646.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5615"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-contour"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901523646.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901523646.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "6302"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6695,6696"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6677,6679"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6673"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#ad3732"
+                }
+            ]
+        },
+        {
+            "id": 210,
+            "sku": "3348901523691",
+            "name": "Dior Contour-593 Brown Fig",
+            "attribute_set_id": 4,
+            "price": 10,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -54,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -53,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -38,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -16,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 219,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901523691.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901523691.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5610"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-contour"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901523691.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901523691.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5989"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6695,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6677,6678"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6669"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#af817b"
+                }
+            ]
+        },
+        {
+            "id": 211,
+            "sku": "3348901523738",
+            "name": "Dior Contour-665 Revee",
+            "attribute_set_id": 4,
+            "price": 10,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -55,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -54,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -39,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -17,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 220,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901523738.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901523738.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "6"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-contour"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901523738.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901523738.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5992"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6693,6696"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6676,6677,6679"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6674"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#9c4349"
+                }
+            ]
+        },
+        {
+            "id": 212,
+            "sku": "3348901523745",
+            "name": "Dior Contour-772 Classic",
+            "attribute_set_id": 4,
+            "price": 10,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -56,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -55,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -40,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -18,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 221,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901523745.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901523745.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5615"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-contour"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901523745.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901523745.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "6301"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6695,6696"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6677,6679"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6670"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#a14746"
+                }
+            ]
+        },
+        {
+            "id": 213,
+            "sku": "3348901523769",
+            "name": "Dior Contour-678 Culte",
+            "attribute_set_id": 4,
+            "price": 10,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -57,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -56,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -41,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -19,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 222,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901523769.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901523769.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5617"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-contour"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901523769.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901523769.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5993"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6694,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6680,6679"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6671"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#8c4b55"
+                }
+            ]
+        },
+        {
+            "id": 214,
+            "sku": "3348901523790",
+            "name": "Dior Contour-060 Premiere",
+            "attribute_set_id": 4,
+            "price": 10,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -58,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -57,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -42,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -20,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 223,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901523790.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901523790.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5616"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-contour"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901523790.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901523790.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5980"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6693,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6675,6676"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6672"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#d1848d"
+                }
+            ]
+        },
+        {
+            "id": 215,
+            "sku": "3348901523820",
+            "name": "Dior Contour-028 Actrice",
+            "attribute_set_id": 4,
+            "price": 10,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -59,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -58,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -43,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -21,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 224,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901523820.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901523820.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5615"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-contour"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901523820.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901523820.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5979"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6695,6696"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6677,6679"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6673"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#e75263"
+                }
+            ]
+        },
+        {
+            "id": 216,
+            "sku": "3348901534024",
+            "name": "Dior Contour-100 Nude Look",
+            "attribute_set_id": 4,
+            "price": 10,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-08-07 11:24:13",
+            "updated_at": "2024-10-24 10:34:53",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -60,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -59,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -44,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -22,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "886"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 225,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901534024.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901534024.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5608"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-contour"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901534024.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901534024.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5981"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Contour"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6695,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "skin_tone",
+                    "value": "6677,6678"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6669"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457",
+                        "886",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#a67470"
+                }
+            ]
+        },
+        {
+            "id": 327,
+            "sku": "689304331029",
+            "name": "Matt Lipstain Travel Set",
+            "attribute_set_id": 4,
+            "price": 10,
+            "status": 1,
+            "visibility": 4,
+            "type_id": "simple",
+            "created_at": "2024-09-12 19:58:40",
+            "updated_at": "2024-09-14 07:10:08",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -171,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -157,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -110,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -2,
+                        "category_id": "450"
+                    },
+                    {
+                        "position": -23,
+                        "category_id": "457"
+                    },
+                    {
+                        "position": 0,
+                        "category_id": "920"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 360,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/6/8/689304331029.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "ar_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/6/8/689304331029.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5614"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "matt-lipstick-travel-set"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/6/8/689304331029.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Matt Lipstick Travel Set"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "description",
+                    "value": "A limited-edition, travel-sized set featuring four all-new, summer-inspired nude shades of Matte Lipstick.\n \n Shades include:\n - Coconut\n - Guava\n - Lychee\n - Orange Blossom"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/6/8/689304331029.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Matt Lipstick Travel Set"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Matt Lipstick Travel Set"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "brand",
+                    "value": "6605"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "9"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "formation",
+                    "value": "5553"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "450",
+                        "457",
+                        "920"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "made_in",
+                    "value": "5586"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "makeup_sets_product_type",
+                    "value": "5739"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#994d47,#c87050,#9c4448,#c3603e"
+                },
+                {
+                    "attribute_code": "gender",
+                    "value": "5852"
+                },
+                {
+                    "attribute_code": "lips_makeup_product_type",
+                    "value": "5727"
+                },
+                {
+                    "attribute_code": "texture",
+                    "value": "5625"
+                }
+            ]
+        },
+        {
+            "id": 535,
+            "sku": "DIO000002",
+            "name": "Dior Lip Glow Oil",
+            "attribute_set_id": 4,
+            "price": 0,
+            "status": 1,
+            "visibility": 4,
+            "type_id": "configurable",
+            "created_at": "2024-10-24 14:16:36",
+            "updated_at": "2024-10-24 14:16:36",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -354,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -307,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -155,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -24,
+                        "category_id": "457"
+                    }
+                ],
+                "configurable_product_options": [
+                    {
+                        "id": 55,
+                        "attribute_id": "283",
+                        "label": "Sub Color",
+                        "position": 0,
+                        "values": [
+                            {
+                                "value_index": 5976
+                            },
+                            {
+                                "value_index": 5977
+                            },
+                            {
+                                "value_index": 5978
+                            }
+                        ],
+                        "product_id": 535
+                    }
+                ],
+                "configurable_product_links": [
+                    536,
+                    537,
+                    538
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 600,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/6/8/689304320221.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "ar_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/6/8/689304320221.jpg"
+                },
+                {
+                    "attribute_code": "allow_glb_in_child_products",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-lip-glow-oil"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/6/8/689304320221.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "description",
+                    "value": "This lip oil teams an intense lip care formula with a natural, flattering color finish for an ultra-luminous result. Dior Addict Lip Glow Oil adapts to all lip colors to bring out their rosy glow. Its non-greasy, non-sticky oil texture pushes the boundaries of shine and creates a smoothing film that shapes the lips with an almost magnifying mirror-shine effect.\n\nMulti-use, Dior Addict Lip Glow Oil can be worn equally well on its own, as a primer under lipstick, or as a top coat for volumizing shine."
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/6/8/689304320221.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "model_variant_attribute",
+                    "value": "283"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "brand",
+                    "value": "6399"
+                },
+                {
+                    "attribute_code": "stored_locally",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "9"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "formation",
+                    "value": "5543"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "made_in",
+                    "value": "5562"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "gender",
+                    "value": "5852"
+                },
+                {
+                    "attribute_code": "lips_makeup_product_type",
+                    "value": "5730"
+                },
+                {
+                    "attribute_code": "texture",
+                    "value": "5627"
+                }
+            ]
+        },
+        {
+            "id": 536,
+            "sku": "3348901491228",
+            "name": "Dior Lip Glow Oil-006 Berry",
+            "attribute_set_id": 4,
+            "price": 13.25,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-10-24 14:16:36",
+            "updated_at": "2024-10-24 14:16:36",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -355,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -308,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -156,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -25,
+                        "category_id": "457"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 601,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901491228.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901491228.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5617"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-lip-glow-oil"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901491228.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901491228.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5976"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6694,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "stored_locally",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6669"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#7f184f"
+                }
+            ]
+        },
+        {
+            "id": 537,
+            "sku": "3348901491235",
+            "name": "Dior Lip Glow Oil-012 Rosewood",
+            "attribute_set_id": 4,
+            "price": 13.25,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-10-24 14:16:36",
+            "updated_at": "2024-10-24 14:16:36",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -356,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -309,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -157,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -26,
+                        "category_id": "457"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 602,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901491235.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901491235.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5615"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-lip-glow-oil"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901491235.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901491235.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5978"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6695,6696"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "stored_locally",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6670"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#ce554c"
+                }
+            ]
+        },
+        {
+            "id": 538,
+            "sku": "3348901491242",
+            "name": "Dior Lip Glow Oil-007 Raspberry",
+            "attribute_set_id": 4,
+            "price": 13.25,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-10-24 14:16:37",
+            "updated_at": "2024-10-24 14:16:37",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -357,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -310,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -158,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -27,
+                        "category_id": "457"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 603,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/3/3/3348901491242.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/3/3/3348901491242.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5616"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "dior-lip-glow-oil"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/3/3/3348901491242.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/3/3/3348901491242.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "5977"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Dior Lip Glow Oil"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6693,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "stored_locally",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "5975"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6671"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#fe93b1"
+                }
+            ]
+        },
+        {
+            "id": 539,
+            "sku": "ABV002",
+            "name": "Liquid Lipstick",
+            "attribute_set_id": 4,
+            "price": 0,
+            "status": 1,
+            "visibility": 4,
+            "type_id": "configurable",
+            "created_at": "2024-10-24 14:20:21",
+            "updated_at": "2024-10-24 14:21:54",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -358,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -311,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -159,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -28,
+                        "category_id": "457"
+                    }
+                ],
+                "configurable_product_options": [
+                    {
+                        "id": 57,
+                        "attribute_id": "283",
+                        "label": "Sub Color",
+                        "position": 0,
+                        "values": [
+                            {
+                                "value_index": 6616
+                            },
+                            {
+                                "value_index": 6626
+                            },
+                            {
+                                "value_index": 6630
+                            }
+                        ],
+                        "product_id": 539
+                    }
+                ],
+                "configurable_product_links": [
+                    540,
+                    541,
+                    542
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 604,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/6/8/689304320030.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "ar_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/6/8/689304320030.jpg"
+                },
+                {
+                    "attribute_code": "allow_glb_in_child_products",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "liquid-lipstick"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/6/8/689304320030.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Liquid Lipstick"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "description",
+                    "value": "A full pigment liquid lip color formula that dries down to a weightless matte finish for smudge proof wearability and long lasting color."
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/6/8/689304320030.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Liquid Lipstick"
+                },
+                {
+                    "attribute_code": "model_variant_attribute",
+                    "value": "283"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Liquid Lipstick"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "brand",
+                    "value": "6605"
+                },
+                {
+                    "attribute_code": "stored_locally",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "9"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "formation",
+                    "value": "5553"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "made_in",
+                    "value": "5586"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "gender",
+                    "value": "5852"
+                },
+                {
+                    "attribute_code": "lips_makeup_product_type",
+                    "value": "5726"
+                },
+                {
+                    "attribute_code": "texture",
+                    "value": "5625"
+                }
+            ]
+        },
+        {
+            "id": 540,
+            "sku": "689304320030",
+            "name": "Liquid Lipstick-spicy",
+            "attribute_set_id": 4,
+            "price": 6.75,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-10-24 14:20:21",
+            "updated_at": "2024-10-24 14:21:55",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -359,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -312,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -160,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -29,
+                        "category_id": "457"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 605,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/6/8/689304320030.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/6/8/689304320030.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5615"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "liquid-lipstick-spicy"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/6/8/689304320030.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Liquid Lipstick-spicy"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/6/8/689304320030.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Liquid Lipstick-spicy"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "6630"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Liquid Lipstick-spicy"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6695,6696"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "stored_locally",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "9"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6670"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#af1e02"
+                }
+            ]
+        },
+        {
+            "id": 541,
+            "sku": "689304320078",
+            "name": "Liquid Lipstick-Eelectric Coral",
+            "attribute_set_id": 4,
+            "price": 6.75,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-10-24 14:20:21",
+            "updated_at": "2024-10-24 14:21:55",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -360,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -313,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -161,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -30,
+                        "category_id": "457"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 606,
+                    "media_type": "image",
+                    "label": "",
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/6/8/689304320078.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/6/8/689304320078.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5616"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "liquid-lipstick-electric-coral"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/6/8/689304320078.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "Liquid Lipstick-Eelectric Coral"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/6/8/689304320078.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "Liquid Lipstick-Eelectric Coral"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "6616"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "Liquid Lipstick-Eelectric Coral"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6693,6697"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "stored_locally",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "size",
+                    "value": "9"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6671"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#ec3738"
+                }
+            ]
+        },
+        {
+            "id": 542,
+            "sku": "689304320221",
+            "name": "Liquid Lipstick-Persimmon",
+            "attribute_set_id": 4,
+            "price": 6.75,
+            "status": 1,
+            "visibility": 1,
+            "type_id": "simple",
+            "created_at": "2024-10-24 14:20:22",
+            "updated_at": "2024-11-05 15:42:15",
+            "weight": 1,
+            "extension_attributes": {
+                "website_ids": [
+                    1
+                ],
+                "category_links": [
+                    {
+                        "position": -361,
+                        "category_id": "2"
+                    },
+                    {
+                        "position": -314,
+                        "category_id": "400"
+                    },
+                    {
+                        "position": -162,
+                        "category_id": "448"
+                    },
+                    {
+                        "position": -31,
+                        "category_id": "457"
+                    }
+                ]
+            },
+            "product_links": [],
+            "options": [],
+            "media_gallery_entries": [
+                {
+                    "id": 607,
+                    "media_type": "image",
+                    "label": null,
+                    "position": 1,
+                    "disabled": false,
+                    "types": [
+                        "image",
+                        "small_image",
+                        "thumbnail"
+                    ],
+                    "file": "/6/8/689304320221_1.jpg"
+                }
+            ],
+            "tier_prices": [],
+            "custom_attributes": [
+                {
+                    "attribute_code": "ar_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "is_product_try_on",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "gift_message_available",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "image",
+                    "value": "/6/8/689304320221_1.jpg"
+                },
+                {
+                    "attribute_code": "color",
+                    "value": "5615"
+                },
+                {
+                    "attribute_code": "url_key",
+                    "value": "liquid-lipstick-persimmon"
+                },
+                {
+                    "attribute_code": "options_container",
+                    "value": "container2"
+                },
+                {
+                    "attribute_code": "small_image",
+                    "value": "/6/8/689304320221_1.jpg"
+                },
+                {
+                    "attribute_code": "meta_title",
+                    "value": "liquid-lipstick-persimmon"
+                },
+                {
+                    "attribute_code": "is_product_skin_try",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "thumbnail",
+                    "value": "/6/8/689304320221_1.jpg"
+                },
+                {
+                    "attribute_code": "meta_keyword",
+                    "value": "liquid-lipstick-persimmon"
+                },
+                {
+                    "attribute_code": "sub_color",
+                    "value": "6626"
+                },
+                {
+                    "attribute_code": "meta_description",
+                    "value": "liquid-lipstick-persimmon"
+                },
+                {
+                    "attribute_code": "as_featured",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "personality",
+                    "value": "6695,6696"
+                },
+                {
+                    "attribute_code": "msrp_display_actual_price_type",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "stored_locally",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "face_shape",
+                    "value": "6672"
+                },
+                {
+                    "attribute_code": "tax_class_id",
+                    "value": "2"
+                },
+                {
+                    "attribute_code": "required_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "category_ids",
+                    "value": [
+                        "2",
+                        "400",
+                        "448",
+                        "457"
+                    ]
+                },
+                {
+                    "attribute_code": "has_options",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "sw_featured",
+                    "value": "1"
+                },
+                {
+                    "attribute_code": "product_image_size",
+                    "value": "0"
+                },
+                {
+                    "attribute_code": "wallet_cash_back",
+                    "value": "0.000000"
+                },
+                {
+                    "attribute_code": "hexacode",
+                    "value": "#b21902"
+                }
+            ]
+        }
+    ],
+    "search_criteria": {
+        "filter_groups": [
+            {
+                "filters": [
+                    {
+                        "field": "category_id",
+                        "value": "457",
+                        "condition_type": "eq"
+                    }
+                ]
+            }
+        ]
+    },
+    "total_count": 27
+}

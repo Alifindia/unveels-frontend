@@ -11,6 +11,8 @@ interface WatchesContextType {
   setSelectedMaterial: (material: string | null) => void;
   selectedShape: string | null;
   setSelectedShape: (shape: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
 }
 
 // Create the context
@@ -23,6 +25,7 @@ export function WatchesProvider({ children }: { children: React.ReactNode }) {
   const [selectedMode, setSelectedMode] = useState<string | null>("shapes");
   const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
   const [selectedShape, setSelectedShape] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
 
   return (
     <WatchesContext.Provider
@@ -37,6 +40,8 @@ export function WatchesProvider({ children }: { children: React.ReactNode }) {
         setSelectedMaterial,
         selectedShape,
         setSelectedShape,
+        colorFamilyToInclude,
+        setColorFamilyToInclude,
       }}
     >
       {children}

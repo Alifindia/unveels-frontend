@@ -7,6 +7,7 @@ export async function fetchVirtualAssistantProduct(
   categories: Category[],
 ): Promise<Product[]> {
   const queries = generateMagentoQueries(products, categories);
+  console.log(queries);
 
   const results = await Promise.all(
     queries.map(async (query) => {

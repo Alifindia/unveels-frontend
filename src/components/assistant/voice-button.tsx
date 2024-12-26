@@ -12,33 +12,20 @@ const VoiceButton = ({
   startListening,
   stopListening,
 }: RecordButtonProps) => {
-  const handleMouseDown = () => {
-    setRecording(true);
-    startListening();
-  };
-
-  const handleMouseUp = () => {
-    setRecording(false);
-    stopListening();
-  };
-
-  const handleTouchStart = () => {
-    setRecording(true);
-    startListening();
-  };
-
-  const handleTouchEnd = () => {
-    setRecording(false);
-    stopListening();
+  const handleClick = () => {
+    if (recording) {
+      setRecording(false);
+      stopListening();
+    } else {
+      setRecording(true);
+      startListening();
+    }
   };
 
   return (
     <button
       type="button"
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
+      onClick={handleClick}
       className={`relative grid size-28 place-items-center rounded-full [&>*]:col-start-1 [&>*]:row-start-1 ${
         recording
           ? "bg-[radial-gradient(50%_50%_at_50%_50%,rgba(255,255,255,0)_0%,rgba(255,255,255,0.0175)_100%)] backdrop-blur-3xl"

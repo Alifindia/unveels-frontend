@@ -11,7 +11,7 @@ export const VirtulAssistant = () => {
   const [screen, setScreen] = useState<"vocal" | "text" | "audio" | null>(null);
   return (
     <CameraProvider>
-      <div className="h-full min-h-dvh w-full overflow-hidden bg-[linear-gradient(180deg,#47330A_0%,#0F0B02_58.39%,#000000_100%)]">
+      <div className="h-full min-h-dvh w-full overflow-hidden bg-[linear-gradient(180deg,#47330A_0%,#0F0B02_58.39%,#000000_100%)] lg:bg-[linear-gradient(180deg,#000000_0%,#0F0B02_41.61%,#47330A_100%)]">
         {started ? (
           screen === "vocal" ? (
             <VocalConnectionScreen

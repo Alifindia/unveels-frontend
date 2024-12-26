@@ -62,8 +62,6 @@ function OverlayCanvas({
         const { innerWidth: width, innerHeight: height } = window;
         const dpr = window.devicePixelRatio || 1;
 
-        ctx.setTransform(-1, 0, 0, 1, width * dpr, 0); // Flip the canvas horizontally
-
         canvas.width = width * dpr;
         canvas.height = height * dpr;
         ctx.scale(dpr, dpr);

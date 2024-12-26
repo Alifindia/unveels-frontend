@@ -7,10 +7,16 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useLipPlumperContext } from "./lip-plumper-context";
 import { useLipPlumperQuery } from "./lip-plumper-query";
+import { ColorPalette } from "../../../../components/color-palette";
+import { Product } from "../../../../api/shared";
+import { useEffect, useState } from "react";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import Lipplumper from "../../../../components/three/makeup/lipplumper";
+import { getLipsMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function LipPlumperSelector() {
   return (
-    <div className="mx-auto w-full divide-y px-4 lg:max-w-xl">
+    <div className="mx-auto w-full divide-y px-4">
       <div>
         <ColorSelector />
       </div>
@@ -59,34 +65,27 @@ function ColorSelector() {
   });
 
   return (
-    <div className="mx-auto w-full py-2 lg:max-w-xl">
-      <div className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-1 sm:py-2">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
         <button
           type="button"
-          className="inline-flex size-10 shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
+          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
           onClick={() => {
             resetColor();
           }}
         >
-          <Icons.empty className="size-10" />
+          <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
 
-        {extracted_sub_colors
-          ? extracted_sub_colors.map((color, index) => (
-              <button
-                key={color}
-                type="button"
-                className={clsx(
-                  "inline-flex size-10 shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80",
-                  {
-                    "border-white/80": selectedColor === color,
-                  },
-                )}
-                style={{ background: color }}
-                onClick={() => setColor(color)}
-              ></button>
-            ))
-          : null}
+        {extracted_sub_colors.map((color, index) => (
+          <ColorPalette
+            key={color}
+            size="large"
+            palette={{ color }}
+            selected={selectedColor === color}
+            onClick={() => setColor(color)}
+          />
+        ))}
       </div>
     </div>
   );
@@ -95,14 +94,14 @@ function ColorSelector() {
 function TextureSelector() {
   const { selectedTexture, setSelectedTexture } = useLipPlumperContext();
   return (
-    <div className="mx-auto w-full py-4 lg:max-w-xl">
-      <div className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-1 sm:py-2">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
         {textures.map((texture, index) => (
           <button
             key={texture.label}
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-3 py-1 text-white/80",
+              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-2 py-0.5 text-white/80 sm:px-3 sm:py-1",
               {
                 "border-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                   selectedTexture === texture.value,
@@ -116,7 +115,7 @@ function TextureSelector() {
               }
             }}
           >
-            <span className="text-sm">{texture.label}</span>
+            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
           </button>
         ))}
       </div>
@@ -125,22 +124,87 @@ function TextureSelector() {
 }
 
 function ProductList() {
-  const { selectedColor, selectedTexture } = useLipPlumperContext();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
+
+  const {
+    selectedColor,
+    setSelectedColor,
+    selectedTexture,
+    setSelectedTexture,
+  } = useLipPlumperContext();
 
   const { data, isLoading } = useLipPlumperQuery({
     hexacode: selectedColor,
     texture: selectedTexture,
   });
 
+  const { setShowLipplumper, setLipplumperColor } = useMakeup();
+
+  useEffect(() => {
+    setLipplumperColor(selectedColor || "#ffffff");
+    setShowLipplumper(selectedColor != null);
+  }, [selectedColor]);
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+    setSelectedTexture(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "texture",
+      )?.value,
+    );
+  };
+
   return (
-    <div className="flex w-full gap-4 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return <VTOProductCard key={product.id} product={product} />;
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Lipplumper: {
+                attributeName: "lips_makeup_product_type",
+                values: getLipsMakeupProductTypeIds([
+                  "Lip Plumpers",
+                  "Lip Glosses",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Lipplumper", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Lip Plumper");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

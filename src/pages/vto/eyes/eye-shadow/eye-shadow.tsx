@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { colors } from "../../../../api/attributes/color";
 import { filterTextures } from "../../../../api/attributes/texture";
 import { Icons } from "../../../../components/icons";
@@ -8,22 +8,25 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { EyeShadowProvider, useEyeShadowContext } from "./eye-shadow-context";
 import { useEyeshadowsQuery } from "./eye-shadow-query";
+import { ColorPalette } from "../../../../components/color-palette";
+import { Product } from "../../../../api/shared";
+import { useMakeup } from "../../../../context/makeup-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getEyeMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function EyeShadowSelector() {
   return (
-    <EyeShadowProvider>
-      <div className="w-full px-4 mx-auto divide-y lg:max-w-xl">
-        <div>
-          <ColorSelector />
-        </div>
-
-        <TextureSelector />
-
-        <ModeSelector />
-
-        <ProductList />
+    <div className="mx-auto w-full divide-y px-4">
+      <div>
+        <ColorSelector />
       </div>
-    </EyeShadowProvider>
+
+      <TextureSelector />
+
+      <ModeSelector />
+
+      <ProductList />
+    </div>
   );
 }
 
@@ -41,16 +44,48 @@ function ColorSelector() {
   const { selectedMode, colorFamily, selectedColors, setSelectedColors } =
     useEyeShadowContext();
 
+  function getCombinations(arr: string[], size: number): string[][] {
+    const result: string[][] = [];
+
+    function combine(start: number, current: string[]) {
+      if (current.length === size) {
+        result.push([...current]);
+        return;
+      }
+      for (let i = start; i < arr.length; i++) {
+        combine(i + 1, [...current, arr[i]]);
+      }
+    }
+
+    combine(0, []);
+    return result;
+  }
+
   const { data } = useEyeshadowsQuery({
     color: null,
     hexcodes: null,
     texture: null,
   });
 
-  const extracted_sub_colors = extractUniqueCustomAttributes(
-    data?.items ?? [],
-    "hexacode",
-  ).flatMap((item) => item.split(","));
+  const extracted_sub_colors =
+    selectedMode == "One" || selectedMode == "Tetra"
+      ? extractUniqueCustomAttributes(data?.items ?? [], "hexacode").flatMap(
+          (item) => item.split(","),
+        )
+      : extractUniqueCustomAttributes(data?.items ?? [], "hexacode");
+
+  const combinations: string[][] = [];
+
+  extracted_sub_colors.forEach((set) => {
+    const colorArrays = set.split(",");
+    if (colorArrays.length < 100) {
+      const combinationsForSet = getCombinations(
+        colorArrays,
+        maxColorsMap[selectedMode] || 1,
+      );
+      combinations.push(...combinationsForSet);
+    }
+  });
 
   const maxColors = maxColorsMap[selectedMode] || 1;
 
@@ -70,6 +105,20 @@ function ColorSelector() {
     setSelectedColors(newColors);
   };
 
+  const handleColorsClick = (color: string[]) => {
+    console.log("clicked", color);
+    setSelectedColors(color);
+  };
+
+  function isSelected(colors: string[]) {
+    if (colors.length !== selectedColors.length) return false;
+
+    const sorted1 = [...colors].sort();
+    const sorted2 = [...selectedColors].sort();
+
+    return sorted1.every((value, index) => value === sorted2[index]);
+  }
+
   useEffect(() => {
     const maxColors = maxColorsMap[selectedMode] || 1;
 
@@ -79,34 +128,39 @@ function ColorSelector() {
   }, [selectedMode, selectedColors, setSelectedColors]);
 
   return (
-    <div className="w-full py-2 mx-auto lg:max-w-xl">
-      <div className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-1 sm:py-2">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
         <button
           type="button"
-          className="inline-flex items-center border border-transparent rounded-full size-10 shrink-0 gap-x-2 text-white/80"
+          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
           onClick={() => {
             setSelectedColors([]);
           }}
         >
-          <Icons.empty className="size-10" />
+          <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
-        {/* {renderPaletteItems()} */}
-        {extracted_sub_colors
+        {(selectedMode == "One" || selectedMode == "Tetra") &&
+        extracted_sub_colors
           ? extracted_sub_colors.map((color, index) => (
-              <button
+              <ColorPalette
                 key={color}
-                type="button"
-                className={clsx(
-                  "inline-flex size-10 shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80",
-                  {
-                    "border-white/80": selectedColors.includes(color),
-                  },
-                )}
-                style={{ background: color }}
+                size="large"
+                selected={selectedColors.includes(color)}
+                palette={{ color }}
                 onClick={() => handleColorClick(color)}
-              ></button>
+              />
             ))
-          : null}
+          : combinations.map((colors, index) => (
+              <ColorPalette
+                key={index}
+                size="large"
+                selected={isSelected(colors)}
+                palette={
+                  selectedMode == "Dual" ? { gradient: colors } : { colors }
+                }
+                onClick={() => handleColorsClick(colors)}
+              />
+            ))}
       </div>
     </div>
   );
@@ -117,14 +171,14 @@ const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
 function TextureSelector() {
   const { selectedTexture, setSelectedTexture } = useEyeShadowContext();
   return (
-    <div className="w-full py-4 mx-auto lg:max-w-xl">
-      <div className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-1 sm:py-2">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 no-scrollbar">
         {textures.map((texture, index) => (
           <button
             key={texture.value}
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-3 py-1 text-white/80",
+              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-2 py-0.5 text-white/80 sm:px-3 sm:py-1",
               {
                 "border-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                   selectedTexture === texture.value,
@@ -138,7 +192,7 @@ function TextureSelector() {
               }
             }}
           >
-            <span className="text-sm">{texture.label}</span>
+            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
           </button>
         ))}
       </div>
@@ -162,14 +216,14 @@ function ModeSelector() {
 
   return (
     <>
-      <div className="w-full py-2 mx-auto lg:max-w-xl">
-        <div className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar">
+      <div className="mx-auto w-full py-1 sm:py-2">
+        <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
           {modes.map((mode, index) => (
             <button
               key={mode.name}
               type="button"
               className={clsx(
-                "relative inline-flex items-center gap-x-2 rounded-full px-3 py-1 text-center text-sm transition-transform",
+                "relative inline-flex items-center gap-x-2 rounded-full px-1 py-1 text-center text-sm transition-transform",
                 {
                   "-translate-y-0.5 text-white": selectedMode === mode.name,
                   "text-white/80": selectedMode !== mode.name,
@@ -182,7 +236,9 @@ function ModeSelector() {
                   {mode.name}
                 </div>
               ) : null}
-              <span className="relative text-sm">{mode.name}</span>
+              <span className="relative text-[9.8px] sm:text-sm">
+                {mode.name}
+              </span>
             </button>
           ))}
 
@@ -190,25 +246,25 @@ function ModeSelector() {
         </div>
       </div>
       {currentMode ? (
-        <div className="w-full py-2 mx-auto lg:max-w-xl">
-          <div className="flex items-center w-full space-x-4 overflow-x-auto no-scrollbar">
+        <div className="mx-auto w-full py-1 sm:py-2">
+          <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
             {[...Array(currentMode.count)].map((_, index) => (
               <button
                 key={index}
                 type="button"
                 className={clsx(
-                  "inline-flex shrink-0 items-center gap-x-2 text-white/80",
+                  "inline-flex shrink-0 items-center gap-x-2 border border-transparent text-white/80",
                   {
                     "border-white/80":
                       modeIndex.toString() === index.toString(),
                   },
                 )}
-                onClick={() => setSelectModeIndex(index + 1)}
+                onClick={() => setSelectModeIndex(index)}
               >
                 <img
-                  src={`/eyeshadows/eyeshadow-${currentMode.name.toLowerCase()}-${index + 1}.png`}
+                  src={`/media/unveels/vto/eyeshadows/eyeshadow-${currentMode.name.toLowerCase()}-${index + 1}.png`}
                   alt="Eye shadow"
-                  className="size-12 shrink-0"
+                  className="size-[35px] shrink-0 sm:size-[50px] lg:size-[65px]"
                 />
               </button>
             ))}
@@ -220,7 +276,18 @@ function ModeSelector() {
 }
 
 function ProductList() {
-  const { selectedTexture, selectedColors } = useEyeShadowContext();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
+
+  const {
+    selectedTexture,
+    selectedColors,
+    setSelectedColors,
+    setSelectedTexture,
+    selectedMode,
+    modeIndex,
+  } = useEyeShadowContext();
 
   const { data, isLoading } = useEyeshadowsQuery({
     color: null,
@@ -228,15 +295,78 @@ function ProductList() {
     texture: selectedTexture,
   });
 
+  const {
+    setEyeShadowColor,
+    setEyeShadowPattern,
+    setEyeShadowMaterial,
+    setEyeShadowMode,
+    setShowEyeShadow,
+  } = useMakeup();
+
+  useEffect(() => {
+    setEyeShadowColor(selectedColors);
+    setEyeShadowPattern(modeIndex);
+    var materialIndex = textures.findIndex((e) => e.value == selectedTexture);
+    setEyeShadowMaterial(materialIndex != -1 ? materialIndex : 0);
+    setEyeShadowMode(selectedMode as "One" | "Dual" | "Tri" | "Quad" | "Penta");
+    setShowEyeShadow(true);
+  }, [selectedColors, modeIndex, selectedMode, selectedTexture]);
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setSelectedColors(
+      product.custom_attributes
+        .find((item) => item.attribute_code === "hexacode")
+        ?.value.split(","),
+    );
+    setSelectedTexture(
+      product.custom_attributes
+        .find((item) => item.attribute_code === "texture")
+        ?.value.split(",")[0],
+    );
+  };
+
   return (
-    <div className="flex w-full gap-4 pt-4 pb-2 overflow-x-auto no-scrollbar active:cursor-grabbing">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return <VTOProductCard product={product} key={product.id} />;
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Eyeshadows: {
+                attributeName: "eye_makeup_product_type",
+                values: getEyeMakeupProductTypeIds(["Eyeshadows"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Eyeshadows", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Eyeshadows");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

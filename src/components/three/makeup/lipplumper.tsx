@@ -9,11 +9,13 @@ import { LIP_PLUMPER_TEXTURE_ONE } from "../../../utils/constants";
 interface LipplumperProps extends MeshProps {
   landmarks: React.RefObject<Landmark[]>;
   planeSize: [number, number];
+  isFlipped: boolean;
 }
 
 const LipplumperInner: React.FC<LipplumperProps> = ({
   landmarks,
   planeSize,
+  isFlipped,
 }) => {
   const { lipplumperColor } = useMakeup();
 
@@ -24,7 +26,7 @@ const LipplumperInner: React.FC<LipplumperProps> = ({
       new MeshBasicMaterial({
         color: lipplumperColor,
         transparent: true,
-        opacity: 2,
+        opacity: 0.36,
         alphaMap: lipplumperTexture,
         alphaTest: 0,
       }),
@@ -36,6 +38,7 @@ const LipplumperInner: React.FC<LipplumperProps> = ({
       landmarks={landmarks}
       material={lipplumperMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={isFlipped}
     />
   );
 };

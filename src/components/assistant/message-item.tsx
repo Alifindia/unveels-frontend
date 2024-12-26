@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import SarahAvatar from "../../assets/sarah-avatar.png";
 import AudioWave from "./audio-wave";
 
 type Message =
@@ -61,8 +60,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
         {!isUser && (
           <img
             alt="Agent"
-            className="h-12 w-12 rounded-full"
-            src={SarahAvatar}
+            className="size-[38.5px] rounded-full sm:size-[55px]"
+            src={"media/unveels/avatar-images/sarah-avatar.png"}
           />
         )}
 
@@ -101,7 +100,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
               </div>
             </div>
           ) : (
-            <p className="w-full text-sm">{message.text}</p>
+            <p className="lg w-full text-[9.8px] sm:text-sm">{message.text}</p>
           )}
         </div>
 

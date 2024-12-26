@@ -13,6 +13,8 @@ interface LipColorContextType {
   setSelectedMode: (mode: string) => void;
   replaceIndex: number;
   setReplaceIndex: (index: number) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
 }
 
 // Create the context
@@ -28,6 +30,7 @@ export function LipColorProvider({ children }: { children: React.ReactNode }) {
   const [selectedShade, setSelectedShade] = useState<string | null>(null);
   const [selectedMode, setSelectedMode] = useState<string>("One");
   const [replaceIndex, setReplaceIndex] = useState<number>(0);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
 
   // Ensure that when mode changes to "One", only one color is selected
   useEffect(() => {
@@ -62,6 +65,8 @@ export function LipColorProvider({ children }: { children: React.ReactNode }) {
         setSelectedMode,
         replaceIndex,
         setReplaceIndex,
+        colorFamilyToInclude,
+        setColorFamilyToInclude
       }}
     >
       {children}

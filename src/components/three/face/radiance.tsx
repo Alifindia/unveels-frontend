@@ -30,6 +30,7 @@ const RadianceInner: React.FC<RadianceProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={radianceMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={true}
     />
   );
 };

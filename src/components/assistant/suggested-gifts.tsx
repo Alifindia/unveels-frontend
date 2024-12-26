@@ -1,5 +1,5 @@
 import { Product } from "../../api/shared";
-import { mediaUrl } from "../../utils/apiUtils";
+import { baseApiUrl, mediaUrl } from "../../utils/apiUtils";
 
 interface SuggestedGiftsProps {
   product: Product[];
@@ -18,6 +18,12 @@ const SuggestedGifts = ({ product }: SuggestedGiftsProps) => {
             <div
               className="flex h-[150px] w-[115px] shrink-0 flex-col overflow-hidden rounded-lg bg-[#2C1F06]"
               key={index}
+              onClick={() => {
+                window.open(
+                  `${baseApiUrl}/${item.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                  "_blank",
+                );
+              }}
             >
               <img
                 className="h-full w-full object-cover"

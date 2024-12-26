@@ -30,6 +30,7 @@ const DroppyInner: React.FC<DroppyProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={droppyMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={true}
     />
   );
 };

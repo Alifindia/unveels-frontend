@@ -25,10 +25,10 @@ const AudioWave = ({ url }: { url: string }) => {
       fetch(url)
         .then((response) => response.blob())
         .then((blob) => {
-          wavesurfer.loadBlob(blob); // Load the blob into wavesurfer
+          wavesurfer.loadBlob(blob);
         });
     } else if (wavesurfer) {
-      wavesurfer.load(url); // Load normal URL
+      wavesurfer.load(url);
     }
   }, [wavesurfer, url]);
 

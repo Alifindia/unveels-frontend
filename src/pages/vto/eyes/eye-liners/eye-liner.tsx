@@ -8,53 +8,61 @@ import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { patterns } from "../../../../api/attributes/pattern";
 import { LoadingProducts } from "../../../../components/loading";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
+import { Product } from "../../../../api/shared";
+import { useEffect, useState } from "react";
+import { useMakeup } from "../../../../context/makeup-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getEyeMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function EyeLinerSelector() {
   return (
-    <EyeLinerProvider>
-      <div className="w-full px-4 mx-auto divide-y lg:max-w-xl">
-        <div>
-          <FamilyColorSelector />
+    <div className="mx-auto w-full divide-y px-4">
+      <div>
+        <FamilyColorSelector />
 
-          <ColorSelector />
-        </div>
-
-        <ShapeSelector />
-
-        <ProductList />
+        <ColorSelector />
       </div>
-    </EyeLinerProvider>
+
+      <ShapeSelector />
+
+      <ProductList />
+    </div>
   );
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useEyeLinerContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useEyeLinerContext();
 
   return (
     <div
-      className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
       data-mode="lip-color"
     >
-      {colors.map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() => setColorFamily(item.value)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.hex,
-            }}
-          />
-          <span className="text-sm">{item.label}</span>
-        </button>
-      ))}
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily === item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
@@ -72,61 +80,54 @@ function ColorSelector() {
   ).flatMap((item) => item.split(","));
 
   return (
-    <div className="w-full py-2 mx-auto lg:max-w-xl">
-      <div className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-1 sm:py-2">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
         <button
           type="button"
-          className="inline-flex items-center border border-transparent rounded-full size-10 shrink-0 gap-x-2 text-white/80"
+          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
           onClick={() => {
             setSelectedColor(null);
           }}
         >
-          <Icons.empty className="size-10" />
+          <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
 
-        {extracted_sub_colors
-          ? extracted_sub_colors.map((color, index) => (
-              <button
-                key={color}
-                type="button"
-                className={clsx(
-                  "inline-flex size-10 shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80",
-                  {
-                    "border-white/80": selectedColor === color,
-                  },
-                )}
-                style={{ background: color }}
-                onClick={() => setSelectedColor(color)}
-              ></button>
-            ))
-          : null}
+        {extracted_sub_colors.map((color, index) => (
+          <ColorPalette
+            key={color}
+            size="large"
+            palette={{ color }}
+            selected={selectedColor === color}
+            onClick={() => setSelectedColor(color)}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
 const eyeliners = [
-  "/eyeliners/eyeliners_arabic-down 1.png",
-  "/eyeliners/eyeliners_arabic-light 1.png",
-  "/eyeliners/eyeliners_arabic-up 1.png",
-  "/eyeliners/eyeliners_double-mod 1.png",
-  "/eyeliners/eyeliners_down-basic 1.png",
-  "/eyeliners/eyeliners_down-bold 1.png",
-  "/eyeliners/eyeliners_down-light 1.png",
-  "/eyeliners/eyeliners_middle-basic 1.png",
-  "/eyeliners/eyeliners_middle-bold 1.png",
-  "/eyeliners/eyeliners_middle-light 1.png",
-  "/eyeliners/eyeliners_open-wings 1.png",
-  "/eyeliners/eyeliners_up-basic 1.png",
-  "/eyeliners/eyeliners_up-bold 1.png",
-  "/eyeliners/eyeliners_up-light 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_arabic-down 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_arabic-light 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_arabic-up 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_double-mod 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_down-basic 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_down-bold 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_down-light 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_middle-basic 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_middle-bold 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_middle-light 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_open-wings 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_up-basic 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_up-bold 1.png",
+  "/media/unveels/vto/eyeliners/eyeliners_up-light 1.png",
 ];
 
 function ShapeSelector() {
   const { selectedShape, setSelectedShape } = useEyeLinerContext();
   return (
-    <div className="w-full py-4 mx-auto lg:max-w-xl">
-      <div className="flex items-center w-full space-x-4 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-4">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
         {patterns.eyeliners.map((pattern, index) => (
           <button
             key={index}
@@ -137,12 +138,18 @@ function ShapeSelector() {
                 "border-white/80": selectedShape === pattern.value,
               },
             )}
-            onClick={() => setSelectedShape(pattern.value)}
+            onClick={() => {
+              if (selectedShape === pattern.value) {
+                setSelectedShape(null);
+              } else {
+                setSelectedShape(pattern.value);
+              }
+            }}
           >
             <img
               src={eyeliners[index % eyeliners.length]}
               alt="Eyebrow"
-              className="rounded size-12"
+              className="size-[35px] rounded sm:size-[50px] lg:size-[65px]"
             />
           </button>
         ))}
@@ -152,22 +159,99 @@ function ShapeSelector() {
 }
 
 function ProductList() {
-  const { colorFamily, selectedShape } = useEyeLinerContext();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
+
+  const {
+    colorFamily,
+    setColorFamily,
+    selectedColor,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+    selectedShape,
+  } = useEyeLinerContext();
 
   const { data, isLoading } = useEyelinerQuery({
     color: colorFamily,
-    pattern: selectedShape,
+    pattern: null,
   });
 
+  const { setEyelinerColor, setEyelinerPattern, setShowEyeliner } = useMakeup();
+
+  useEffect(() => {
+    setEyelinerColor(selectedColor || "#ffffff");
+    var pattern = patterns["eyeliners"].findIndex(
+      (e) => e.value == selectedShape,
+    );
+    setEyelinerPattern(pattern != -1 ? pattern : 0);
+    setShowEyeliner(selectedColor != null);
+  }, [selectedColor, selectedShape]);
+
+  if (colorFamilyToInclude == null && data?.items != null) {
+    setColorFamilyToInclude(
+      data.items.map(
+        (d) =>
+          d.custom_attributes.find((c) => c.attribute_code === "color")?.value,
+      ),
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+  };
+
   return (
-    <div className="flex w-full gap-4 pt-4 pb-2 overflow-x-auto no-scrollbar active:cursor-grabbing">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return <VTOProductCard product={product} key={product.id} />;
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Eyeliners: {
+                attributeName: "eye_makeup_product_type",
+                values: getEyeMakeupProductTypeIds(["Eyeliners"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Eyeliners", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Eyeliners");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

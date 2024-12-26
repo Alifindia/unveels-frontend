@@ -30,6 +30,7 @@ const EyebagInner: React.FC<EyebagProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={eyebagMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={true}
     />
   );
 };

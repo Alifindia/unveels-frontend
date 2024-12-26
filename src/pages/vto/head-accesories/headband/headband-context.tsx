@@ -5,8 +5,10 @@ interface HeadbandContextType {
   setColorFamily: (color: string | null) => void;
   selectedColor: string | null;
   setSelectedColor: (color: string | null) => void;
-  selectedMaterial: string | null;
-  setSelectedMaterial: (shape: string | null) => void;
+  selectedFabric: string | null;
+  setSelectedFabric: (shape: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
 }
 
 // Create the context
@@ -18,7 +20,8 @@ const HeadbandContext = createContext<HeadbandContextType | undefined>(
 export function HeadbandProvider({ children }: { children: React.ReactNode }) {
   const [colorFamily, setColorFamily] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
+  const [selectedFabric, setSelectedFabric] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
 
   return (
     <HeadbandContext.Provider
@@ -27,8 +30,10 @@ export function HeadbandProvider({ children }: { children: React.ReactNode }) {
         setColorFamily,
         selectedColor,
         setSelectedColor,
-        selectedMaterial,
-        setSelectedMaterial,
+        selectedFabric,
+        setSelectedFabric,
+        setColorFamilyToInclude,
+        colorFamilyToInclude,
       }}
     >
       {children}

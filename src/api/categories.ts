@@ -1,6 +1,6 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Category, defaultHeaders } from "./shared";
-import { buildSearchParams } from "../utils/apiUtils";
+import { baseUrl, buildSearchParams } from "../utils/apiUtils";
 
 const categoriesKey = {
   all: ["categories"],
@@ -8,7 +8,8 @@ const categoriesKey = {
 
 async function fetchCategories() {
   const response = await fetch(
-    "/rest/V1/categories/list?" +
+    baseUrl +
+      "/rest/V1/categories/list?" +
       buildSearchParams([
         {
           filters: [

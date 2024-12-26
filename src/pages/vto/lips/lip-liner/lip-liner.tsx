@@ -7,10 +7,15 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useLipLinerContext } from "./lip-liner-context";
 import { useLipLinerQuery } from "./lip-liner-query";
+import { ColorPalette } from "../../../../components/color-palette";
+import { Product } from "../../../../api/shared";
+import { useEffect, useState } from "react";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getLipsMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function LipLinerSelector() {
   return (
-    <div className="mx-auto w-full divide-y px-4 lg:max-w-xl">
+    <div className="mx-auto w-full divide-y px-4">
       <div>
         <FamilyColorSelector />
 
@@ -25,32 +30,37 @@ export function LipLinerSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useLipLinerContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useLipLinerContext();
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
       data-mode="lip-color"
     >
-      {colors.map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() => setColorFamily(item.value)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.hex,
-            }}
-          />
-          <span className="text-sm">{item.label}</span>
-        </button>
-      ))}
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily === item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
@@ -88,34 +98,24 @@ function ColorSelector() {
   );
 
   return (
-    <div className="mx-auto w-full py-2 lg:max-w-xl">
-      <div className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-1 sm:py-2">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
         <button
           type="button"
-          className="inline-flex size-10 shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
-          onClick={() => {
-            resetColor();
-          }}
+          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
+          onClick={resetColor}
         >
-          <Icons.empty className="size-10" />
+          <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
-
-        {data
-          ? extracted_sub_colors.map((color, index) => (
-              <button
-                key={color}
-                type="button"
-                className={clsx(
-                  "inline-flex size-10 shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80",
-                  {
-                    "border-white/80": selectedColor === color,
-                  },
-                )}
-                style={{ background: color }}
-                onClick={() => setColor(color)}
-              ></button>
-            ))
-          : null}
+        {extracted_sub_colors.map((color, index) => (
+          <ColorPalette
+            key={color}
+            size="large"
+            palette={{ color }}
+            selected={selectedColor === color}
+            onClick={() => setColor(color)}
+          />
+        ))}
       </div>
     </div>
   );
@@ -141,14 +141,14 @@ function SizeSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-4 lg:max-w-xl">
-      <div className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-1 sm:py-2">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
         {lipLinerSizes.map((size, index) => (
           <button
             key={size}
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-white/80",
+              "inline-flex shrink-0 items-center gap-x-2 rounded border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
               {
                 "border-white/80": selectedSize === size,
               },
@@ -156,9 +156,9 @@ function SizeSelector() {
             onClick={() => setPattern(index, size)}
           >
             <img
-              src={`/lipliners/lipliner ${size.toLowerCase()}.png`}
+              src={`/media/unveels/vto/lipliners/lipliner ${size.toLowerCase()}.png`}
               alt={size}
-              className="size-12"
+              className="size-[35px] shrink-0 sm:size-[50px] lg:size-[65px]"
             />
           </button>
         ))}
@@ -168,7 +168,19 @@ function SizeSelector() {
 }
 
 function ProductList() {
-  const { colorFamily, selectedSize: selectedShade } = useLipLinerContext();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
+
+  const {
+    colorFamily,
+    setColorFamily,
+    selectedColor,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+    selectedSize: selectedShade,
+  } = useLipLinerContext();
 
   const { data, isLoading } = useLipLinerQuery({
     color: colorFamily,
@@ -176,15 +188,78 @@ function ProductList() {
     texture: null,
   });
 
+  const { setLiplinerColor, setLiplinerPattern, setShowLipliner } = useMakeup();
+
+  useEffect(() => {
+    setLiplinerColor(selectedColor || "#ffffff");
+    const pattern = lipLinerSizes.findIndex((s) => s == selectedShade);
+    setLiplinerPattern(pattern != -1 ? pattern : 1);
+    setShowLipliner(selectedColor != null);
+  }, [selectedColor, selectedShade]);
+
+  if (colorFamilyToInclude == null && data?.items != null) {
+    setColorFamilyToInclude(
+      data.items.map(
+        (d) =>
+          d.custom_attributes.find((c) => c.attribute_code === "color")?.value,
+      ),
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+  };
+
   return (
-    <div className="flex w-full gap-4 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return <VTOProductCard key={product.id} product={product} />;
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Lipliners: {
+                attributeName: "lips_makeup_product_type",
+                values: getLipsMakeupProductTypeIds(["Lip Liners"]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Lipliners", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Lipliners");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

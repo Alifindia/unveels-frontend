@@ -1,5 +1,4 @@
 import { Player } from "@lottiefiles/react-lottie-player";
-import SarahAvatar from "../../assets/sarah-avatar.png";
 
 interface LoadingChatProps {
   showAvatar?: boolean;
@@ -12,7 +11,7 @@ const LoadingChat: React.FC<LoadingChatProps> = ({ showAvatar = true }) => {
         <img
           alt="Agent"
           className="mr-2 size-14 rounded-full"
-          src={SarahAvatar}
+          src={"media/unveels/avatar-images/sarah-avatar.png"}
         />
       )}
       <Player

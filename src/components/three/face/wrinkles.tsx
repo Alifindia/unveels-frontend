@@ -30,6 +30,7 @@ const WrinklesInner: React.FC<WrinklesProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={wrinklesMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={true}
     />
   );
 };

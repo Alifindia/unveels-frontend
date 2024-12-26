@@ -3,15 +3,12 @@ import { useCamera } from "../../context/recorder-context";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { Canvas } from "@react-three/fiber";
 import { Landmark } from "../../types/landmark";
-import { BboxLandmark } from "../../types/bboxLandmark";
 import SkinAnalysisThreeScene from "./skin-analysis-three-scene";
 import OverlayCanvas from "./overlay-canvas";
 import { useSkinAnalysis } from "../../context/skin-analysis-context";
-import { sRGBEncoding } from "@react-three/drei/helpers/deprecated";
 import { SRGBColorSpace } from "three";
 import { FaceResults } from "../../types/faceResults";
 
-// Komponen utama SkinAnalysisScene yang menggabungkan Three.js Canvas dan OverlayCanvas
 interface SkinAnalysisSceneProps {
   data: FaceResults[];
 }
@@ -26,8 +23,10 @@ export function SkinAnalysisScene({ data }: SkinAnalysisSceneProps) {
     null,
   );
   const [isLandmarkerReady, setIsLandmarkerReady] = useState<boolean>(false);
-  const [landmarks, setLandmarks] = useState<Landmark[]>([]); // Tipe yang diperbarui
-  const landmarkRef = useRef<Landmark[]>([]); // Initialize landmarkRef with an empty array
+  const [landmarks, setLandmarks] = useState<Landmark[]>([]);
+  const landmarkRef = useRef<Landmark[]>([]);
+
+  const [isReady, setIsReady] = useState<boolean>(false);
 
   // Memuat gambar ketika capturedImage berubah
   useEffect(() => {
@@ -63,7 +62,6 @@ export function SkinAnalysisScene({ data }: SkinAnalysisSceneProps) {
                 "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
               delegate: "GPU", // Opsional: gunakan "GPU" jika didukung
             },
-            outputFaceBlendshapes: true,
             runningMode: "IMAGE",
             numFaces: 1,
           },
@@ -115,10 +113,11 @@ export function SkinAnalysisScene({ data }: SkinAnalysisSceneProps) {
     processImage();
   }, [imageLoaded, faceLandmarker, isLandmarkerReady]);
 
-  // Jika tidak ada gambar yang ditangkap atau gambar belum dimuat, render hanya canvas overlay
-  if (!criterias.capturedImage || !imageLoaded) {
-    return null;
-  }
+  useEffect(() => {
+    if (imageLoaded && landmarks.length > 0) {
+      setIsReady(true);
+    }
+  }, [imageLoaded, landmarks]);
 
   const handleLabelClick = (label: string | null) => {
     if (label != null) {
@@ -140,6 +139,10 @@ export function SkinAnalysisScene({ data }: SkinAnalysisSceneProps) {
       console.log(label);
     }
   };
+
+  if (!criterias.capturedImage || !imageLoaded) {
+    return null;
+  }
 
   return (
     <div
@@ -166,8 +169,8 @@ export function SkinAnalysisScene({ data }: SkinAnalysisSceneProps) {
         className="absolute inset-0"
         style={{
           background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-          zIndex: 200, // Lebih rendah dari overlay canvas
-          pointerEvents: "none", // Agar tidak menghalangi klik
+          zIndex: 200,
+          pointerEvents: "none",
         }}
       ></div>
 
@@ -175,7 +178,7 @@ export function SkinAnalysisScene({ data }: SkinAnalysisSceneProps) {
       <canvas
         ref={overlayCanvasRef}
         className="absolute left-0 top-0 h-full w-full"
-        style={{ zIndex: 100 }} // Lebih tinggi dari gradient overlay
+        style={{ zIndex: 100 }}
       />
       {/* Komponen untuk menggambar gambar di overlay canvas */}
       <OverlayCanvas

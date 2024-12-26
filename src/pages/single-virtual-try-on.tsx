@@ -1,190 +1,337 @@
-import clsx from "clsx";
 import {
   ChevronDown,
   ChevronLeft,
-  ChevronUp,
   CirclePlay,
   Heart,
+  HeartIcon,
   PauseCircle,
   Plus,
+  PlusIcon,
   StopCircle,
   X,
 } from "lucide-react";
-import { cloneElement, CSSProperties, Fragment, useState } from "react";
+import { CSSProperties, useState } from "react";
 import { Icons } from "../components/icons";
 
-import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
+import { Link, useNavigate } from "react-router-dom";
 
-import { Footer } from "../components/footer";
-import { VideoScene } from "../components/recorder/recorder";
-import { CameraProvider, useCamera } from "../context/recorder-context";
-import { ShareModal } from "../components/share-modal";
-import { SkinColorProvider } from "../components/skin-tone-finder-scene/skin-color-context";
-import { usePage } from "../hooks/usePage";
-import { useRecordingControls } from "../hooks/useRecorder";
-import { EyesMode } from "./vto/eyes/eyes-makeup";
-import { FaceMode } from "./vto/face/face-makeup";
-import { HairMode } from "./vto/hair/hair-makeup";
-import { HandAccessoriesMode } from "./vto/hand-accessories/hand-accessories";
-import { HeadAccessoriesMode } from "./vto/head-accesories/head-accessories";
-import { LipsMode } from "./vto/lips/lips-makeup";
-import { NailsMode } from "./vto/nails/nails-makeup";
-import { NeckAccessoriesMode } from "./vto/neck-accessories/neck-accessories";
-import { VirtualTryOnScene } from "../components/vto/virtual-try-on-scene";
-import { MakeupProvider } from "../context/makeup-context";
-import { useSingleProductQuery } from "../api/get-product";
-import { getProductAttributes } from "../utils/apiUtils";
+import clsx from "clsx";
 import {
-  faceMakeupProductTypesMap,
-  lipsMakeupProductTypesMap,
+  handAccessoriesProductTypeFilter,
+  headAccessoriesProductTypeFilter,
+  neckAccessoriesProductTypeFilter,
+} from "../api/attributes/accessories";
+import {
+  faceMakeupProductTypesFilter,
+  getEyeMakeupProductTypeIds,
+  getFaceMakeupProductTypeIds,
+  getLashMakeupProductTypeIds,
+  lipsMakeupProductTypesFilter,
 } from "../api/attributes/makeups";
+import { useMultipleProductsQuery } from "../api/get-product";
+import { Product } from "../api/shared";
+import { Footer } from "../components/footer";
+import { SkinColorProvider } from "../components/skin-tone-finder-scene/skin-color-context";
+import { VirtualTryOnScene } from "../components/vto/virtual-try-on-scene";
+import { AccesoriesProvider } from "../context/accesories-context";
+import { MakeupProvider } from "../context/makeup-context";
+import { CameraProvider, useCamera } from "../context/recorder-context";
+import { useVirtualTryOnProduct } from "../context/virtual-try-on-product-context";
+import { useRecordingControls } from "../hooks/useRecorder";
+import { getProductAttributes, mediaUrl } from "../utils/apiUtils";
+import { VirtualTryOnProvider } from "./virtual-try-on";
+import { SingleEyeLinerSelector } from "./vto/eyes/eye-liners/eye-liner-single";
+import { SingleEyeShadowSelector } from "./vto/eyes/eye-shadow/eye-shadow-single";
+import { SingleEyebrowsSelector } from "./vto/eyes/eyebrows/eyebrows-single";
+import { SingleLashesSelector } from "./vto/eyes/lashes/lashes-single";
+import { SingleLenseSelector } from "./vto/eyes/lenses/lense-single";
+import { SingleMascaraSelector } from "./vto/eyes/mascara/mascara-single";
+import { SingleBlushSelector } from "./vto/face/blush/blush-single";
+import { SingleBronzerSelector } from "./vto/face/bronzer/bronzer-single";
+import { SingleConcealerSelector } from "./vto/face/concealer/concealer-single";
+import { SingleContourSelector } from "./vto/face/contour/contour-single";
+import { SingleFoundationSelector } from "./vto/face/foundation/foundation-single";
+import { SingleHighlighterSelector } from "./vto/face/highlighter/highlighter-single";
+import { SingleHairColorSelector } from "./vto/hair/hair-color/hair-color-single";
+import { SingleHandwearSelector } from "./vto/hand-accessories/handwear/handwear-single";
+import { SingleWatchesSelector } from "./vto/hand-accessories/watches/watches-single";
+import { SingleEarringsSelector } from "./vto/head-accesories/earrings/earrings-single";
+import { SingleGlassesSelector } from "./vto/head-accesories/glasses/glasses-single";
+import { SingleHatsSelector } from "./vto/head-accesories/hats/hats-single";
+import { SingleHeadbandSelector } from "./vto/head-accesories/headband/headband-single";
+import { SingleTiaraSelector } from "./vto/head-accesories/tiaras/tiaras-single";
+import { SingleLipColorSelector } from "./vto/lips/lip-color/lip-color-single";
+import { SingleLipLinerSelector } from "./vto/lips/lip-liner/lip-liner-single";
+import { SingleLipPlumperSelector } from "./vto/lips/lip-plumper/lip-plumper-single";
+import { SingleNailPolishSelector } from "./vto/nails/nail-polish/nail-polish-single";
+import { SinglePressOnNailsSelector } from "./vto/nails/press-on-nails/press-on-nails-single";
+import { SingleNeckwearSelector } from "./vto/neck-accessories/neckwear/neckwear-single";
+import { SingleScarvesSelector } from "./vto/neck-accessories/scarves/scarves-single";
+import { BrandName } from "../components/product/brand";
+
+export const productTypeCheckers = {
+  isLipColorProduct: (data: Product) => {
+    const lipColorsTypes = [
+      "Lipsticks",
+      "Lip Stains",
+      "Lip Tints",
+      "Lip Glosses",
+    ];
+    return lipsMakeupProductTypesFilter(lipColorsTypes)
+      .split(",")
+      .includes(getProductAttributes(data, "lips_makeup_product_type"));
+  },
+  isLipLinerProduct: (data: Product) => {
+    return getFaceMakeupProductTypeIds(["Lip Liners"]).includes(
+      getProductAttributes(data, "face_makeup_product_type"),
+    );
+  },
+  isContourProduct: (data: Product) => {
+    return getFaceMakeupProductTypeIds(["Contour"]).includes(
+      getProductAttributes(data, "face_makeup_product_type"),
+    );
+  },
+  isHighlighterProduct: (data: Product) => {
+    return getFaceMakeupProductTypeIds(["Highlighter"]).includes(
+      getProductAttributes(data, "face_makeup_product_type"),
+    );
+  },
+  isNailPolishProduct: (data: Product) => {
+    return getProductAttributes(data, "product_types").includes("Nail Polish");
+  },
+  isPressOnNailsProduct: (data: Product) => {
+    return getProductAttributes(data, "product_types").includes(
+      "Press-On Nails",
+    );
+  },
+  isEarringsProduct: (data: Product) => {
+    return headAccessoriesProductTypeFilter(["Earrings"]).includes(
+      getProductAttributes(data, "head_accessories_product_type"),
+    );
+  },
+  isScarvesProduct: (data: Product) => {
+    return neckAccessoriesProductTypeFilter(["Scarves"]).includes(
+      getProductAttributes(data, "neck_accessories_product_type"),
+    );
+  },
+  isGlassesProduct: (data: Product) => {
+    return headAccessoriesProductTypeFilter(["Glasses"]).includes(
+      getProductAttributes(data, "head_accessories_product_type"),
+    );
+  },
+  isTiarasProduct: (data: Product) => {
+    return headAccessoriesProductTypeFilter(["Tiaras"]).includes(
+      getProductAttributes(data, "head_accessories_product_type"),
+    );
+  },
+  isHatsProduct: (data: Product) => {
+    return headAccessoriesProductTypeFilter(["Hats"]).includes(
+      getProductAttributes(data, "head_accessories_product_type"),
+    );
+  },
+  isHeadbandProduct: (data: Product) => {
+    return headAccessoriesProductTypeFilter(["Head Bands"]).includes(
+      getProductAttributes(data, "head_accessories_product_type"),
+    );
+  },
+  isWatchesProduct: (data: Product) => {
+    return handAccessoriesProductTypeFilter(["Watches"]).includes(
+      getProductAttributes(data, "hand_accessories_product_type"),
+    );
+  },
+  isNeckwearProduct: (data: Product) => {
+    return neckAccessoriesProductTypeFilter([
+      "Chokers",
+      "Necklaces",
+      "Pendants",
+    ]).includes(getProductAttributes(data, "neck_accessories_product_type"));
+  },
+  isLashesProduct: (data: Product) => {
+    return getLashMakeupProductTypeIds([
+      "Lash Curlers",
+      "Individual False Lashes",
+      "Full Line Lashes",
+    ]).includes(getProductAttributes(data, "lash_makeup_product_type"));
+  },
+  isMascaraProduct: (data: Product) => {
+    return getLashMakeupProductTypeIds(["Mascaras"]).includes(
+      getProductAttributes(data, "lash_makeup_product_type"),
+    );
+  },
+  isEyeLinerProduct: (data: Product) => {
+    return getEyeMakeupProductTypeIds(["Eyeliners"]).includes(
+      getProductAttributes(data, "eye_makeup_product_type"),
+    );
+  },
+  isEyeShadowProduct: (data: Product) => {
+    return getEyeMakeupProductTypeIds(["Eyeshadows"]).includes(
+      getProductAttributes(data, "eye_makeup_product_type"),
+    );
+  },
+  isEyebrowsProduct: (data: Product) => {
+    return getProductAttributes(data, "brow_makeup_product_type");
+  },
+  isFoundationProduct: (data: Product) => {
+    return faceMakeupProductTypesFilter(["Foundations"]).includes(
+      getProductAttributes(data, "face_makeup_product_type"),
+    );
+  },
+  isBlushProduct: (data: Product) => {
+    return faceMakeupProductTypesFilter(["Blushes"]).includes(
+      getProductAttributes(data, "face_makeup_product_type"),
+    );
+  },
+  isBronzerProduct: (data: Product) => {
+    return faceMakeupProductTypesFilter(["Bronzers"]).includes(
+      getProductAttributes(data, "face_makeup_product_type"),
+    );
+  },
+  isLipPlumperProduct: (data: Product) => {
+    return lipsMakeupProductTypesFilter([
+      "Lip Plumpers",
+      "Lip Glosses",
+    ]).includes(getProductAttributes(data, "lips_makeup_product_type"));
+  },
+  isConcealerProduct: (data: Product) => {
+    return getEyeMakeupProductTypeIds(["Concealers"]).includes(
+      getProductAttributes(data, "face_makeup_product_type"),
+    );
+  },
+  isLenseProduct: (data: Product) => {
+    return getProductAttributes(data, "lenses_product_type");
+  },
+  isHairColorProduct: (data: Product) => {
+    return getProductAttributes(data, "hair_color_product_type");
+  },
+  isHandwearProduct: (data: Product) => {
+    return handAccessoriesProductTypeFilter([
+      "Rings",
+      "Bracelets",
+      "Bangles",
+    ]).includes(getProductAttributes(data, "hand_accessories_product_type"));
+  },
+};
 
 export function SingleVirtualTryOn() {
-  const params = useParams<{
-    sku: string;
-  }>();
+  const [selectedSKU, setSelectedSKU] = useState<Product | null>(null);
+  const { skus } = useVirtualTryOnProduct();
 
-  console.log({ params });
-
-  if (!params.sku) {
-    return null;
-  }
-
-  const { data } = useSingleProductQuery({
-    sku: params.sku,
+  const { data, isLoading } = useMultipleProductsQuery({
+    skus: skus,
   });
 
-  if (!data) {
-    return null;
-  }
-
-  const lipColorsTypes = [
-    "Lipsticks",
-    "Lip Stains",
-    "Lip Tints",
-    "Lip Glosses",
-  ];
-
-  if (
-    lipColorsTypes
-      .map((type) => lipsMakeupProductTypesMap[type])
-      .includes(getProductAttributes(data, "lips_makeup_product_type"))
-  ) {
-    const hexacodes = getProductAttributes(data, "hexacode");
-    if (!hexacodes) {
-      throw new Error(
-        `No hexacodes found on product attributes with sku ${params.sku}`,
-      );
-    }
-    const colors = hexacodes.split(",");
-
-    console.log({
-      colors,
-    });
-
+  if (isLoading) {
     return (
-      <CameraProvider>
-        <SkinColorProvider>
-          <MakeupProvider
-            initialValues={{
-              showLipColor: true,
-              lipColors: colors,
-              lipColorMode: "Dual",
-            }}
-          >
-            <div className="h-full min-h-dvh">
-              <Main />
-            </div>
-          </MakeupProvider>
-        </SkinColorProvider>
-      </CameraProvider>
+      <div className="absolute inset-0">
+        <div className="flex h-full items-center justify-center">
+          Loading...
+        </div>
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
+          }}
+        ></div>
+      </div>
     );
   }
 
-  const contourTypes = ["Contouring"];
-
-  if (
-    contourTypes
-      .map((type) => faceMakeupProductTypesMap[type])
-      .includes(getProductAttributes(data, "face_makeup_product_type"))
-  ) {
-    const hexacodes = getProductAttributes(data, "hexacode");
-    if (!hexacodes) {
-      throw new Error(
-        `No hexacodes found on product attributes with sku ${params.sku}`,
-      );
-    }
-
-    const contourColors = hexacodes.split(",");
-
+  if (!data?.length) {
     return (
-      <CameraProvider>
-        <SkinColorProvider>
-          <MakeupProvider
-            initialValues={{
-              showContour: true,
-              contourColors,
-            }}
-          >
-            <div className="h-full min-h-dvh">
-              <Main />
-            </div>
-          </MakeupProvider>
-        </SkinColorProvider>
-      </CameraProvider>
+      <div className="absolute inset-0">
+        <div className="flex h-full items-center justify-center">
+          No products found
+        </div>
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
+          }}
+        ></div>
+      </div>
     );
   }
 
-  const highlighterTypes = ["Highlighters"];
+  return (
+    <VTOProviders>
+      <SKUSelector
+        skus={data}
+        selected={selectedSKU?.sku || null}
+        onSelect={(selected) => {
+          const product = data.find((d) => d.sku === selected);
 
-  if (
-    highlighterTypes
-      .map((type) => faceMakeupProductTypesMap[type])
-      .includes(getProductAttributes(data, "face_makeup_product_type"))
-  ) {
-    const hexacodes = getProductAttributes(data, "hexacode");
-    if (!hexacodes) {
-      throw new Error(
-        `No hexacodes found on product attributes with sku ${params.sku}`,
-      );
-    }
+          if (!product) {
+            return;
+          }
+          setSelectedSKU(product);
+        }}
+      />
+      <Main product={selectedSKU ?? data[0]} />
+    </VTOProviders>
+  );
+}
 
-    const highlighterColors = hexacodes.split(",");
-
-    return (
-      <CameraProvider>
-        <SkinColorProvider>
-          <MakeupProvider
-            initialValues={{
-              showHighlighter: true,
-            }}
-          >
-            <div className="h-full min-h-dvh">
-              <Main />
-            </div>
-          </MakeupProvider>
-        </SkinColorProvider>
-      </CameraProvider>
-    );
-  }
-
-  return null;
-
+function VTOProviders({ children }: { children: React.ReactNode }) {
   return (
     <CameraProvider>
       <SkinColorProvider>
         <MakeupProvider>
-          <div className="h-full min-h-dvh">
-            <Main />
-          </div>
+          <AccesoriesProvider>
+            <VirtualTryOnProvider>
+              <div className="h-full min-h-dvh">{children}</div>
+            </VirtualTryOnProvider>
+          </AccesoriesProvider>
         </MakeupProvider>
       </SkinColorProvider>
     </CameraProvider>
   );
 }
 
-function Main() {
+export function SKUSelector({
+  skus,
+  selected,
+  onSelect,
+}: {
+  skus: Product[];
+  selected: string | null;
+  onSelect: (selectedSKUs: string) => void;
+}) {
+  return (
+    <div className="pointer-events-none fixed inset-y-0 left-0 z-10 flex flex-col items-center justify-center [&_button]:pointer-events-auto">
+      <div className="flex max-h-64 flex-col items-center justify-center gap-4 overflow-y-auto rounded-lg bg-black/25 p-4 backdrop-blur-3xl">
+        <div className="flex flex-col items-center justify-center gap-4">
+          {skus.map((sku) => {
+            const imageUrl = mediaUrl(sku.media_gallery_entries[0].file);
+            return (
+              <button
+                key={sku.sku}
+                type="button"
+                onClick={() => {
+                  onSelect(sku.sku);
+                }}
+                className={clsx(
+                  "flex flex-col items-center justify-center gap-2 border-2 border-transparent p-1 transition-all",
+                  {
+                    "scale-125": sku.sku === selected,
+                  },
+                )}
+              >
+                <img
+                  src={imageUrl}
+                  alt={sku.name}
+                  className="size-16 rounded-lg object-cover"
+                />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Main({ product }: { product: Product }) {
   return (
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
       <div className="absolute inset-0">
@@ -199,50 +346,156 @@ function Main() {
       <RecorderStatus />
       <TopNavigation />
 
+      <div className="absolute inset-x-0 top-24 space-y-2.5 px-5">
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="flex size-[1.875rem] items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl"
+          >
+            <HeartIcon className="size-4 text-white" />
+          </button>
+          <div className="w-full pl-4">
+            <div className="font-semibold text-white">{product.name}</div>
+            <div className="text-white/60">
+              <BrandName brandId={getProductAttributes(product, "brand")} />
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="flex size-[1.875rem] items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl"
+          >
+            <PlusIcon className="size-4 text-white" />
+          </button>
+          <div className="w-full pl-4">
+            <div className="font-medium text-white">${product.price}</div>
+          </div>
+        </div>
+      </div>
+
       <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
         <Sidebar />
-        <MainContent />
+        <MainContent product={product} />
         <Footer />
       </div>
     </div>
   );
 }
 
-function MainContent() {
-  const [collapsed, setCollapsed] = useState(false);
-  const { criterias } = useCamera();
-  const [shareOpen, setShareOpen] = useState(false);
+function MainContent({ product }: { product: Product }) {
   const navigate = useNavigate();
 
-  if (criterias.isFinished) {
-    return shareOpen ? (
-      <ShareModal
-        onClose={() => {
-          setShareOpen(false);
-        }}
-      />
-    ) : (
-      <div className="flex space-x-5 px-5 pb-10 font-serif">
-        <button
-          type="button"
-          className="h-10 w-full rounded border border-[#CA9C43] text-white"
-        >
-          Exit
-        </button>
-        <button
-          type="button"
-          className="h-10 w-full rounded bg-gradient-to-r from-[#CA9C43] to-[#92702D] text-white"
-          onClick={() => setShareOpen(true)}
-        >
-          Share <Icons.share className="ml-4 inline-block size-6" />
-        </button>
-      </div>
-    );
+  if (productTypeCheckers.isLipColorProduct(product)) {
+    return <SingleLipColorSelector product={product} />;
   }
 
+  if (productTypeCheckers.isLipLinerProduct(product)) {
+    return <SingleLipLinerSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isContourProduct(product)) {
+    return <SingleContourSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isHighlighterProduct(product)) {
+    return <SingleHighlighterSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isNailPolishProduct(product)) {
+    return <SingleNailPolishSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isPressOnNailsProduct(product)) {
+    return <SinglePressOnNailsSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isEarringsProduct(product)) {
+    return <SingleEarringsSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isScarvesProduct(product)) {
+    return <SingleScarvesSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isGlassesProduct(product)) {
+    return <SingleGlassesSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isTiarasProduct(product)) {
+    return <SingleTiaraSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isHatsProduct(product)) {
+    return <SingleHatsSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isHeadbandProduct(product)) {
+    return <SingleHeadbandSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isWatchesProduct(product)) {
+    return <SingleWatchesSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isNeckwearProduct(product)) {
+    return <SingleNeckwearSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isLashesProduct(product)) {
+    return <SingleLashesSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isMascaraProduct(product)) {
+    return <SingleMascaraSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isEyeLinerProduct(product)) {
+    return <SingleEyeLinerSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isEyeShadowProduct(product)) {
+    return <SingleEyeShadowSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isEyebrowsProduct(product)) {
+    return <SingleEyebrowsSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isFoundationProduct(product)) {
+    return <SingleFoundationSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isBlushProduct(product)) {
+    return <SingleBlushSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isBronzerProduct(product)) {
+    return <SingleBronzerSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isLipPlumperProduct(product)) {
+    return <SingleLipPlumperSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isConcealerProduct(product)) {
+    return <SingleConcealerSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isLenseProduct(product)) {
+    return <SingleLenseSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isHairColorProduct(product)) {
+    return <SingleHairColorSelector product={product} />;
+  }
+
+  if (productTypeCheckers.isHandwearProduct(product)) {
+    return <SingleHandwearSelector product={product} />;
+  }
   return (
     <>
-      {collapsed ? null : <BottomContent />}
+      <div>No product found</div>
       <div className="flex justify-center">
         <button
           type="button"
@@ -255,240 +508,6 @@ function MainContent() {
       </div>
     </>
   );
-}
-
-export function TryOnSelector() {
-  const [tab, setTab] = useState(null as "makeup" | "accessories" | null);
-
-  const activeClassNames =
-    "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text text-transparent";
-
-  return (
-    <div className="mx-auto w-full space-y-2 px-4 lg:max-w-xl">
-      <div className="flex h-10 w-full items-center justify-between border-b border-gray-600 text-center">
-        {["makeup", "accessories"].map((shadeTab) => {
-          const isActive = tab === shadeTab;
-          return (
-            <Fragment key={shadeTab}>
-              <button
-                key={shadeTab}
-                className={`relative h-10 grow border-b text-lg ${
-                  isActive
-                    ? activeClassNames
-                    : "border-transparent text-gray-500"
-                }`}
-                onClick={() => setTab(shadeTab as "makeup" | "accessories")}
-              >
-                <span className={isActive ? "text-white/70 blur-sm" : ""}>
-                  {shadeTab.charAt(0).toUpperCase() + shadeTab.slice(1)}
-                </span>
-                {isActive ? (
-                  <>
-                    <div
-                      className={clsx(
-                        "absolute inset-0 flex items-center justify-center text-lg blur-sm",
-                        activeClassNames,
-                      )}
-                    >
-                      <span className="text-center text-lg">
-                        {shadeTab.charAt(0).toUpperCase() + shadeTab.slice(1)}{" "}
-                      </span>
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-center text-lg text-white/70">
-                        {shadeTab.charAt(0).toUpperCase() + shadeTab.slice(1)}{" "}
-                      </span>
-                    </div>
-                  </>
-                ) : null}
-              </button>
-              {shadeTab === "matched" && (
-                <div className="h-10 px-px py-2">
-                  <div className="h-full border-r border-white"></div>
-                </div>
-              )}
-            </Fragment>
-          );
-        })}
-      </div>
-
-      {tab === "makeup" ? (
-        <Makeups />
-      ) : tab === "accessories" ? (
-        <Accessories />
-      ) : null}
-      <Outlet />
-    </div>
-  );
-}
-
-export function Makeups() {
-  const shadeOptions = [
-    {
-      name: "Lips",
-      icon: <Icons.makeupLips />,
-      items: ["Lip Color", "Lip Liner", "Lip Plumper"],
-    },
-    {
-      name: "Eyes",
-      icon: <Icons.makeupEyes />,
-    },
-    {
-      name: "Face",
-      icon: <Icons.makeupFace />,
-    },
-    {
-      name: "Nails",
-      icon: <Icons.makeupNails />,
-    },
-    {
-      name: "Hair",
-      icon: <Icons.makeupHair />,
-    },
-  ];
-
-  const [selectedMakeup, setSelectedMakeup] = useState<string | null>(null);
-
-  return (
-    <>
-      <div className="flex flex-col items-start">
-        <div className="flex w-full min-w-0 justify-between py-4 peer-has-[data-mode]:hidden">
-          {shadeOptions.map((option, index) => (
-            <button
-              key={index}
-              className="flex flex-col items-center space-y-2"
-              data-selected={selectedMakeup === option.name}
-              onClick={() => setSelectedMakeup(option.name)}
-            >
-              <div
-                className={clsx(
-                  "relative flex w-12 shrink-0 items-center justify-center rounded-3xl border border-transparent py-2 text-center text-xs text-white transition-all",
-                  {
-                    "bg-gradient-to-r from-[#CA9C43] via-[#916E2B] to-[#473209]":
-                      selectedMakeup === option.name,
-                  },
-                )}
-              >
-                {cloneElement(option.icon, {
-                  className: "text-white size-6",
-                })}
-
-                <div
-                  className="absolute inset-0 rounded-3xl border-2 border-transparent p-1"
-                  style={
-                    {
-                      background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
-                      "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-                      mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-                      "-webkit-mask-composite": "destination-out",
-                      "mask-composite": "exclude",
-                    } as CSSProperties
-                  }
-                />
-              </div>
-              <div className="text-white">{option.name}</div>
-            </button>
-          ))}
-        </div>
-
-        {selectedMakeup === "Lips" ? (
-          <LipsMode />
-        ) : selectedMakeup === "Eyes" ? (
-          <EyesMode />
-        ) : selectedMakeup === "Face" ? (
-          <FaceMode />
-        ) : selectedMakeup === "Nails" ? (
-          <NailsMode />
-        ) : selectedMakeup === "Hair" ? (
-          <HairMode />
-        ) : null}
-      </div>
-    </>
-  );
-}
-
-export function Accessories() {
-  const shadeOptions = [
-    {
-      name: "Head Accessories",
-      icon: <Icons.accessoryHead />,
-    },
-    {
-      name: "Neck Accessories",
-      icon: <Icons.accessoryNeck />,
-    },
-    {
-      name: "Hand Accessories",
-      icon: <Icons.accessoryHand />,
-    },
-    {
-      name: "Nails",
-      icon: <Icons.makeupNails />,
-    },
-  ];
-
-  const [selectedAccessory, setSelectedAccessory] = useState<string | null>(
-    null,
-  );
-
-  return (
-    <>
-      <div className="flex flex-col items-start">
-        <div className="flex w-full min-w-0 justify-between py-4 peer-has-[data-mode]:hidden">
-          {shadeOptions.map((option, index) => (
-            <button
-              key={index}
-              className="flex flex-col items-center space-y-2"
-              data-selected={selectedAccessory === option.name}
-              onClick={() => setSelectedAccessory(option.name)}
-            >
-              <div
-                className={clsx(
-                  "relative flex w-12 shrink-0 items-center justify-center rounded-3xl border border-transparent py-2 text-center text-xs text-white transition-all",
-                  {
-                    "bg-gradient-to-r from-[#CA9C43] via-[#916E2B] to-[#473209]":
-                      selectedAccessory === option.name,
-                  },
-                )}
-              >
-                {cloneElement(option.icon, {
-                  className: "text-white size-6",
-                })}
-
-                <div
-                  className="absolute inset-0 rounded-3xl border-2 border-transparent p-1"
-                  style={
-                    {
-                      background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
-                      "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-                      mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-                      "-webkit-mask-composite": "destination-out",
-                      "mask-composite": "exclude",
-                    } as CSSProperties
-                  }
-                />
-              </div>
-              <div className="text-white">{option.name}</div>
-            </button>
-          ))}
-        </div>
-
-        {selectedAccessory === "Head Accessories" ? (
-          <HeadAccessoriesMode />
-        ) : selectedAccessory === "Neck Accessories" ? (
-          <NeckAccessoriesMode />
-        ) : selectedAccessory === "Hand Accessories" ? (
-          <HandAccessoriesMode />
-        ) : selectedAccessory === "Nails" ? (
-          <NailsMode />
-        ) : null}
-      </div>
-    </>
-  );
-}
-
-function BottomContent() {
-  return <Outlet />;
 }
 
 function RecorderStatus() {
@@ -543,7 +562,6 @@ export function TopNavigation({
   item?: boolean;
   cart?: boolean;
 }) {
-  const { setPage } = usePage();
   const { flipCamera } = useCamera();
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
@@ -593,7 +611,7 @@ export function TopNavigation({
                 background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
                 "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
                 mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-                "-webkit-mask-composite": "destination-out",
+                WebkitMaskComposite: "destination-out",
                 "mask-composite": "exclude",
               } as CSSProperties
             }
@@ -628,7 +646,7 @@ function Sidebar() {
               background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
               "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
               mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-              "-webkit-mask-composite": "destination-out",
+              WebkitMaskComposite: "destination-out",
               "mask-composite": "exclude",
             } as CSSProperties
           }

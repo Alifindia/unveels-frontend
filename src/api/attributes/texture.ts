@@ -25,9 +25,16 @@ export const textures = [
   },
 ];
 
-export function filterTextures(selectedTextures: String[]) {
+export function filterTextures(selectedTextures: string[]) {
   const filteredTextures = textures.filter((texture) =>
     selectedTextures.includes(texture.label),
+  );
+  return filteredTextures;
+}
+
+export function filterTexturesByValue(selectedTextures: string[]) {
+  const filteredTextures = textures.filter((texture) =>
+    selectedTextures.includes(texture.value),
   );
   return filteredTextures;
 }

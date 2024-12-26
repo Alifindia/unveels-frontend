@@ -9,7 +9,6 @@ import React, {
 } from "react";
 import { useReactMediaRecorder } from "react-media-recorder";
 import Webcam from "react-webcam";
-import { RecordRTCPromisesHandler } from "recordrtc";
 
 interface BoundingBox {
   x: number;
@@ -17,6 +16,8 @@ interface BoundingBox {
   width: number;
   height: number;
 }
+
+type RunningMode = "LIVE_CAMERA" | "IMAGE" | "VIDEO";
 
 interface CameraState {
   facePosition: boolean;
@@ -29,7 +30,8 @@ interface CameraState {
   capturedImageCut: string | null;
   isCompare: boolean;
   lastBoundingBox: BoundingBox | null;
-  faceDetected: boolean;
+  runningMode: RunningMode;
+  screenshotImage: string | null;
 }
 
 interface SkinToneThreeSceneRef {
@@ -39,6 +41,8 @@ interface SkinToneThreeSceneRef {
 interface CameraContextType {
   skinToneThreeSceneRef: MutableRefObject<SkinToneThreeSceneRef | null>;
   webcamRef: MutableRefObject<Webcam | null>;
+  imageRef: MutableRefObject<HTMLImageElement | null>;
+  videoRef: MutableRefObject<HTMLVideoElement | null>;
   criterias: CameraState;
   setCriterias: (newState: Partial<CameraState>) => void;
   flipCamera: () => void;
@@ -55,8 +59,11 @@ interface CameraContextType {
   stopRecording: () => void;
   downloadVideo: () => void;
   exit: () => void;
+  setScreenshotImage: (image: string) => void;
   status: string;
   mediaBlobUrl: string | undefined;
+  runningMode: RunningMode;
+  setRunningMode: (mode: RunningMode) => void;
 }
 
 const CameraContext = createContext<CameraContextType | undefined>(undefined);
@@ -64,9 +71,12 @@ const CameraContext = createContext<CameraContextType | undefined>(undefined);
 export const CameraProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const skinToneThreeSceneRef = useRef<{ callFunction: () => void }>(null);
+  const skinToneThreeSceneRef = useRef<SkinToneThreeSceneRef | null>(null);
   const webcamRef = useRef<Webcam>(null);
-  const recorderRef = useRef<RecordRTCPromisesHandler | null>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   const {
     status,
@@ -76,7 +86,7 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
     resumeRecording,
     mediaBlobUrl,
   } = useReactMediaRecorder({
-    screen: true,
+    screen: !isMobile,
   });
 
   const [state, setState] = useState<CameraState>({
@@ -90,7 +100,8 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
     capturedImageCut: null,
     isCompare: false,
     lastBoundingBox: null,
-    faceDetected: false,
+    runningMode: "LIVE_CAMERA",
+    screenshotImage: null, // Add screenshotImage to state
   });
 
   function setCriterias(newState: Partial<CameraState>) {
@@ -161,10 +172,28 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   function exit() {
-    if (recorderRef.current) {
-      recorderRef.current = null;
-    }
-    setState((prevState) => ({ ...prevState, isFinished: false }));
+    // Reset to default mode on exit
+    setRunningMode("LIVE_CAMERA");
+    setState((prevState) => ({
+      ...prevState,
+      isFinished: false,
+      isCaptured: false,
+      capturedImage: null,
+      capturedImageCut: null,
+      lastBoundingBox: null,
+    }));
+  }
+
+  function setRunningMode(mode: RunningMode) {
+    setState((prevState) => ({ ...prevState, runningMode: mode }));
+  }
+
+  // Function to set screenshot image
+  function setScreenshotImage(image: string) {
+    setState((prevState) => ({
+      ...prevState,
+      screenshotImage: image,
+    }));
   }
 
   return (
@@ -172,6 +201,8 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         skinToneThreeSceneRef,
         webcamRef,
+        imageRef,
+        videoRef,
         criterias: state,
         setCriterias,
         flipCamera,
@@ -190,6 +221,9 @@ export const CameraProvider: React.FC<{ children: ReactNode }> = ({
         exit,
         status,
         mediaBlobUrl,
+        runningMode: state.runningMode,
+        setRunningMode,
+        setScreenshotImage, // Provide setScreenshotImage to context
       }}
     >
       {children}

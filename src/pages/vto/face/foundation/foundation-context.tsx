@@ -7,6 +7,8 @@ interface FoundationContextType {
   setSelectedColor: (color: string | null) => void;
   selectedTexture: string | null;
   setSelectedTexture: (texture: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
 }
 
 // Create the context
@@ -23,6 +25,7 @@ export function FoundationProvider({
   const [colorFamily, setColorFamily] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedTexture, setSelectedTexture] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
 
   return (
     <FoundationContext.Provider
@@ -33,6 +36,8 @@ export function FoundationProvider({
         setSelectedColor,
         selectedTexture,
         setSelectedTexture,
+        colorFamilyToInclude,
+        setColorFamilyToInclude,
       }}
     >
       {children}

@@ -10,11 +10,6 @@ import FaceMesh from "../face-mesh";
 import { Landmark } from "../../../types/landmark";
 import { useMakeup } from "../../../context/makeup-context";
 import {
-  BLUSH_TEXTURE_FIVE,
-  BLUSH_TEXTURE_FOUR,
-  BLUSH_TEXTURE_ONE,
-  BLUSH_TEXTURE_THREE,
-  BLUSH_TEXTURE_TWO,
   EYEBROW_TEXTURE_EIGHT,
   EYEBROW_TEXTURE_FIVE,
   EYEBROW_TEXTURE_FOUR,
@@ -28,9 +23,14 @@ import {
 interface EyebrowsProps extends MeshProps {
   landmarks: React.RefObject<Landmark[]>;
   planeSize: [number, number];
+  isFlipped: boolean;
 }
 
-const EyebrowsInner: React.FC<EyebrowsProps> = ({ landmarks, planeSize }) => {
+const EyebrowsInner: React.FC<EyebrowsProps> = ({
+  landmarks,
+  planeSize,
+  isFlipped,
+}) => {
   const { eyebrowsVisibility, eyebrowsPattern, eyebrowsColor } = useMakeup();
 
   // Memuat semua tekstur sekaligus
@@ -71,6 +71,7 @@ const EyebrowsInner: React.FC<EyebrowsProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={eyebrowsMaterial}
       planeSize={planeSize}
+      flipHorizontal={isFlipped}
     />
   );
 };

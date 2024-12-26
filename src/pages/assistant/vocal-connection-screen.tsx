@@ -3,7 +3,6 @@ import { Icons } from "../../components/icons";
 import {
   BleedEffect,
   LoadingChat,
-  MessageItem,
   ModelScene,
   SuggestedGifts,
   TopNavigation,
@@ -22,6 +21,11 @@ import { ProductRequest } from "../../types/productRequest";
 import { Product } from "../../api/shared";
 import { fetchVirtualAssistantProduct } from "../../api/fetch-virtual-asistant-product";
 import { categories } from "../../api/virtual-assistant-attributes/category";
+import { BlendData } from "../../types/blendData";
+import {
+  talkingAvatarHost,
+  makeSpeech,
+} from "../../utils/virtualAssistantUtils";
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_BARD_API_KEY);
 
@@ -47,15 +51,24 @@ const VocalConnectionScreen = ({ onBack }: { onBack: () => void }) => {
   const [chats, setChats] = useState<Chat[]>([]);
 
   const [text, setText] = useState("");
+  const [language, setLanguage] = useState("");
 
   const [loading, setLoading] = useState(false);
   const audioPlayer = useRef<ReactAudioPlayer>(null);
-  const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
-    useSpeechRecognition();
+
+  const {
+    transcript,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+    interimTranscript,
+  } = useSpeechRecognition();
 
   const [fetchProducts, setFetchProducts] = useState(false);
+  const [fetchComplete, setFetchComplete] = useState(false);
   const [products, setProducts] = useState<ProductRequest[]>([]);
   const [productData, setProductData] = useState<Product[]>([]);
+
+  const [blendshape, setBlendshape] = useState<BlendData[]>([]);
 
   const getCurrentTimestamp = (): string => {
     const now = new Date();
@@ -64,20 +77,111 @@ const VocalConnectionScreen = ({ onBack }: { onBack: () => void }) => {
 
   useEffect(() => {
     setMsg(transcript);
+    console.log(interimTranscript);
   }, [transcript]);
 
   useEffect(() => {
-    if (fetchProducts && products.length > 0) {
-      setLoading(true);
-      fetchVirtualAssistantProduct(products, categories)
-        .then((fetchedProducts) => {
+    const fetchAndHandleProducts = async () => {
+      if (fetchProducts && products.length > 0) {
+        setLoading(true);
+
+        try {
+          const fetchedProducts = await fetchVirtualAssistantProduct(
+            products,
+            categories,
+          );
           setProductData(fetchedProducts);
           setFetchProducts(false);
+        } catch (error) {
+          console.error("Error fetching products:", error);
+        } finally {
           setLoading(false);
-        })
-        .finally(() => setLoading(false));
-    }
+          setFetchComplete(true);
+        }
+      }
+    };
+
+    fetchAndHandleProducts();
   }, [fetchProducts, products]);
+
+  useEffect(() => {
+    const speak = async () => {
+      console.log(productData);
+
+      if (productData.length < 1) {
+        const text =
+          language === "en-US"
+            ? "sorry, the product is out of stock"
+            : "عذرا المنتج غير متوفر";
+
+        // Tambahkan respons ke chats
+        setChats((prevChats) => [
+          ...prevChats,
+          {
+            id: Date.now() + 1,
+            text: text,
+            sender: "agent",
+            type: "chat",
+            mode: "text-connection",
+            timestamp: getCurrentTimestamp(),
+          },
+        ]);
+
+        try {
+          const audioSrc = await makeSpeech(
+            text,
+            language === "en-US" ? "en-US" : "ar-SA",
+          );
+
+          setTimeout(() => {
+            setAudioSource(`${talkingAvatarHost}${audioSrc.data.filename}`);
+            setBlendshape(audioSrc.data.blendData);
+            setSpeak(true);
+          }, 1000);
+        } catch (error) {
+          console.error("Error creating speech:", error);
+        }
+      } else {
+        const text =
+          language === "en-US"
+            ? "Here is the product you are looking for"
+            : "هذا هو المنتج الذي تبحث عنه";
+
+        // Tambahkan respons ke chats
+        setChats((prevChats) => [
+          ...prevChats,
+          {
+            id: Date.now() + 1,
+            text: text,
+            sender: "agent",
+            type: "chat",
+            mode: "text-connection",
+            timestamp: getCurrentTimestamp(),
+          },
+        ]);
+
+        try {
+          const audioSrc = await makeSpeech(
+            text,
+            language === "en-US" ? "en-US" : "ar-SA",
+          );
+
+          setTimeout(() => {
+            setAudioSource(`${talkingAvatarHost}${audioSrc.data.filename}`);
+            setBlendshape(audioSrc.data.blendData);
+            setSpeak(true);
+            setFetchComplete(false);
+          }, 1000);
+        } catch (error) {
+          console.error("Error creating speech:", error);
+        }
+      }
+    };
+
+    if (fetchComplete) {
+      speak();
+    }
+  }, [fetchComplete]);
 
   const getResponse = async (userMsg: string) => {
     if (!userMsg.trim()) {
@@ -101,39 +205,48 @@ const VocalConnectionScreen = ({ onBack }: { onBack: () => void }) => {
     console.log(prompt);
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash-002",
+      model: "gemini-1.5-pro-002",
+      generationConfig: { temperature: 1.3 },
       systemInstruction: botPrompt,
     });
     const result = await model.generateContent(prompt);
 
     try {
-      const responseText = await result.response.text(); // Pastikan await di sini jika perlu
+      const responseText = await result.response.text();
       const removeBackticks = responseText.replace(/```/g, "");
       const jsonLabel = removeBackticks.replace(/json/g, "");
       console.log(jsonLabel);
       const respond = JSON.parse(jsonLabel);
 
-      // Tambahkan respons ke chats
-      setChats((prevChats) => [
-        ...prevChats,
-        {
-          id: Date.now() + 1,
-          text: respond.chat,
-          sender: "agent",
-          type: "chat",
-          mode: "voice-connection",
-          timestamp,
-        },
-      ]);
-
       if (respond.isFinished) {
         setProducts(respond.product);
         setLoading(true);
         setFetchProducts(true);
-      }
+      } else {
+        // Tambahkan respons ke chats
+        setChats((prevChats) => [
+          ...prevChats,
+          {
+            id: Date.now() + 1,
+            text: respond.chat,
+            sender: "agent",
+            type: "chat",
+            mode: "voice-connection",
+            timestamp,
+          },
+        ]);
 
-      setText(respond.chat);
-      setSpeak(true);
+        setText(respond.chat);
+        setLanguage(respond.lang);
+
+        const audioSrc = await makeSpeech(respond.chat, respond.lang);
+
+        setTimeout(() => {
+          setAudioSource(`${talkingAvatarHost}${audioSrc.data.filename}`);
+          setBlendshape(audioSrc.data.blendData);
+          setSpeak(true);
+        }, 1000);
+      }
     } catch (error) {
       setText(await result.response.text());
       setSpeak(true);
@@ -162,8 +275,11 @@ const VocalConnectionScreen = ({ onBack }: { onBack: () => void }) => {
       return;
     }
     if (browserSupportsSpeechRecognition) {
-      resetTranscript(); // Clear previous transcript
-      SpeechRecognition.startListening({ continuous: true, language: "id-ID" });
+      resetTranscript();
+      SpeechRecognition.startListening({
+        continuous: true,
+        interimResults: true,
+      });
     } else {
       console.error("Voice recognition not supported in this browser.");
     }
@@ -176,7 +292,7 @@ const VocalConnectionScreen = ({ onBack }: { onBack: () => void }) => {
     }
     SpeechRecognition.stopListening();
     if (msg.trim()) {
-      addChatMessage(msg); // Add the transcript to chats when recording stops
+      addChatMessage(msg);
     } else {
       console.error("Message cannot be empty.");
     }
@@ -204,23 +320,25 @@ const VocalConnectionScreen = ({ onBack }: { onBack: () => void }) => {
     setMsg("");
   };
 
+  const stopAudio = () => {
+    if (audioPlayer.current) {
+      audioPlayer.current.audioEl.current?.pause();
+      setPlaying(false);
+      setAudioSource(null);
+    }
+  };
+
   return (
     <div className="relative mx-auto flex h-full min-h-dvh w-full flex-col bg-[linear-gradient(180deg,#000000_0%,#0F0B02_41.61%,#47330A_100%)]">
       <div className="pointer-events-none absolute inset-0 flex justify-center overflow-hidden">
-        <ModelScene
-          speak={speak}
-          text={text}
-          playing={playing}
-          setAudioSource={setAudioSource}
-          setSpeak={setSpeak}
-        />
+        <ModelScene speak={speak} playing={playing} blendshape={blendshape} />
       </div>
       <div className="absolute inset-x-0 bottom-0 flex h-1/3 flex-col bg-gradient-to-b from-[#1B1404] to-[#2C1F06]">
         <div className="flex-1 p-4 text-xl text-white">
           {productData.length > 0 && <SuggestedGifts product={productData} />}
           {loading ? <LoadingChat showAvatar={false} /> : msg}
         </div>
-        <div className="relative overflow-hidden rounded-t-3xl bg-black/25 shadow-[inset_0px_1px_0px_0px_#FFFFFF40] backdrop-blur-3xl">
+        <div className="shadow-[inset_0px_1px_ 0px_0px_#FFFFFF40] relative overflow-hidden rounded-t-3xl bg-black/25 backdrop-blur-3xl">
           <div className="pointer-events-none absolute inset-x-0 -top-[116px] flex justify-center">
             <BleedEffect className="h-48" />
           </div>
@@ -258,6 +376,7 @@ const VocalConnectionScreen = ({ onBack }: { onBack: () => void }) => {
                 <button
                   type="button"
                   className="rounded-full border border-white/10 bg-[#171717] p-3"
+                  onClick={stopAudio}
                 >
                   <X className="size-6 text-white" />
                 </button>
@@ -271,8 +390,8 @@ const VocalConnectionScreen = ({ onBack }: { onBack: () => void }) => {
         ref={audioPlayer}
         onEnded={playerEnded}
         onCanPlayThrough={playerReady}
+        autoPlay
       />
-
       <TopNavigation onBack={onBack} />
     </div>
   );

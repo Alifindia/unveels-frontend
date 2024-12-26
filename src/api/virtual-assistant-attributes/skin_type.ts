@@ -1,9 +1,5 @@
 export const skin_types = [
   {
-    label: " ",
-    value: "",
-  },
-  {
     label: "Dry Skin",
     value: "6471",
   },

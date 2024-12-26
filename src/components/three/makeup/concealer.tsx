@@ -9,9 +9,14 @@ import { CONCEALER_TEXTURE } from "../../../utils/constants";
 interface ConcealerProps extends MeshProps {
   landmarks: React.RefObject<Landmark[]>;
   planeSize: [number, number];
+  isFlipped: boolean;
 }
 
-const ConcealerInner: React.FC<ConcealerProps> = ({ landmarks, planeSize }) => {
+const ConcealerInner: React.FC<ConcealerProps> = ({
+  landmarks,
+  planeSize,
+  isFlipped,
+}) => {
   const { concealerColor } = useMakeup();
 
   const concealerTexture = useLoader(TextureLoader, CONCEALER_TEXTURE);
@@ -21,7 +26,7 @@ const ConcealerInner: React.FC<ConcealerProps> = ({ landmarks, planeSize }) => {
       new MeshBasicMaterial({
         color: concealerColor,
         transparent: true,
-        opacity: 0.15,
+        opacity: 0.36,
         alphaMap: concealerTexture,
         alphaTest: 0,
       }),
@@ -33,6 +38,7 @@ const ConcealerInner: React.FC<ConcealerProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={concealerMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={isFlipped}
     />
   );
 };

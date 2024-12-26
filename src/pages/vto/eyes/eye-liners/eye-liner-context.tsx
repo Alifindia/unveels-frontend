@@ -5,6 +5,8 @@ interface EyeLinerContextType {
   setColorFamily: (color: string | null) => void;
   selectedColor: string | null;
   setSelectedColor: (color: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
   selectedShape: string | null;
   setSelectedShape: (shape: string | null) => void;
 }
@@ -19,6 +21,9 @@ export function EyeLinerProvider({ children }: { children: React.ReactNode }) {
   const [colorFamily, setColorFamily] = useState<string | null>(null);
   const [selectedColor, setColor] = useState<string | null>(null);
   const [selectedShape, setSelectedShape] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<
+    string[] | null
+  >(null);
 
   return (
     <EyeLinerContext.Provider
@@ -29,6 +34,8 @@ export function EyeLinerProvider({ children }: { children: React.ReactNode }) {
         setSelectedColor: setColor,
         selectedShape,
         setSelectedShape,
+        colorFamilyToInclude,
+        setColorFamilyToInclude,
       }}
     >
       {children}

@@ -1,105 +1,104 @@
 import clsx from "clsx";
+
+import { colors } from "../../../../api/attributes/color";
+import { LoadingProducts } from "../../../../components/loading";
+import { VTOProductCard } from "../../../../components/vto/vto-product-card";
+import { useHairColorContext } from "./hair-color-context";
+import { useHairColorQuery } from "./hair-color-query";
+import { useMakeup } from "../../../../context/makeup-context";
 import { useState } from "react";
-import { Icons } from "../../../../components/icons";
-
-import { ColorPalette } from "../../../../components/color-palette";
-import { HairColorProvider, useHairColorContext } from "./hair-color-context";
-
-const colorFamilies = [
-  { name: "Yellow", value: "#FFFF00" },
-  { name: "Black", value: "#000000" },
-  { name: "Silver", value: "#C0C0C0" },
-  {
-    name: "Gold",
-    value:
-      "linear-gradient(90deg, #CA9C43 0%, #C79A42 33%, #BE923E 56%, #AE8638 77%, #98752F 96%, #92702D 100%)",
-  },
-  { name: "Rose Gold", value: "#B76E79" },
-  { name: "Brass", value: "#B5A642" },
-  { name: "Gray", value: "#808080" },
-  {
-    name: "Multicolor",
-    value:
-      "linear-gradient(270deg, #E0467C 0%, #E55300 25.22%, #00E510 47.5%, #1400FF 72%, #FFFA00 100%)",
-  },
-  { name: "Pink", value: "#FE3699" },
-  { name: "Beige", value: "#F2D3BC" },
-  { name: "Brown", value: "#3D0B0B" },
-  { name: "Red", value: "#FF0000" },
-  { name: "White", value: "#FFFFFF" },
-  { name: "Purple", value: "#800080" },
-  { name: "Blue", value: "#1400FF" },
-  { name: "Green", value: "#52FF00" },
-  { name: "Transparent", value: "none" },
-  { name: "Orange", value: "#FF7A00" },
-  { name: "Bronze", value: "#CD7F32" },
-  { name: "Nude", value: "#E1E1A3" },
-];
+import { Product } from "../../../../api/shared";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getHairColorProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function HairColorSelector() {
   return (
-    <HairColorProvider>
-      <div className="w-full px-4 mx-auto divide-y lg:max-w-xl">
-        <div>
-          <FamilyColorSelector />
+    <div className="mx-auto w-full divide-y px-4">
+      <div>
+        <FamilyColorSelector />
 
-          <ColorSelector />
-        </div>
-
-        <ProductList />
+        <ColorSelector />
       </div>
-    </HairColorProvider>
+
+      <ProductList />
+    </div>
   );
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useHairColorContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useHairColorContext();
 
   return (
     <div
-      className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
       data-mode="lip-color"
     >
-      {colorFamilies.map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-white/80",
-            {
-              "border-white/80": colorFamily === item.name,
-            },
-          )}
-          onClick={() => setColorFamily(item.name)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.value,
-            }}
-          />
-          <span className="text-sm">{item.name}</span>
-        </button>
-      ))}
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-sm text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily === item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
 
 const haircolors = [
-  "/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 1.png",
-  "/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 2.png",
-  "/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 3.png",
-  "/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 4.png",
-  "/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 5.png",
-  "/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 6.png",
-  "/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 7.png",
-  "/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 8.png",
+  "/media/unveels/vto/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 1.png",
+  "/media/unveels/vto/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 2.png",
+  "/media/unveels/vto/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 3.png",
+  "/media/unveels/vto/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 4.png",
+  "/media/unveels/vto/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 5.png",
+  "/media/unveels/vto/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 6.png",
+  "/media/unveels/vto/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 7.png",
+  "/media/unveels/vto/haircolors/fcb451ec-5284-476f-9872-5b749dfee8d9 8.png",
+];
+
+const colorList = [
+  "#d9be95",
+  "#784405",
+  "#403007",
+  "#403007",
+  "#181305",
+  "#181305",
+  "#b7a189",
+  "#483209",
 ];
 
 function ColorSelector() {
+  const { hairColor, setHairColor, showHair, setShowHair } = useMakeup();
   const { selectedColor, setSelectedColor } = useHairColorContext();
+
+  function setColor(color: number) {
+    if (!showHair) {
+      setShowHair(true);
+    }
+    setSelectedColor(color.toString());
+    setHairColor(colorList[color]);
+  }
+
   return (
-    <div className="w-full py-4 mx-auto lg:max-w-xl">
-      <div className="flex items-center w-full space-x-4 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
         {haircolors.map((path, index) => (
           <button
             key={index}
@@ -110,9 +109,13 @@ function ColorSelector() {
                 "border-white/80": selectedColor === index.toString(),
               },
             )}
-            onClick={() => setSelectedColor(index.toString())}
+            onClick={() => setColor(index)}
           >
-            <img src={path} alt="Hair Color" className="h-12 rounded w-14" />
+            <img
+              src={path}
+              alt="Hair Color"
+              className="h-[31.5px] w-[41.3px] rounded object-cover sm:h-[45px] sm:w-[59px] lg:h-[58.5px] lg:w-[76.7px]"
+            />
           </button>
         ))}
       </div>
@@ -121,74 +124,90 @@ function ColorSelector() {
 }
 
 function ProductList() {
-  const products = [
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Double Wear Stay-in-Place Foundation",
-      brand: "Estée Lauder",
-      price: 52,
-      originalPrice: 60,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-    {
-      name: "Tom Ford Item name Tom Ford",
-      brand: "Brand name",
-      price: 15,
-      originalPrice: 23,
-    },
-  ];
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
+
+  const {
+    colorFamily,
+    setColorFamily,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+  } = useHairColorContext();
+
+  const { data, isLoading } = useHairColorQuery({
+    color: colorFamily,
+    shape: null,
+  });
+
+  if (colorFamilyToInclude == null && data?.items != null) {
+    setColorFamilyToInclude(
+      data.items.map(
+        (d) =>
+          d.custom_attributes.find((c) => c.attribute_code === "color")?.value,
+      ),
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes
+        .find((item) => item.attribute_code === "hexacode")
+        ?.value.split(",")[0],
+    );
+  };
 
   return (
-    <div className="flex w-full gap-4 pt-4 pb-2 overflow-x-auto no-scrollbar active:cursor-grabbing">
-      {products.map((product, index) => (
-        <div key={index} className="w-[100px] rounded shadow">
-          <div className="relative h-[70px] w-[100px] overflow-hidden">
-            <img
-              src={"https://picsum.photos/id/237/200/300"}
-              alt="Product"
-              className="object-cover rounded"
-            />
-          </div>
-
-          <h3 className="line-clamp-2 h-10 py-2 text-[0.625rem] font-semibold text-white">
-            {product.name}
-          </h3>
-          <p className="text-[0.625rem] text-white/60">{product.brand}</p>
-          <div className="flex items-end justify-between pt-1 space-x-1">
-            <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.625rem] text-transparent">
-              $15
-            </div>
-            <button
-              type="button"
-              className="flex h-7 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-2.5 text-[0.5rem] font-semibold text-white"
-            >
-              Add to cart
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.625rem] text-white sm:py-2"
+          onClick={() => {
+            setMapTypes({
+              Hair: {
+                attributeName: "hair_color_product_type",
+                values: getHairColorProductTypeIds([
+                  "Permanent Color",
+                  "Semi Permanent Color",
+                  "Free Ammonia Color",
+                ]),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Hair", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Hair Color");
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

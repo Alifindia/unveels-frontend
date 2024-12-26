@@ -1,5 +1,6 @@
-import { ReactNode, useState, useEffect } from "react";
-import { Icons } from "../components/icons";
+import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+import * as tf from "@tensorflow/tfjs-core";
+import * as tflite from "@tensorflow/tfjs-tflite";
 import clsx from "clsx";
 import {
   ChevronLeft,
@@ -8,35 +9,40 @@ import {
   StopCircle,
   X,
 } from "lucide-react";
-import { CircularProgressRings } from "../components/circle-progress-rings";
-import { Footer } from "../components/footer";
-import { Rating } from "../components/rating";
-import { VideoScene } from "../components/recorder/recorder";
-import { CameraProvider, useCamera } from "../context/recorder-context";
-import { VideoStream } from "../components/recorder/video-stream";
-import { useRecordingControls } from "../hooks/useRecorder";
-import { personalityInference } from "../inference/personalityInference";
-import { Classifier } from "../types/classifier";
-import { personalityAnalysisResult } from "../utils/constants";
-import { usePage } from "../hooks/usePage";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useFragrancesProductQuery } from "../api/fragrances";
-import { LoadingProducts } from "../components/loading";
-import { getProductAttributes, mediaUrl } from "../utils/apiUtils";
-import { BrandName } from "../components/product/brand";
-import { useNavigate } from "react-router-dom";
 import { useLipsProductQuery } from "../api/lips";
 import { useLookbookProductQuery } from "../api/lookbook";
+import { CircularProgressRings } from "../components/circle-progress-rings";
+import { Footer } from "../components/footer";
+import { Icons } from "../components/icons";
+import { LoadingProducts } from "../components/loading";
+import { BrandName } from "../components/product/brand";
+import { Rating } from "../components/rating";
+import { VideoScene } from "../components/recorder/recorder";
+import { VideoStream } from "../components/recorder/video-stream";
 import {
   InferenceProvider,
   useInferenceContext,
 } from "../context/inference-context";
-import { TopNavigation } from "./virtual-try-on";
+import { CameraProvider, useCamera } from "../context/recorder-context";
+import { useRecordingControls } from "../hooks/useRecorder";
+import { personalityInference } from "../inference/personalityInference";
+import { Classifier } from "../types/classifier";
+import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
+import { personalityAnalysisResult } from "../utils/constants";
+import {
+  loadTFLiteModel,
+  preprocessTFLiteImage,
+  runTFLiteInference,
+} from "../utils/tfliteInference";
+import { useModelLoader } from "../hooks/useModelLoader";
+import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { Scanner } from "../components/scanner";
-import * as tf from "@tensorflow/tfjs-core";
-import * as tflite from "@tensorflow/tfjs-tflite";
-import { loadTFLiteModel } from "../utils/tfliteInference";
+import { useCartContext } from "../context/cart-context";
 import { useTranslation } from "react-i18next";
-import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+import { TopNavigation } from "../components/top-navigation";
 
 export function PersonalityFinder() {
   return (
@@ -51,15 +57,9 @@ export function PersonalityFinder() {
 }
 
 function MainContent() {
-  const [modelFaceShape, setModelFaceShape] =
-    useState<tflite.TFLiteModel | null>(null);
-
-  const [modelPersonalityFinder, setModelPersonalityFinder] =
-    useState<tflite.TFLiteModel | null>(null);
-
-  const [faceLandmarker, setFaceLandmarker] = useState<FaceLandmarker | null>(
-    null,
-  );
+  const modelFaceShapeRef = useRef<tflite.TFLiteModel | null>(null);
+  const modelPersonalityFinderRef = useRef<tflite.TFLiteModel | null>(null);
+  const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
 
   const { criterias } = useCamera();
   const {
@@ -69,19 +69,22 @@ function MainContent() {
     setInferenceError,
     setIsInferenceRunning,
   } = useInferenceContext();
-  const [inferenceResult, setInferenceResult] = useState<Classifier[] | null>();
+  const [inferenceResult, setInferenceResult] = useState<Classifier[] | null>(
+    null,
+  );
 
-  useEffect(() => {
-    let isMounted = true;
-    const dummyInput = tf.zeros([1, 224, 224, 3], "float32");
+  const [isInferenceCompleted, setIsInferenceCompleted] = useState(false);
+  const [showScannerAfterInference, setShowScannerAfterInference] =
+    useState(true);
 
-    const loadModel = async () => {
-      try {
-        const vision = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        );
-
-        const faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
+  const steps = [
+    async () => {
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+      );
+      const faceLandmarkerInstance = await FaceLandmarker.createFromOptions(
+        vision,
+        {
           baseOptions: {
             modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
             delegate: "GPU",
@@ -92,43 +95,50 @@ function MainContent() {
           minTrackingConfidence: 0.7,
           runningMode: "IMAGE",
           numFaces: 1,
-        });
-
-        setModelFaceShape(
-          await loadTFLiteModel(
-            "/models/personality-finder/face-analyzer.tflite",
-          ),
+        },
+      );
+      faceLandmarkerRef.current = faceLandmarkerInstance;
+    },
+    async () => {
+      const model = await loadTFLiteModel(
+        "/media/unveels/models/personality-finder/face-analyzer.tflite",
+      );
+      modelFaceShapeRef.current = model;
+    },
+    async () => {
+      const model = await loadTFLiteModel(
+        "/media/unveels/models/personality-finder/personality_finder.tflite",
+      );
+      modelPersonalityFinderRef.current = model;
+    },
+    async () => {
+      // Warmup for modelFaceShape
+      if (modelFaceShapeRef.current) {
+        const warmupFace = modelFaceShapeRef.current.predict(
+          tf.zeros([1, 224, 224, 3], "float32"),
         );
-        setModelPersonalityFinder(
-          await loadTFLiteModel(
-            "/models/personality-finder/personality_finder.tflite",
-          ),
+
+        tf.dispose([warmupFace]);
+      }
+      // Warmup for modelPersonalityFinder
+      if (modelPersonalityFinderRef.current) {
+        const warmupPersonality = modelPersonalityFinderRef.current.predict(
+          tf.zeros([1, 224, 224, 3], "float32"),
         );
 
-        if (isMounted) {
-          setFaceLandmarker(faceLandmarker);
-          // warmup
-          modelFaceShape?.predict(dummyInput);
-          modelPersonalityFinder?.predict(dummyInput);
-          modelFaceShape?.predict(dummyInput);
-          modelPersonalityFinder?.predict(dummyInput);
-        }
-      } catch (error) {
-        console.error("Failed to initialize: ", error);
+        tf.dispose([warmupPersonality]);
       }
-    };
+    },
+  ];
 
-    loadModel();
+  const {
+    progress,
+    isLoading: modelLoading,
+    loadModels,
+  } = useModelLoader(steps);
 
-    return () => {
-      isMounted = false;
-      if (faceLandmarker) {
-        faceLandmarker.close();
-      }
-      if (modelPersonalityFinder && modelFaceShape) {
-        dummyInput.dispose();
-      }
-    };
+  useEffect(() => {
+    loadModels();
   }, []);
 
   useEffect(() => {
@@ -137,18 +147,49 @@ function MainContent() {
         setIsInferenceRunning(true);
         setIsLoading(true);
         setInferenceError(null);
+
+        // Tambahkan delay sebelum inferensi
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
         try {
-          if (modelFaceShape && modelPersonalityFinder && faceLandmarker) {
-            const personalityResult: Classifier[] = await personalityInference(
-              modelFaceShape,
-              modelPersonalityFinder,
-              faceLandmarker,
+          if (
+            modelFaceShapeRef.current &&
+            modelPersonalityFinderRef.current &&
+            faceLandmarkerRef.current
+          ) {
+            // Preprocess gambar
+            const preprocessedImage = await preprocessTFLiteImage(
               criterias.capturedImage,
               224,
               224,
             );
+
+            const predFaceShape = await runTFLiteInference(
+              modelFaceShapeRef.current,
+              preprocessedImage,
+              224,
+              224,
+            );
+            const predPersonality = await runTFLiteInference(
+              modelPersonalityFinderRef.current,
+              preprocessedImage,
+              224,
+              224,
+            );
+
+            const personalityResult: Classifier[] = await personalityInference(
+              faceLandmarkerRef.current,
+              predFaceShape,
+              predPersonality,
+              criterias.capturedImage,
+            );
             setInferenceResult(personalityResult);
             setIsInferenceFinished(true);
+            setIsInferenceCompleted(true);
+
+            setTimeout(() => {
+              setShowScannerAfterInference(false); // Hentikan scanner setelah 2 detik
+            }, 2000);
           }
         } catch (error: any) {
           setIsInferenceFinished(false);
@@ -166,35 +207,44 @@ function MainContent() {
     performInference();
   }, [criterias.isCaptured]);
 
-  if (inferenceResult) {
+  if (inferenceResult && !showScannerAfterInference) {
     return <Result inferenceResult={inferenceResult} />;
   }
 
   return (
-    <div className="relative mx-auto h-full min-h-dvh w-full bg-pink-950">
-      <div className="absolute inset-0">
-        {criterias.isCaptured ? (
-          <Scanner />
-        ) : (
-          <>
-            <VideoStream debugMode={false} />
-          </>
-        )}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-          }}
-        ></div>
-      </div>
-      <RecorderStatus />
-      <TopNavigation cart={isInferenceFinished} />
+    <>
+      {modelLoading && <ModelLoadingScreen progress={progress} />}
+      <div className="relative mx-auto h-full min-h-dvh w-full bg-pink-950">
+        <>
+          {criterias.isCaptured ? (
+            <>
+              {showScannerAfterInference || !isInferenceCompleted ? (
+                <Scanner />
+              ) : (
+                <></>
+              )}
+            </>
+          ) : (
+            <>
+              <VideoStream />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
+                  zIndex: 0,
+                }}
+              ></div>
+              <TopNavigation />
+            </>
+          )}
+        </>
 
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-        <VideoScene />
-        <Footer />
+        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
+          <VideoScene />
+          <Footer />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -208,7 +258,6 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
 
   const [selectedTab, setTab] = useState(tabs[0].title);
 
-  const { setPage } = usePage();
   const { criterias } = useCamera();
 
   const navigate = useNavigate();
@@ -216,19 +265,22 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
   return (
     <div className="flex h-screen flex-col bg-black font-sans text-white">
       {/* Navigation */}
-      <div className="flex items-center justify-between px-4 py-2">
-        <button className="size-6">
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-        <button
-          type="button"
-          className="size-6"
-          onClick={() => {
-            navigate("/");
-          }}
-        >
-          <X className="h-6 w-6" />
-        </button>
+      <div className="mb-14">
+        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+          <button className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-white/25 backdrop-blur-3xl">
+            <ChevronLeft className="size-6 text-white" />
+          </button>
+
+          <Link
+            type="button"
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-white/25 backdrop-blur-3xl"
+            to="/"
+          >
+            <X className="size-6 text-white" />
+          </Link>
+
+          <TopNavigation cart={inferenceResult.length > 0} />
+        </div>
       </div>
 
       {/* Profile Section */}
@@ -237,7 +289,7 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
           <div className="flex items-center justify-center rounded-full bg-gradient-to-b from-[#CA9C43] to-[#644D21] p-1">
             {criterias.capturedImage ? (
               <img
-                className="size-24 rounded-full object-fill"
+                className="size-20 rounded-full object-fill sm:size-24"
                 src={criterias.capturedImage}
                 alt="Captured Profile"
               />
@@ -259,7 +311,7 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
             <Icons.hashtagCircle className="size-4" />
             <div className="text-sm">AI Personality Analysis :</div>
           </div>
-          <div className="mt-1 pl-5 text-xs">
+          <div className="mt-1 pl-5 pr-8 text-[10.8px] sm:text-xs lg:pl-0 lg:pt-7">
             {inferenceResult?.[15]?.outputIndex !== undefined
               ? personalityAnalysisResult[inferenceResult[15].outputIndex]
               : ""}
@@ -278,7 +330,7 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
                 "w-full translate-y-0.5 border-b-2 py-2",
                 tab.key === selectedTab
                   ? "border-[#CA9C43] bg-gradient-to-r from-[#92702D] to-[#CA9C43] bg-clip-text text-transparent"
-                  : "border-transparent",
+                  : "border-transparent text-[#9E9E9E]",
               )}
               onClick={() => setTab(tab.key)}
             >
@@ -311,7 +363,7 @@ function PersonalityTab({ data }: { data: Classifier[] | null }) {
   }
 
   return (
-    <div className="flex-1 space-y-6 overflow-auto px-10 py-6">
+    <div className="flex-1 space-y-6 overflow-auto px-5 py-6 md:px-10">
       <h2 className="text-center text-xl font-medium">
         {t("viewpersonality.personality_traits")}
       </h2>
@@ -419,7 +471,7 @@ You're obsessed with discovering new cultures, concepts, and opportunities, and 
           description="People with an Agreeable personality reveal their kind-hearted and compassionate nature; characterized by a strong desire to maintain harmonious relationships. People, high in agreeableness, are often cooperative, empathetic, and considerate towards others; making them valuable team players and supportive friends. They prioritize the needs of others and are willing to go out of their way to help and support those around them. Their warm and nurturing behaviour makes them approachable and easy to get along with, fostering a sense of trust and camaraderie in their social interactions. In short, your agreeable personality is a key aspect of your character and it influences your interactions and relationships with others. Unveels has prepared a customized recommendation list based on your agreeable personality."
           score={
             data?.[15]?.outputData !== undefined
-              ? parseFloat((data[15].outputData[3] * 100).toFixed(1))
+              ? parseFloat((data[15].outputData[2] * 100).toFixed(1))
               : 0
           }
         />
@@ -437,7 +489,7 @@ You're obsessed with discovering new cultures, concepts, and opportunities, and 
           description="Conscientiousness is a key personality trait that reflects an individual's tendency to be organized, responsible, and goal-oriented. People high in conscientiousness are known for their reliability, diligence, and attention to detail; moreover, they're often diligent in their work, follow through on tasks, and are typically well-prepared. Unveels has unveiled the Conscientious side of your personality; and here's your recommended list based on it."
           score={
             data?.[15]?.outputData !== undefined
-              ? parseFloat((data[15].outputData[2] * 100).toFixed(1))
+              ? parseFloat((data[15].outputData[3] * 100).toFixed(1))
               : 0
           }
         />
@@ -499,19 +551,41 @@ function RecommendationsTab({ personality }: { personality: string }) {
     personality,
   });
 
+  const { guestCartId, addItemToCart } = useCartContext(); // Mengakses CartContext
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
+
   return (
     <div className="w-full overflow-auto px-4 py-8">
       <div className="pb-14">
-        <h2 className="pb-4 text-xl font-bold">Perfumes Recommendations</h2>
+        <h2 className="pb-4 text-xl font-bold lg:text-2xl">
+          Perfumes Recommendations
+        </h2>
         {fragrances ? (
-          <div className="flex w-full gap-4 overflow-x-auto no-scrollbar">
+          <div className="flex w-full gap-4 overflow-x-auto no-scrollbar lg:gap-x-14">
             {fragrances.items.map((product, index) => {
               const imageUrl =
                 mediaUrl(product.media_gallery_entries[0].file) ??
                 "https://picsum.photos/id/237/200/300";
 
               return (
-                <div key={product.id} className="w-[150px] rounded">
+                <div
+                  key={product.id}
+                  className="w-[150px] rounded"
+                  onClick={() => {
+                    window.open(
+                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      "_blank",
+                    );
+                  }}
+                >
                   <div className="relative h-[150px] w-[150px] overflow-hidden">
                     <img
                       src={imageUrl}
@@ -522,7 +596,7 @@ function RecommendationsTab({ personality }: { personality: string }) {
 
                   <div className="flex items-start justify-between py-2">
                     <div className="w-full">
-                      <h3 className="line-clamp-2 h-10 text-sm font-semibold text-white">
+                      <h3 className="text-xsfont-semibold line-clamp-1 text-white">
                         {product.name}
                       </h3>
                       <p className="text-[0.625rem] text-white/60">
@@ -531,7 +605,7 @@ function RecommendationsTab({ personality }: { personality: string }) {
                         />
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center justify-end gap-x-1">
+                    <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="text-sm font-bold text-white">
                         ${product.price}
                       </span>
@@ -544,14 +618,15 @@ function RecommendationsTab({ personality }: { personality: string }) {
                     <button
                       type="button"
                       className="flex h-7 w-full items-center justify-center border border-white text-[0.5rem] font-semibold"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleAddToCart(
+                          product.id.toString(),
+                          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                        );
+                      }}
                     >
                       ADD TO CART
-                    </button>
-                    <button
-                      type="button"
-                      className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
-                    >
-                      SEE IMPROVEMENT
                     </button>
                   </div>
                 </div>
@@ -570,35 +645,31 @@ function RecommendationsTab({ personality }: { personality: string }) {
         </p>
         {items ? (
           <div className="flex w-full gap-4 overflow-x-auto no-scrollbar">
-            {items.items.map((product, index) => {
-              const imageUrl =
-                mediaUrl(product.media_gallery_entries[0].file) ??
-                "https://picsum.photos/id/237/200/300";
-
+            {items.profiles.map((profile, index) => {
+              const imageUrl = baseApiUrl + "/media/" + profile.image;
               return (
-                <div key={product.id} className="w-[150px] rounded">
+                <div key={profile.identifier} className="w-[150px] rounded">
                   <div className="relative h-[150px] w-[150px] overflow-hidden">
                     <img
                       src={imageUrl}
                       alt="Product"
-                      className="rounded object-cover"
+                      className="h-full w-full rounded object-cover"
                     />
                   </div>
 
                   <div className="flex items-start justify-between py-2">
                     <div className="w-full">
-                      <h3 className="line-clamp-2 h-10 text-sm font-semibold text-white">
-                        {product.name}
+                      <h3 className="text-xsfont-semibold line-clamp-1 text-white">
+                        {profile.name}
                       </h3>
-                      <p className="text-[0.625rem] text-white/60">
-                        <BrandName
-                          brandId={getProductAttributes(product, "brand")}
-                        />
-                      </p>
                     </div>
-                    <div className="flex flex-wrap items-center justify-end gap-x-1">
+                    <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="text-sm font-bold text-white">
-                        ${product.price}
+                        $
+                        {profile.products.reduce(
+                          (acc, product) => acc + product.price,
+                          0,
+                        )}
                       </span>
                     </div>
                   </div>
@@ -616,7 +687,7 @@ function RecommendationsTab({ personality }: { personality: string }) {
                       type="button"
                       className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
                     >
-                      SEE IMPROVEMENT
+                      TRY ON
                     </button>
                   </div>
                 </div>
@@ -640,7 +711,16 @@ function RecommendationsTab({ personality }: { personality: string }) {
                 "https://picsum.photos/id/237/200/300";
 
               return (
-                <div key={product.id} className="w-[150px] rounded">
+                <div
+                  key={product.id}
+                  className="w-[150px] rounded"
+                  onClick={() => {
+                    window.open(
+                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      "_blank",
+                    );
+                  }}
+                >
                   <div className="relative h-[150px] w-[150px] overflow-hidden">
                     <img
                       src={imageUrl}
@@ -651,7 +731,7 @@ function RecommendationsTab({ personality }: { personality: string }) {
 
                   <div className="flex items-start justify-between py-2">
                     <div className="w-full">
-                      <h3 className="line-clamp-2 h-10 text-sm font-semibold text-white">
+                      <h3 className="text-xsfont-semibold line-clamp-1 text-white">
                         {product.name}
                       </h3>
                       <p className="text-[0.625rem] text-white/60">
@@ -660,7 +740,7 @@ function RecommendationsTab({ personality }: { personality: string }) {
                         />
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center justify-end gap-x-1">
+                    <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="text-sm font-bold text-white">
                         ${product.price}
                       </span>
@@ -673,14 +753,24 @@ function RecommendationsTab({ personality }: { personality: string }) {
                     <button
                       type="button"
                       className="flex h-7 w-full items-center justify-center border border-white text-[0.5rem] font-semibold"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleAddToCart(
+                          product.id.toString(),
+                          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                        );
+                      }}
                     >
                       ADD TO CART
                     </button>
                     <button
                       type="button"
                       className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                      }}
                     >
-                      SEE IMPROVEMENT
+                      TRY ON
                     </button>
                   </div>
                 </div>
@@ -703,13 +793,13 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
   }
 
   return (
-    <div className="grid flex-1 grid-cols-1 gap-4 space-y-6 overflow-auto px-10 py-6 md:grid-cols-2">
+    <div className="grid flex-1 grid-cols-1 gap-4 space-y-6 overflow-auto px-10 py-6 md:grid-cols-2 md:space-y-0">
       <FeatureSection
         icon={<Icons.face className="size-12" />}
         title="Face"
         features={[
           { name: "Face Shape", value: data[14].outputLabel },
-          { name: "Skin Tone", value: data[16].outputLabel },
+          { name: "Skin Tone", value: data[17].outputLabel },
         ]}
       />
       <FeatureSection
@@ -791,25 +881,31 @@ function FeatureSection({
   }[];
 }) {
   return (
-    <div className="flex flex-col space-y-2">
-      <div className="flex items-center space-x-2 pb-5">
-        <span className="text-2xl">{icon}</span>
-        <h2 className="text-3xl font-semibold">{title}</h2>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        {features.map((feature, index) => (
-          <div key={index} className="">
-            <div className="text-xl font-bold">{feature.name}</div>
-            {feature.color ? (
-              <div
-                className="w-ful h-6"
-                style={{ backgroundColor: feature.hex }}
-              ></div>
-            ) : (
-              <div className="text-sm">{feature.value}</div>
-            )}
-          </div>
-        ))}
+    <div className="flex h-full flex-col border-white/50 md:even:border-l md:even:pl-4">
+      <div className="flex flex-col space-y-2">
+        <div className="flex items-center space-x-2 pb-5">
+          <span className="text-2xl">{icon}</span>
+          <h2 className="text-3xl font-semibold">{title}</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          {features.map((feature, index) => (
+            <div key={index} className="">
+              <div className="text-xl font-bold">{feature.name}</div>
+              {feature.color ? (
+                <div
+                  className="w-ful h-6"
+                  style={{ backgroundColor: feature.hex }}
+                ></div>
+              ) : (
+                <ul>
+                  <li className="list-inside list-disc text-sm">
+                    {feature.value}
+                  </li>
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
       <div className="flex-1 border-b border-white/50 py-4"></div>
     </div>

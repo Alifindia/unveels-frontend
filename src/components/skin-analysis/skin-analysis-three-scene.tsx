@@ -131,10 +131,6 @@ const SkinAnalysisThreeScene: React.FC<SkinAnalysisThreeSceneProps> = ({
         landmarks={landmarksRef}
         planeSize={[planeSize[0], planeSize[1]]}
       />
-      <Radiance
-        landmarks={landmarksRef}
-        planeSize={[planeSize[0], planeSize[1]]}
-      />
     </>
   );
 };

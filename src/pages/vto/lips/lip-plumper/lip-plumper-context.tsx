@@ -5,6 +5,8 @@ interface LipPlumperContextType {
   setColorFamily: (color: string | null) => void;
   selectedColor: string | null;
   setSelectedColor: (color: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
   selectedTexture: string | null;
   setSelectedTexture: (texture: string | null) => void;
 }
@@ -22,6 +24,7 @@ export function LipPlumperProvider({
 }) {
   const [colorFamily, setColorFamily] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedTexture, setSelectedTexture] = useState<string | null>(null);
 
@@ -32,6 +35,8 @@ export function LipPlumperProvider({
         setColorFamily,
         selectedColor,
         setSelectedColor,
+        colorFamilyToInclude,
+        setColorFamilyToInclude,
         selectedTexture,
         setSelectedTexture,
       }}

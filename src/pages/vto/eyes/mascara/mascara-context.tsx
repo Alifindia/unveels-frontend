@@ -5,6 +5,8 @@ interface MascaraContextType {
   setColorFamily: (color: string | null) => void;
   selectedColor: string | null;
   setSelectedColor: (color: string | null) => void;
+  colorFamilyToInclude: string[] | null;
+  setColorFamilyToInclude: (family: string[] | null) => void;
 }
 
 // Create the context
@@ -14,6 +16,7 @@ const MascaraContext = createContext<MascaraContextType | undefined>(undefined);
 export function MascaraProvider({ children }: { children: React.ReactNode }) {
   const [colorFamily, setColorFamily] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [colorFamilyToInclude, setColorFamilyToInclude] = useState<string[] | null>(null);
 
   return (
     <MascaraContext.Provider
@@ -22,6 +25,8 @@ export function MascaraProvider({ children }: { children: React.ReactNode }) {
         setColorFamily,
         selectedColor,
         setSelectedColor,
+        colorFamilyToInclude,
+        setColorFamilyToInclude,
       }}
     >
       {children}

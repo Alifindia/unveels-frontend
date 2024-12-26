@@ -1,5 +1,6 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { defaultHeaders } from "./shared";
+import { baseUrl } from "../utils/apiUtils";
 
 export type CustomAttributeValue = {
   label: string;
@@ -11,7 +12,7 @@ const brandsKey = {
 };
 
 async function fetchBrands() {
-  const response = await fetch("/rest/V1/products/attributes/brand", {
+  const response = await fetch(baseUrl + "/rest/V1/products/attributes/brand", {
     headers: defaultHeaders,
   });
   if (!response.ok) {

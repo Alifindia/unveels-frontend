@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useCamera } from "../context/recorder-context";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 
@@ -6,6 +6,44 @@ export function Scanner() {
   const { criterias } = useCamera();
   const [imageLoaded, setImageLoaded] = useState<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const workerRef = useRef<Worker | null>(null);
+  const [landmarker, setLandmarker] = useState<FaceLandmarker | null>(null);
+
+  // Path Web Worker berdasarkan environment
+  const workerPath =
+    import.meta.env.MODE === "development"
+      ? new URL("../workers/scannerWorker.ts", import.meta.url) // Path relatif untuk dev
+      : "/static/frontend/Smartwave/porto/en_US/Unveels_Tech/js/scannerWorker-C0zh0GnA.js"; // Path untuk build/produksi
+
+  // Initialize MediaPipe Face Landmarker
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadLandmarker() {
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+      );
+      const faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath:
+            "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+        },
+        runningMode: "IMAGE",
+        numFaces: 1,
+      });
+      if (isMounted) {
+        setLandmarker(faceLandmarker);
+      }
+    }
+    loadLandmarker();
+
+    return () => {
+      isMounted = false;
+      if (landmarker) {
+        landmarker.close();
+      }
+    };
+  }, []);
 
   // Memuat gambar ketika capturedImage berubah
   useEffect(() => {
@@ -18,94 +56,81 @@ export function Scanner() {
     }
   }, [criterias.capturedImage]);
 
-  // Animasi Scanner dengan `requestAnimationFrame`
+  // Menginisialisasi Web Worker dan OffscreenCanvas
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !imageLoaded) return;
+    if (!canvas || !imageLoaded || !landmarker) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      console.error("Gagal mendapatkan konteks 2D untuk overlay canvas.");
-      return;
-    }
-
-    let scanPosition = 0;
-    let direction = 1; // 1 untuk turun, -1 untuk naik
-
-    const animateScanner = () => {
-      const { innerWidth: width, innerHeight: height } = window;
+    const updateCanvasSize = () => {
       const dpr = window.devicePixelRatio || 1;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
       canvas.width = width * dpr;
       canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, width, height);
-
-      // Hitung ukuran dan posisi gambar
-      const imgAspect = imageLoaded.naturalWidth / imageLoaded.naturalHeight;
-      const canvasAspect = width / height;
-      let drawWidth, drawHeight, offsetX, offsetY;
-
-      if (imgAspect < canvasAspect) {
-        drawWidth = width;
-        drawHeight = width / imgAspect;
-        offsetX = 0;
-        offsetY = (height - drawHeight) / 2;
-      } else {
-        drawWidth = height * imgAspect;
-        drawHeight = height;
-        offsetX = (width - drawWidth) / 2;
-        offsetY = 0;
-      }
-
-      ctx.save();
-      ctx.scale(-1, 1);
-      ctx.drawImage(
-        imageLoaded,
-        -offsetX - drawWidth,
-        offsetY,
-        drawWidth,
-        drawHeight,
-      );
-      ctx.restore();
-
-      // Gambar animasi scanning (lapisan bawah hijau neon)
-      ctx.fillStyle = "rgba(0, 255, 0, 0.6)";
-      ctx.shadowBlur = 20;
-      ctx.shadowColor = "rgba(0, 255, 0, 1)";
-      ctx.fillRect(0, scanPosition, width, 15);
-
-      // Reset shadow sebelum menggambar lapisan atas
-      ctx.shadowBlur = 0;
-      ctx.shadowColor = "transparent";
-
-      // Gambar lapisan atas (garis putih di tengah)
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, scanPosition + 3, width, 9);
-
-      // Update posisi scanner
-      scanPosition += 5 * direction;
-      if (scanPosition >= height - 15 || scanPosition <= 0) {
-        direction *= -1; // Balik arah
-      }
-
-      requestAnimationFrame(animateScanner); // Panggil ulang untuk animasi berikutnya
     };
 
-    animateScanner();
+    // Update ukuran canvas saat pertama kali dan ketika ukuran layar berubah
+    updateCanvasSize();
+    window.addEventListener("resize", updateCanvasSize);
 
-    return () => cancelAnimationFrame(animateScanner);
-  }, [imageLoaded, canvasRef]);
+    const offscreen = canvas.transferControlToOffscreen();
+
+    createImageBitmap(imageLoaded).then((imageBitmap) => {
+      const result = landmarker.detect(imageBitmap);
+
+      const worker = new Worker(workerPath, { type: "module" });
+
+      workerRef.current = worker;
+
+      worker.postMessage(
+        {
+          imageData: imageBitmap,
+          width: canvas.width,
+          height: canvas.height,
+          canvas: offscreen,
+          landmarks: result.faceLandmarks[0] || [],
+        },
+        [offscreen, imageBitmap],
+      );
+
+      worker.onmessage = (e) => {
+        // Optional: Handle worker messages
+      };
+    });
+
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+      }
+      window.removeEventListener("resize", updateCanvasSize);
+    };
+  }, [imageLoaded, landmarker]);
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center"
-      style={{ zIndex: 0 }}
-    >
-      <canvas
-        ref={canvasRef}
-        className="absolute left-0 top-0 h-full w-full"
-        style={{ zIndex: 100 }}
-      />
-    </div>
+    <>
+      <div
+        className="fixed inset-0 flex items-center justify-center"
+        style={{
+          width: "100vw",
+          height: "100vh",
+        }}
+      >
+        <canvas
+          ref={canvasRef}
+          className="absolute left-0 top-0 h-full w-full"
+          style={{}}
+        />
+      </div>
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
+        }}
+      ></div>
+    </>
   );
 }

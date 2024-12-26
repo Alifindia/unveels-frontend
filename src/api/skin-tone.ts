@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { buildSearchParams } from "../utils/apiUtils";
+import { baseUrl, buildSearchParams } from "../utils/apiUtils";
 import { defaultHeaders, Product } from "./shared";
 
 const skintoneKeys = {
@@ -63,7 +63,7 @@ export function useSkinToneProductQuery({
       }
 
       const response = await fetch(
-        "/rest/V1/products?" + buildSearchParams(filters),
+        baseUrl + "/rest/V1/products?" + buildSearchParams(filters),
         {
           headers: defaultHeaders,
         },

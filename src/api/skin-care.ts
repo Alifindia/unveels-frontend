@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { buildSearchParams } from "../utils/apiUtils";
+import { baseUrl, buildSearchParams } from "../utils/apiUtils";
 import { skin_concerns } from "./attributes/skin_concern";
 import { defaultHeaders, Product } from "./shared";
 
@@ -54,7 +54,7 @@ export function useSkincareProductQuery({
       }
 
       const response = await fetch(
-        "/rest/V1/products?" + buildSearchParams(filters),
+        baseUrl + "/rest/V1/products?" + buildSearchParams(filters),
         {
           headers: defaultHeaders,
         },

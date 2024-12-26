@@ -1,5 +1,6 @@
-import { ReactNode, useState, useEffect } from "react";
-import { Icons } from "../components/icons";
+import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+import * as tf from "@tensorflow/tfjs-core";
+import * as tflite from "@tensorflow/tfjs-tflite";
 import clsx from "clsx";
 import {
   ChevronLeft,
@@ -8,30 +9,37 @@ import {
   StopCircle,
   X,
 } from "lucide-react";
-import { Footer } from "../components/footer";
-import { Rating } from "../components/rating";
-import { VideoScene } from "../components/recorder/recorder";
-import { CameraProvider, useCamera } from "../context/recorder-context";
-import { VideoStream } from "../components/recorder/video-stream";
-import { useRecordingControls } from "../hooks/useRecorder";
-import { personalityInference } from "../inference/personalityInference";
-import { Classifier } from "../types/classifier";
-import { usePage } from "../hooks/usePage";
-import { LoadingProducts } from "../components/loading";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useFragrancesProductQuery } from "../api/fragrances";
 import { useLipsProductQuery } from "../api/lips";
 import { useLookbookProductQuery } from "../api/lookbook";
-import { getProductAttributes, mediaUrl } from "../utils/apiUtils";
+import { Footer } from "../components/footer";
+import { Icons } from "../components/icons";
+import { LoadingProducts } from "../components/loading";
+import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { BrandName } from "../components/product/brand";
+import { Rating } from "../components/rating";
+import { VideoScene } from "../components/recorder/recorder";
+import { VideoStream } from "../components/recorder/video-stream";
+import { Scanner } from "../components/scanner";
+import { TopNavigation } from "../components/top-navigation";
 import {
   InferenceProvider,
   useInferenceContext,
 } from "../context/inference-context";
-import { TopNavigation } from "../components/top-navigation";
-import * as tf from "@tensorflow/tfjs-core";
-import * as tflite from "@tensorflow/tfjs-tflite";
-import { loadTFLiteModel } from "../utils/tfliteInference";
-import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+import { CameraProvider, useCamera } from "../context/recorder-context";
+import { useModelLoader } from "../hooks/useModelLoader";
+import { useRecordingControls } from "../hooks/useRecorder";
+import { personalityInference } from "../inference/personalityInference";
+import { Classifier } from "../types/classifier";
+import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
+import {
+  loadTFLiteModel,
+  preprocessTFLiteImage,
+  runTFLiteInference,
+} from "../utils/tfliteInference";
+import { useCartContext } from "../context/cart-context";
 
 export function FaceAnalyzer() {
   return (
@@ -46,15 +54,9 @@ export function FaceAnalyzer() {
 }
 
 function MainContent() {
-  const [modelFaceShape, setModelFaceShape] =
-    useState<tflite.TFLiteModel | null>(null);
-
-  const [modelPersonalityFinder, setModelPersonalityFinder] =
-    useState<tflite.TFLiteModel | null>(null);
-
-  const [faceLandmarker, setFaceLandmarker] = useState<FaceLandmarker | null>(
-    null,
-  );
+  const modelFaceShapeRef = useRef<tflite.TFLiteModel | null>(null);
+  const modelPersonalityFinderRef = useRef<tflite.TFLiteModel | null>(null);
+  const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
 
   const { criterias } = useCamera();
   const {
@@ -69,17 +71,18 @@ function MainContent() {
     null,
   );
 
-  useEffect(() => {
-    let isMounted = true;
-    const dummyInput = tf.zeros([1, 224, 224, 3], "float32");
+  const [isInferenceCompleted, setIsInferenceCompleted] = useState(false);
+  const [showScannerAfterInference, setShowScannerAfterInference] =
+    useState(true);
 
-    const loadModel = async () => {
-      try {
-        const vision = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        );
-
-        const faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
+  const steps = [
+    async () => {
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+      );
+      const faceLandmarkerInstance = await FaceLandmarker.createFromOptions(
+        vision,
+        {
           baseOptions: {
             modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
             delegate: "GPU",
@@ -90,43 +93,50 @@ function MainContent() {
           minTrackingConfidence: 0.7,
           runningMode: "IMAGE",
           numFaces: 1,
-        });
-
-        setModelFaceShape(
-          await loadTFLiteModel(
-            "/models/personality-finder/face-analyzer.tflite",
-          ),
+        },
+      );
+      faceLandmarkerRef.current = faceLandmarkerInstance;
+    },
+    async () => {
+      const model = await loadTFLiteModel(
+        "/media/unveels/models/personality-finder/face-analyzer.tflite",
+      );
+      modelFaceShapeRef.current = model;
+    },
+    async () => {
+      const model = await loadTFLiteModel(
+        "/media/unveels/models/personality-finder/personality_finder.tflite",
+      );
+      modelPersonalityFinderRef.current = model;
+    },
+    async () => {
+      // Warmup for modelFaceShape
+      if (modelFaceShapeRef.current) {
+        const warmupFace = modelFaceShapeRef.current.predict(
+          tf.zeros([1, 224, 224, 3], "float32"),
         );
-        setModelPersonalityFinder(
-          await loadTFLiteModel(
-            "/models/personality-finder/personality_finder.tflite",
-          ),
+
+        tf.dispose([warmupFace]);
+      }
+      // Warmup for modelPersonalityFinder
+      if (modelPersonalityFinderRef.current) {
+        const warmupPersonality = modelPersonalityFinderRef.current.predict(
+          tf.zeros([1, 224, 224, 3], "float32"),
         );
 
-        if (isMounted) {
-          setFaceLandmarker(faceLandmarker);
-          // warmup
-          modelFaceShape?.predict(dummyInput);
-          modelPersonalityFinder?.predict(dummyInput);
-          modelFaceShape?.predict(dummyInput);
-          modelPersonalityFinder?.predict(dummyInput);
-        }
-      } catch (error) {
-        console.error("Failed to initialize: ", error);
+        tf.dispose([warmupPersonality]);
       }
-    };
+    },
+  ];
 
-    loadModel();
+  const {
+    progress,
+    isLoading: modelLoading,
+    loadModels,
+  } = useModelLoader(steps);
 
-    return () => {
-      isMounted = false;
-      if (faceLandmarker) {
-        faceLandmarker.close();
-      }
-      if (modelPersonalityFinder && modelFaceShape) {
-        dummyInput.dispose();
-      }
-    };
+  useEffect(() => {
+    loadModels();
   }, []);
 
   useEffect(() => {
@@ -135,18 +145,48 @@ function MainContent() {
         setIsInferenceRunning(true);
         setIsLoading(true);
         setInferenceError(null);
+
+        // Tambahkan delay sebelum inferensi
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
         try {
-          if (modelFaceShape && modelPersonalityFinder && faceLandmarker) {
-            const personalityResult: Classifier[] = await personalityInference(
-              modelFaceShape,
-              modelPersonalityFinder,
-              faceLandmarker,
+          if (
+            modelFaceShapeRef.current &&
+            modelPersonalityFinderRef.current &&
+            faceLandmarkerRef.current
+          ) {
+            // Preprocess gambar
+            const preprocessedImage = await preprocessTFLiteImage(
               criterias.capturedImage,
               224,
               224,
             );
+            const predFaceShape = await runTFLiteInference(
+              modelFaceShapeRef.current,
+              preprocessedImage,
+              224,
+              224,
+            );
+            const predPersonality = await runTFLiteInference(
+              modelPersonalityFinderRef.current,
+              preprocessedImage,
+              224,
+              224,
+            );
+
+            const personalityResult: Classifier[] = await personalityInference(
+              faceLandmarkerRef.current,
+              predFaceShape,
+              predPersonality,
+              criterias.capturedImage,
+            );
             setInferenceResult(personalityResult);
             setIsInferenceFinished(true);
+            setIsInferenceCompleted(true);
+
+            setTimeout(() => {
+              setShowScannerAfterInference(false); // Hentikan scanner setelah 2 detik
+            }, 2000);
           }
         } catch (error: any) {
           setIsInferenceFinished(false);
@@ -169,24 +209,42 @@ function MainContent() {
   }
 
   return (
-    <div className="relative mx-auto h-full min-h-dvh w-full bg-pink-950">
-      <div className="absolute inset-0">
-        <VideoStream debugMode={false} />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-          }}
-        ></div>
-      </div>
-      <RecorderStatus />
-      <TopNavigation cart={isInferenceFinished} />
+    <>
+      {modelLoading && <ModelLoadingScreen progress={progress} />}
+      <div className="relative mx-auto h-full min-h-dvh w-full bg-pink-950">
+        <div className="absolute inset-0">
+          <>
+            {criterias.isCaptured ? (
+              <>
+                {showScannerAfterInference || !isInferenceCompleted ? (
+                  <Scanner />
+                ) : (
+                  <></>
+                )}
+              </>
+            ) : (
+              <>
+                <VideoStream />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
+                    zIndex: 0,
+                  }}
+                ></div>
+              </>
+            )}
+          </>
+        </div>
 
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-        <VideoScene />
-        <Footer />
+        <TopNavigation />
+
+        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
+          <VideoScene />
+          <Footer />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -202,19 +260,28 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
 
   const [selectedTab, setTab] = useState(tabs[0].title);
 
-  const { setPage } = usePage();
+  const navigate = useNavigate();
   const { criterias } = useCamera();
 
   return (
     <div className="flex h-screen flex-col bg-black font-sans text-white">
       {/* Navigation */}
-      <div className="flex items-center justify-between px-4 py-2">
-        <button className="size-6">
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-        <button type="button" className="size-6" onClick={() => setPage(null)}>
-          <X className="h-6 w-6" />
-        </button>
+      <div className="mb-14">
+        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+          <button className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-white/25 backdrop-blur-3xl">
+            <ChevronLeft className="size-6 text-white" />
+          </button>
+
+          <a
+            href={`${baseApiUrl}technologies`}
+            rel="noopener noreferrer"
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-white/25 backdrop-blur-3xl"
+          >
+            <X className="size-6 text-white" />
+          </a>
+
+          <TopNavigation cart={inferenceResult.length > 0} />
+        </div>
       </div>
 
       {/* Profile Section */}
@@ -255,7 +322,7 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
                 "w-full translate-y-0.5 border-b-2 py-2",
                 tab.title === selectedTab
                   ? "border-[#CA9C43] bg-gradient-to-r from-[#92702D] to-[#CA9C43] bg-clip-text text-transparent"
-                  : "border-transparent",
+                  : "border-transparent text-[#9E9E9E]",
               )}
               onClick={() => setTab(tab.title)}
             >
@@ -278,47 +345,6 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
   );
 }
 
-function PersonalitySection({
-  title,
-  description,
-  score,
-}: {
-  title: string;
-  description: string;
-  score: number;
-}) {
-  // High -> 70% - 100%
-  // Moderate -> above 40% - 69%
-  // low -> 0% - 39%
-  const scoreType = score < 40 ? "Low" : score < 70 ? "Moderate" : "High";
-  return (
-    <div className="py-5">
-      <div className="flex items-center space-x-2 pb-6">
-        <Icons.personalityTriangle className="size-8" />
-
-        <h2 className="text-3xl font-bold text-white">{title}</h2>
-      </div>
-
-      <span className="text-xl font-bold">Description</span>
-      <p className="pb-6 pt-1 text-sm">{description}</p>
-
-      <span className="text-xl font-bold">Score</span>
-      <div
-        className={clsx(
-          "text-sm",
-          score < 40
-            ? "text-[#FF0000]"
-            : score < 70
-              ? "text-[#FAFF00]"
-              : "text-[#5ED400]",
-        )}
-      >
-        {scoreType} {score}%
-      </div>
-    </div>
-  );
-}
-
 function RecommendationsTab({ faceShape }: { faceShape: string }) {
   const { data: fragrances } = useFragrancesProductQuery({
     faceShape,
@@ -331,10 +357,23 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
     faceShape,
   });
 
+  const { addItemToCart } = useCartContext();
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
+
   return (
     <div className="w-full overflow-auto px-4 py-8">
       <div className="pb-14">
-        <h2 className="pb-4 text-xl font-bold">Perfumes Recommendations</h2>
+        <h2 className="pb-4 text-xl font-bold lg:text-2xl">
+          Perfumes Recommendations
+        </h2>
         {fragrances ? (
           <div className="flex w-full gap-4 overflow-x-auto no-scrollbar">
             {fragrances.items.map((product, index) => {
@@ -343,7 +382,16 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                 "https://picsum.photos/id/237/200/300";
 
               return (
-                <div key={product.id} className="w-[150px] rounded">
+                <div
+                  key={product.id}
+                  className="w-[150px] rounded"
+                  onClick={() => {
+                    window.open(
+                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      "_blank",
+                    );
+                  }}
+                >
                   <div className="relative h-[150px] w-[150px] overflow-hidden">
                     <img
                       src={imageUrl}
@@ -354,7 +402,7 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
 
                   <div className="flex items-start justify-between py-2">
                     <div className="w-full">
-                      <h3 className="line-clamp-2 h-10 text-sm font-semibold text-white">
+                      <h3 className="text-xsfont-semibold line-clamp-1 text-white">
                         {product.name}
                       </h3>
                       <p className="text-[0.625rem] text-white/60">
@@ -363,7 +411,7 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                         />
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center justify-end gap-x-1">
+                    <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="text-sm font-bold text-white">
                         ${product.price}
                       </span>
@@ -376,14 +424,15 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                     <button
                       type="button"
                       className="flex h-7 w-full items-center justify-center border border-white text-[0.5rem] font-semibold"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleAddToCart(
+                          product.id.toString(),
+                          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                        );
+                      }}
                     >
                       ADD TO CART
-                    </button>
-                    <button
-                      type="button"
-                      className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
-                    >
-                      SEE IMPROVEMENT
                     </button>
                   </div>
                 </div>
@@ -402,35 +451,31 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
         </p>
         {items ? (
           <div className="flex w-full gap-4 overflow-x-auto no-scrollbar">
-            {items.items.map((product, index) => {
-              const imageUrl =
-                mediaUrl(product.media_gallery_entries[0].file) ??
-                "https://picsum.photos/id/237/200/300";
-
+            {items.profiles.map((profile, index) => {
+              const imageUrl = baseApiUrl + "/media/" + profile.image;
               return (
-                <div key={product.id} className="w-[150px] rounded">
+                <div key={profile.identifier} className="w-[150px] rounded">
                   <div className="relative h-[150px] w-[150px] overflow-hidden">
                     <img
                       src={imageUrl}
                       alt="Product"
-                      className="rounded object-cover"
+                      className="h-full w-full rounded object-cover"
                     />
                   </div>
 
                   <div className="flex items-start justify-between py-2">
                     <div className="w-full">
-                      <h3 className="line-clamp-2 h-10 text-sm font-semibold text-white">
-                        {product.name}
+                      <h3 className="text-xsfont-semibold line-clamp-1 text-white">
+                        {profile.name}
                       </h3>
-                      <p className="text-[0.625rem] text-white/60">
-                        <BrandName
-                          brandId={getProductAttributes(product, "brand")}
-                        />
-                      </p>
                     </div>
-                    <div className="flex flex-wrap items-center justify-end gap-x-1">
+                    <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="text-sm font-bold text-white">
-                        ${product.price}
+                        $
+                        {profile.products.reduce(
+                          (acc, product) => acc + product.price,
+                          0,
+                        )}
                       </span>
                     </div>
                   </div>
@@ -448,7 +493,7 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                       type="button"
                       className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
                     >
-                      SEE IMPROVEMENT
+                      TRY ON
                     </button>
                   </div>
                 </div>
@@ -483,7 +528,7 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
 
                   <div className="flex items-start justify-between py-2">
                     <div className="w-full">
-                      <h3 className="line-clamp-2 h-10 text-sm font-semibold text-white">
+                      <h3 className="text-xsfont-semibold line-clamp-1 text-white">
                         {product.name}
                       </h3>
                       <p className="text-[0.625rem] text-white/60">
@@ -492,7 +537,7 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                         />
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center justify-end gap-x-1">
+                    <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="text-sm font-bold text-white">
                         ${product.price}
                       </span>
@@ -505,6 +550,13 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                     <button
                       type="button"
                       className="flex h-7 w-full items-center justify-center border border-white text-[0.5rem] font-semibold"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleAddToCart(
+                          product.id.toString(),
+                          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                        );
+                      }}
                     >
                       ADD TO CART
                     </button>
@@ -512,7 +564,7 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                       type="button"
                       className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
                     >
-                      SEE IMPROVEMENT
+                      TRY ON
                     </button>
                   </div>
                 </div>
@@ -533,13 +585,13 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
   }
 
   return (
-    <div className="grid flex-1 grid-cols-1 gap-4 space-y-6 overflow-auto px-10 py-6 md:grid-cols-2">
+    <div className="grid flex-1 grid-cols-1 gap-4 space-y-6 overflow-auto px-10 py-6 md:grid-cols-2 md:space-y-0">
       <FeatureSection
         icon={<Icons.face className="size-12" />}
         title="Face"
         features={[
           { name: "Face Shape", value: data[14].outputLabel },
-          { name: "Skin Tone", value: "Dark latte" },
+          { name: "Skin Tone", value: data[17].outputLabel },
         ]}
       />
       <FeatureSection
@@ -590,7 +642,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
       <FeatureSection
         icon={<Icons.cheekbones className="size-12" />}
         title="Cheekbones"
-        features={[{ name: "cheekbones", value: data[0].outputLabel }]}
+        features={[{ name: "Cheekbones", value: data[0].outputLabel }]}
       />
       <FeatureSection
         icon={<Icons.nose className="size-12" />}
@@ -636,7 +688,11 @@ function FeatureSection({
                 style={{ backgroundColor: feature.hex }}
               ></div>
             ) : (
-              <div className="text-sm">{feature.value}</div>
+              <ul>
+                <li className="list-inside list-disc text-sm">
+                  {feature.value}
+                </li>
+              </ul>
             )}
           </div>
         ))}

@@ -1,3 +1,5 @@
+import React from "react";
+
 export const Icons = {
   logoType: (props: React.SVGProps<SVGSVGElement>) => (
     <svg fill="none" viewBox="0 0 44 14" {...props}>
@@ -42,12 +44,12 @@ export const Icons = {
           y2="6.05847"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#CA9C43" />
-          <stop offset="0.33" stop-color="#C79A42" />
-          <stop offset="0.56" stop-color="#BE923E" />
-          <stop offset="0.77" stop-color="#AE8638" />
-          <stop offset="0.96" stop-color="#98752F" />
-          <stop offset="1" stop-color="#92702D" />
+          <stop stopColor="#CA9C43" />
+          <stop offset="0.33" stopColor="#C79A42" />
+          <stop offset="0.56" stopColor="#BE923E" />
+          <stop offset="0.77" stopColor="#AE8638" />
+          <stop offset="0.96" stopColor="#98752F" />
+          <stop offset="1" stopColor="#92702D" />
         </linearGradient>
       </defs>
     </svg>
@@ -138,13 +140,13 @@ export const Icons = {
     </svg>
   ),
   upload: (props: React.SVGProps<SVGSVGElement>) => (
-    <svg role="img" viewBox="0 0 25 25" {...props}>
+    <svg fill="none" viewBox="0 0 18 18" {...props}>
       <path
-        stroke="#fff"
+        stroke="currentColor"
         stroke-linecap="round"
         stroke-linejoin="round"
-        stroke-width="2"
-        d="M21.02 15.08v4a2 2 0 0 1-2 2h-14a2 2 0 0 1-2-2v-4M17.02 8.08l-5-5-5 5M12.02 3.08v12"
+        stroke-width="1.4"
+        d="M15.397 10.956v2.8a1.4 1.4 0 0 1-1.4 1.4h-9.8a1.4 1.4 0 0 1-1.4-1.4v-2.8M12.598 6.055l-3.5-3.5-3.5 3.5M9.098 2.555v8.4"
       />
     </svg>
   ),
@@ -530,6 +532,105 @@ export const Icons = {
         stroke-width="1.5"
         d="M19.664 21h-14a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1Z"
         clip-rule="evenodd"
+      />
+    </svg>
+  ),
+  sort: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path
+        d="M10 8L7 5L4 8"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M7 19V5"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M14 16L17 19L20 16"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M17 5V19"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  ),
+  filter: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 29 24" fill="none" {...props}>
+      <path
+        d="M21.2812 5H24.8283"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M3.54688 5H13.0057"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M15.3711 12H24.8299"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M3.54688 12H7.09393"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M21.2812 19H24.8283"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M3.54688 19H13.0057"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M20.589 3.58575C21.5124 4.36675 21.5124 5.63275 20.589 6.41375C19.6656 7.19475 18.1687 7.19475 17.2453 6.41375C16.3219 5.63275 16.3219 4.36675 17.2453 3.58575C18.1687 2.80475 19.6656 2.80475 20.589 3.58575"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.13 10.5858C12.0534 11.3668 12.0534 12.6328 11.13 13.4138C10.2066 14.1948 8.70973 14.1948 7.78631 13.4138C6.8629 12.6328 6.8629 11.3668 7.78631 10.5858C8.70973 9.80475 10.2066 9.80475 11.13 10.5858"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M20.589 17.5858C21.5124 18.3668 21.5124 19.6328 20.589 20.4138C19.6656 21.1948 18.1687 21.1948 17.2453 20.4138C16.3219 19.6328 16.3219 18.3668 17.2453 17.5858C18.1687 16.8047 19.6656 16.8047 20.589 17.5858"
+        stroke="white"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
       />
     </svg>
   ),
@@ -949,7 +1050,6 @@ export const Icons = {
       />
     </svg>
   ),
-
   chatMessages: (props: React.SVGProps<SVGSVGElement>) => (
     <svg fill="none" viewBox="0 0 32 32" {...props}>
       <path
@@ -989,6 +1089,264 @@ export const Icons = {
           <stop offset=".77" stop-color="#AE8638" />
           <stop offset=".96" stop-color="#98752F" />
           <stop offset="1" stop-color="#92702D" />
+        </linearGradient>
+      </defs>
+    </svg>
+  ),
+  liveCamera: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg width="52" height="33" viewBox="0 0 52 33" fill="none" {...props}>
+      <path
+        d="M50.1 5.70801L34.5 16.758L50.1 27.808V5.70801Z"
+        stroke="url(#paint0_linear_1673_80054)"
+        stroke-width="2.34"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M30.1667 1.80811H6.33333C3.9401 1.80811 2 3.72049 2 6.07953V27.4367C2 29.7957 3.9401 31.7081 6.33333 31.7081H18.25H30.1667C32.5599 31.7081 34.5 29.7957 34.5 27.4367V6.07953C34.5 3.72049 32.5599 1.80811 30.1667 1.80811Z"
+        stroke="url(#paint1_linear_1673_80054)"
+        stroke-width="2.34"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M14.98 20.0606V20.9082H10.7524V13.4566H11.756V20.0606H14.98ZM16.8538 15.6406V20.9082H15.9282V15.6406H16.8538ZM17.0514 13.987C17.0514 14.0771 17.0323 14.1621 16.9942 14.2418C16.9595 14.3181 16.911 14.3874 16.8486 14.4498C16.7896 14.5087 16.7186 14.5555 16.6354 14.5902C16.5556 14.6249 16.4707 14.6422 16.3806 14.6422C16.2904 14.6422 16.2055 14.6249 16.1258 14.5902C16.0495 14.5555 15.9819 14.5087 15.923 14.4498C15.864 14.3874 15.8172 14.3181 15.7826 14.2418C15.7479 14.1621 15.7306 14.0771 15.7306 13.987C15.7306 13.8969 15.7479 13.8119 15.7826 13.7322C15.8172 13.649 15.864 13.5779 15.923 13.519C15.9819 13.4566 16.0495 13.4081 16.1258 13.3734C16.2055 13.3387 16.2904 13.3214 16.3806 13.3214C16.4707 13.3214 16.5556 13.3387 16.6354 13.3734C16.7186 13.4081 16.7896 13.4566 16.8486 13.519C16.911 13.5779 16.9595 13.649 16.9942 13.7322C17.0323 13.8119 17.0514 13.8969 17.0514 13.987ZM22.8882 15.6406L20.7406 20.9082H19.9086L17.761 15.6406H18.515C18.5913 15.6406 18.6537 15.6597 18.7022 15.6978C18.7507 15.7359 18.7837 15.781 18.801 15.833L20.1374 19.2234C20.179 19.3517 20.2154 19.4765 20.2466 19.5978C20.2778 19.7191 20.3073 19.8405 20.335 19.9618C20.3627 19.8405 20.3922 19.7191 20.4234 19.5978C20.4546 19.4765 20.4927 19.3517 20.5378 19.2234L21.8898 15.833C21.9106 15.7775 21.9453 15.7325 21.9938 15.6978C22.0423 15.6597 22.0995 15.6406 22.1654 15.6406H22.8882ZM27.1205 17.6998C27.1205 17.4849 27.0893 17.289 27.0269 17.1122C26.968 16.9319 26.8796 16.7777 26.7617 16.6494C26.6473 16.5177 26.5069 16.4171 26.3405 16.3478C26.1741 16.275 25.9852 16.2386 25.7737 16.2386C25.33 16.2386 24.9781 16.3686 24.7181 16.6286C24.4616 16.8851 24.3021 17.2422 24.2397 17.6998H27.1205ZM27.8693 20.1698C27.7549 20.3085 27.618 20.4298 27.4585 20.5338C27.2991 20.6343 27.1275 20.7175 26.9437 20.7834C26.7635 20.8493 26.5763 20.8978 26.3821 20.929C26.188 20.9637 25.9956 20.981 25.8049 20.981C25.4409 20.981 25.1047 20.9203 24.7961 20.799C24.4911 20.6742 24.2259 20.4939 24.0005 20.2582C23.7787 20.019 23.6053 19.7243 23.4805 19.3742C23.3557 19.0241 23.2933 18.6219 23.2933 18.1678C23.2933 17.8003 23.3488 17.4571 23.4597 17.1382C23.5741 16.8193 23.7371 16.5437 23.9485 16.3114C24.16 16.0757 24.4183 15.8919 24.7233 15.7602C25.0284 15.625 25.3716 15.5574 25.7529 15.5574C26.0684 15.5574 26.3596 15.6111 26.6265 15.7186C26.8969 15.8226 27.1292 15.9751 27.3233 16.1762C27.5209 16.3738 27.6752 16.6199 27.7861 16.9146C27.8971 17.2058 27.9525 17.5386 27.9525 17.913C27.9525 18.0586 27.9369 18.1557 27.9057 18.2042C27.8745 18.2527 27.8156 18.277 27.7289 18.277H24.2085C24.2189 18.6098 24.264 18.8993 24.3437 19.1454C24.4269 19.3915 24.5413 19.5978 24.6869 19.7642C24.8325 19.9271 25.0059 20.0502 25.2069 20.1334C25.408 20.2131 25.6333 20.253 25.8829 20.253C26.1152 20.253 26.3145 20.227 26.4809 20.175C26.6508 20.1195 26.7964 20.0606 26.9177 19.9982C27.0391 19.9358 27.1396 19.8786 27.2193 19.8266C27.3025 19.7711 27.3736 19.7434 27.4325 19.7434C27.5088 19.7434 27.5677 19.7729 27.6093 19.8318L27.8693 20.1698Z"
+        fill="url(#paint2_linear_1673_80054)"
+      />
+      <defs>
+        <linearGradient
+          id="paint0_linear_1673_80054"
+          x1="34.5"
+          y1="17.1673"
+          x2="50.1"
+          y2="17.1673"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#CA9C43" />
+          <stop offset="0.604" stop-color="#98752F" />
+          <stop offset="1" stop-color="#92702D" />
+        </linearGradient>
+        <linearGradient
+          id="paint1_linear_1673_80054"
+          x1="2"
+          y1="17.3118"
+          x2="34.5"
+          y2="17.3118"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#CA9C43" />
+          <stop offset="0.604" stop-color="#98752F" />
+          <stop offset="1" stop-color="#92702D" />
+        </linearGradient>
+        <linearGradient
+          id="paint2_linear_1673_80054"
+          x1="9.80078"
+          y1="17.1304"
+          x2="28.8008"
+          y2="17.1304"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#CA9C43" />
+          <stop offset="0.604" stop-color="#98752F" />
+          <stop offset="1" stop-color="#92702D" />
+        </linearGradient>
+      </defs>
+    </svg>
+  ),
+  takeSnapshot: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+      width="52"
+      height="44"
+      viewBox="0 0 52 44"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g clip-path="url(#clip0_5098_100539)">
+        <path
+          d="M41.5125 34.2707C41.5125 35.2188 41.1359 36.1281 40.4654 36.7986C39.795 37.469 38.8857 37.8457 37.9375 37.8457H5.7625C4.81435 37.8457 3.90504 37.469 3.23459 36.7986C2.56415 36.1281 2.1875 35.2188 2.1875 34.2707V14.6082C2.1875 13.66 2.56415 12.7507 3.23459 12.0802C3.90504 11.4098 4.81435 11.0332 5.7625 11.0332H12.9125L16.4875 5.67065H27.2125L30.7875 11.0332H37.9375C38.8857 11.0332 39.795 11.4098 40.4654 12.0802C41.1359 12.7507 41.5125 13.66 41.5125 14.6082V34.2707Z"
+          stroke="url(#paint0_linear_5098_100539)"
+          stroke-width="2.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <circle
+          cx="21.8492"
+          cy="24.358"
+          r="6.175"
+          stroke="url(#paint1_linear_5098_100539)"
+          stroke-width="1.95"
+        />
+      </g>
+      <defs>
+        <linearGradient
+          id="paint0_linear_5098_100539"
+          x1="2.1875"
+          y1="22.354"
+          x2="41.5125"
+          y2="22.354"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#CA9C43" />
+          <stop offset="0.33" stop-color="#C79A42" />
+          <stop offset="0.56" stop-color="#BE923E" />
+          <stop offset="0.77" stop-color="#AE8638" />
+          <stop offset="0.96" stop-color="#98752F" />
+          <stop offset="1" stop-color="#92702D" />
+        </linearGradient>
+        <linearGradient
+          id="paint1_linear_5098_100539"
+          x1="14.6992"
+          y1="24.6228"
+          x2="28.9992"
+          y2="24.6228"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#CA9C43" />
+          <stop offset="0.274" stop-color="#916E2B" />
+          <stop offset="0.594" stop-color="#6A4F1B" />
+          <stop offset="1" stop-color="#473209" />
+        </linearGradient>
+        <clipPath id="clip0_5098_100539">
+          <rect
+            width="42.9"
+            height="42.9"
+            fill="white"
+            transform="translate(0.398438 0.308105)"
+          />
+        </clipPath>
+      </defs>
+    </svg>
+  ),
+  uploadPhotoOrVideo: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+      width="53"
+      height="53"
+      viewBox="0 0 53 53"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M46.2116 21.7733V36.9463C46.2116 41.7348 42.3297 45.6166 37.5413 45.6166H15.8656C11.0771 45.6166 7.19531 41.7348 7.19531 36.9463V15.2706C7.19531 10.4822 11.0771 6.60034 15.8656 6.60034H28.871"
+        stroke="url(#paint0_linear_5098_100548)"
+        stroke-width="1.95"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M7.19531 28.2755L10.0027 25.4682C10.9827 24.4881 12.312 23.9375 13.698 23.9375C15.084 23.9375 16.4133 24.4881 17.3934 25.4682L26.7034 34.7782"
+        stroke="url(#paint1_linear_5098_100548)"
+        stroke-width="1.95"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M15.8711 45.6163L29.5163 31.9711C31.5572 29.9302 34.8661 29.9302 36.907 31.9711L45.4454 40.5095"
+        stroke="url(#paint2_linear_5098_100548)"
+        stroke-width="1.95"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M39.708 6.60034L34.2891 12.0193"
+        stroke="url(#paint3_linear_5098_100548)"
+        stroke-width="1.95"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M45.126 12.0193L39.707 6.60034"
+        stroke="url(#paint4_linear_5098_100548)"
+        stroke-width="1.95"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M39.7088 6.60034V17.4382"
+        stroke="url(#paint5_linear_5098_100548)"
+        stroke-width="1.95"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <defs>
+        <linearGradient
+          id="paint0_linear_5098_100548"
+          x1="7.19531"
+          y1="26.831"
+          x2="46.2116"
+          y2="26.831"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#CA9C43" />
+          <stop offset="0.274" stop-color="#916E2B" />
+          <stop offset="0.594" stop-color="#6A4F1B" />
+          <stop offset="1" stop-color="#473209" />
+        </linearGradient>
+        <linearGradient
+          id="paint1_linear_5098_100548"
+          x1="7.19531"
+          y1="29.5586"
+          x2="26.7034"
+          y2="29.5586"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#CA9C43" />
+          <stop offset="0.274" stop-color="#916E2B" />
+          <stop offset="0.594" stop-color="#6A4F1B" />
+          <stop offset="1" stop-color="#473209" />
+        </linearGradient>
+        <linearGradient
+          id="paint2_linear_5098_100548"
+          x1="15.8711"
+          y1="38.3094"
+          x2="45.4454"
+          y2="38.3094"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#CA9C43" />
+          <stop offset="0.274" stop-color="#916E2B" />
+          <stop offset="0.594" stop-color="#6A4F1B" />
+          <stop offset="1" stop-color="#473209" />
+        </linearGradient>
+        <linearGradient
+          id="paint3_linear_5098_100548"
+          x1="34.2891"
+          y1="9.41015"
+          x2="39.708"
+          y2="9.41015"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#CA9C43" />
+          <stop offset="0.274" stop-color="#916E2B" />
+          <stop offset="0.594" stop-color="#6A4F1B" />
+          <stop offset="1" stop-color="#473209" />
+        </linearGradient>
+        <linearGradient
+          id="paint4_linear_5098_100548"
+          x1="39.707"
+          y1="9.41015"
+          x2="45.126"
+          y2="9.41015"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#CA9C43" />
+          <stop offset="0.274" stop-color="#916E2B" />
+          <stop offset="0.594" stop-color="#6A4F1B" />
+          <stop offset="1" stop-color="#473209" />
+        </linearGradient>
+        <linearGradient
+          id="paint5_linear_5098_100548"
+          x1="38.625"
+          y1="12.22"
+          x2="40.7926"
+          y2="12.22"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#CA9C43" />
+          <stop offset="0.274" stop-color="#916E2B" />
+          <stop offset="0.594" stop-color="#6A4F1B" />
+          <stop offset="1" stop-color="#473209" />
         </linearGradient>
       </defs>
     </svg>

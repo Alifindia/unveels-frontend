@@ -3,6 +3,7 @@ import { useCamera } from "../context/recorder-context";
 import { Link } from "react-router-dom";
 import { Icons } from "./icons";
 import { CSSProperties } from "react";
+import { useCartContext } from "../context/cart-context";
 
 export function TopNavigation({
   item = false,
@@ -12,6 +13,7 @@ export function TopNavigation({
   cart?: boolean;
 }) {
   const { flipCamera } = useCamera();
+  const { summaryCount } = useCartContext();
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
@@ -42,6 +44,7 @@ export function TopNavigation({
           </div>
         ) : null}
       </div>
+
       <div className="flex flex-col gap-4">
         <Link
           type="button"
@@ -50,6 +53,7 @@ export function TopNavigation({
         >
           <X className="size-6 text-white" />
         </Link>
+
         <div className="relative -m-0.5 p-0.5">
           <div
             className="absolute inset-0 rounded-full border-2 border-transparent"
@@ -71,12 +75,16 @@ export function TopNavigation({
             <Icons.flipCamera className="size-6 text-white" />
           </button>
         </div>
+
         {cart && (
           <button
             type="button"
             className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           >
             <Icons.myCart className="size-6 text-white" />
+            <span className="absolute bottom-[5px] right-[5px] flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+              {summaryCount}
+            </span>
           </button>
         )}
       </div>

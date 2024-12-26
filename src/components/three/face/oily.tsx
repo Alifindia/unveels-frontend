@@ -30,6 +30,7 @@ const OilyInner: React.FC<OilyProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={oilyMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={true}
     />
   );
 };

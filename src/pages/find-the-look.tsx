@@ -1,4 +1,10 @@
+import {
+  FaceLandmarker,
+  FilesetResolver,
+  ObjectDetector,
+} from "@mediapipe/tasks-vision";
 import clsx from "clsx";
+import { capitalize } from "lodash";
 import {
   ChevronLeft,
   CirclePlay,
@@ -7,7 +13,12 @@ import {
   StopCircle,
   X,
 } from "lucide-react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
+import {
+  handAccessoriesProductTypeFilter,
+  headAccessoriesProductTypeFilter,
+  neckAccessoriesProductTypeFilter,
+} from "../api/attributes/accessories";
 import {
   getFaceMakeupProductTypeIds,
   getLashMakeupProductTypeIds,
@@ -16,31 +27,30 @@ import {
 } from "../api/attributes/makeups";
 import { useProducts } from "../api/get-product";
 import { useLipsProductQuery } from "../api/lips";
-import {
-  FindTheLookProvider,
-  useFindTheLookContext,
-} from "../components/find-the-look/find-the-look-context";
+import { FindTheLookMainScreen } from "../components/find-the-look/find-the-look-main-screen";
+import { FindTheLookScene } from "../components/find-the-look/find-the-look-scene";
 import { Footer } from "../components/footer";
 import { Icons } from "../components/icons";
 import { LoadingProducts } from "../components/loading";
+import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { BrandName } from "../components/product/brand";
 import { Rating } from "../components/rating";
 import { VideoScene } from "../components/recorder/recorder";
-import { CameraProvider, useCamera } from "../context/recorder-context";
 import { VideoStream } from "../components/recorder/video-stream";
 import { ShareModal } from "../components/share-modal";
-import { SkinAnalysisProvider } from "../context/skin-analysis-context";
-import { SkinAnalysisScene } from "../components/skin-analysis/skin-analysis-scene";
-import { useRecordingControls } from "../hooks/useRecorder";
-import { skinAnalysisInference } from "../inference/skinAnalysisInference";
-import { FaceResults } from "../types/faceResults";
-import { getProductAttributes, mediaUrl } from "../utils/apiUtils";
 import { TopNavigation } from "../components/top-navigation";
 import {
-  headAccessoriesProductTypeFilter,
-  neckAccessoriesProductTypeFilter,
-} from "../api/attributes/accessories";
-import { FindTheLookScene } from "../components/find-the-look/find-the-look-scene";
+  FindTheLookProvider,
+  useFindTheLookContext,
+} from "../context/find-the-look-context";
+import { CameraProvider, useCamera } from "../context/recorder-context";
+import { SkinAnalysisProvider } from "../context/skin-analysis-context";
+import { useModelLoader } from "../hooks/useModelLoader";
+import { useRecordingControls } from "../hooks/useRecorder";
+import { FindTheLookItems } from "../types/findTheLookItems";
+import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
+import { VTOProductCard } from "../components/vto/vto-product-card";
+import { useCartContext } from "../context/cart-context";
 
 export function FindTheLook() {
   return (
@@ -58,33 +68,128 @@ export function FindTheLook() {
 
 function Main() {
   const { criterias } = useCamera();
+  const [selectionMade, setSelectionMade] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+
+  const modelsRef = useRef<{
+    faceLandmarker: FaceLandmarker | null;
+    accesoriesDetector: ObjectDetector | null;
+    makeupDetector: ObjectDetector | null;
+  }>({
+    faceLandmarker: null,
+    accesoriesDetector: null,
+    makeupDetector: null,
+  });
+
+  const steps = [
+    async () => {
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+      );
+
+      const faceLandmarkerInstance = await FaceLandmarker.createFromOptions(
+        vision,
+        {
+          baseOptions: {
+            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          numFaces: 1,
+          minFaceDetectionConfidence: 0.5,
+          minTrackingConfidence: 0.5,
+          minFacePresenceConfidence: 0.5,
+        },
+      );
+      modelsRef.current.faceLandmarker = faceLandmarkerInstance;
+    },
+    async () => {
+      const accesoriesDetectorInstance = await ObjectDetector.createFromOptions(
+        await FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+        ),
+        {
+          baseOptions: {
+            modelAssetPath:
+              "/media/unveels/models/find-the-look/accesories_model.tflite",
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          maxResults: 10,
+          scoreThreshold: 0.1,
+        },
+      );
+      modelsRef.current.accesoriesDetector = accesoriesDetectorInstance;
+    },
+    async () => {
+      const makeupDetectorInstance = await ObjectDetector.createFromOptions(
+        await FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+        ),
+        {
+          baseOptions: {
+            modelAssetPath: "/media/unveels/models/find-the-look/makeup.tflite",
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          maxResults: 4,
+          scoreThreshold: 0.1,
+        },
+      );
+      modelsRef.current.makeupDetector = makeupDetectorInstance;
+    },
+  ];
+
+  const {
+    progress,
+    isLoading: modelLoading,
+    loadModels,
+  } = useModelLoader(steps);
+
+  useEffect(() => {
+    loadModels();
+  }, []);
+
+  const handleSelection = () => {
+    setSelectionMade(true);
+  };
+
+  if (modelLoading) {
+    return <ModelLoadingScreen progress={progress} />;
+  }
 
   return (
-    <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
-      <div className="absolute inset-0">
-        {criterias.isCaptured && criterias.capturedImage ? (
-          <FindTheLookScene />
-        ) : (
-          <>
-            <VideoStream />
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-                zIndex: 0,
-              }}
-            ></div>
-          </>
-        )}
-      </div>
-      <RecorderStatus />
-      <TopNavigation item={false} />
+    <>
+      {!selectionMade && (
+        <FindTheLookMainScreen onSelection={handleSelection} />
+      )}
+      {selectionMade && (
+        <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+          <div className="absolute inset-0">
+            {criterias.isCaptured && criterias.capturedImage ? (
+              <FindTheLookScene models={modelsRef.current} />
+            ) : (
+              <>
+                <VideoStream />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
+                    zIndex: 0,
+                  }}
+                ></div>
+              </>
+            )}
+          </div>
+          <TopNavigation cart={true} />
 
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-        <MainContent />
-        <Footer />
-      </div>
-    </div>
+          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
+            <MainContent />
+            <Footer />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -121,107 +226,139 @@ function MainContent() {
   return <BottomContent />;
 }
 
-const makeups = [
-  "Lipstick",
-  "Mascara",
-  "Blusher",
-  "Highlighter",
-  "Eyecolor",
-] as const;
-
-function MakeupCategories() {
-  const [tab, setTab] = useState<(typeof makeups)[number]>("Lipstick");
+function MakeupCategories({
+  makeups,
+  activeTab,
+  onTabChange,
+}: {
+  makeups: FindTheLookItems[];
+  activeTab?: string | null;
+  onTabChange: (label: string) => void;
+}) {
+  const [tab, setTab] = useState<string | undefined>(
+    activeTab ?? makeups[0]?.label,
+  );
   const { setView } = useFindTheLookContext();
 
-  return (
-    <>
-      <div className="relative space-y-2 px-4 pb-4">
-        <div className="flex w-full items-center space-x-3.5 overflow-x-auto overflow-y-visible pt-7 no-scrollbar">
-          {makeups.map((category) => {
-            const isActive = tab === category;
-            return (
-              <Fragment key={category}>
-                <button
-                  key={category}
-                  className={clsx(
-                    "overflow relative shrink-0 rounded-full border border-white px-3 py-1 text-sm text-white",
-                    {
-                      "bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)]":
-                        isActive,
-                    },
-                  )}
-                  onClick={() => setTab(category)}
-                >
-                  {category}
-                </button>
-              </Fragment>
-            );
-          })}
-        </div>
+  // Update the tab if activeTab changes
+  useEffect(() => {
+    if (activeTab) {
+      setTab(activeTab);
+    }
+  }, [activeTab]);
 
-        <div className="pb-2 text-right">
-          <button
-            type="button"
-            className="text-white"
-            onClick={() => {
-              setView("all_categories");
-            }}
-          >
-            View all
-          </button>
-        </div>
-        <ProductList product_type={tab} />
+  return (
+    <div className="relative space-y-2 px-4 pb-4">
+      <div className="flex w-full items-center space-x-2.5 overflow-x-auto pt-4 no-scrollbar sm:pt-7">
+        {makeups.map((category) => {
+          const isActive = capitalize(tab) === capitalize(category.label);
+          return (
+            <Fragment key={category.section}>
+              <button
+                className={clsx(
+                  "relative flex h-[18px] shrink-0 items-center rounded-full border border-white px-2 text-[9.8px] text-white sm:h-7 sm:px-3 sm:py-1 sm:text-sm",
+                  {
+                    "bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)]":
+                      isActive,
+                  },
+                )}
+                onClick={() => {
+                  setTab(category.label);
+                  onTabChange(category.label); // Notify parent of the selected tab
+                }}
+              >
+                {category.label}
+              </button>
+            </Fragment>
+          );
+        })}
       </div>
-    </>
+
+      <div className="text-right">
+        <button
+          type="button"
+          className="text-[10px] text-white sm:text-sm"
+          onClick={() => {
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+
+      {/* Render ProductList if a valid tab (label) is selected */}
+      {tab && mapTypes[tab] ? <ProductList product_type={tab} /> : null}
+    </div>
   );
 }
 
-const accessories = ["Sunglasses", "Chokers", "Earrings"];
-
-function AccessoriesCategories() {
-  const [tab, setTab] = useState<(typeof accessories)[number]>("Sunglasses");
+function AccessoriesCategories({
+  accessories,
+  activeTab,
+  onTabChange,
+}: {
+  accessories: FindTheLookItems[];
+  activeTab?: string | null;
+  onTabChange: (label: string) => void;
+}) {
+  const [tab, setTab] = useState<string | undefined>(
+    activeTab ?? capitalize(accessories[0]?.label),
+  );
   const { setView } = useFindTheLookContext();
 
-  return (
-    <>
-      <div className="relative space-y-2 px-4 pb-4">
-        <div className="flex w-full items-center space-x-3.5 overflow-x-auto overflow-y-visible pt-7 no-scrollbar">
-          {accessories.map((category) => {
-            const isActive = tab === category;
-            return (
-              <Fragment key={category}>
-                <button
-                  key={category}
-                  className={clsx(
-                    "overflow relative shrink-0 rounded-full border border-white px-3 py-1 text-sm text-white",
-                    {
-                      "bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)]":
-                        isActive,
-                    },
-                  )}
-                  onClick={() => setTab(category)}
-                >
-                  {category}
-                </button>
-              </Fragment>
-            );
-          })}
-        </div>
+  // Update the tab if activeTab changes
+  useEffect(() => {
+    if (activeTab) {
+      setTab(capitalize(activeTab));
+    }
+  }, [activeTab]);
 
-        <div className="pb-2 text-right">
-          <button
-            type="button"
-            className="text-white"
-            onClick={() => {
-              setView("all_categories");
-            }}
-          >
-            View all
-          </button>
-        </div>
-        <ProductList product_type={tab} />
+  function onTabClick(label: string) {
+    setTab(label);
+    onTabChange(label); // Notify parent of the selected tab
+  }
+
+  return (
+    <div className="relative space-y-2 px-4 pb-4">
+      <div className="flex w-full items-center space-x-2.5 overflow-x-auto pt-4 no-scrollbar sm:pt-7">
+        {accessories.map((category) => {
+          const isActive = capitalize(tab) === capitalize(category.label);
+          return (
+            <Fragment key={category.section}>
+              <button
+                className={clsx(
+                  "relative flex h-[18px] shrink-0 items-center rounded-full border border-white px-2 text-[9.8px] text-white sm:h-7 sm:px-3 sm:py-1 sm:text-sm",
+                  {
+                    "bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)]":
+                      isActive,
+                  },
+                )}
+                onClick={() => {
+                  onTabClick(capitalize(category.label));
+                }}
+              >
+                {category.label}
+              </button>
+            </Fragment>
+          );
+        })}
       </div>
-    </>
+
+      <div className="text-right">
+        <button
+          type="button"
+          className="text-[10px] text-white sm:text-sm"
+          onClick={() => {
+            setView("all_categories");
+          }}
+        >
+          View all
+        </button>
+      </div>
+
+      {/* Render ProductList if a valid tab (label) is selected */}
+      {tab && mapTypes[tab] ? <ProductList product_type={tab} /> : null}
+    </div>
   );
 }
 
@@ -263,6 +400,22 @@ const mapTypes: {
     attributeName: "head_accessories_product_type",
     values: headAccessoriesProductTypeFilter(["Sunglasses"]),
   },
+  "Head Bands": {
+    attributeName: "head_accessories_product_type",
+    values: headAccessoriesProductTypeFilter(["Head Bands"]),
+  },
+  Glasses: {
+    attributeName: "head_accessories_product_type",
+    values: headAccessoriesProductTypeFilter(["Glasses"]),
+  },
+  Caps: {
+    attributeName: "head_accessories_product_type",
+    values: headAccessoriesProductTypeFilter(["Hats"]),
+  },
+  Hats: {
+    attributeName: "head_accessories_product_type",
+    values: headAccessoriesProductTypeFilter(["Hats"]),
+  },
   Chokers: {
     attributeName: "neck_accessories_product_type",
     values: neckAccessoriesProductTypeFilter(["Chokers"]),
@@ -271,6 +424,22 @@ const mapTypes: {
     attributeName: "head_accessories_product_type",
     values: headAccessoriesProductTypeFilter(["Earrings"]),
   },
+  Necklace: {
+    attributeName: "neck_accessories_product_type",
+    values: headAccessoriesProductTypeFilter(["Necklaces"]),
+  },
+  Scarf: {
+    attributeName: "neck_accessories_product_type",
+    values: neckAccessoriesProductTypeFilter(["Scarves"]),
+  },
+  Bracelet: {
+    attributeName: "hand_accessories_product_type",
+    values: handAccessoriesProductTypeFilter(["Bracelets"]),
+  },
+  Rings: {
+    attributeName: "hand_accessories_product_type",
+    values: handAccessoriesProductTypeFilter(["Rings"]),
+  },
 };
 
 function ProductList({ product_type }: { product_type: string }) {
@@ -278,6 +447,17 @@ function ProductList({ product_type }: { product_type: string }) {
     product_type_key: mapTypes[product_type].attributeName,
     type_ids: mapTypes[product_type].values,
   });
+
+  const { addItemToCart } = useCartContext();
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
 
   return (
     <div className="flex w-full gap-4 overflow-x-auto no-scrollbar active:cursor-grabbing">
@@ -288,7 +468,16 @@ function ProductList({ product_type }: { product_type: string }) {
             "https://picsum.photos/id/237/200/300";
 
           return (
-            <div key={product.id} className="w-[115px] rounded shadow">
+            <div
+              key={product.id}
+              className="w-[115px] rounded shadow"
+              onClick={() => {
+                window.open(
+                  `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                  "_blank",
+                );
+              }}
+            >
               <div className="relative h-[80px] w-[115px] overflow-hidden">
                 <img
                   src={imageUrl}
@@ -297,7 +486,7 @@ function ProductList({ product_type }: { product_type: string }) {
                 />
               </div>
 
-              <h3 className="line-clamp-2 h-10 py-2 text-[0.625rem] font-semibold text-white">
+              <h3 className="line-clamp-2 py-1 text-[0.625rem] font-semibold text-white sm:h-10 sm:py-2">
                 {product.name}
               </h3>
 
@@ -311,7 +500,14 @@ function ProductList({ product_type }: { product_type: string }) {
                 </div>
                 <button
                   type="button"
-                  className="flex h-7 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-2.5 text-[0.5rem] font-semibold text-white"
+                  className="flex h-5 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-2.5 text-[0.5rem] font-semibold text-white sm:h-7"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleAddToCart(
+                      product.id.toString(),
+                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                    );
+                  }}
                 >
                   Add to cart
                 </button>
@@ -326,11 +522,55 @@ function ProductList({ product_type }: { product_type: string }) {
   );
 }
 
+const groupedItems = (findTheLookItems: FindTheLookItems[]) => {
+  if (!findTheLookItems) return { makeup: [], accessories: [] };
+  return {
+    makeup: findTheLookItems.filter((item) => item.section === "makeup"),
+    accessories: findTheLookItems.filter(
+      (item) => item.section === "accessories",
+    ),
+  };
+};
+
 function BottomContent() {
   const { criterias, setCriterias } = useCamera();
-  const { view, setView } = useFindTheLookContext();
+  const { view, setView, findTheLookItems, tab, section, setTab, setSection } =
+    useFindTheLookContext();
+  const [groupedItemsData, setGroupedItemsData] = useState<{
+    makeup: FindTheLookItems[];
+    accessories: FindTheLookItems[];
+  }>({
+    makeup: [],
+    accessories: [],
+  });
+
+  useEffect(() => {
+    if (findTheLookItems) {
+      const grouped = groupedItems(findTheLookItems);
+      setGroupedItemsData(grouped);
+      console.log(groupedItemsData);
+    }
+  }, [findTheLookItems]);
+
+  const initialSection: "makeup" | "accessories" | undefined =
+    section === "makeup" || section === "accessories" ? section : undefined;
 
   if (criterias.isCaptured) {
+    if (tab && section) {
+      return (
+        <ProductRecommendationsTabs
+          groupedItemsData={groupedItemsData}
+          initialSection={initialSection}
+          activeTab={tab}
+          onClose={() => {
+            setTab(null);
+            setSection(null);
+            setView("face");
+          }}
+        />
+      );
+    }
+
     if (view === "face") {
       return (
         <InferenceResults
@@ -347,9 +587,9 @@ function BottomContent() {
     if (view === "recommendations") {
       return (
         <ProductRecommendationsTabs
-          onClose={() => {
-            setView("face");
-          }}
+          groupedItemsData={groupedItemsData}
+          initialSection="makeup"
+          onClose={() => setView("face")}
         />
       );
     }
@@ -370,6 +610,7 @@ function BottomContent() {
         onClose={() => {
           setView("face");
         }}
+        groupedItemsData={groupedItemsData}
       />
     );
   }
@@ -401,53 +642,78 @@ function InferenceResults({
   );
 }
 
-function ProductRecommendationsTabs({ onClose }: { onClose: () => void }) {
-  const [tab, setTab] = useState<"makeup" | "accessories">("makeup");
+function ProductRecommendationsTabs({
+  groupedItemsData,
+  onClose,
+  initialSection = "makeup",
+  activeTab,
+}: {
+  groupedItemsData: {
+    makeup: FindTheLookItems[];
+    accessories: FindTheLookItems[];
+  };
+  onClose: () => void;
+  initialSection?: "makeup" | "accessories"; // New prop to initialize the section
+  activeTab?: string; // Active tab for initializing the selected tab in categories
+}) {
+  const [tab, setTab] = useState<"makeup" | "accessories">(initialSection);
+  const [localActiveTab, setLocalActiveTab] = useState<string | null>(
+    activeTab ?? null,
+  );
+
+  // Update localActiveTab when activeTab changes
+  useEffect(() => {
+    setLocalActiveTab(activeTab ?? null);
+  }, [activeTab]);
+
+  // Reset active tab when the category changes
+  useEffect(() => {
+    setLocalActiveTab(null);
+  }, [tab]); // This will reset activeTab when the user switches between makeup and accessories
 
   const activeClassNames =
-    "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text text-transparent";
+    "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text";
 
   return (
     <>
-      <div
-        className="fixed inset-0 h-full w-full"
-        onClick={() => {
-          onClose();
-        }}
-      ></div>
+      <div className="fixed inset-0 h-full w-full" onClick={onClose}></div>
       <div className="mx-auto w-full space-y-2 px-4 lg:max-w-xl">
-        <div className="flex h-10 w-full items-center justify-between border-b border-gray-600 text-center">
-          {["makeup", "accessories"].map((shadeTab) => {
-            const isActive = tab === shadeTab;
+        <div className="flex h-6 w-full items-center justify-between border-b border-gray-600 text-center sm:h-10">
+          {["makeup", "accessories"].map((section) => {
+            const isActive = tab.toLowerCase() === section;
             return (
-              <Fragment key={shadeTab}>
+              <Fragment key={section}>
                 <button
-                  key={shadeTab}
-                  className={`relative h-10 grow border-b text-lg ${
+                  key={section}
+                  className={`relative h-full grow border-b font-luxury text-sm sm:text-lg ${
                     isActive
                       ? activeClassNames
                       : "border-transparent text-gray-500"
                   }`}
-                  onClick={() => setTab(shadeTab as "makeup" | "accessories")}
+                  onClick={() => setTab(section as "makeup" | "accessories")}
                 >
-                  <span className={isActive ? "text-white/70 blur-sm" : ""}>
-                    {shadeTab.charAt(0).toUpperCase() + shadeTab.slice(1)}
+                  <span
+                    className={clsx("capitalize", {
+                      "text-white/70 blur-sm": isActive,
+                    })}
+                  >
+                    {section}
                   </span>
                   {isActive ? (
                     <>
                       <div
                         className={clsx(
-                          "absolute inset-0 flex items-center justify-center text-lg blur-sm",
+                          "absolute inset-0 flex items-center justify-center blur-sm",
                           activeClassNames,
                         )}
                       >
-                        <span className="text-center text-lg">
-                          {shadeTab.charAt(0).toUpperCase() + shadeTab.slice(1)}{" "}
+                        <span className="text-center text-sm capitalize md:text-lg">
+                          {section}
                         </span>
                       </div>
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-center text-lg text-white/70">
-                          {shadeTab.charAt(0).toUpperCase() + shadeTab.slice(1)}{" "}
+                        <span className="text-center text-sm capitalize text-white/70 md:text-lg">
+                          {section}
                         </span>
                       </div>
                     </>
@@ -458,12 +724,33 @@ function ProductRecommendationsTabs({ onClose }: { onClose: () => void }) {
           })}
         </div>
       </div>
-      {tab === "makeup" ? <MakeupCategories /> : <AccessoriesCategories />}
+      {tab === "makeup" ? (
+        <MakeupCategories
+          makeups={groupedItemsData.makeup}
+          activeTab={localActiveTab} // Pass localActiveTab to MakeupCategories
+          onTabChange={(label) => setLocalActiveTab(label)}
+        />
+      ) : (
+        <AccessoriesCategories
+          accessories={groupedItemsData.accessories}
+          activeTab={localActiveTab} // Pass localActiveTab to AccessoriesCategories
+          onTabChange={(label) => setLocalActiveTab(label)}
+        />
+      )}
     </>
   );
 }
 
-function AllProductsPage({ onClose }: { onClose: () => void }) {
+function AllProductsPage({
+  onClose,
+  groupedItemsData,
+}: {
+  onClose: () => void;
+  groupedItemsData: {
+    makeup: FindTheLookItems[];
+    accessories: FindTheLookItems[];
+  };
+}) {
   const [tab, setTab] = useState<"makeup" | "accessories">("makeup");
   const { selectedItems: cart, dispatch } = useFindTheLookContext();
 
@@ -531,7 +818,11 @@ function AllProductsPage({ onClose }: { onClose: () => void }) {
         ))}
       </div>
 
-      {tab === "makeup" ? <MakeupAllView /> : <AccessoriesAllView />}
+      {tab === "makeup" ? (
+        <MakeupAllView makeups={groupedItemsData.makeup} />
+      ) : (
+        <AccessoriesAllView accessories={groupedItemsData.accessories} />
+      )}
 
       <div className="h-20">
         <div className="mx-auto flex max-w-sm space-x-2.5 pb-6 pt-4 lg:space-x-6">
@@ -553,12 +844,40 @@ function AllProductsPage({ onClose }: { onClose: () => void }) {
   );
 }
 
-function MakeupAllView() {
+function MakeupAllView({ makeups }: { makeups: FindTheLookItems[] }) {
+  const validMakeups = makeups.filter((category) => mapTypes[category.label]);
+
   return (
     <div className="h-full flex-1 overflow-y-auto px-5">
       <div className="space-y-14">
-        {makeups.map((category) => (
-          <ProductHorizontalList category={category} />
+        {validMakeups.map((category) => (
+          <ProductHorizontalList
+            category={category.label}
+            key={category.section}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AccessoriesAllView({
+  accessories,
+}: {
+  accessories: FindTheLookItems[];
+}) {
+  const validAccessories = accessories.filter(
+    (category) => mapTypes[category.label],
+  );
+
+  return (
+    <div className="h-full flex-1 overflow-y-auto px-5">
+      <div className="space-y-14">
+        {validAccessories.map((category) => (
+          <ProductHorizontalList
+            category={category.label}
+            key={category.section}
+          />
         ))}
       </div>
     </div>
@@ -566,12 +885,29 @@ function MakeupAllView() {
 }
 
 function ProductHorizontalList({ category }: { category: string }) {
+  const { selectedItems: cart, dispatch } = useFindTheLookContext(); // Assuming dispatch is here
+
+  if (!mapTypes[category]) {
+    console.warn(`Category "${category}" is not defined in mapTypes.`);
+    return null;
+  }
+
+  const { attributeName, values } = mapTypes[category];
   const { data } = useProducts({
-    product_type_key: mapTypes[category].attributeName,
-    type_ids: mapTypes[category].values,
+    product_type_key: attributeName,
+    type_ids: values,
   });
 
-  const { selectedItems: cart, dispatch } = useFindTheLookContext();
+  const { addItemToCart } = useCartContext();
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
 
   return (
     <div key={category}>
@@ -588,7 +924,13 @@ function ProductHorizontalList({ category }: { category: string }) {
             return (
               <div
                 key={product.id}
-                className="w-[calc(50%-0.5rem)] shrink-0 rounded shadow lg:w-[calc(20%-0.5rem)]"
+                className="w-[calc(50%-0.5rem)] shrink-0 rounded shadow lg:w-[calc(16.667%-0.5rem)]"
+                onClick={() => {
+                  window.open(
+                    `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                    "_blank",
+                  );
+                }}
               >
                 <div className="relative aspect-square w-full overflow-hidden">
                   <img
@@ -618,6 +960,12 @@ function ProductHorizontalList({ category }: { category: string }) {
                   <button
                     type="button"
                     className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
+                    onClick={() => {
+                      handleAddToCart(
+                        product.id.toString(),
+                        `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      );
+                    }}
                   >
                     ADD TO CART
                   </button>
@@ -642,18 +990,6 @@ function ProductHorizontalList({ category }: { category: string }) {
   );
 }
 
-function AccessoriesAllView() {
-  return (
-    <div className="h-full flex-1 overflow-y-auto px-5">
-      <div className="space-y-14">
-        {accessories.map((category) => (
-          <ProductHorizontalList category={category} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function SingleCategoryView({
   category,
   onClose,
@@ -662,6 +998,17 @@ function SingleCategoryView({
   onClose: () => void;
 }) {
   const { data } = useLipsProductQuery({});
+
+  const { addItemToCart } = useCartContext();
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
 
   return (
     <div
@@ -684,14 +1031,23 @@ function SingleCategoryView({
         <div className="py-4">
           <h2 className="text-base text-[#E6E5E3]">{category}</h2>
         </div>
-        <div className="grid grid-cols-2 gap-2.5 py-4 sm:grid-cols-3 xl:grid-cols-5">
+        <div className="grid grid-cols-2 gap-2.5 py-4 sm:grid-cols-3 xl:grid-cols-6">
           {data
             ? data.items.map((product, index) => {
                 const imageUrl = mediaUrl(
                   product.media_gallery_entries[0].file,
                 ) as string;
                 return (
-                  <div key={product.id} className="w-full rounded shadow">
+                  <div
+                    key={product.id}
+                    className="w-full rounded shadow"
+                    // onClick={() => {
+                    //   window.open(
+                    //     `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                    //     "_blank",
+                    //   );
+                    // }}
+                  >
                     <div className="relative aspect-square overflow-hidden">
                       <img
                         src={imageUrl}
@@ -720,6 +1076,12 @@ function SingleCategoryView({
                       <button
                         type="button"
                         className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
+                        onClick={() => {
+                          handleAddToCart(
+                            product.id.toString(),
+                            `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                          );
+                        }}
                       >
                         ADD TO CART
                       </button>
@@ -736,51 +1098,6 @@ function SingleCategoryView({
             : null}
         </div>
       </div>
-    </div>
-  );
-}
-
-function RecorderStatus() {
-  const { isRecording, formattedTime, handleStartPause, handleStop, isPaused } =
-    useRecordingControls();
-  const { finish } = useCamera();
-
-  return (
-    <div className="absolute inset-x-0 top-14 flex items-center justify-center gap-4">
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={handleStartPause}
-      >
-        {isPaused ? (
-          <CirclePlay className="size-6 text-white" />
-        ) : isRecording ? (
-          <PauseCircle className="size-6 text-white" />
-        ) : null}
-      </button>
-      <span className="relative flex size-4">
-        {isRecording ? (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-        ) : null}
-        <span className="relative inline-flex size-4 rounded-full bg-red-500"></span>
-      </span>
-      <div className="font-serif text-white">{formattedTime}</div>
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={
-          isRecording
-            ? () => {
-                handleStop();
-                finish();
-              }
-            : handleStartPause
-        }
-      >
-        {isRecording || isPaused ? (
-          <StopCircle className="size-6 text-white" />
-        ) : (
-          <CirclePlay className="size-6 text-white" />
-        )}
-      </button>
     </div>
   );
 }

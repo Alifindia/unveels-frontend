@@ -16,9 +16,14 @@ import { Landmark } from "../../../types/landmark";
 interface LipColorProps extends MeshProps {
   landmarks: React.RefObject<Landmark[]>;
   planeSize: [number, number];
+  isFlipped: boolean;
 }
 
-const LipColorInner: React.FC<LipColorProps> = ({ landmarks, planeSize }) => {
+const LipColorInner: React.FC<LipColorProps> = ({
+  landmarks,
+  planeSize,
+  isFlipped,
+}) => {
   const { lipColorMode, lipColors } = useMakeup();
 
   useEffect(() => {
@@ -26,7 +31,6 @@ const LipColorInner: React.FC<LipColorProps> = ({ landmarks, planeSize }) => {
     console.log("Lip Colors:", lipColors);
   }, [lipColorMode, lipColors]);
 
-  // Definisikan peta tekstur berdasarkan mode
   const texturePaths = useMemo(() => {
     if (lipColorMode === "One") {
       return {
@@ -65,7 +69,7 @@ const LipColorInner: React.FC<LipColorProps> = ({ landmarks, planeSize }) => {
     const material = new MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 1,
+      opacity: 0.36,
       alphaMap: standardTexture,
       alphaTest: 0,
     });
@@ -77,7 +81,7 @@ const LipColorInner: React.FC<LipColorProps> = ({ landmarks, planeSize }) => {
     const material = new MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 1,
+      opacity: 0.36,
       alphaMap: standardTexture,
       alphaTest: 0,
     });
@@ -89,14 +93,13 @@ const LipColorInner: React.FC<LipColorProps> = ({ landmarks, planeSize }) => {
     const material = new MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 1,
+      opacity: 0.36,
       alphaMap: highTexture,
       alphaTest: 0,
     });
     return material;
   }, [lipColors, highTexture]);
 
-  // Cleanup materials untuk mencegah kebocoran memori
   useEffect(() => {
     return () => {
       singleMaterial.dispose();
@@ -105,7 +108,6 @@ const LipColorInner: React.FC<LipColorProps> = ({ landmarks, planeSize }) => {
     };
   }, [singleMaterial, dualStandardMaterial, dualHighMaterial]);
 
-  // Render FaceMesh dengan material yang sesuai berdasarkan mode
   return (
     <>
       {lipColorMode === "One" && lipColors[0] && (
@@ -113,6 +115,7 @@ const LipColorInner: React.FC<LipColorProps> = ({ landmarks, planeSize }) => {
           landmarks={landmarks}
           material={singleMaterial}
           planeSize={planeSize}
+          flipHorizontal={isFlipped}
         />
       )}
 
@@ -123,6 +126,7 @@ const LipColorInner: React.FC<LipColorProps> = ({ landmarks, planeSize }) => {
               landmarks={landmarks}
               material={dualStandardMaterial}
               planeSize={planeSize}
+              flipHorizontal={isFlipped}
             />
           )}
           {lipColors[1] && (
@@ -130,6 +134,7 @@ const LipColorInner: React.FC<LipColorProps> = ({ landmarks, planeSize }) => {
               landmarks={landmarks}
               material={dualHighMaterial}
               planeSize={planeSize}
+              flipHorizontal={isFlipped}
             />
           )}
         </>

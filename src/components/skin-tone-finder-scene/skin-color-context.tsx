@@ -16,8 +16,8 @@ const SkinColorContext = createContext<SkinColorContextType | undefined>(
 
 // Provider component
 export const SkinColorProvider = ({ children }: { children: ReactNode }) => {
-  const [hexColor, setHexColorState] = useState<string>("#FFFFFF"); // Existing state
-  const [hexSkin, setHexSkin] = useState<string>("#FFFFFF"); // New state
+  const [hexColor, setHexColorState] = useState<string>(""); // Existing state
+  const [hexSkin, setHexSkin] = useState<string>(""); // New state
   const [skinType, setSkinType] = useState<SkinType | null>(null);
 
   // Setter to update hexSkin and skinType

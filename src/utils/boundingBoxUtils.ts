@@ -6,7 +6,7 @@ import { MappedBox } from "../types/mappedBox";
 
 export function processBoundingBox(
   box: any, // Replace with actual type
-  video: HTMLVideoElement,
+  video: HTMLVideoElement | HTMLImageElement,
   videoRect: DOMRect,
   flipped: boolean,
   setBoundingBox: (box: MappedBox) => void,

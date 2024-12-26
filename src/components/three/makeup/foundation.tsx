@@ -8,10 +8,11 @@ import { useMakeup } from "../../../context/makeup-context";
 interface FoundationProps extends MeshProps {
   landmarks: React.RefObject<Landmark[]>;
   planeSize: [number, number];
+  isFlipped: boolean;
 }
 
 const FoundationInner: React.FC<FoundationProps> = React.memo(
-  ({ landmarks, planeSize }) => {
+  ({ landmarks, planeSize, isFlipped }) => {
     const { foundationColor } = useMakeup();
 
     // Membuat material dengan useMemo hanya saat foundationColor berubah
@@ -19,7 +20,7 @@ const FoundationInner: React.FC<FoundationProps> = React.memo(
       return new MeshBasicMaterial({
         color: new Color(foundationColor),
         transparent: true,
-        opacity: 0.15,
+        opacity: 0.046,
       });
     }, [foundationColor]);
 
@@ -28,6 +29,7 @@ const FoundationInner: React.FC<FoundationProps> = React.memo(
         landmarks={landmarks}
         material={foundationMaterial}
         planeSize={planeSize}
+        flipHorizontal={isFlipped}
       />
     );
   },

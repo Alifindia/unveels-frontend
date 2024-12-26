@@ -2,8 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { lipsMakeupProductTypesFilter } from "../../../../api/attributes/makeups";
 import { defaultHeaders, Product } from "../../../../api/shared";
 import {
+  baseUrl,
   buildSearchParams,
-  fetchConfigurableProducts,
+  fetchAllProducts,
 } from "../../../../utils/apiUtils";
 
 export function useLipColorQuery({
@@ -18,28 +19,31 @@ export function useLipColorQuery({
   return useQuery({
     queryKey: ["products", "lipcolor", color, sub_color, texture],
     queryFn: async () => {
-      const baseFilters = [
+      const filters = [
         {
           filters: [
             {
               field: "lips_makeup_product_type",
-              value: lipsMakeupProductTypesFilter([
-                "Lipsticks",
-                "Lip Stains",
-                "Lip Tints",
-                "Lip Balms",
-              ]),
+              value: "5726,5727,5728,5731",
+              condition_type: "in",
+            },
+          ],
+        },
+        {
+          filters: [
+            {
+              field: "type_id",
+              value: "configurable,simple",
               condition_type: "in",
             },
           ],
         },
       ];
 
-      // Skip filter ini karena, lips_makeup_product_type tidak bisa di filter dengan color
-      const filters = [];
+      const colorFilter = [];
 
       if (color) {
-        filters.push({
+        colorFilter.push({
           filters: [
             {
               field: "color",
@@ -62,18 +66,24 @@ export function useLipColorQuery({
         });
       }
 
-      const response = await fetch(
-        "/rest/V1/products?" + buildSearchParams([...baseFilters]), // Hanya apply baseFilters karena filter color tidak bisa di apply
-        {
+      const [productsList] = await Promise.all([
+        fetch(baseUrl + "/rest/V1/products?" + buildSearchParams(filters), {
           headers: defaultHeaders,
-        },
-      );
+        }),
+      ]);
 
-      const results = (await response.json()) as {
+      const products = (await productsList.json()) as {
         items: Array<Product>;
       };
 
-      return await fetchConfigurableProducts(results, filters);
+      const combinedResults = [...products.items];
+
+      return fetchAllProducts(
+        {
+          items: combinedResults,
+        },
+        colorFilter,
+      );
     },
   });
 }

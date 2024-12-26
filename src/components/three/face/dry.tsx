@@ -30,6 +30,7 @@ const DryInner: React.FC<DryProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={dryMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={true}
     />
   );
 };

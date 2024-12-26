@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { defaultHeaders, LookbookCategory, Product } from "./shared";
-import { buildSearchParams } from "../utils/apiUtils";
+import { baseUrl, buildSearchParams } from "../utils/apiUtils";
 
 export type CustomAttributeValue = {
   label: string;
@@ -20,16 +20,15 @@ const lookbookKey = {
 };
 
 async function fetchLookbookProducts(options: LookbookFilters) {
-  let response = await fetch("/rest/V1/lookbook/categories", {
+  let response = await fetch(baseUrl + "/rest/V1/lookbook/categories", {
     headers: defaultHeaders,
   });
   if (!response.ok) {
-    throw new Error("Failed to fetch brands");
+    throw new Error("Failed to fetch lookbook categories");
   }
-  const json = response.json() as Promise<LookbookCategory[]>;
+  const categories = (await response.json()) as LookbookCategory[];
 
-  const data = await json;
-  const filteredData = data
+  const filteredProfiles = categories
     .map((category) => category.profiles)
     .flat()
     .filter((profile) => {
@@ -46,7 +45,7 @@ async function fetchLookbookProducts(options: LookbookFilters) {
       return false;
     });
 
-  const skus = filteredData
+  const skus = filteredProfiles
     .map((profile) => {
       const markers = JSON.parse(profile.marker) as {
         sku: string;
@@ -67,17 +66,33 @@ async function fetchLookbookProducts(options: LookbookFilters) {
     },
   ];
 
-  response = await fetch("/rest/V1/products?" + buildSearchParams(filters), {
-    headers: defaultHeaders,
-  });
+  response = await fetch(
+    baseUrl + "/rest/V1/products?" + buildSearchParams(filters),
+    {
+      headers: defaultHeaders,
+    },
+  );
 
   if (!response.ok) {
-    throw new Error("Failed to fetch brands");
+    throw new Error("Failed to fetch products");
   }
 
-  return response.json() as Promise<{
-    items: Array<Product>;
-  }>;
+  const products = (await response.json()) as {
+    items: Product[];
+  };
+
+  console.log({
+    products,
+  });
+
+  return {
+    profiles: filteredProfiles.map((profile) => ({
+      ...profile,
+      products: products.items.filter((product) =>
+        profile.marker.includes(product.sku),
+      ),
+    })),
+  };
 }
 
 export function useLookbookProductQuery(filters: LookbookFilters) {

@@ -21,12 +21,16 @@ import {
 interface LiplinerProps extends MeshProps {
   landmarks: React.RefObject<Landmark[]>;
   planeSize: [number, number];
+  isFlipped: boolean;
 }
 
-const LiplinerInner: React.FC<LiplinerProps> = ({ landmarks, planeSize }) => {
+const LiplinerInner: React.FC<LiplinerProps> = ({
+  landmarks,
+  planeSize,
+  isFlipped,
+}) => {
   const { liplinerColor, liplinerPattern } = useMakeup();
 
-  // Memuat semua tekstur sekaligus
   const liplinerTextures = useLoader(TextureLoader, [
     LIPLINER_TEXTURE_ONE,
     LIPLINER_TEXTURE_TWO,
@@ -36,20 +40,18 @@ const LiplinerInner: React.FC<LiplinerProps> = ({ landmarks, planeSize }) => {
     LIPLINER_TEXTURE_SIX,
   ]);
 
-  // Memilih tekstur yang sesuai berdasarkan blushPattern
   const alphaMap = liplinerTextures[liplinerPattern] || null;
 
-  // Inisialisasi material dengan useMemo
   const liplinerMaterial = useMemo(() => {
     const materialOptions: Partial<MeshBasicMaterialParameters> = {
       color: new Color(liplinerColor),
-      transparent: !!alphaMap, // Menjadikan transparan jika alphaMap digunakan
-      opacity: 1,
+      transparent: !!alphaMap,
+      opacity: 0.36,
     };
 
     if (alphaMap) {
       materialOptions.alphaMap = alphaMap;
-      materialOptions.alphaTest = 0; // Sesuaikan alphaTest jika diperlukan
+      materialOptions.alphaTest = 0;
     }
 
     return new MeshBasicMaterial(materialOptions);
@@ -60,6 +62,7 @@ const LiplinerInner: React.FC<LiplinerProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={liplinerMaterial}
       planeSize={planeSize}
+      flipHorizontal={isFlipped}
     />
   );
 };

@@ -8,14 +8,16 @@ export const mapBoxToRenderedVideo = (
     width: number;
     height: number;
   },
-  video: HTMLVideoElement,
+  video: HTMLVideoElement | HTMLImageElement,
   videoRect: DOMRect,
   flipped: boolean,
 ) => {
   let { originX, originY, width, height } = box;
 
-  const videoWidth = video.videoWidth;
-  const videoHeight = video.videoHeight;
+  const videoWidth =
+    "videoWidth" in video ? video.videoWidth : video.naturalWidth;
+  const videoHeight =
+    "videoHeight" in video ? video.videoHeight : video.naturalHeight;
 
   const renderedWidth = videoRect.width;
   const renderedHeight = videoRect.height;
@@ -47,17 +49,19 @@ export const mapBoxToRenderedVideo = (
  */
 export const mapPointToRenderedVideo = (
   keypoint: { x: number; y: number },
-  video: HTMLVideoElement,
+  video: HTMLVideoElement | HTMLImageElement,
   videoRect: DOMRect,
   flipped: boolean,
 ) => {
   let { x, y } = keypoint;
 
-  x *= video.videoWidth;
-  y *= video.videoHeight;
+  x *= "videoWidth" in video ? video.videoWidth : video.naturalWidth;
+  y *= "videoHeight" in video ? video.videoHeight : video.naturalHeight;
 
-  const videoWidth = video.videoWidth;
-  const videoHeight = video.videoHeight;
+  const videoWidth =
+    "videoWidth" in video ? video.videoWidth : video.naturalWidth;
+  const videoHeight =
+    "videoHeight" in video ? video.videoHeight : video.naturalHeight;
 
   const renderedWidth = videoRect.width;
   const renderedHeight = videoRect.height;

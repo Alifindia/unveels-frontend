@@ -16,6 +16,11 @@ import { ProductRequest } from "../../types/productRequest";
 import { Product } from "../../api/shared";
 import { fetchVirtualAssistantProduct } from "../../api/fetch-virtual-asistant-product";
 import { categories } from "../../api/virtual-assistant-attributes/category";
+import {
+  makeSpeech,
+  talkingAvatarHost,
+} from "../../utils/virtualAssistantUtils";
+import { BlendData } from "../../types/blendData";
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_BARD_API_KEY);
 
@@ -37,25 +42,119 @@ const AudioConnectionScreen = ({ onBack }: { onBack: () => void }) => {
 
   const [chats, setChats] = useState<Chat[]>([]);
   const [text, setText] = useState("");
+  const [language, setLanguage] = useState("en-US");
   const [loading, setLoading] = useState(false);
   const audioPlayer = useRef<ReactAudioPlayer>(null);
 
   const [fetchProducts, setFetchProducts] = useState(false);
+  const [fetchComplete, setFetchComplete] = useState(false);
   const [products, setProducts] = useState<ProductRequest[]>([]);
   const [productData, setProductData] = useState<Product[]>([]);
 
+  const [blendshape, setBlendshape] = useState<BlendData[]>([]);
+
   useEffect(() => {
-    if (fetchProducts && products.length > 0) {
-      setLoading(true);
-      fetchVirtualAssistantProduct(products, categories)
-        .then((fetchedProducts) => {
+    const fetchAndHandleProducts = async () => {
+      if (fetchProducts && products.length > 0) {
+        setLoading(true);
+
+        try {
+          const fetchedProducts = await fetchVirtualAssistantProduct(
+            products,
+            categories,
+          );
           setProductData(fetchedProducts);
           setFetchProducts(false);
+        } catch (error) {
+          console.error("Error fetching products:", error);
+        } finally {
           setLoading(false);
-        })
-        .finally(() => setLoading(false));
-    }
+          setFetchComplete(true);
+        }
+      }
+    };
+
+    fetchAndHandleProducts();
   }, [fetchProducts, products]);
+
+  useEffect(() => {
+    const speak = async () => {
+      console.log(productData);
+
+      if (productData.length < 1) {
+        const text =
+          language === "en-US"
+            ? "sorry, the product is out of stock"
+            : "عذرا المنتج غير متوفر";
+
+        // Tambahkan respons ke chats
+        setChats((prevChats) => [
+          ...prevChats,
+          {
+            id: Date.now() + 1,
+            text: text,
+            sender: "agent",
+            type: "chat",
+            mode: "text-connection",
+            timestamp: getCurrentTimestamp(),
+          },
+        ]);
+
+        try {
+          const audioSrc = await makeSpeech(
+            text,
+            language === "en-US" ? "en-US" : "ar-SA",
+          );
+
+          setTimeout(() => {
+            setAudioSource(`${talkingAvatarHost}${audioSrc.data.filename}`);
+            setBlendshape(audioSrc.data.blendData);
+            setSpeak(true);
+          }, 1000);
+        } catch (error) {
+          console.error("Error creating speech:", error);
+        }
+      } else {
+        const text =
+          language === "en-US"
+            ? "Here is the product you are looking for"
+            : "هذا هو المنتج الذي تبحث عنه";
+
+        // Tambahkan respons ke chats
+        setChats((prevChats) => [
+          ...prevChats,
+          {
+            id: Date.now() + 1,
+            text: text,
+            sender: "agent",
+            type: "chat",
+            mode: "text-connection",
+            timestamp: getCurrentTimestamp(),
+          },
+        ]);
+
+        try {
+          const audioSrc = await makeSpeech(
+            text,
+            language === "en-US" ? "en-US" : "ar-SA",
+          );
+
+          setTimeout(() => {
+            setAudioSource(`${talkingAvatarHost}${audioSrc.data.filename}`);
+            setBlendshape(audioSrc.data.blendData);
+            setSpeak(true);
+            setFetchComplete(false);
+          }, 1000);
+        } catch (error) {
+          console.error("Error creating speech:", error);
+        }
+      }
+    };
+
+    if (fetchComplete) {
+      speak();
+    }
+  }, [fetchComplete]);
 
   const getResponse = async (userMsg: string) => {
     const timestamp = getCurrentTimestamp();
@@ -73,7 +172,8 @@ const AudioConnectionScreen = ({ onBack }: { onBack: () => void }) => {
 
     try {
       const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash-002",
+        model: "gemini-1.5-pro-002",
+        generationConfig: { temperature: 1.3 },
         systemInstruction: botPrompt,
       });
 
@@ -84,27 +184,36 @@ const AudioConnectionScreen = ({ onBack }: { onBack: () => void }) => {
       console.log(jsonLabel);
       const respond = JSON.parse(jsonLabel);
 
-      // Tambahkan respons ke chats
-      setChats((prevChats) => [
-        ...prevChats,
-        {
-          id: Date.now() + 1,
-          text: respond.chat,
-          sender: "agent",
-          type: "chat",
-          mode: "audio-connection",
-          timestamp,
-        },
-      ]);
-
       if (respond.isFinished) {
         setProducts(respond.product);
         setLoading(true);
         setFetchProducts(true);
+      } else {
+        setChats((prevChats) => [
+          ...prevChats,
+          {
+            id: Date.now() + 1,
+            text: respond.chat,
+            sender: "agent",
+            type: "chat",
+            mode: "text-connection",
+            timestamp,
+          },
+        ]);
       }
 
       setText(respond.chat);
-      setSpeak(true);
+      setLanguage(respond.lang);
+
+      // make speech
+      const audioSrc = await makeSpeech(respond.chat, respond.lang);
+
+      // delay to make sure it connect
+      setTimeout(() => {
+        setAudioSource(`${talkingAvatarHost}${audioSrc.data.filename}`);
+        setBlendshape(audioSrc.data.blendData);
+        setSpeak(true);
+      }, 1000);
     } catch (error) {
       console.error("Error fetching AI response:", error);
     } finally {
@@ -115,6 +224,8 @@ const AudioConnectionScreen = ({ onBack }: { onBack: () => void }) => {
   const onSendMessage = (message: string, audioURL: string | null = null) => {
     const timestamp = getCurrentTimestamp();
 
+    console.log(message === "" ? true : false);
+
     if (audioURL) {
       setChats((prev) => [
         ...prev,
@@ -122,7 +233,7 @@ const AudioConnectionScreen = ({ onBack }: { onBack: () => void }) => {
           id: Date.now() + 1,
           text: message,
           sender: "user",
-          mode: "audio-connection",
+          mode: "text-connection",
           type: "audio",
           timestamp,
           audioURL: audioURL,
@@ -136,7 +247,7 @@ const AudioConnectionScreen = ({ onBack }: { onBack: () => void }) => {
           text: message,
           type: "chat",
           sender: "user",
-          mode: "audio-connection",
+          mode: "text-connection",
           timestamp,
           audioURL: null,
         },
@@ -156,17 +267,6 @@ const AudioConnectionScreen = ({ onBack }: { onBack: () => void }) => {
     audioPlayer.current?.audioEl.current?.play();
     setPlaying(true);
     const timestamp = getCurrentTimestamp();
-    setChats((prev) => [
-      ...prev,
-      {
-        id: Date.now() + 1,
-        text: text,
-        sender: "agent",
-        mode: "audio-connection",
-        timestamp,
-        type: "chat",
-      },
-    ]);
   }
 
   useEffect(() => {
@@ -180,13 +280,7 @@ const AudioConnectionScreen = ({ onBack }: { onBack: () => void }) => {
   return (
     <div className="relative mx-auto flex h-full min-h-dvh w-full flex-col bg-[linear-gradient(180deg,#000000_0%,#0F0B02_41.61%,#47330A_100%)]">
       <div className="pointer-events-none absolute inset-0 flex justify-center overflow-hidden">
-        <ModelScene
-          speak={speak}
-          text={text}
-          playing={playing}
-          setAudioSource={setAudioSource}
-          setSpeak={setSpeak}
-        />
+        <ModelScene speak={speak} playing={playing} blendshape={blendshape} />
       </div>
 
       <div className="absolute inset-x-0 bottom-0 flex h-1/2 flex-col bg-gradient-to-b from-[#1B1404] to-[#2C1F06]">
@@ -215,6 +309,13 @@ const AudioConnectionScreen = ({ onBack }: { onBack: () => void }) => {
         ref={audioPlayer}
         onEnded={playerEnded}
         onCanPlayThrough={playerReady}
+        onError={(e) => {
+          console.error("Audio Playback Error:", e);
+          console.log(
+            "Audio Source:",
+            audioSource || "No audio source provided",
+          );
+        }}
       />
 
       <TopNavigation onBack={onBack} />

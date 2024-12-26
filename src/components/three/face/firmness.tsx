@@ -30,6 +30,7 @@ const FirmnessInner: React.FC<FirmnessProps> = ({ landmarks, planeSize }) => {
       landmarks={landmarks}
       material={firmnessMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={true}
     />
   );
 };

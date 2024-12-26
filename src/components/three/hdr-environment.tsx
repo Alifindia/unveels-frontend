@@ -23,6 +23,7 @@ const HDREnvironment: React.FC<HDREnvironmentProps> = ({
         const pmremGenerator = new THREE.PMREMGenerator(gl);
         pmremGenerator.compileEquirectangularShader();
         const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+
         if (onLoaded) onLoaded(envMap);
         texture.dispose();
         pmremGenerator.dispose();

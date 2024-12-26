@@ -33,6 +33,7 @@ const DarkCircleInner: React.FC<DarkCircleProps> = ({
       landmarks={landmarks}
       material={darkCircleMaterial}
       planeSize={[planeSize[0], planeSize[1]]}
+      flipHorizontal={true}
     />
   );
 };

@@ -12,12 +12,12 @@ type GradientPalette = {
 
 type TriplePalette = {
   name?: string;
-  colors: [string, string, string]; // Hexes. eg.[#FFFFFF, #FFAABB, #FFCCDD]
+  colors: string[]; // Hexes. eg.[#FFFFFF, #FFAABB, #FFCCDD]
 };
 
 type QuadruplePalette = {
   name?: string;
-  colors: [string, string, string, string]; // Hexes. eg.[#FFFFFF, #FFAABB, #FFCCDD, #FFEEFF]
+  colors: string[]; // Hexes. eg.[#FFFFFF, #FFAABB, #FFCCDD, #FFEEFF]
 };
 
 type PaletteType =
@@ -40,11 +40,12 @@ export function ColorPalette({
   if ("color" in palette) {
     return (
       <button
-        className={clsx("shrink-0 rounded-full border border-transparent", {
-          "size-10": size === "large",
+        className={clsx("shrink-0 rounded-full border border-transparent transform transition-all", {
+          "size-5 sm:size-[1.875rem]": size === "large",
           "size-2.5": size === "small",
-          "border-white": selected,
-        })}
+            "scale-[1.3] border-white": selected,
+          },
+        )}
         style={{ background: palette.color }}
         onClick={onClick}
       />
@@ -55,12 +56,12 @@ export function ColorPalette({
     return (
       <button
         className={clsx("shrink-0 rounded-full border border-transparent", {
-          "size-10": size === "large",
+          "size-5 sm:size-[1.875rem]": size === "large",
           "size-2.5": size === "small",
-          "border-white": selected,
+          "scale-[1.5] border-white": selected,
         })}
         style={{
-          background: `linear-gradient(270deg, ${palette.gradient[0]} 0%, ${palette.gradient[1]} 100%)`,
+          background: `linear-gradient(0deg, ${palette.gradient[0]} 0%, ${palette.gradient[1]} 100%)`,
         }}
         onClick={onClick}
       />
@@ -70,9 +71,9 @@ export function ColorPalette({
   return (
     <button
       className={clsx("shrink-0 rounded-full border border-transparent", {
-        "size-10": size === "large",
+        "size-5 sm:size-[1.875rem]": size === "large",
         "size-2.5": size === "small",
-        "border-white": selected,
+        "scale-[1.5] border-white": selected,
       })}
       onClick={onClick}
     >
@@ -98,7 +99,7 @@ const ColorPieChart = ({ colors }: { colors: string[] }) => {
   };
 
   return (
-    <svg viewBox="0 0 100 100" className="w-full h-full">
+    <svg viewBox="0 0 100 100" className="h-full w-full">
       {colors.map((color, index) => {
         const startAngle = index * segmentAngle;
         const endAngle = (index + 1) * segmentAngle;

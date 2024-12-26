@@ -103,6 +103,8 @@ export const SkinAnalysisProvider: React.FC<SkinAnalysisProviderProps> = ({
   };
 
   const getScoresByLabel = (label: string): number[] => {
+    console.log(label);
+
     return skinAnalysisResult
       .filter((item) => item.label.toLowerCase() === label.toLowerCase())
       .map((item) => item.score);
