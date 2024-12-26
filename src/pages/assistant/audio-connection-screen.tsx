@@ -280,14 +280,7 @@ const AudioConnectionScreen = ({ onBack }: { onBack: () => void }) => {
   return (
     <div className="relative mx-auto flex h-full min-h-dvh w-full flex-col bg-[linear-gradient(180deg,#000000_0%,#0F0B02_41.61%,#47330A_100%)]">
       <div className="pointer-events-none absolute inset-0 flex justify-center overflow-hidden">
-        <ModelScene
-          speak={speak}
-          text={text}
-          playing={playing}
-          setAudioSource={setAudioSource}
-          setSpeak={setSpeak}
-          language={language}
-        />
+        <ModelScene speak={speak} playing={playing} blendshape={blendshape} />
       </div>
 
       <div className="absolute inset-x-0 bottom-0 flex h-1/2 flex-col bg-gradient-to-b from-[#1B1404] to-[#2C1F06]">

@@ -67,6 +67,9 @@ import { TiaraProvider } from "./vto/head-accesories/tiaras/tiaras-context";
 import { HeadbandProvider } from "./vto/head-accesories/headband/headband-context";
 import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-context";
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
+import VoiceCommand from "../components/voice-command/voice-command";
+import { VirtualTryOnMakeupsVoiceProvider } from "../context/virtual-try-on-makeups-voice-context";
+import { SelecProductNumberProvider, useSelecProductNumberContext } from "./vto/select-product-context";
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
 import { set } from "lodash";
@@ -78,8 +81,6 @@ import { FindTheLookItems } from "../types/findTheLookItems";
 import { CartProvider, useCartContext } from "../context/cart-context";
 import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
 import { FilterProvider } from "../context/filter-context";
-import { SelecProductNumberProvider } from "./vto/select-product-context";
-import VoiceCommand from "../components/voice-command/voice-command";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -87,63 +88,63 @@ interface VirtualTryOnProvider {
 
 export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
   return (
-  <SelecProductNumberProvider>
-    <WatchesProvider>
-      <HandwearProvider>
-        <ScarvesProvider>
-          <NeckwearProvider>
-            <TiaraProvider>
-              <HeadbandProvider>
-                <HatsProvider>
-                  <GlassesProvider>
-                    <EarringsProvider>
-                      <HairColorProvider>
-                        <PressOnNailsProvider>
-                          <NailPolishProvider>
-                            <MascaraProvider>
-                              <LenseProvider>
-                                <LashesProvider>
-                                  <EyebrowsProvider>
-                                    <EyeShadowProvider>
-                                      <EyeLinerProvider>
-                                        <ConcealerProvider>
-                                          <ContourProvider>
-                                            <BronzerProvider>
-                                              <HighlighterProvider>
-                                                <FoundationProvider>
-                                                  <BlushProvider>
-                                                    <LipColorProvider>
-                                                      <LipLinerProvider>
-                                                        <LipPlumperProvider>
-                                                          {children}
-                                                        </LipPlumperProvider>
-                                                      </LipLinerProvider>
-                                                    </LipColorProvider>
-                                                  </BlushProvider>
-                                                </FoundationProvider>
-                                              </HighlighterProvider>
-                                            </BronzerProvider>
-                                          </ContourProvider>
-                                        </ConcealerProvider>
-                                      </EyeLinerProvider>
-                                    </EyeShadowProvider>
-                                  </EyebrowsProvider>
-                                </LashesProvider>
-                              </LenseProvider>
-                            </MascaraProvider>
-                          </NailPolishProvider>
-                        </PressOnNailsProvider>
-                      </HairColorProvider>
-                    </EarringsProvider>
-                  </GlassesProvider>
-                </HatsProvider>
-              </HeadbandProvider>
-            </TiaraProvider>
-          </NeckwearProvider>
-        </ScarvesProvider>
-      </HandwearProvider>
-    </WatchesProvider>
-  </SelecProductNumberProvider>
+    <SelecProductNumberProvider>
+      <WatchesProvider>
+        <HandwearProvider>
+          <ScarvesProvider>
+            <NeckwearProvider>
+              <TiaraProvider>
+                <HeadbandProvider>
+                  <HatsProvider>
+                    <GlassesProvider>
+                      <EarringsProvider>
+                        <HairColorProvider>
+                          <PressOnNailsProvider>
+                            <NailPolishProvider>
+                              <MascaraProvider>
+                                <LenseProvider>
+                                  <LashesProvider>
+                                    <EyebrowsProvider>
+                                      <EyeShadowProvider>
+                                        <EyeLinerProvider>
+                                          <ConcealerProvider>
+                                            <ContourProvider>
+                                              <BronzerProvider>
+                                                <HighlighterProvider>
+                                                  <FoundationProvider>
+                                                    <BlushProvider>
+                                                      <LipColorProvider>
+                                                        <LipLinerProvider>
+                                                          <LipPlumperProvider>
+                                                            {children}
+                                                          </LipPlumperProvider>
+                                                        </LipLinerProvider>
+                                                      </LipColorProvider>
+                                                    </BlushProvider>
+                                                  </FoundationProvider>
+                                                </HighlighterProvider>
+                                              </BronzerProvider>
+                                            </ContourProvider>
+                                          </ConcealerProvider>
+                                        </EyeLinerProvider>
+                                      </EyeShadowProvider>
+                                    </EyebrowsProvider>
+                                  </LashesProvider>
+                                </LenseProvider>
+                              </MascaraProvider>
+                            </NailPolishProvider>
+                          </PressOnNailsProvider>
+                        </HairColorProvider>
+                      </EarringsProvider>
+                    </GlassesProvider>
+                  </HatsProvider>
+                </HeadbandProvider>
+              </TiaraProvider>
+            </NeckwearProvider>
+          </ScarvesProvider>
+        </HandwearProvider>
+      </WatchesProvider>
+    </SelecProductNumberProvider>
   );
 }
 
@@ -153,17 +154,19 @@ export function VirtualTryOn() {
       <SkinColorProvider>
         <MakeupProvider>
           <AccesoriesProvider>
-            <VirtualTryOnProvider>
-              <FindTheLookProvider>
-                <CartProvider>
-                  <FilterProvider>
-                    <div className="h-full min-h-dvh">
-                      <Main />
-                    </div>
-                  </FilterProvider>
-                </CartProvider>
-              </FindTheLookProvider>
-            </VirtualTryOnProvider>
+            <VirtualTryOnMakeupsVoiceProvider>
+              <VirtualTryOnProvider>
+                <FindTheLookProvider>
+                  <CartProvider>
+                    <FilterProvider>
+                      <div className="h-full min-h-dvh">
+                        <Main />
+                      </div>
+                    </FilterProvider>
+                  </CartProvider>
+                </FindTheLookProvider>
+              </VirtualTryOnProvider>
+            </VirtualTryOnMakeupsVoiceProvider>
           </AccesoriesProvider>
         </MakeupProvider>
       </SkinColorProvider>
@@ -377,6 +380,7 @@ export function Makeups() {
   ];
 
   const [selectedMakeup, setSelectedMakeup] = useState<string | null>(null);
+  const { setSelectedProductNumber } = useSelecProductNumberContext()
 
   return (
     <>
@@ -387,7 +391,10 @@ export function Makeups() {
               key={index}
               className="flex flex-col items-center space-y-2"
               data-selected={selectedMakeup === option.name}
-              onClick={() => setSelectedMakeup(option.name)}
+              onClick={() => {
+                setSelectedMakeup(option.name)
+                setSelectedProductNumber(null)
+              }}
             >
               <div
                 className={clsx(
@@ -635,47 +642,32 @@ function Sidebar({
   setMode,
   setShowChangeModel,
 }: SidebarProps) {
+  const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
+
   return (
     <div className="pointer-events-none flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
       <div className="relative p-0.5">
-        <div
-          className="absolute inset-0 rounded-full border-2 border-transparent"
-          style={
-            {
-              background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
-              "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-              mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-              "-webkit-mask-composite": "destination-out",
-              "mask-composite": "exclude",
-            } as CSSProperties
-          }
-        />
+        <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 
         <div className="flex flex-col gap-4 rounded-full bg-black/25 px-1.5 py-2 backdrop-blur-md">
           <VoiceCommand />
-          <button className="">
+          <button className="" onClick={screenShoot}>
             <Icons.camera className="size-4 text-white sm:size-6" />
           </button>
-          <button className="">
+          <button className="" onClick={flipCamera}>
             <Icons.flipCamera className="size-4 text-white sm:size-6" />
           </button>
-          <button className="">
+          <button className="" onClick={onExpandClick}>
             <Icons.expand className="size-4 text-white sm:size-6" />
           </button>
-          <button className="">
+          <button className="" onClick={compareCapture}>
             <Icons.compare className="size-4 text-white sm:size-6" />
-          </button>
-          <button className="">
-            <Icons.reset className="size-4 text-white sm:size-6" />
           </button>
           <UploadMediaDialog
             setMediaFile={setMediaFile}
             setMode={setMode}
             setShowChangeModel={setShowChangeModel}
           />
-          <button>
-            <Icons.share className="size-4 text-white sm:size-6" />
-          </button>
         </div>
       </div>
     </div>
