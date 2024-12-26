@@ -1,0 +1,363 @@
+{
+  "hints": {
+    "facePosition": [
+      "Keep the face centered within the frame.",
+      "Position the face at the center of the screen for best results.",
+      "Aim the camera straight at the face."
+    ],
+    "lighting": [
+      "Ensure it is a well-lit area with natural or bright artificial light.",
+      "Ensure the light source is in front of the face, not behind."
+    ],
+    "orientation": [
+      "Hold the head upright and avoid tilting the face.",
+      "Maintain a straight gaze without looking up or down."
+    ]
+  },
+  "criteria": {
+    "facePosition": "Face Position",
+    "lighting": "Lighting",
+    "orientation": "Orientation"
+  },
+  "tabOptions": {
+    "matched": "Matched Shades",
+    "other": "Other Shades"
+  },
+  "camera_select": {
+    "live": {
+      "title": "Live Camera",
+      "desc": {
+        "text": " Hold the camera parallel to the face...",
+        "h4": "Steps to Follow",
+        "li1": "Choose a high-quality photo or video for upper body only.",
+        "li2": "Ensure the entire face is centered in the frame.",
+        "li3": "Position the camera at eye level with the face.",
+        "li4": "Keep the camera steady and avoid tilting.",
+        "li5": "Ensure the area is well-lit for clear detection.",
+        "li6": "Avoid shadows on the face by using soft, even lighting.",
+        "btn": "USE LIVE CAMERA"
+      }
+    },
+    "snap": {
+      "title": "Take a Snapshot",
+      "desc": {
+        "text": "Unveil the potential of your favorite images with our photo upload feature.",
+        "h4": "Steps to Follow",
+        "li1": "Take a clear, high-resolution photo for the best results.",
+        "li2": "Make sure the entire upper body is visible in the photo.",
+        "li3": "Take a photo with even lighting and minimal shadows.",
+        "li4": "Ensure the photo contains only one individual for accurate analysis.",
+        "btn": "UPLOAD PHOTO"
+      }
+    },
+    "upload": {
+      "title": "Upload Photo Or Video",
+      "desc": {
+        "text": "Immerse yourself in the luxury of transformation with our video upload feature.",
+        "h4": "Steps to Follow",
+        "li1": "Choose a high-quality photo or video for upper body only.",
+        "li2": "Ensure the photo or video is stable and not shaky",
+        "li3": "Make sure the entire look is visible",
+        "li4": "Opt for a photo or video with bright, even lighting and minimal shadows.",
+        "li5": "Ensure the photo or video contains only one individual for precise detection.",
+        "btn": "UPLOAD PHOTO/VIDEO"
+      }
+    }
+  },
+  "skin_types": {
+    "fair": "Fair Skin",
+    "light": "Light Skin",
+    "medium": "Medium Skin",
+    "olive": "Olive Skin",
+    "tan": "Tan Skin",
+    "brown": "Brown Skin",
+    "deep": "Deep Skin"
+  },
+  "tone_types": {
+    "perfect_fit": "Perfect Fit",
+    "lighter": "Lighter",
+    "cooler": "Cooler",
+    "warmer": "Warmer",
+    "darker": "Darker"
+  },
+  "view_all": "view all",
+  "skin_tones": {
+    "fair_skin": "Fair Skin",
+    "medium_skin": "Medium Skin",
+    "olive_skin": "Olive Skin",
+    "tan_skin": "Tan Skin",
+    "brown_skin": "Brown Skin",
+    "deep_skin": "Deep Skin"
+  },
+
+  "tabsmenupf": {
+    "personality": "Personality",
+    "attributes": "Attributes",
+    "recommendations: ": "Recommendations"
+  },
+  "scoreTypes": {
+    "low": "Low",
+    "moderate": "Moderate",
+    "high": "High"
+  },
+  "viewpersonality": {
+    "aiPersonalityAnalysis": "AI Personality Analysis",
+    "aiFaceAnalyzer": "AI Face Analyzer",
+    "personality_traits": "Main 5 Personality Traits",
+    "score": "Score",
+    "description": "Description",
+    "perfumerec": "Perfumes Recommendations",
+    "addcart": "ADD TO CART",
+    "seeimprovement": "SEE IMPROVEMENT",
+    "lookrec": "Look Recommendations",
+    "lookdec": " A bold red lipstick and defined brows, mirror your strong, vibrant personality",
+    "lipcolorrec": "Lip Color Recommendations",
+    "lipcolordec": "The best lip color for you are orange shades"
+  },
+  "personality": {
+    "extraversion": {
+      "title": "Extraversion",
+      "description": "An extravert personality provides insights into an individual's social behaviour and interaction preferences. Extraverts are known for their outgoing, energetic, and talkative nature. They thrive in social settings, seek excitement, and enjoy being the center of attention. Extraverts are often described as sociable, assertive, and enthusiastic individuals who are comfortable in group settings and have a wide circle of friends. This also delves into the extraversion traits; highlighting that they're strong in communication, leadership, and relationship-building skills. Therefore, here's what Unveels suggests for you based on your Extraversion."
+    },
+    "conscientiousness": {
+      "title": "Conscientiousness",
+      "description": "Description for Conscientiousness..."
+    },
+    "openness": {
+      "title": "Openness",
+      "description": "Description for Openness to Experience..."
+    },
+    "agreeableness": {
+      "title": "Agreeableness",
+      "description": "Description for Agreeableness..."
+    },
+    "neuroticism": {
+      "title": "Neuroticism",
+      "description": "Description for Neuroticism..."
+    }
+  },
+  "attributepf": {
+    "face": {
+      "title": "Face",
+      "faceattribute": {
+        "faceshape": "Face Shape",
+        "skintone": "Skin Tone"
+      }
+    },
+    "eyes": {
+      "title": "Eyes",
+      "eyesattribute": {
+        "eyeshape": "Eye Shape",
+        "eyesize": "Eye Size ",
+        "eyeangle": "Eye Angle",
+        "eyedistance": "Eye Distance",
+        "eyelid": "Eyelid",
+        "eyecolor": "Eye Color"
+      }
+    },
+    "brows": {
+      "title": "Brows",
+      "eyesattribute": {
+        "eyebrowshape": "Eyebrow Shape",
+        "thickness": "Thickness ",
+        "eyebrowdistance": "Eyebrow Distance",
+        "eyebrowcolor": "Eyebrow Color"
+      }
+    },
+    "lips": {
+      "title": "Lips",
+      "lipsattribute": {
+        "lipshape": "Lip Shape",
+        "lipcolor": "Lip Color"
+      }
+    },
+    "cheekbones": {
+      "title": "Checkbones",
+      "cheekbonesattribute": {
+        "cheeckbones": "Checkbones"
+      }
+    },
+    "nose": {
+      "title": "Nose",
+      "noseattribute": {
+        "noseshape": "Nose Shape"
+      }
+    },
+    "hair": {
+      "title": "Hair",
+      "hairattribute": {
+        "haircolor": "Color"
+      }
+    }
+  },
+  "thinness": {
+    "normal": "Normal",
+    "thick": "Thick",
+    "thin": "Thin"
+  },
+  "thickness": {
+    "dense": "Dense",
+    "medium": "Medium",
+    "sparse": "Sparse"
+  },
+  "nosewidthlabels": {
+    "broad": "Broad",
+    "medium": "Medium",
+    "narrow": "Narrow"
+  },
+  "nose_length_labels": {
+    "average": "Average",
+    "long": "Long",
+    "short": "Short"
+  },
+  "liplabels": {
+    "full_lips": "Full Lips",
+    "heart_lips": "Heart Lips",
+    "heavy_lower_lips": "Heavy Lower Lips",
+    "heavy_upper_lips": "Heavy Upper Lips",
+    "round_lips": "Round Lips",
+    "thin_lips": "Thin Lips",
+    "wide_lips": "Wide Lips"
+  },
+  "faceshapelabels": {
+    "heart": "Heart",
+    "oval": "Oval",
+    "round": "Round",
+    "square": "Square"
+  },
+  "eyelidLabels": {
+    "double_lids": "Double Lids",
+    "monolids": "Monolids"
+  },
+  "eyebrowshapelabels": {
+    "curved": "Curved",
+    "highArch": "High Arch",
+    "sShaped": "S-Shaped",
+    "softArch": "Soft Arch",
+    "straight": "Straight",
+    "upward": "Upward"
+  },
+  "eyebrowdistanceLabels": {
+    "close": "Close",
+    "proportioned": "Proportioned",
+    "wide": "Wide"
+  },
+  "eyesizeLabels": {
+    "large": "Large",
+    "medium": "Medium",
+    "small": "Small"
+  },
+  "eyeshapeLabels": {
+    "almond": "Almond",
+    "downturned": "Downturned",
+    "monolid": "Monolid",
+    "round": "Round",
+    "upturned": "Upturned",
+    "hooded": "Hooded"
+  },
+  "eyedistanceLabels": {
+    "average_set": "Average-Set",
+    "close_set": "Close-set",
+    "wide_set": "Wide-Set"
+  },
+  "eyeangleLabels": {
+    "downturned": "Downturned",
+    "neutral": "Neutral",
+    "upturned": "Upturned"
+  },
+  "cheeksbonesLabels": {
+    "high_cheeks": "High Cheeks",
+    "low_cheeks": "Low Cheeks",
+    "roun_cheeks": "Round Cheeks"
+  },
+  "hairLabels": {
+    "long": "Long",
+    "normal": "Normal",
+    "short": "Short"
+  },
+  "personalityLabels": {
+    "extravert": "Extravert",
+    "neurotic": "Neurotic",
+    "agreable": "Agreeable",
+    "conscientious": "Conscientious",
+    "open": "Open"
+  },
+  "personalityAnalysisResult": [
+    "Individuals with an extravert personality are outgoing, energetic, and talkative. They thrive in social settings, seek excitement, and enjoy being the center of attention. Strong in communication, leadership, and relationship-building skills, Unveels suggests recommendations based on your extraversion.",
+    "Neuroticism reflects a tendency to experience negative emotions like anxiety, depression, and moodiness. People high in neuroticism may be more prone to worry and stress, while those low in neuroticism are more emotionally stable and resilient. Unveels offers a bespoke recommendation list based on your neuroticism.",
+    "People with an agreeable personality are kind-hearted and compassionate, characterized by a strong desire to maintain harmonious relationships. They are cooperative, empathetic, and considerate towards others, making them valuable team players and supportive friends. Unveels has prepared a customized recommendation list based on your agreeable personality.",
+    "Individuals high in conscientiousness are organized, responsible, and goal-oriented. Known for their reliability, diligence, and attention to detail, they are diligent in their work and well-prepared. Unveels has unveiled the conscientious side of your personality and provides a recommended list based on it.",
+    "Individuals with an open personality possess a vibrant imagination, curiosity, and eagerness to explore new ideas and experiences. They are creative, flexible, and adaptable, receptive to change and innovation. Unveels has prepared a recommendation list based on your open personality."
+  ],
+
+  "viewftl": {
+    "find_the_look": "FIND THE LOOK",
+    "addcart": "ADD TO CART",
+    "view_all": "View all",
+    "try_now": "TRY NOW",
+    "add_all_to_cart": "ADD ALL TO CART",
+    "try_on": "TRY ON",
+    "select": "SELECT",
+    "similar": "Similar",
+    "page": "How do you want to find the look"
+  },
+  "tabOptionsftl": {
+    "makeup": "Makeup",
+    "accessories": "Accessories"
+  },
+  "categories_label": {
+    "Headband": "Headband",
+    "Hat": "Hat",
+    "Cap": "Cat",
+    "Lipstick": "Lipstick",
+    "Mascara": "Mascara",
+    "Blusher": "Blusher",
+    "Highlighter": "Highlighter",
+    "Eyecolor": "Eyecolor",
+    "Glasses": "Glasses",
+    "Sunglasses": "Sunglasses",
+    "Watch": "Watch",
+    "Bracelet": "Bracelet",
+    "earring": "Earring",
+    "Necklace": "Necklace",
+    "Neckless": "Neckless",
+    "Scarf": "Scarf",
+    "rings": "Rings"
+  },
+
+  "viewskinan": {
+    "analysis_result": "ANALYSIS RESULT",
+    "skin_health": " Skin Health Score :",
+    "skin_age": "Skin Age :",
+    "detected_skin": "Detected Skin Problems",
+    "detected_skin_con": "Detected Skin Condition",
+    "skin_problem": "Skin Problems",
+    "detected": "Detected",
+    "description": "Description",
+    "recomend": "Recommended Products",
+    "score": "Score",
+    "addcart": "ADD TO CART",
+    "seeimprovement": "SEE IMPROVEMENT",
+    "Less": "Less",
+    "Readmore": "Read More"
+  },
+  "skinlabel": {
+    "radiance": "radiance",
+    "texture": "texture",
+    "moisture": "moisture",
+    "whitehead": "whitehead",
+    "blackhead": "blackhead",
+    "acne": "acne",
+    "spots": "spots",
+    "pores": "pores",
+    "wrinkles": "wrinkles",
+    "droopy upper eyelid": "droopy upper eyelid",
+    "droopy lower eyelid": "droopy lower eyelid",
+    "eyebags": "eyebags",
+    "redness": "redness",
+    "oily": "oily",
+    "firmness": "firmness",
+    "dark circles": "dark circles",
+    "dry": "dry"
+  }
+}
