@@ -1443,6 +1443,36 @@ export const EYELINER_SIX =
 export const EYELINER_SEVEN =
   "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_07.png";
 
+export const EYELINER_EIGHT =
+  "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_08.png";
+
+export const EYELINER_NINE =
+  "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_09.png";
+
+export const EYELINER_TEN =
+  "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_10.png";
+
+export const EYELINER_ELEVEN =
+  "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_11.png";
+
+export const EYELINER_TWELVE =
+  "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_12.png";
+
+export const EYELINER_THIRTEEN =
+  "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_13.png";
+
+export const EYELINER_FOURTEEN =
+  "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_14.png";
+
+export const EYELINER_FIVETEEN =
+  "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_15.png";
+
+export const EYELINER_SIXTEEN =
+  "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_16.png";
+
+export const EYELINER_SEVENTEEN =
+  "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_17.png";
+
 // face problem alpha
 export const WRINKLE_ALPHA =
   "/media/unveels/vto-assets/texture/face-problem/wrinkles_alpha(1).jpg";
@@ -1646,6 +1676,10 @@ export const EYEBROW_TEXTURE_SEVEN =
   "/media/unveels/vto-assets/texture/eyebrow/eyebrow-7.png";
 export const EYEBROW_TEXTURE_EIGHT =
   "/media/unveels/vto-assets/texture/eyebrow/eyebrow-8.png";
+export const EYEBROW_TEXTURE_NINE =
+  "/media/unveels/vto-assets/texture/eyebrow/eyebrow-9.png";
+export const EYEBROW_TEXTURE_TEN =
+  "/media/unveels/vto-assets/texture/eyebrow/eyebrow-10.png";
 
 // head occluder
 export const HEAD_OCCLUDER =

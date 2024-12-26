@@ -130,6 +130,8 @@ function PatternSelector() {
   const { setEyebrowsPattern } = useMakeup();
 
   function setPattern(pattern: number, patternName: string) {
+    console.log(pattern);
+
     setSelectedPattern(patternName);
     setEyebrowsPattern(pattern);
   }
