@@ -25,10 +25,12 @@ import { Blendshape } from "../../types/blendshape";
 import { useMakeup } from "../../context/makeup-context";
 
 import * as faceLandmarksDetection from "@tensorflow-models/face-landmarks-detection";
+import * as handPoseDetection from '@tensorflow-models/hand-pose-detection';
 import "@tensorflow/tfjs-core";
 // Register WebGL backend.
 import "@tensorflow/tfjs-backend-webgl";
 import "@mediapipe/face_mesh";
+import "@mediapipe/hands";
 import * as tf from "@tensorflow/tfjs";
 
 export function VirtualTryOnScene() {
@@ -98,8 +100,9 @@ export function VirtualTryOnScene() {
     });
   };
 
-  const normalizedLandmark = (
+  const normalizedLandmark = async (
     faces: [{ x: number; y: number; z: number; name?: string | null }],
+    hands: [{ x: number; y: number; z: number; name?: string | null }],
   ) => {
     if (
       webcamRef.current &&
@@ -140,7 +143,7 @@ export function VirtualTryOnScene() {
           ctx.clearRect(0, 0, width, height);
 
           try {
-            const normalizedLandmarks = normalizeLandmarks(
+            const normalizedFaceLandmarks = normalizeLandmarks(
               faces,
               video.videoWidth,
               video.videoHeight,
@@ -148,9 +151,19 @@ export function VirtualTryOnScene() {
               drawHeight,
             );
 
-            landmarksRef.current = normalizedLandmarks;
+            const normalizedHandLandmarks = normalizeLandmarks(
+              hands,
+              video.videoWidth,
+              video.videoHeight,
+              drawWidth,
+              drawHeight,
+            );
 
-            console.log(landmarksRef);
+            landmarksRef.current = normalizedFaceLandmarks;
+            handLandmarksRef.current = normalizedHandLandmarks;
+
+            console.log('Face landmarks:', landmarksRef);
+            console.log('Hand landmarks:', handLandmarksRef);
           } catch (err) {
             console.error("Detection error:", err);
             setError(err as Error);
@@ -161,27 +174,50 @@ export function VirtualTryOnScene() {
   };
 
   const runDetector = async (video: HTMLVideoElement) => {
-    const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
-
-    const detector = await faceLandmarksDetection.createDetector(model, {
+    // Initialize face detector
+    const faceModel = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
+    const faceDetector = await faceLandmarksDetection.createDetector(faceModel, {
       runtime: "mediapipe",
       refineLandmarks: true,
       solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh",
     });
 
+    // Initialize hand detector
+    const handModel = handPoseDetection.SupportedModels.MediaPipeHands;
+    const handDetector = await handPoseDetection.createDetector(handModel, {
+      runtime: "mediapipe",
+      solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/hands",
+      modelType: 'full'
+    });
+
     const detect = async (
-      net: faceLandmarksDetection.FaceLandmarksDetector,
+      faceNet: faceLandmarksDetection.FaceLandmarksDetector,
+      handNet: handPoseDetection.HandDetector,
     ) => {
       const inputTensor = tf.browser.fromPixels(video);
-      const faces = await net.estimateFaces(inputTensor, {
+
+      // Run both detections
+      const faces = await faceNet.estimateFaces(inputTensor, {
         flipHorizontal: false,
       });
-      if (faces.length > 0 && faces[0].keypoints.length > 0) {
-        requestAnimationFrame(() => normalizedLandmark(faces[0].keypoints));
+      const hands = await handNet.estimateHands(video, {
+        flipHorizontal: false
+      });
+
+      if ((faces.length > 0 && faces[0].keypoints.length > 0) || hands.length > 0) {
+        requestAnimationFrame(() =>
+          normalizedLandmark(
+            faces[0]?.keypoints || [],
+            hands[0]?.keypoints || []
+          )
+        );
       }
-      detect(detector);
+
+      detect(faceDetector, handDetector);
+      inputTensor.dispose();
     };
-    detect(detector);
+
+    detect(faceDetector, handDetector);
   };
 
   const handleVideoLoad = () => {
@@ -259,7 +295,6 @@ export function VirtualTryOnScene() {
 
       {/* Error Display */}
       {error && <ErrorOverlay message={error.message} />}
-
     </div>
   );
 }
