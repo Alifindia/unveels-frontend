@@ -11,6 +11,7 @@ import { useBlushContext } from "./blush-context";
 import { useBlushQuery } from "./blush-query";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { Product } from "../../../../api/shared";
+import { useSelecProductNumberContext } from "../../select-product-context";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 import { getFaceMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
@@ -272,6 +273,7 @@ function ShadesSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -299,7 +301,35 @@ function ProductList() {
     setShowBlush(selectedColors.length > 0);
   }, [selectedColors, selectedMode, selectedColors]);
 
+  useEffect(() => {
+    if (data?.items && selectedProductNumber) {
+      const adjustedIndex = selectedProductNumber - 1;
+      const matchedProduct = data.items[adjustedIndex];
+      console.log(selectedProductNumber)
+      if (matchedProduct) {
+        setSelectedProduct(matchedProduct);
+        setSelectedColors([
+          matchedProduct.custom_attributes
+            .find((item) => item.attribute_code === "hexacode")
+            ?.value.split(",")[0],
+        ]);
+        setSelectedTexture(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "texture",
+          )?.value,
+        );
+      }
+    }
+  }, [data, selectedProductNumber]);
+
   const handleProductClick = (product: Product) => {
+    if (selectedProduct?.id === product.id) {
+      setSelectedProduct(null);
+      setSelectedProductNumber(null);
+      setSelectedColors([])
+      setSelectedTexture(null)
+      return
+    }
     console.log(product);
     setSelectedProduct(product);
     setSelectedColors([
@@ -345,6 +375,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
+                productNumber={index+1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

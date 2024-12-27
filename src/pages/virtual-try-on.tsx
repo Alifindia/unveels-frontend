@@ -67,6 +67,9 @@ import { TiaraProvider } from "./vto/head-accesories/tiaras/tiaras-context";
 import { HeadbandProvider } from "./vto/head-accesories/headband/headband-context";
 import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-context";
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
+import VoiceCommand from "../components/voice-command/voice-command";
+import { VirtualTryOnMakeupsVoiceProvider } from "../context/virtual-try-on-makeups-voice-context";
+import { SelecProductNumberProvider, useSelecProductNumberContext } from "./vto/select-product-context";
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
 import {
@@ -85,61 +88,63 @@ interface VirtualTryOnProvider {
 
 export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
   return (
-    <WatchesProvider>
-      <HandwearProvider>
-        <ScarvesProvider>
-          <NeckwearProvider>
-            <TiaraProvider>
-              <HeadbandProvider>
-                <HatsProvider>
-                  <GlassesProvider>
-                    <EarringsProvider>
-                      <HairColorProvider>
-                        <PressOnNailsProvider>
-                          <NailPolishProvider>
-                            <MascaraProvider>
-                              <LenseProvider>
-                                <LashesProvider>
-                                  <EyebrowsProvider>
-                                    <EyeShadowProvider>
-                                      <EyeLinerProvider>
-                                        <ConcealerProvider>
-                                          <ContourProvider>
-                                            <BronzerProvider>
-                                              <HighlighterProvider>
-                                                <FoundationProvider>
-                                                  <BlushProvider>
-                                                    <LipColorProvider>
-                                                      <LipLinerProvider>
-                                                        <LipPlumperProvider>
-                                                          {children}
-                                                        </LipPlumperProvider>
-                                                      </LipLinerProvider>
-                                                    </LipColorProvider>
-                                                  </BlushProvider>
-                                                </FoundationProvider>
-                                              </HighlighterProvider>
-                                            </BronzerProvider>
-                                          </ContourProvider>
-                                        </ConcealerProvider>
-                                      </EyeLinerProvider>
-                                    </EyeShadowProvider>
-                                  </EyebrowsProvider>
-                                </LashesProvider>
-                              </LenseProvider>
-                            </MascaraProvider>
-                          </NailPolishProvider>
-                        </PressOnNailsProvider>
-                      </HairColorProvider>
-                    </EarringsProvider>
-                  </GlassesProvider>
-                </HatsProvider>
-              </HeadbandProvider>
-            </TiaraProvider>
-          </NeckwearProvider>
-        </ScarvesProvider>
-      </HandwearProvider>
-    </WatchesProvider>
+    <SelecProductNumberProvider>
+      <WatchesProvider>
+        <HandwearProvider>
+          <ScarvesProvider>
+            <NeckwearProvider>
+              <TiaraProvider>
+                <HeadbandProvider>
+                  <HatsProvider>
+                    <GlassesProvider>
+                      <EarringsProvider>
+                        <HairColorProvider>
+                          <PressOnNailsProvider>
+                            <NailPolishProvider>
+                              <MascaraProvider>
+                                <LenseProvider>
+                                  <LashesProvider>
+                                    <EyebrowsProvider>
+                                      <EyeShadowProvider>
+                                        <EyeLinerProvider>
+                                          <ConcealerProvider>
+                                            <ContourProvider>
+                                              <BronzerProvider>
+                                                <HighlighterProvider>
+                                                  <FoundationProvider>
+                                                    <BlushProvider>
+                                                      <LipColorProvider>
+                                                        <LipLinerProvider>
+                                                          <LipPlumperProvider>
+                                                            {children}
+                                                          </LipPlumperProvider>
+                                                        </LipLinerProvider>
+                                                      </LipColorProvider>
+                                                    </BlushProvider>
+                                                  </FoundationProvider>
+                                                </HighlighterProvider>
+                                              </BronzerProvider>
+                                            </ContourProvider>
+                                          </ConcealerProvider>
+                                        </EyeLinerProvider>
+                                      </EyeShadowProvider>
+                                    </EyebrowsProvider>
+                                  </LashesProvider>
+                                </LenseProvider>
+                              </MascaraProvider>
+                            </NailPolishProvider>
+                          </PressOnNailsProvider>
+                        </HairColorProvider>
+                      </EarringsProvider>
+                    </GlassesProvider>
+                  </HatsProvider>
+                </HeadbandProvider>
+              </TiaraProvider>
+            </NeckwearProvider>
+          </ScarvesProvider>
+        </HandwearProvider>
+      </WatchesProvider>
+    </SelecProductNumberProvider>
   );
 }
 
@@ -159,17 +164,19 @@ export function VirtualTryOn() {
       <SkinColorProvider>
         <MakeupProvider>
           <AccesoriesProvider>
-            <VirtualTryOnProvider>
-              <FindTheLookProvider>
-                <CartProvider>
-                  <FilterProvider>
-                    <div className="h-full min-h-dvh">
-                      <Main />
-                    </div>
-                  </FilterProvider>
-                </CartProvider>
-              </FindTheLookProvider>
-            </VirtualTryOnProvider>
+            <VirtualTryOnMakeupsVoiceProvider>
+              <VirtualTryOnProvider>
+                <FindTheLookProvider>
+                  <CartProvider>
+                    <FilterProvider>
+                      <div className="h-full min-h-dvh">
+                        <Main />
+                      </div>
+                    </FilterProvider>
+                  </CartProvider>
+                </FindTheLookProvider>
+              </VirtualTryOnProvider>
+            </VirtualTryOnMakeupsVoiceProvider>
           </AccesoriesProvider>
         </MakeupProvider>
       </SkinColorProvider>
@@ -387,6 +394,7 @@ export function Makeups() {
   ];
 
   const [selectedMakeup, setSelectedMakeup] = useState<string | null>(null);
+  const { setSelectedProductNumber } = useSelecProductNumberContext()
 
   return (
     <>
@@ -397,7 +405,10 @@ export function Makeups() {
               key={index}
               className="flex flex-col items-center space-y-2"
               data-selected={selectedMakeup === option.name}
-              onClick={() => setSelectedMakeup(option.name)}
+              onClick={() => {
+                setSelectedMakeup(option.name)
+                setSelectedProductNumber(null)
+              }}
             >
               <div
                 className={clsx(
@@ -536,6 +547,51 @@ function BottomContent() {
   return <Outlet />;
 }
 
+function RecorderStatus() {
+  const { isRecording, formattedTime, handleStartPause, handleStop, isPaused } =
+    useRecordingControls();
+  const { finish } = useCamera();
+
+  return (
+    <div className="absolute inset-x-0 top-14 flex items-center justify-center gap-4">
+      <button
+        className="flex size-8 items-center justify-center"
+        onClick={handleStartPause}
+      >
+        {isPaused ? (
+          <CirclePlay className="size-6 text-white" />
+        ) : isRecording ? (
+          <PauseCircle className="size-6 text-white" />
+        ) : null}
+      </button>
+      <span className="relative flex size-4">
+        {isRecording ? (
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+        ) : null}
+        <span className="relative inline-flex size-4 rounded-full bg-red-500"></span>
+      </span>
+      <div className="font-serif text-white">{formattedTime}</div>
+      <button
+        className="flex size-8 items-center justify-center"
+        onClick={
+          isRecording
+            ? () => {
+                handleStop();
+                finish();
+              }
+            : handleStartPause
+        }
+      >
+        {isRecording || isPaused ? (
+          <StopCircle className="size-6 text-white" />
+        ) : (
+          <CirclePlay className="size-6 text-white" />
+        )}
+      </button>
+    </div>
+  );
+}
+
 export function TopNavigation({
   item = false,
   cart = false,
@@ -610,6 +666,7 @@ function Sidebar({
         <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 
         <div className="flex flex-col gap-4 rounded-full bg-black/25 px-1.5 py-2 backdrop-blur-md">
+          <VoiceCommand />
           <button className="" onClick={screenShoot}>
             <Icons.camera className="size-4 text-white sm:size-6" />
           </button>

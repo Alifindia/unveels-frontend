@@ -4,11 +4,13 @@ import { BrandName } from "../product/brand";
 
 export function VTOProductCard({
   product,
+  productNumber,
   selectedProduct,
   setSelectedProduct,
   onClick,
 }: {
   product: Product;
+  productNumber?: number;
   selectedProduct: Product | null;
   setSelectedProduct: React.Dispatch<React.SetStateAction<Product | null>>;
   onClick: () => void;
@@ -41,7 +43,7 @@ export function VTOProductCard({
       </div>
 
       <h3 className="line-clamp-2 h-6 py-1 text-[0.425rem] font-semibold text-white sm:h-10 sm:py-2 sm:text-[0.625rem]">
-        {product.name}
+        {productNumber}. {product.name}
       </h3>
       <p className="h-3 text-[0.425rem] text-white/60 sm:h-4 sm:text-[0.625rem]">
         <BrandName brandId={getProductAttributes(product, "brand")} />

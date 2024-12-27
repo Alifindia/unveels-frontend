@@ -58,6 +58,10 @@ import {
   TryOnSelectorMakeups,
 } from "./pages/virtual-try-on-makeups";
 import {
+  VirtualTryOnMakeupsVoice,
+  TryOnSelectorMakeupsVoice,
+} from "./pages/virtual-try-on-makeups-voice";
+import {
   TryOnSelectorAccesories,
   VirtualTryOnAccesories,
 } from "./pages/virtual-try-on-accesories";
@@ -179,6 +183,41 @@ const routes = [
     ],
   },
   {
+    path: "/virtual-try-on-makeups-voice",
+    element: <VirtualTryOnMakeupsVoice />,
+    children: [
+      { path: "makeups", element: <TryOnSelectorMakeupsVoice /> },
+      // Lips
+      { path: "lips", element: <LipsMode /> },
+      { path: "lip-color", element: <LipColorSelector /> },
+      { path: "lip-liner", element: <LipLinerSelector /> },
+      { path: "lip-plumper", element: <LipPlumperSelector /> },
+      // Eyes
+      { path: "eyes", element: <EyesMode /> },
+      { path: "eyebrows", element: <EyebrowsSelector /> },
+      { path: "eye-shadow", element: <EyeShadowSelector /> },
+      { path: "eye-liner", element: <EyeLinerSelector /> },
+      { path: "lashes", element: <LashesSelector /> },
+      { path: "mascara", element: <MascaraSelector /> },
+      { path: "lenses", element: <LenseSelector /> },
+      // Face
+      { path: "face", element: <FaceMode /> },
+      { path: "foundation", element: <FoundationSelector /> },
+      { path: "concealer", element: <ConcealerSelector /> },
+      { path: "contour", element: <ContourSelector /> },
+      { path: "blush", element: <BlushSelector /> },
+      { path: "bronzer", element: <BronzerSelector /> },
+      { path: "highlighter", element: <HighlighterSelector /> },
+      // Nails
+      { path: "nails", element: <NailsMode /> },
+      { path: "nail-polish", element: <NailPolishSelector /> },
+      { path: "press-on-nails", element: <PressOnNailsSelector /> },
+      // Hair
+      { path: "hair", element: <HairMode /> },
+      { path: "hair-color", element: <HairColorSelector /> },
+    ],
+  },
+  {
     path: "/virtual-try-on-accesories",
     element: <VirtualTryOnAccesories />,
     children: [
@@ -227,6 +266,9 @@ function Home() {
       <LinkButton to="/virtual-try-on/makeups">Virtual Try On</LinkButton>
       <LinkButton to="/virtual-try-on-makeups/makeups">
         Virtual Try On Makeup
+      </LinkButton>
+      <LinkButton to="/virtual-try-on-makeups-voice/makeups">
+        Virtual Try On Makeup Voice
       </LinkButton>
       <LinkButton to="/virtual-try-on-accesories/accesories">
         Virtual Try On Accesories

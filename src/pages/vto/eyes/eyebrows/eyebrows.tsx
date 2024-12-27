@@ -13,6 +13,7 @@ import { filterColors } from "../../../../api/attributes/color";
 import { ColorPalette } from "../../../../components/color-palette";
 import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
+import { useSelecProductNumberContext } from "../../select-product-context";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 import { getBrowMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
@@ -192,6 +193,7 @@ function BrightnessSlider() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -209,7 +211,6 @@ function ProductList() {
       ? getPatternByIndex("eyebrows", parseInt(selectedPattern)).value
       : null,
   });
-
   const { setEyebrowsColor, setEyebrowsPattern, setShowEyebrows } = useMakeup();
 
   useEffect(() => {
@@ -218,8 +219,35 @@ function ProductList() {
     setShowEyebrows(selectedColor != null && selectedPattern != null);
   }, [selectedColor, selectedPattern]);
 
+  useEffect(() => {
+    if (data?.items && selectedProductNumber) {
+      const adjustedIndex = selectedProductNumber - 1;
+      const matchedProduct = data.items[adjustedIndex];
+      console.log(selectedProductNumber)
+      if (matchedProduct) {
+        setSelectedProduct(matchedProduct);
+        setSelectedColor(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "hexacode",
+          )?.value || null
+        );
+        setColorFamily(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "color",
+          )?.value || null
+        );
+      }
+    }
+  }, [data, selectedProductNumber]);
+
   const handleProductClick = (product: Product) => {
-    console.log(product);
+    if (selectedProduct?.id === product.id) {
+      setSelectedProduct(null);
+      setSelectedProductNumber(null);
+      setColorFamily(null);
+      setSelectedColor(null);
+      return
+    }
     setSelectedProduct(product);
     setColorFamily(
       product.custom_attributes.find((item) => item.attribute_code === "color")
@@ -267,6 +295,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
+                productNumber={index+1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

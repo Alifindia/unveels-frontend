@@ -6,8 +6,9 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useHairColorContext } from "./hair-color-context";
 import { useHairColorQuery } from "./hair-color-query";
 import { useMakeup } from "../../../../context/makeup-context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
+import { useSelecProductNumberContext } from "../../select-product-context";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 import { getHairColorProductTypeIds } from "../../../../api/attributes/makeups";
 
@@ -125,6 +126,7 @@ function ColorSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -150,7 +152,35 @@ function ProductList() {
     );
   }
 
+  useEffect(() => {
+    if (data?.items && selectedProductNumber) {
+      const adjustedIndex = selectedProductNumber - 1;
+      const matchedProduct = data.items[adjustedIndex];
+      console.log(selectedProductNumber)
+      if (matchedProduct) {
+        setSelectedProduct(matchedProduct);
+        setSelectedColor(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "hexacode",
+          )?.value || null
+        );
+        setColorFamily(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "color",
+          )?.value || null
+        );
+      }
+    }
+  }, [data, selectedProductNumber]);
+
   const handleProductClick = (product: Product) => {
+    if (selectedProduct?.id === product.id) {
+      setSelectedProduct(null);
+      setSelectedProductNumber(null);
+      setColorFamily(null);
+      setSelectedColor(null);
+      return
+    }
     console.log(product);
     setSelectedProduct(product);
     setColorFamily(
@@ -199,6 +229,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
+                productNumber={index+1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

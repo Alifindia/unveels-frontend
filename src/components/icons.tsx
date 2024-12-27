@@ -1,6 +1,68 @@
 import React from "react";
 
 export const Icons = {
+  speech: (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+      width="25"
+      height="24"
+      viewBox="0 0 25 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M12.0198 16V16C9.81084 16 8.01984 14.209 8.01984 12V6C8.01984 3.791 9.81084 2 12.0198 2V2C14.2288 2 16.0198 3.791 16.0198 6V12C16.0198 14.209 14.2288 16 12.0198 16Z"
+        stroke={props.color}
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M19.0198 11V11.9C19.0198 15.821 15.8858 19 12.0198 19V19C8.15384 19 5.01984 15.821 5.01984 11.9V11"
+        stroke={props.color}
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.5198 6H12.5198"
+        stroke={props.color}
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.0198 9H13.0198"
+        stroke={props.color}
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.5198 12.0298H12.5198"
+        stroke={props.color}
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12.0198 19V22"
+        stroke={props.color}
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M9.01984 22H15.0198"
+        stroke={props.color}
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  ),
   logoType: (props: React.SVGProps<SVGSVGElement>) => (
     <svg fill="none" viewBox="0 0 44 14" {...props}>
       <path

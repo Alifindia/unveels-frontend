@@ -10,6 +10,7 @@ import { useLipPlumperQuery } from "./lip-plumper-query";
 import { ColorPalette } from "../../../../components/color-palette";
 import { Product } from "../../../../api/shared";
 import { useEffect, useState } from "react";
+import { useSelecProductNumberContext } from "../../select-product-context";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 import Lipplumper from "../../../../components/three/makeup/lipplumper";
 import { getLipsMakeupProductTypeIds } from "../../../../api/attributes/makeups";
@@ -125,6 +126,7 @@ function TextureSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -147,7 +149,35 @@ function ProductList() {
     setShowLipplumper(selectedColor != null);
   }, [selectedColor]);
 
+  useEffect(() => {
+    if (data?.items && selectedProductNumber) {
+      const adjustedIndex = selectedProductNumber - 1;
+      const matchedProduct = data.items[adjustedIndex];
+      console.log(matchedProduct, selectedProductNumber)
+      if (matchedProduct) {
+        setSelectedProduct(matchedProduct);
+        setSelectedColor(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "hexacode",
+          )?.value || null
+        );
+        setSelectedTexture(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "texture",
+          )?.value || null
+        );
+      }
+    }
+  }, [data, selectedProductNumber]);
+
   const handleProductClick = (product: Product) => {
+    if (selectedProduct?.id === product.id) {
+      setSelectedProduct(null);
+      setSelectedProductNumber(null);
+      setSelectedTexture(null);
+      setSelectedColor(null);
+      return
+    }
     console.log(product);
     setSelectedProduct(product);
     setSelectedColor(
@@ -196,6 +226,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
+                productNumber={index+1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

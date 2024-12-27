@@ -33,7 +33,6 @@ function Main() {
     setShowEyebrows,
     setEyebrowsColor,
     setEyebrowsPattern,
-    setEyebrowsVisibility,
     setShowLens,
     setLensPattern,
     setShowFoundation,
@@ -53,18 +52,6 @@ function Main() {
     setShowHighlighter,
     setHighlighterColor,
     setHighlighterPattern,
-    setShowEyeShadow,
-    setEyeShadowColor,
-    setEyeShadowMaterial,
-    setEyeShadowPattern,
-    setShowLashes,
-    setLashesColor,
-    setLashesPattern,
-    setShowMascara,
-    setMascaraColor,
-    setShowEyeliner,
-    setEyelinerColor,
-    setEyelinerPattern,
   } = useMakeup();
 
   const {
@@ -111,7 +98,7 @@ function Main() {
           }
 
           if (data.liplinerPattern !== undefined) {
-            setLiplinerPattern(data.liplinerPattern);
+            setLiplinerPattern(data.setLiplinerPattern);
           }
 
           if (data.liplinerColor !== undefined) {
@@ -140,49 +127,10 @@ function Main() {
             setEyebrowsPattern(data.eyebrowsPattern);
           }
 
-          if (data.eyebrowsVisibility !== undefined) {
-            setEyebrowsVisibility(data.eyebrowsVisibility);
-          }
-
-          // lashes
-          if (data.showLashes !== undefined) {
-            setShowLashes(data.showLashes);
-          }
-
-          if (data.lashesColor !== undefined) {
-            setLashesColor(data.lashesColor);
-          }
-
-          if (data.lashesPattern !== undefined) {
-            setLashesPattern(data.lashesPattern);
-          }
-
-          // mascara
-          if (data.showMascara !== undefined) {
-            setShowMascara(data.showMascara);
-          }
-
-          if (data.mascaraColor !== undefined) {
-            setMascaraColor(data.mascaraColor);
-          }
-
-          // eyeliner
-          if (data.showEyeliner !== undefined) {
-            setShowEyeliner(data.showEyeliner);
-          }
-
-          if (data.eyelinerColor !== undefined) {
-            setEyelinerColor(data.eyelinerColor);
-          }
-
-          if (data.eyelinerPattern !== undefined) {
-            setEyelinerPattern(data.eyelinerPattern);
-          }
-
           // lens
 
           if (data.showLens !== undefined) {
-            setShowLens(data.showLens);
+            setShowLens(data.setShowLens);
           }
 
           if (data.lensPattern !== undefined) {
@@ -264,23 +212,6 @@ function Main() {
             setHighlighterPattern(data.highlighterPattern);
           }
 
-          //eyeshadow
-          if (data.showEyeShadow !== undefined) {
-            setShowEyeShadow(data.showEyeShadow);
-          }
-
-          if (data.eyeShadowColor !== undefined) {
-            setEyeShadowColor(data.eyeShadowColor);
-          }
-
-          if (data.eyeshadowPattern !== undefined) {
-            setEyeShadowPattern(data.eyeshadowPattern);
-          }
-
-          if (data.eyeshadowMaterial !== undefined) {
-            setEyeShadowMaterial(data.eyeshadowMaterial);
-          }
-
           //bracelet
           if (data.showBracelet !== undefined) {
             setShowBracelet(data.showBracelet);
@@ -343,6 +274,9 @@ function Main() {
         <VirtualTryOnScene />
         <div
           className="pointer-events-none absolute inset-0"
+          style={{
+            background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
+          }}
         ></div>
       </div>
     </div>

@@ -11,6 +11,7 @@ import { useEyeshadowsQuery } from "./eye-shadow-query";
 import { ColorPalette } from "../../../../components/color-palette";
 import { Product } from "../../../../api/shared";
 import { useMakeup } from "../../../../context/makeup-context";
+import { useSelecProductNumberContext } from "../../select-product-context";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 import { getEyeMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
@@ -277,6 +278,7 @@ function ModeSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -310,9 +312,37 @@ function ProductList() {
     setEyeShadowMaterial(materialIndex != -1 ? materialIndex : 0);
     setEyeShadowMode(selectedMode as "One" | "Dual" | "Tri" | "Quad" | "Penta");
     setShowEyeShadow(true);
-  }, [selectedColors, modeIndex, selectedMode, selectedTexture]);
+  }, [selectedColors, selectedTexture]);
+
+  useEffect(() => {
+    if (data?.items && selectedProductNumber) {
+      const adjustedIndex = selectedProductNumber - 1;
+      const matchedProduct = data.items[adjustedIndex];
+      console.log(selectedProductNumber)
+      if (matchedProduct) {
+        setSelectedProduct(matchedProduct);
+        setSelectedColors(
+          matchedProduct.custom_attributes
+            .find((item) => item.attribute_code === "hexacode")
+            ?.value.split(","),
+        );
+        setSelectedTexture(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "texture",
+          )?.value || null
+        );
+      }
+    }
+  }, [selectedProductNumber]);
 
   const handleProductClick = (product: Product) => {
+    if (selectedProduct?.id === product.id) {
+      setSelectedProduct(null);
+      setSelectedProductNumber(null);
+      setSelectedTexture(null);
+      setSelectedColors([]);
+      return
+    }
     console.log(product);
     setSelectedProduct(product);
     setSelectedColors(
@@ -358,6 +388,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
+                productNumber={index+1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}
