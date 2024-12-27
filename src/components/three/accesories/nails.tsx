@@ -1,6 +1,6 @@
 import { MeshProps, useFrame, useThree } from "@react-three/fiber";
 import React, { useMemo, useRef, Suspense, useEffect } from "react";
-import { BackSide, Mesh, MeshStandardMaterial, Object3D } from "three";
+import { Mesh, MeshStandardMaterial, Object3D } from "three";
 import { Landmark } from "../../../types/landmark";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../utils/calculateDistance";
@@ -43,7 +43,6 @@ const NailsInner: React.FC<NailsProps> = React.memo(
               if (mesh.material instanceof MeshStandardMaterial) {
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.color.set(nailsColor); // Set the nails color
-                mesh.material.side = BackSide;
                 mesh.material.needsUpdate = true;
               }
               child.renderOrder = 2;
