@@ -69,15 +69,14 @@ import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-conte
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
-import { set } from "lodash";
 import {
   FindTheLookProvider,
   useFindTheLookContext,
 } from "../context/find-the-look-context";
-import { FindTheLookItems } from "../types/findTheLookItems";
 import { CartProvider, useCartContext } from "../context/cart-context";
 import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
 import { FilterProvider } from "../context/filter-context";
+import { useTranslation } from "react-i18next";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -144,6 +143,12 @@ export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
 }
 
 export function VirtualTryOn() {
+  const { i18n } = useTranslation();
+  
+    useEffect(() => {
+      i18n.changeLanguage("ar"); // Mengatur bahasa ke Arab saat komponen di-mount
+    }, [i18n]);
+
   return (
     <CameraProvider>
       <SkinColorProvider>
@@ -287,6 +292,8 @@ function MainContent() {
 }
 
 export function TryOnSelector() {
+  const { t } = useTranslation();
+
   const [tab, setTab] = useState("makeup" as "makeup" | "accessories" | null);
 
   const activeClassNames =
@@ -314,7 +321,7 @@ export function TryOnSelector() {
                     isActive ? "text-white/70 blur-sm" : "",
                   )}
                 >
-                  {shadeTab}
+                  {t('vto.'+shadeTab)}
                 </span>
                 {isActive ? (
                   <>
@@ -325,12 +332,12 @@ export function TryOnSelector() {
                       )}
                     >
                       <span className="text-center text-[12.6px] capitalize sm:text-lg lg:text-2xl">
-                        {shadeTab}
+                      {t('vto.'+shadeTab)}
                       </span>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="text-center text-[12.6px] capitalize text-white/70 sm:text-lg lg:text-2xl">
-                        {shadeTab}
+                      {t('vto.'+shadeTab)}
                       </span>
                     </div>
                   </>
@@ -352,6 +359,8 @@ export function TryOnSelector() {
 }
 
 export function Makeups() {
+  const { t } = useTranslation();
+
   const shadeOptions = [
     {
       name: "Lips",
@@ -412,7 +421,7 @@ export function Makeups() {
                 />
               </div>
               <div className="text-center text-sm !leading-4 text-white lg:text-lg">
-                {option.name}
+                {t('vto.'+option.name)}
               </div>
             </button>
           ))}
@@ -435,6 +444,8 @@ export function Makeups() {
 }
 
 export function Accessories() {
+  const { t } = useTranslation();
+
   const shadeOptions = [
     {
       name: "Head Accessories",
@@ -496,7 +507,7 @@ export function Accessories() {
                 />
               </div>
               <div className="text-center text-[9.8px] !leading-4 text-white sm:text-sm lg:text-lg">
-                {option.name}
+                {t('vto.'+option.name)}
               </div>
             </button>
           ))}

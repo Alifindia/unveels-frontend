@@ -358,5 +358,22 @@
     "firmness": "الشد",
     "dark circles": "الهالات السوداء",
     "dry": "جاف"
+  },
+  "model_loading" : {"label" : "مدعوم بواسطة Unveels"},
+  "vto" : {
+   "makeup": "ماكياج",
+   "accessories": "مُكَمِّلات", 
+   "Lips": "شفه",
+   "Eyes": "عيون",
+   "Face" : "وجه",
+   "Hair": "الرامبوت",
+   "Head Accessories": "إكسسوارات الرأس",
+   "Neck Accessories": "إكسسوارات الرقبة",
+   "Hand Accessories": "إكسسوارات اليد",
+   "Nails": "الأظافر",
+   "Lip Color": " لون الشفاه ",
+   "Lip Liner": "محدد الشفاه ",
+   "Lip Plumper": "ملمع الشفاه  "
   }
+
 }

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 const modes = [
@@ -15,6 +16,8 @@ const modes = [
   },
 ];
 export function LipsMode() {
+  const { t } = useTranslation();
+  
   return (
     <div className="flex items-center w-full space-x-2 overflow-x-auto no-scrollbar">
       {modes.map((mode, index) => (
@@ -23,7 +26,7 @@ export function LipsMode() {
             type="button"
             className="inline-flex items-center px-3 py-1 border rounded-full gap-x-2 whitespace-nowrap border-white/80 text-white/80"
           >
-            <span className="text-[9.8px] sm:text-sm">{mode.name}</span>
+            <span className="text-[9.8px] sm:text-sm">{t('vto.'+mode.name)}</span>
           </button>
         </Link>
       ))}
