@@ -68,12 +68,28 @@ const inputObjects = Object.fromEntries(
   }),
 );
 
+function mediaPipeExportsWorkaround() {
+  return {
+      name: "mediapipe_workaround",
+      load(id: string) {
+          if (path.basename(id) === "face_mesh.js") {
+              console.log("mediapipe workaround");
+              let code = fs.readFileSync(id, "utf-8");
+              code += "exports.FaceMesh = FaceMesh;";
+              return { code };
+          } else {
+              return null;
+          }
+      },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), mediaPipeExportsWorkaround()],
   server: {
     proxy: {
       "/rest": {
-        target: "https://magento-1231949-4398885.cloudwaysapps.com/",
+        target: "https://unveels.com/",
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/rest/, "/en/rest"),
