@@ -52,13 +52,18 @@ import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
 import { VTOProductCard } from "../components/vto/vto-product-card";
 import { useCartContext } from "../context/cart-context";
 import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
 
 export function FindTheLook() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    i18n.changeLanguage("en"); // Mengatur bahasa ke Arab saat komponen di-mount
-  }, [i18n]);
+      const storeLang = getCookie("store");
+  
+      const lang = storeLang === "ar" ? "ar" : "en";
+  
+      i18n.changeLanguage(lang);
+    }, [i18n]);
 
   return (
     <CameraProvider>

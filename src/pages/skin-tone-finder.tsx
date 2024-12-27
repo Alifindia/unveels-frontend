@@ -65,12 +65,18 @@ import { useCartContext } from "../context/cart-context";
 import { Rating } from "../components/rating";
 import { BrandName } from "../components/product/brand";
 import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
+
 
 export function SkinToneFinder() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    i18n.changeLanguage("en"); // Mengatur bahasa ke Arab saat komponen di-mount
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
   }, [i18n]);
 
   return (

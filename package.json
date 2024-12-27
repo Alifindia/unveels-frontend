@@ -28,6 +28,7 @@
     "@tensorflow/tfjs-converter": "^4.22.0",
     "@tensorflow/tfjs-core": "^4.22.0",
     "@tensorflow/tfjs-tflite": "0.0.1-alpha.9",
+    "@types/js-cookie": "^3.0.6",
     "@types/three": "^0.169.0",
     "@wavesurfer/react": "^1.0.7",
     "axios": "^1.7.7",

@@ -77,6 +77,7 @@ import { CartProvider, useCartContext } from "../context/cart-context";
 import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
 import { FilterProvider } from "../context/filter-context";
 import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -145,9 +146,13 @@ export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
 export function VirtualTryOn() {
   const { i18n } = useTranslation();
   
-    useEffect(() => {
-      i18n.changeLanguage("ar"); // Mengatur bahasa ke Arab saat komponen di-mount
-    }, [i18n]);
+  useEffect(() => {
+    const storeLang = getCookie("store");
+    
+    const lang = storeLang === "ar" ? "ar" : "en";
+    
+    i18n.changeLanguage(lang);
+  }, [i18n]);
 
   return (
     <CameraProvider>

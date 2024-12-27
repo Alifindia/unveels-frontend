@@ -29,13 +29,19 @@ import {
 } from "../context/see-improvement-context";
 import { useCartContext } from "../context/cart-context";
 import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
 
 export function SeeImprovement() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    i18n.changeLanguage("en"); // Mengatur bahasa ke Arab saat komponen di-mount
+        const storeLang = getCookie("store");
+    
+        const lang = storeLang === "ar" ? "ar" : "en";
+    
+        i18n.changeLanguage(lang);
   }, [i18n]);
+
   return (
     <CameraProvider>
       <SkinAnalysisProvider>
