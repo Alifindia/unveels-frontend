@@ -41,8 +41,15 @@ import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { Scanner } from "../components/scanner";
 import { useCartContext } from "../context/cart-context";
+import { useTranslation } from "react-i18next";
 
 export function SkinAnalysis() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    i18n.changeLanguage("ar"); // Mengatur bahasa ke Arab saat komponen di-mount
+  }, [i18n]);
+
   return (
     <CameraProvider>
       <InferenceProvider>
@@ -243,17 +250,17 @@ function MainContent({
 const tabs = [
   "acne",
   "blackhead",
-  "dark circle",
-  "droopy eyelid lower",
-  "droopy eyelid upper",
+  "dark circles",
+  "droopy lower eyelid",
+  "droopy upper eyelid",
   "dry",
-  "eyebag",
+  "eyebags",
   "firmness",
-  "moistures",
+  "moisture",
   "oily",
-  "pore",
+  "pores",
   "radiance",
-  "skinredness",
+  "redness",
   "spots",
   "texture",
   "whitehead",
@@ -262,6 +269,7 @@ const tabs = [
 
 function SkinProblems({ onClose }: { onClose: () => void }) {
   const { tab, setTab, getTotalScoreByLabel } = useSkinAnalysis();
+  const { t } = useTranslation();
   const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
   const activeClassNames =
@@ -301,7 +309,7 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
                   )}
                   onClick={() => setTab(problemTab)}
                 >
-                  {problemTab}
+                  {t(`skinlabel.${problemTab}`)}
 
                   <div
                     className={clsx(
@@ -328,7 +336,7 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
             className="text-[0.625rem] text-white sm:py-2"
             onClick={() => {}}
           >
-            View all
+            {t("view_all")}
           </button>
         </div>
 
@@ -339,10 +347,14 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
 }
 
 function DescriptionText({ text }: { text: string }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   return (
     <div className="py-2">
-      <h4 className="pb-1 font-bold text-white sm:text-xl">Description</h4>
+      <h4 className="pb-1 font-bold text-white sm:text-xl">
+        {" "}
+        {t("viewskinan.description")}
+      </h4>
       <p
         className={clsx("text-[9.4px] text-white sm:text-sm", {
           "line-clamp-3": !expanded,
@@ -357,13 +369,14 @@ function DescriptionText({ text }: { text: string }) {
           setExpanded(!expanded);
         }}
       >
-        {expanded ? "Less" : "More"}
+        {expanded ? t("viewskinan.Less") : t("viewskinan.Readmore")}
       </button>
     </div>
   );
 }
 
 function ProductList({ skinConcern }: { skinConcern: string }) {
+  const { t } = useTranslation();
   const { data } = useSkincareProductQuery({
     skinConcern,
   });
@@ -435,7 +448,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                     );
                   }}
                 >
-                  ADD TO CART
+                  {t("viewskinan.addcart")}
                 </button>
                 <button
                   type="button"
@@ -444,7 +457,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                     event.stopPropagation();
                   }}
                 >
-                  SEE IMPROVEMENT
+                  {t("viewskinan.seeimprovement")}
                 </button>
               </div>
             </div>
@@ -497,6 +510,7 @@ function ProblemResults({
 }: {
   isInferenceCompleted: boolean;
 }) {
+  const { t } = useTranslation();
   const { view, setView } = useSkinAnalysis();
   return (
     <>
@@ -510,7 +524,7 @@ function ProblemResults({
                 setView("results");
               }}
             >
-              ANALYSIS RESULT
+              {t("viewskinan.analysis_result")}
             </button>
           </div>
         </>
@@ -527,6 +541,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
     getTotalScoreByLabel,
   } = useSkinAnalysis();
 
+  const { t } = useTranslation();
   const { criterias } = useCamera();
 
   return (
@@ -552,7 +567,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
         </div>
 
         <h1 className="bg-[linear-gradient(89.39deg,#92702D_0.52%,#CA9C43_99.44%)] bg-clip-text text-3xl font-medium text-transparent">
-          Analysis Results
+          {t("viewskinan.analysis_result")}
         </h1>
       </div>
 
@@ -579,13 +594,14 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
           <div className="flex items-center gap-x-2">
             <Icons.chart className="size-5" />
             <div className="text-lg">
-              Skin Health Score : {calculateSkinHealthScore()}%
+              {t("viewskinan.skin_health")} : {calculateSkinHealthScore()}%
             </div>
           </div>
           <div className="flex items-center gap-x-2">
             <Icons.hashtagCircle className="size-5" />
             <div className="text-lg">
-              Skin Age: {Math.floor(Math.random() * (64 - 20 + 1)) + 20}
+              {t("viewskinan.skin_age")}:{" "}
+              {Math.floor(Math.random() * (64 - 20 + 1)) + 20}
             </div>
           </div>
         </div>
@@ -593,7 +609,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
 
       <div className="flex-1 overflow-y-auto py-6">
         <h2 className="text-center text-xl font-medium">
-          Detected Skin Problems
+          {t("viewskinan.detected_skin")}
         </h2>
 
         <div className="md:hidden">
@@ -606,14 +622,14 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
                   percentage: getTotalScoreByLabel("texture"),
                   color: "#E9A0DD",
                 },
-                { percentage: getTotalScoreByLabel("pore"), color: "#F4EB24" },
+                { percentage: getTotalScoreByLabel("pores"), color: "#F4EB24" },
                 { percentage: getTotalScoreByLabel("spots"), color: "#0F38CC" },
                 {
-                  percentage: getTotalScoreByLabel("eyebag"),
+                  percentage: getTotalScoreByLabel("eyebags"),
                   color: "#00E0FF",
                 },
                 {
-                  percentage: getTotalScoreByLabel("dark circle"),
+                  percentage: getTotalScoreByLabel("dark circles"),
                   color: "#6B13B1",
                 },
                 {
@@ -627,7 +643,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
               <div className="text-xl font-bold">
                 {calculateAverageSkinProblemsScore()}%
               </div>
-              <div className="">Skin Problems</div>
+              <div className="">{t("viewskinan.skin_problem")}</div>
             </div>
           </div>
 
@@ -638,21 +654,21 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#00FF38] text-sm font-bold text-white">
                   {getTotalScoreByLabel("texture")}%
                 </div>
-                <span>Texture</span>
+                <span>{t("skinlabel.texture")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#6B13B1] text-sm font-bold text-white">
                   {getTotalScoreByLabel("dark circle")}%
                 </div>
-                <span>Dark Circles</span>
+                <span>{t("skinlabel.dark circles")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#00E0FF] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("eyebag")}%
+                  {getTotalScoreByLabel("eyebags")}%
                 </div>
-                <span>Eyebags</span>
+                <span>{t("skinlabel.eyebags")}</span>
               </div>
             </div>
 
@@ -661,28 +677,28 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0F38CC] text-sm font-bold text-white">
                   {getTotalScoreByLabel("wrinkles")}%
                 </div>
-                <span>Wrinkles</span>
+                <span>{t("skinlabel.wrinkles")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#F4EB24] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("pore")}%
+                  {getTotalScoreByLabel("pores")}%
                 </div>
-                <span>Pores</span>
+                <span>{t("skinlabel.pores")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#E9A0DD] text-sm font-bold text-white">
                   {getTotalScoreByLabel("spots")}%
                 </div>
-                <span>Spots</span>
+                <span>{t("skinlabel.spots")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#F72585] text-sm font-bold text-white">
                   {getTotalScoreByLabel("acne")}%
                 </div>
-                <span>Acne</span>
+                <span>{t("skinlabel.acne")}</span>
               </div>
             </div>
           </div>
@@ -695,28 +711,28 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0F38CC] text-sm font-bold text-white">
                   {getTotalScoreByLabel("wrinkles")}%
                 </div>
-                <span>Wrinkles</span>
+                <span>{t("skinlabel.wrinkles")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#F4EB24] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("pore")}%
+                  {getTotalScoreByLabel("pores")}%
                 </div>
-                <span>Pores</span>
+                <span>{t("skinlabel.pores")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#E9A0DD] text-sm font-bold text-white">
                   {getTotalScoreByLabel("spots")}%
                 </div>
-                <span>Spots</span>
+                <span>{t("skinlabel.spots")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#F72585] text-sm font-bold text-white">
                   {getTotalScoreByLabel("acne")}%
                 </div>
-                <span>Acne</span>
+                <span>{t("skinlabel.acne")}</span>
               </div>
             </div>
           </div>
@@ -730,14 +746,14 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
                   percentage: getTotalScoreByLabel("texture"),
                   color: "#E9A0DD",
                 },
-                { percentage: getTotalScoreByLabel("pore"), color: "#F4EB24" },
+                { percentage: getTotalScoreByLabel("pores"), color: "#F4EB24" },
                 { percentage: getTotalScoreByLabel("spots"), color: "#0F38CC" },
                 {
-                  percentage: getTotalScoreByLabel("eyebag"),
+                  percentage: getTotalScoreByLabel("eyebags"),
                   color: "#00E0FF",
                 },
                 {
-                  percentage: getTotalScoreByLabel("dark circle"),
+                  percentage: getTotalScoreByLabel("dark circles"),
                   color: "#6B13B1",
                 },
                 {
@@ -751,7 +767,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
               <div className="text-xl font-bold">
                 {calculateAverageSkinProblemsScore()}%
               </div>
-              <div className="">Skin Problems</div>
+              <div className="">{t("viewskinan.skin_problem")}</div>
             </div>
           </div>
 
@@ -762,28 +778,28 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#00FF38] text-sm font-bold text-white">
                   {getTotalScoreByLabel("texture")}%
                 </div>
-                <span>Texture</span>
+                <span>{t("skinlabel.texture")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#6B13B1] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("dark circle")}%
+                  {getTotalScoreByLabel("dark circles")}%
                 </div>
-                <span>Dark Circles</span>
+                <span>{t("skinlabel.dark circles")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#00E0FF] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("eyebag")}%
+                  {getTotalScoreByLabel("eyebags")}%
                 </div>
-                <span>Eyebags</span>
+                <span>{t("skinlabel.eyebags")}</span>
               </div>
             </div>
           </div>
         </div>
 
         <h2 className="pt-12 text-center text-xl font-medium">
-          Detected Skin Condition
+          {t("viewskinan.detected_skin_con")}
         </h2>
 
         <div className="md:hidden">
@@ -792,24 +808,24 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
               className="mx-auto w-full max-w-96"
               data={[
                 {
-                  percentage: getTotalScoreByLabel("moistures"),
+                  percentage: getTotalScoreByLabel("moisture"),
                   color: "#4CC9F0",
                 },
                 {
-                  percentage: getTotalScoreByLabel("skinredness"),
+                  percentage: getTotalScoreByLabel("redness"),
                   color: "#BD8EFF",
                 },
                 { percentage: getTotalScoreByLabel("oily"), color: "#B5179E" },
                 {
-                  percentage: getTotalScoreByLabel("moistures"),
+                  percentage: getTotalScoreByLabel("moisture"),
                   color: "#5DD400",
                 },
                 {
-                  percentage: getTotalScoreByLabel("droopy eyelid lower"),
+                  percentage: getTotalScoreByLabel("droopy lower eyelid"),
                   color: "#14A086",
                 },
                 {
-                  percentage: getTotalScoreByLabel("droopy eyelid upper"),
+                  percentage: getTotalScoreByLabel("droopy upper eyelid"),
                   color: "#F72585",
                 },
                 {
@@ -823,7 +839,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
               <div className="text-xl font-bold">
                 {calculateAverageSkinConditionScore()}%
               </div>
-              <div className="">Skin Problems</div>
+              <div className="">{t("viewskinan.skin_problem")}</div>
             </div>
           </div>
 
@@ -834,51 +850,51 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#F1B902] text-sm font-bold text-white">
                   {getTotalScoreByLabel("firmness")}%
                 </div>
-                <span>Firmness</span>
+                <span>{t("skinlabel.firmness")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#F72585] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("droopy eyelid upper")}%
+                  {getTotalScoreByLabel("droopy upper eyelid")}%
                 </div>
-                <span>Droopy Upper Eyelid</span>
+                <span>{t("skinlabel.droopy upper eyelid")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#14A086] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("droopy eyelid lower")}%
+                  {getTotalScoreByLabel("droopy lower eyelid")}%
                 </div>
-                <span>Droopy Lower Eyelid</span>
+                <span>{t("skinlabel.droopy lower eyelid")}</span>
               </div>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#5DD400] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("moistures")}%
+                  {getTotalScoreByLabel("moisture")}%
                 </div>
-                <span>Moisture Level</span>
+                <span>{t("skinlabel.moisture")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#B5179E] text-sm font-bold text-white">
                   {getTotalScoreByLabel("oily")}%
                 </div>
-                <span>Oiliness</span>
+                <span>{t("skinlabel.oily")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#BD8EFF] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("skinredness")}%
+                  {getTotalScoreByLabel("redness")}%
                 </div>
-                <span>Redness</span>
+                <span>{t("skinlabel.redness")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#4CC9F0] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("moistures")}%
+                  {getTotalScoreByLabel("moisture")}%
                 </div>
-                <span>Radiance</span>
+                <span>{t("skinlabel.radiance")}</span>
               </div>
             </div>
           </div>
@@ -889,30 +905,30 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
             <div className="space-y-4">
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#5DD400] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("moistures")}%
+                  {getTotalScoreByLabel("moisture")}%
                 </div>
-                <span>Moisture Level</span>
+                <span>{t("skinlabel.moisture")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#B5179E] text-sm font-bold text-white">
                   {getTotalScoreByLabel("oily")}%
                 </div>
-                <span>Oiliness</span>
+                <span>{t("skinlabel.oily")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#BD8EFF] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("skinredness")}%
+                  {getTotalScoreByLabel("redness")}%
                 </div>
-                <span>Redness</span>
+                <span>{t("skinlabel.redness")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#4CC9F0] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("moistures")}%
+                  {getTotalScoreByLabel("moisture")}%
                 </div>
-                <span>Radiance</span>
+                <span>{t("skinlabel.radiance")}</span>
               </div>
             </div>
           </div>
@@ -922,24 +938,24 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
               className="mx-auto size-96"
               data={[
                 {
-                  percentage: getTotalScoreByLabel("moistures"),
+                  percentage: getTotalScoreByLabel("moisture"),
                   color: "#4CC9F0",
                 },
                 {
-                  percentage: getTotalScoreByLabel("skinredness"),
+                  percentage: getTotalScoreByLabel("redness"),
                   color: "#BD8EFF",
                 },
                 { percentage: getTotalScoreByLabel("oily"), color: "#B5179E" },
                 {
-                  percentage: getTotalScoreByLabel("moistures"),
+                  percentage: getTotalScoreByLabel("moisture"),
                   color: "#5DD400",
                 },
                 {
-                  percentage: getTotalScoreByLabel("droopy eyelid lower"),
+                  percentage: getTotalScoreByLabel("droopy lower eyelid"),
                   color: "#14A086",
                 },
                 {
-                  percentage: getTotalScoreByLabel("droopy eyelid upper"),
+                  percentage: getTotalScoreByLabel("droopy upper eyelid"),
                   color: "#F72585",
                 },
                 {
@@ -953,7 +969,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
               <div className="text-xl font-bold">
                 {calculateAverageSkinConditionScore()}%
               </div>
-              <div className="">Skin Problems</div>
+              <div className="">{t("viewskinan.skin_problem")}</div>
             </div>
           </div>
 
@@ -964,21 +980,21 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#F1B902] text-sm font-bold text-white">
                   {getTotalScoreByLabel("firmness")}%
                 </div>
-                <span>Firmness</span>
+                <span>{t("skinlabel.firmness")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#F72585] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("droopy eyelid upper")}%
+                  {getTotalScoreByLabel("droopy upper eyelid")}%
                 </div>
-                <span>Droopy Upper Eyelid</span>
+                <span>{t("skinlabel.droopy upper eyelid")}</span>
               </div>
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#14A086] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("droopy eyelid lower")}%
+                  {getTotalScoreByLabel("droopy lower eyelid")}%
                 </div>
-                <span>Droopy Lower Eyelid</span>
+                <span>{t("skinlabel.droopy lower eyelid")}</span>
               </div>
             </div>
           </div>
@@ -1016,7 +1032,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
             score={getTotalScoreByLabel("redness")}
           />
           <ProblemSection
-            title="Oiliness"
+            title="oily"
             detected="Detected"
             description="Oiliness can be caused by hormonal changes, stress, and genetics. It can be treated with oil-free skincare products, medication, and lifestyle changes."
             score={getTotalScoreByLabel("oily")}
@@ -1025,19 +1041,19 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
             title="Moisture"
             detected="Detected"
             description="Dry skin can be caused by cold weather, harsh soaps, and aging. It can be treated with moisturizers, humidifiers, and lifestyle changes."
-            score={getTotalScoreByLabel("moistures")}
+            score={getTotalScoreByLabel("moisture")}
           />
           <ProblemSection
             title="Pores"
             detected="Detected"
             description="Large pores can be caused by genetics, oily skin, and aging. They can be treated with topical creams, laser therapy, and microneedling."
-            score={getTotalScoreByLabel("pore")}
+            score={getTotalScoreByLabel("pores")}
           />
           <ProblemSection
-            title="Eye Bags"
+            title="Eyebags"
             detected="Detected"
             description="Eye bags can be caused by lack of sleep, allergies, and aging. They can be treated with eye creams, fillers, and surgery."
-            score={getTotalScoreByLabel("eyebag")}
+            score={getTotalScoreByLabel("eyebags")}
           />
           <ProblemSection
             title="Radiance"
@@ -1046,7 +1062,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
             score={getTotalScoreByLabel("radiance")}
           />
           <ProblemSection
-            title="Firminess"
+            title="Firmness"
             detected="Detected"
             description="Loss of firmness can be caused by aging, sun exposure, and smoking. It can be treated with topical creams, botox, and fillers."
             score={getTotalScoreByLabel("firmness")}
@@ -1054,14 +1070,14 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
           <ProblemSection
             title="Droopy Upper Eyelid"
             detected="Detected"
-            description="Droopy eyelids can be caused by aging, genetics, and sun exposure. They can be treated with eyelid surgery, botox, and fillers."
-            score={getTotalScoreByLabel("dropy upper eyelid")}
+            description="Droopy  can  eyelidbe caused by aging, genetics, and sun exposure. They can be treated with eyelid surgery, botox, and fillers."
+            score={getTotalScoreByLabel("droopy upper eyelid")}
           />
           <ProblemSection
             title="Droopy Lower Eyelid"
             detected="Detected"
-            description="Droopy eyelids can be caused by aging, genetics, and sun exposure. They can be treated with eyelid surgery, botox, and fillers."
-            score={getTotalScoreByLabel("dropy lower eyelid")}
+            description="Droopy  can  eyelidbe caused by aging, genetics, and sun exposure. They can be treated with eyelid surgery, botox, and fillers."
+            score={getTotalScoreByLabel("droopy lower eyelid")}
           />
           <ProblemSection
             title="Acne"
@@ -1086,6 +1102,7 @@ function ProblemSection({
   description: string;
   score: number;
 }) {
+  const { t } = useTranslation();
   // High -> 70% - 100%
   // Moderate -> above 40% - 69%
   // low -> 0% - 39%
@@ -1095,14 +1112,16 @@ function ProblemSection({
       <div className="flex items-center space-x-2 pb-6">
         <Icons.personalityTriangle className="size-8 shrink-0" />
 
-        <h2 className="text-3xl font-bold capitalize text-white">{title}</h2>
+        <h2 className="text-3xl font-bold capitalize text-white">
+          {t(`skinlabel.${title.toLocaleLowerCase()}`).toLocaleUpperCase()}
+        </h2>
       </div>
-      <span className="text-xl font-bold">Detected</span>
+      <span className="text-xl font-bold">{t("viewskinan.detected")}</span>
       <p className="pb-6 pt-1 text-sm">{detected}</p>
       <div className="pt-6"></div>
-      <span className="text-xl font-bold">Description</span>
+      <span className="text-xl font-bold">{t("viewskinan.description")}</span>
       <p className="pb-6 pt-1 text-sm">{description}</p>
-      <span className="text-xl font-bold">Score</span>
+      <span className="text-xl font-bold">{t("viewskinan.score")}</span>
       <div
         className={clsx(
           "text-sm",
@@ -1113,12 +1132,12 @@ function ProblemSection({
               : "text-[#5ED400]",
         )}
       >
-        {scoreType} {score}%
+        {t(`scoreTypes.${scoreType.toLocaleLowerCase()}`)} {score}%
       </div>
 
       <div className="py-8">
         <h2 className="pb-4 text-xl font-bold lg:text-2xl">
-          Recommended products
+          {t("viewskinan.recomend")}
         </h2>
 
         <ProductList skinConcern={title} />

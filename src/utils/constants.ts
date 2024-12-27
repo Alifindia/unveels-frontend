@@ -1189,17 +1189,17 @@ export const faces = [
 export const labels = [
   "acne",
   "blackhead",
-  "dark circle",
-  "droopy eyelid lower",
-  "droopy eyelid upper",
+  "dark circles",
+  "droopy lower eyelid",
+  "droopy upper eyelid",
   "dry",
-  "eyebag",
+  "eyebags",
   "firmness",
-  "moistures",
+  "moisture",
   "oily",
-  "pore",
+  "pores",
   "radiance",
-  "skinredness",
+  "redness",
   "spots",
   "texture",
   "whitehead",
@@ -1212,34 +1212,35 @@ export const labelsDescription: { [key: string]: string } = {
   blackhead:
     "Hello! Blackheads may be small, but they can be stubborn. A consistent skincare routine that includes gentle exfoliation can help keep them at bay. Try incorporating products with ingredients like salicylic acid to deeply cleanse your pores and prevent buildup. With each step, you’re working towards a smoother complexion, and your future self will love the glow and clarity you’ve cultivated.",
 
-  "dark circle":
+  circles:
     "Hey there! Dark circles can make an appearance even if you’re getting your rest. To brighten up that under-eye area, stay hydrated, get quality sleep, and consider products with antioxidants and ingredients like vitamin C or hyaluronic acid. Treat your under-eye area with care, and over time, you’ll notice a brighter, fresher look that your future self will thank you for!",
 
-  "droopy eyelid lower":
+  "droopy lower eyelid":
     "Hey! A little care for your eyelids can go a long way in giving you a refreshed, bright-eyed look. The lower eyelids can naturally show signs of tiredness, so be gentle with this sensitive area. Apply nourishing products and use sunscreen to protect from sun damage. Embrace your eyes, and with this extra care, they’ll keep shining as beautifully as ever.",
 
-  "droopy eyelid upper":
+  "droopy upper eyelid":
     "Hello! Upper eyelids can start to droop with time, but gentle care can help keep them looking lifted and youthful. Apply nourishing creams to this delicate area, always use sunscreen, and avoid tugging or pulling. Your eyelids will thank you for the gentle touch, and this care will help them stay refreshed for years to come.",
 
   dry: "Hey there! Dry skin can benefit immensely from a moisturizing routine. Keep hydrated from within, use a rich moisturizer to lock in hydration, and consider layering products that help your skin retain moisture throughout the day. Your future self will appreciate the soft, supple skin you’ve nourished with so much love and attention.",
 
-  eyebag:
+  eyebags:
     "Hey there! Eyebags can be caused by lack of rest, stress, or even just our natural facial structure, but taking steps to manage them can make a big difference. Remember to drink plenty of water, get your beauty sleep, and try eye creams or cooling gels to help reduce puffiness. With regular care, your eyes will look refreshed and bright, and your future self will thank you for the effort!",
 
   firmness:
     "Hey there! Our skin’s firmness can naturally decrease over time, but with a nourishing and hydrating routine, you can help maintain that fresh, youthful look. Use products that support collagen production and keep your skin moisturized to improve elasticity. A little effort now goes a long way in maintaining firm, radiant skin that your future self will love.",
 
-  moistures:
+  moisture:
     "Hello! Keeping your skin well-moisturized is one of the best gifts you can give yourself. Hydrated skin feels smooth, looks dewy, and maintains a youthful glow. Drink water throughout the day, use hydrating serums, and apply a rich moisturizer. Your future self will thank you for taking such wonderful care to maintain that plump, healthy skin!",
 
   oily: "Hey there! Oily skin is manageable with the right balance of products that help control shine without over-drying. Cleanse with gentle, oil-balancing products and keep skin hydrated to avoid triggering more oil production. A consistent routine will help you find that perfect balance, and your future self will love the way you’ve kept that shine in check!",
 
-  pore: "Hello! Large pores can benefit from a cleansing and pore-refining routine. Regular exfoliation and gentle products help keep pores clear and minimize their appearance. By taking these steps now, you’ll be rewarded with a refined, smoother texture that your future self will truly appreciate.",
+  pores:
+    "Hello! Large pores can benefit from a cleansing and pore-refining routine. Regular exfoliation and gentle products help keep pores clear and minimize their appearance. By taking these steps now, you’ll be rewarded with a refined, smoother texture that your future self will truly appreciate.",
 
   radiance:
     "Hey there! Radiant skin starts from within, and nourishing it daily with hydrating and brightening products can give you that beautiful glow. Stay hydrated, include vitamins in your diet, and use serums that promote luminosity. Your future self will thank you for the commitment to glowing, vibrant skin that shines from within!",
 
-  skinredness:
+  redness:
     "Hey there! Skin prone to redness can benefit from a gentle, calming skincare routine. Choose hydrating and soothing products, avoid harsh scrubs, and remember to protect your skin with sunscreen. With this extra care, you’ll help calm and balance your skin tone, and your future self will thank you for the even, serene complexion.",
 
   spots:
@@ -1269,19 +1270,19 @@ export const skinAnalysisDataItem: SkinAnalysisItem[] = [
     point: 36,
   },
   {
-    label: "moistures",
+    label: "moisture",
     class: 7,
     score: Math.floor(Math.random() * (80 - 50 + 1)) + 50,
     point: 347,
   },
   {
-    label: "moistures",
+    label: "moisture",
     class: 7,
     score: Math.floor(Math.random() * (80 - 50 + 1)) + 50,
     point: 347,
   },
   {
-    label: "moistures",
+    label: "moisture",
     class: 7,
     score: Math.floor(Math.random() * (80 - 50 + 1)) + 50,
     point: 227,
@@ -1317,7 +1318,7 @@ export const skinAnalysisDataItem: SkinAnalysisItem[] = [
     point: 193,
   },
   {
-    label: "pore",
+    label: "pores",
     class: 10,
     score: Math.floor(Math.random() * (80 - 50 + 1)) + 50,
     point: 100,
@@ -1336,49 +1337,49 @@ export const skinAnalysisDataItem: SkinAnalysisItem[] = [
   },
 
   {
-    label: "droopy eyelid upper",
+    label: "droopy upper eyelid",
     class: 4,
     score: Math.floor(Math.random() * (90 - 50 + 1)) + 50,
     point: 159,
   },
   {
-    label: "droopy eyelid upper",
+    label: "droopy upper eyelid",
     class: 4,
     score: Math.floor(Math.random() * (90 - 50 + 1)) + 50,
     point: 257,
   },
   {
-    label: "droopy eyelid lower",
+    label: "droopy lower eyelid",
     class: 3,
     score: Math.floor(Math.random() * (90 - 50 + 1)) + 50,
     point: 23,
   },
   {
-    label: "droopy eyelid lower",
+    label: "droopy lower eyelid",
     class: 6,
     score: Math.floor(Math.random() * (90 - 50 + 1)) + 50,
     point: 253,
   },
   {
-    label: "eyebag",
+    label: "eyebags",
     class: 6,
     score: Math.floor(Math.random() * (90 - 50 + 1)) + 50,
     point: 31,
   },
   {
-    label: "eyebag",
+    label: "eyebags",
     class: 6,
     score: Math.floor(Math.random() * (90 - 50 + 1)) + 50,
     point: 261,
   },
   {
-    label: "skinredness",
+    label: "redness",
     class: 12,
     score: Math.floor(Math.random() * (90 - 50 + 1)) + 50,
     point: 101,
   },
   {
-    label: "skinredness",
+    label: "redness",
     class: 12,
     score: Math.floor(Math.random() * (90 - 50 + 1)) + 50,
     point: 330,
@@ -1402,7 +1403,7 @@ export const skinAnalysisDataItem: SkinAnalysisItem[] = [
     point: 436,
   },
   {
-    label: "dark circle",
+    label: "dark circles",
     class: 2,
     score: Math.floor(Math.random() * (90 - 50 + 1)) + 50,
     point: 229,
