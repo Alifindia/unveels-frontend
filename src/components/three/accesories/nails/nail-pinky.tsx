@@ -1,20 +1,20 @@
 import { MeshProps, useFrame, useThree } from "@react-three/fiber";
 import React, { useMemo, useRef, Suspense, useEffect } from "react";
 import { BackSide, Mesh, MeshStandardMaterial, Object3D } from "three";
-import { Landmark } from "../../../types/landmark";
+import { Landmark } from "../../../../types/landmark";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
-import { calculateDistance } from "../../../utils/calculateDistance";
-import { handQuaternion } from "../../../utils/handOrientation";
-import { useAccesories } from "../../../context/accesories-context";
-import { NAILS } from "../../../utils/constants";
-import { useMakeup } from "../../../context/makeup-context";
+import { calculateDistance } from "../../../../utils/calculateDistance";
+import { handQuaternion } from "../../../../utils/handOrientation";
+import { useAccesories } from "../../../../context/accesories-context";
+import { NAILS } from "../../../../utils/constants";
+import { useMakeup } from "../../../../context/makeup-context";
 
-interface NailThumbProps extends MeshProps {
+interface NailPinkyProps extends MeshProps {
   handLandmarks: React.RefObject<Landmark[]>;
   planeSize: [number, number];
 }
 
-const NailThumbInner: React.FC<NailThumbProps> = React.memo(
+const NailPinkyInner: React.FC<NailPinkyProps> = React.memo(
   ({ handLandmarks, planeSize }) => {
     const nailsRef = useRef<Object3D | null>(null);
     const { scene, viewport } = useThree();
@@ -71,7 +71,7 @@ const NailThumbInner: React.FC<NailThumbProps> = React.memo(
       if (!handLandmarks.current || !nailsRef.current) return;
       const middleFingerMCP = handLandmarks.current[9];
       const nailsFingerMCP = handLandmarks.current[13];
-      const nailsFingerDIP = handLandmarks.current[4];
+      const nailsFingerDIP = handLandmarks.current[20];
 
       const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
 
@@ -91,7 +91,7 @@ const NailThumbInner: React.FC<NailThumbProps> = React.memo(
       nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
       nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      const quaternion = handQuaternion(handLandmarks.current, 1, 5);
+      const quaternion = handQuaternion(handLandmarks.current, 15, 20);
 
       if (quaternion) {
         nailsRef.current.setRotationFromQuaternion(quaternion);
@@ -115,12 +115,12 @@ const NailThumbInner: React.FC<NailThumbProps> = React.memo(
   },
 );
 
-const NailThumb: React.FC<NailThumbProps> = (props) => {
+const NailPinky: React.FC<NailPinkyProps> = (props) => {
   return (
     <Suspense fallback={null}>
-      <NailThumbInner {...props} />
+      <NailPinkyInner {...props} />
     </Suspense>
   );
 };
 
-export default NailThumb;
+export default NailPinky;
