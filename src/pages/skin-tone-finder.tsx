@@ -70,7 +70,7 @@ export function SkinToneFinder() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    i18n.changeLanguage("ar"); // Mengatur bahasa ke Arab saat komponen di-mount
+    i18n.changeLanguage("en"); // Mengatur bahasa ke Arab saat komponen di-mount
   }, [i18n]);
 
   return (

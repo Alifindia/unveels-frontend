@@ -8,6 +8,7 @@ import { handQuaternion } from "../../../../utils/handOrientation";
 import { useAccesories } from "../../../../context/accesories-context";
 import { NAILS } from "../../../../utils/constants";
 import { useMakeup } from "../../../../context/makeup-context";
+import { FrontSide } from "three";
 
 interface NailRingProps extends MeshProps {
   handLandmarks: React.RefObject<Landmark[]>;
@@ -43,7 +44,7 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
               if (mesh.material instanceof MeshStandardMaterial) {
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.color.set(nailsColor); // Set initial color
-                mesh.material.side = BackSide;
+                mesh.material.side = FrontSide;
                 mesh.material.needsUpdate = true;
               }
               child.renderOrder = 2;
@@ -91,7 +92,7 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
       nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
       nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      const quaternion = handQuaternion(handLandmarks.current, 12, 16);
+      const quaternion = handQuaternion(handLandmarks.current, 16, 12);
 
       if (quaternion) {
         nailsRef.current.setRotationFromQuaternion(quaternion);
