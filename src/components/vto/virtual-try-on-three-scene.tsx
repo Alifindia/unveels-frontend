@@ -42,6 +42,7 @@ import EyeShadow from "../three/makeup/eyeshadow";
 import Eyeliner from "../three/makeup/eyeliner";
 import { useCamera } from "../../context/recorder-context";
 import Nails from "../three/accesories/nails";
+import NailThumb from "../three/accesories/nail-thumb";
 
 interface VirtualTryOnThreeSceneProps extends MeshProps {
   videoRef: React.RefObject<Webcam | HTMLVideoElement | HTMLImageElement>;
@@ -421,6 +422,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
           )}
 
           <Nails planeSize={planeSize} handLandmarks={handlandmarks} />
+          <NailThumb planeSize={planeSize} handLandmarks={handlandmarks} />
         </>
       )}
     </>

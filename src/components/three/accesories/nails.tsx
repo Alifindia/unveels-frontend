@@ -6,7 +6,7 @@ import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../utils/calculateDistance";
 import { handQuaternion } from "../../../utils/handOrientation";
 import { useAccesories } from "../../../context/accesories-context";
-import { RING } from "../../../utils/constants";
+import { NAILS } from "../../../utils/constants";
 
 interface NailsProps extends MeshProps {
   handLandmarks: React.RefObject<Landmark[]>;
@@ -15,7 +15,7 @@ interface NailsProps extends MeshProps {
 
 const NailsInner: React.FC<NailsProps> = React.memo(
   ({ handLandmarks, planeSize }) => {
-    const nailsRefs = useRef<Object3D[]>([]);
+    const nailsRefs = useRef<(Object3D | null)[]>([]); // Create an array of references
     const { scene, viewport } = useThree();
     const { envMapAccesories } = useAccesories();
 
@@ -26,13 +26,13 @@ const NailsInner: React.FC<NailsProps> = React.memo(
       if (viewport.width > 1200) {
         return { scaleMultiplier: 500 };
       }
-      return { scaleMultiplier: 200 };
+      return { scaleMultiplier: 500 };
     }, [viewport.width]);
 
     useEffect(() => {
       const loader = new GLTFLoader();
       loader.load(
-        RING,
+        NAILS,
         (gltf) => {
           const ring = gltf.scene;
           ring.traverse((child) => {
@@ -46,14 +46,14 @@ const NailsInner: React.FC<NailsProps> = React.memo(
             }
           });
 
-          // Clone the ring object for each finger (5 total)
-          for (let i = 0; i < 5; i++) {
-            const ringClone = ring.clone();
-            nailsRefs.current.push(ringClone);
-            scene.add(ringClone);
+          // Create 4 copies of the nails model
+          for (let i = 0; i < 4; i++) {
+            const nailClone = ring.clone();
+            nailsRefs.current.push(nailClone); // Add the clone to the nailsRefs array
+            scene.add(nailClone); // Add it to the scene
           }
 
-          console.log("ring model loaded successfully");
+          console.log("Ring model loaded successfully");
         },
         undefined,
         (error) => {
@@ -62,51 +62,55 @@ const NailsInner: React.FC<NailsProps> = React.memo(
       );
 
       return () => {
-        nailsRefs.current.forEach((nailRef) => {
-          scene.remove(nailRef);
+        nailsRefs.current.forEach((nail) => {
+          if (nail) {
+            scene.remove(nail);
+          }
         });
       };
     }, [scene]);
 
     useFrame(() => {
-      if (!handLandmarks.current || nailsRefs.current.length < 5) return;
+      if (!handLandmarks.current || nailsRefs.current.length === 0) return;
 
-      const fingersLandmarks = [
-        handLandmarks.current[4], // Thumb
-        handLandmarks.current[8], // Index
-        handLandmarks.current[12], // Middle
-        handLandmarks.current[16], // Ring
-        handLandmarks.current[20], // Pinky
-      ];
+      const landmarksIndices = [8, 12, 16, 20]; // Landmarks indices for the nails
+      const scaleX = viewport.width / outputWidth;
+      const scaleY = viewport.height / outputHeight;
 
-      fingersLandmarks.forEach((landmark, index) => {
-        const nailRef = nailsRefs.current[index];
+      landmarksIndices.forEach((index, i) => {
+        if (handLandmarks.current) {
+          const landmark = handLandmarks.current[index];
+          if (!landmark) return;
 
-        if (!nailRef) return;
+          const nailsFingerX =
+            (1 - landmark.x) * outputWidth * scaleX - viewport.width / 2;
+          const nailsFingerY =
+            -landmark.y * outputHeight * scaleY + viewport.height / 2;
+          const nailsFingerZ = -landmark.z * 100;
 
-        const scaleX = viewport.width / outputWidth;
-        const scaleY = viewport.height / outputHeight;
+          // Scale the nail object
+          const fingerSize = calculateDistance(
+            handLandmarks.current[9],
+            handLandmarks.current[13],
+          );
+          const scaleFactor =
+            fingerSize * Math.min(scaleX, scaleY) * scaleMultiplier;
 
-        const nailX =
-          (1 - landmark.x) * outputWidth * scaleX - viewport.width / 2;
-        const nailY = -landmark.y * outputHeight * scaleY + viewport.height / 2;
-        const nailZ = -landmark.z * 100;
+          nailsRefs.current[i]?.position.set(
+            nailsFingerX,
+            nailsFingerY,
+            nailsFingerZ,
+          );
+          nailsRefs.current[i]?.scale.set(
+            scaleFactor,
+            scaleFactor,
+            scaleFactor,
+          );
 
-        const fingerSize = calculateDistance(
-          handLandmarks.current[9], // Using the middle finger MCP as a reference
-          handLandmarks.current[13],
-        );
-
-        const scaleFactor =
-          fingerSize * Math.min(scaleX, scaleY) * scaleMultiplier;
-
-        nailRef.position.set(nailX, nailY, nailZ);
-        nailRef.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-        const quaternion = handQuaternion(handLandmarks.current);
-
-        if (quaternion) {
-          nailRef.setRotationFromQuaternion(quaternion);
+          const quaternion = handQuaternion(handLandmarks.current, 7, 11);
+          if (quaternion) {
+            nailsRefs.current[i]?.setRotationFromQuaternion(quaternion);
+          }
         }
       });
     });

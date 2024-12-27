@@ -1717,6 +1717,9 @@ export const NECKLACE = "/media/unveels/vto-assets/necklace/neck.glb";
 //facecap
 export const FACECAP = "/media/unveels/vto-assets/facecap/new.glb";
 
+//facecap
+export const NAILS = "/media/unveels/vto-assets/nails/nails.glb";
+
 // hdr acc
 export const HDR_ACCESORIES =
   "/media/unveels/vto-assets/light/hotel_room_1k.hdr";
