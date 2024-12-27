@@ -1,6 +1,12 @@
 import { MeshProps, useFrame, useThree } from "@react-three/fiber";
 import React, { useMemo, useRef, Suspense, useEffect } from "react";
-import { BackSide, Mesh, MeshStandardMaterial, Object3D } from "three";
+import {
+  BackSide,
+  FrontSide,
+  Mesh,
+  MeshStandardMaterial,
+  Object3D,
+} from "three";
 import { Landmark } from "../../../../types/landmark";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../../utils/calculateDistance";
@@ -43,7 +49,7 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
               if (mesh.material instanceof MeshStandardMaterial) {
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.color.set(nailsColor); // Set initial color
-                mesh.material.side = BackSide;
+                mesh.material.side = FrontSide;
                 mesh.material.needsUpdate = true;
               }
               child.renderOrder = 2;
@@ -91,7 +97,7 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
       nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
       nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      const quaternion = handQuaternion(handLandmarks.current, 12, 16);
+      const quaternion = handQuaternion(handLandmarks.current, 16, 10);
 
       if (quaternion) {
         nailsRef.current.setRotationFromQuaternion(quaternion);

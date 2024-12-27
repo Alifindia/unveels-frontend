@@ -295,143 +295,166 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
             />
           </mesh>
 
-          {showFoundation && (
-            <Foundation
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
-          )}
+          {landmarks.current && landmarks.current?.length > 0 && (
+            <>
+              {showFoundation && (
+                <Foundation
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
 
-          {showBlush && (
-            <Blush
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
-          )}
+              {showBlush && (
+                <Blush
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
 
-          {showConcealer && (
-            <Concealer
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
-          )}
+              {showConcealer && (
+                <Concealer
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
 
-          {showHighlighter && (
-            <Highlighter
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
-          )}
+              {showHighlighter && (
+                <Highlighter
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
 
-          {showContour && (
-            <Contour
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
-          )}
+              {showContour && (
+                <Contour
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
 
-          {showLipliner && (
-            <Lipliner
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
-          )}
+              {showLipliner && (
+                <Lipliner
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
 
-          {showLipplumper && (
-            <Lipplumper
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
-          )}
+              {showLipplumper && (
+                <Lipplumper
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
 
-          {showLipColor && (
-            <LipColor
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
-          )}
+              {showLipColor && (
+                <LipColor
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
 
-          {showBronzer && (
-            <Bronzer
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
-          )}
+              {showBronzer && (
+                <Bronzer
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
 
-          {showLens && (
-            <ContactLens planeSize={planeSize} landmarks={landmarks} />
-          )}
+              {showLens && (
+                <ContactLens planeSize={planeSize} landmarks={landmarks} />
+              )}
 
-          {showEyebrows && (
-            <Eyebrows
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
-          )}
+              {showEyebrows && (
+                <Eyebrows
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
 
-          {showEyeShadow && (
-            <EyeShadow
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
-          )}
+              {showEyeShadow && (
+                <EyeShadow
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
 
-          {showEyeliner && (
-            <Eyeliner
-              planeSize={planeSize}
-              landmarks={landmarks}
-              isFlipped={isFlipped}
-            />
+              {showEyeliner && (
+                <Eyeliner
+                  planeSize={planeSize}
+                  landmarks={landmarks}
+                  isFlipped={isFlipped}
+                />
+              )}
+            </>
           )}
 
           {/* <HeadOccluder planeSize={planeSize} landmarks={landmarks} />
           <NeckOccluder planeSize={planeSize} landmarks={landmarks} />
           <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} /> */}
 
-          {showHat && <Hat planeSize={planeSize} landmarks={landmarks} />}
-
-          {showGlasess && (
-            <Glasess planeSize={planeSize} landmarks={landmarks} />
-          )}
-
-          {showHeadband && (
-            <Headband planeSize={planeSize} landmarks={landmarks} />
-          )}
-
-          {showEarring && (
-            <Earring planeSize={planeSize} landmarks={landmarks} />
-          )}
-
-          {showNecklace && (
-            <Necklace planeSize={planeSize} landmarks={landmarks} />
-          )}
-
-          {showWatch && (
-            <Watch planeSize={planeSize} handLandmarks={handlandmarks} />
-          )}
-
-          {showRing && (
-            <Ring planeSize={planeSize} handLandmarks={handlandmarks} />
-          )}
-
-          {showNails && (
+          {handlandmarks.current && handlandmarks.current.length > 0 && (
             <>
-              <NailThumb planeSize={planeSize} handLandmarks={handlandmarks} />
-              <NailMidlle planeSize={planeSize} handLandmarks={handlandmarks} />
-              <NailIndex planeSize={planeSize} handLandmarks={handlandmarks} />
-              <NailRing planeSize={planeSize} handLandmarks={handlandmarks} />
-              <NailPinky planeSize={planeSize} handLandmarks={handlandmarks} />
+              {showHat && <Hat planeSize={planeSize} landmarks={landmarks} />}
+
+              {showGlasess && (
+                <Glasess planeSize={planeSize} landmarks={landmarks} />
+              )}
+
+              {showHeadband && (
+                <Headband planeSize={planeSize} landmarks={landmarks} />
+              )}
+
+              {showEarring && (
+                <Earring planeSize={planeSize} landmarks={landmarks} />
+              )}
+
+              {showNecklace && (
+                <Necklace planeSize={planeSize} landmarks={landmarks} />
+              )}
+
+              {showWatch && (
+                <Watch planeSize={planeSize} handLandmarks={handlandmarks} />
+              )}
+
+              {showRing && (
+                <Ring planeSize={planeSize} handLandmarks={handlandmarks} />
+              )}
+
+              {showNails && (
+                <>
+                  <NailThumb
+                    planeSize={planeSize}
+                    handLandmarks={handlandmarks}
+                  />
+                  <NailMidlle
+                    planeSize={planeSize}
+                    handLandmarks={handlandmarks}
+                  />
+                  <NailIndex
+                    planeSize={planeSize}
+                    handLandmarks={handlandmarks}
+                  />
+                  <NailRing
+                    planeSize={planeSize}
+                    handLandmarks={handlandmarks}
+                  />
+                  <NailPinky
+                    planeSize={planeSize}
+                    handLandmarks={handlandmarks}
+                  />
+                </>
+              )}
             </>
           )}
         </>
