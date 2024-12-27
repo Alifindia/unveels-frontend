@@ -377,9 +377,8 @@ export function VirtualTryOnScene({
     if (
       faceLandmarkerRef.current &&
       handLandmarkerRef.current &&
-      hairSegmenterRef.current &&
       videoUploadRef.current &&
-      videoUploadRef.current.readyState === 3
+      videoUploadRef.current.readyState === 4
     ) {
       const video = videoUploadRef.current;
       const canvas = canvasRef.current;
@@ -425,46 +424,6 @@ export function VirtualTryOnScene({
               video,
               startTimeMs,
             );
-
-            // const hairResults = hairSegmenterRef.current.segmentForVideo(
-            //   video,
-            //   startTimeMs,
-            // );
-
-            // if (hairResults?.categoryMask) {
-            //   hairRef.current = hairResults.categoryMask.getAsFloat32Array();
-            //   let imageData = ctx.getImageData(
-            //     0,
-            //     0,
-            //     video.videoWidth,
-            //     video.videoHeight,
-            //   ).data;
-
-            //   let j = 0;
-            //   for (let i = 0; i < hairRef.current.length; ++i) {
-            //     const maskVal = Math.round(hairRef.current[i] * 255.0);
-
-            //     // Proses hanya untuk label index 1
-            //     if (maskVal === 1) {
-            //       const legendColor =
-            //         legendColors[maskVal % legendColors.length];
-            //       imageData[j] = (legendColor[0] + imageData[j]) / 2;
-            //       imageData[j + 1] = (legendColor[1] + imageData[j + 1]) / 2;
-            //       imageData[j + 2] = (legendColor[2] + imageData[j + 2]) / 2;
-            //       imageData[j + 3] = (legendColor[3] + imageData[j + 3]) / 2;
-            //     }
-            //     j += 4;
-            //   }
-
-            //   const uint8Array = new Uint8ClampedArray(imageData.buffer);
-            //   const dataNew = new ImageData(
-            //     uint8Array,
-            //     video.videoWidth,
-            //     video.videoHeight,
-            //   );
-
-            //   hairMaskRef.current = dataNew;
-            // }
 
             if (results.facialTransformationMatrixes.length > 0) {
               faceTransformRef.current =
@@ -551,6 +510,7 @@ export function VirtualTryOnScene({
 
   // Function to start the detection loop
   const startDetection = useCallback(() => {
+    console.log("startDetection called");
     if (isDetectingRef.current) return;
     isDetectingRef.current = true;
 
@@ -745,9 +705,9 @@ export function VirtualTryOnScene({
           controls
           autoPlay
           loop
-          onLoad={() => {
+          onLoadedData={() => {
             isDetectingRef.current = false;
-            console.log("Image loaded");
+            console.log("Video Loaded");
             startDetection();
           }}
         />

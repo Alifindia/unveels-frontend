@@ -36,21 +36,11 @@ function Main() {
 
   const modelsRef = useRef<{
     faceLandmarker: FaceLandmarker | null;
-    handDetector: ObjectDetector | null;
-    ringDetector: ObjectDetector | null;
-    neckDetector: ObjectDetector | null;
-    earringDetector: ObjectDetector | null;
-    glassDetector: ObjectDetector | null;
-    headDetector: ObjectDetector | null;
+    accesoriesDetector: ObjectDetector | null;
     makeupDetector: ObjectDetector | null;
   }>({
     faceLandmarker: null,
-    handDetector: null,
-    ringDetector: null,
-    neckDetector: null,
-    earringDetector: null,
-    glassDetector: null,
-    headDetector: null,
+    accesoriesDetector: null,
     makeupDetector: null,
   });
 
@@ -77,107 +67,22 @@ function Main() {
       modelsRef.current.faceLandmarker = faceLandmarkerInstance;
     },
     async () => {
-      const handDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/hand.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 2,
-          scoreThreshold: 0.63,
-        },
-      );
-      modelsRef.current.handDetector = handDetectorInstance;
-    },
-    async () => {
-      const ringDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/rings.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.9,
-        },
-      );
-      modelsRef.current.ringDetector = ringDetectorInstance;
-    },
-    async () => {
-      const neckDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/neck.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.9,
-        },
-      );
-      modelsRef.current.neckDetector = neckDetectorInstance;
-    },
-    async () => {
-      const earringDetectorInstance = await ObjectDetector.createFromOptions(
+      const accesoriesDetectorInstance = await ObjectDetector.createFromOptions(
         await FilesetResolver.forVisionTasks(
           "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
         ),
         {
           baseOptions: {
             modelAssetPath:
-              "/media/unveels/models/find-the-look/earrings.tflite",
+              "/media/unveels/models/find-the-look/accesories_model.tflite",
             delegate: "GPU",
           },
           runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.9,
+          maxResults: 5,
+          scoreThreshold: 0.25,
         },
       );
-      modelsRef.current.earringDetector = earringDetectorInstance;
-    },
-    async () => {
-      const glassDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/glass.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.6,
-        },
-      );
-      modelsRef.current.glassDetector = glassDetectorInstance;
-    },
-    async () => {
-      const headDetectorInstance = await ObjectDetector.createFromOptions(
-        await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
-        ),
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/find-the-look/head.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "IMAGE",
-          maxResults: 1,
-          scoreThreshold: 0.63,
-        },
-      );
-      modelsRef.current.headDetector = headDetectorInstance;
+      modelsRef.current.accesoriesDetector = accesoriesDetectorInstance;
     },
     async () => {
       const makeupDetectorInstance = await ObjectDetector.createFromOptions(

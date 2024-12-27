@@ -41,6 +41,11 @@ import { Blendshape } from "../../types/blendshape";
 import EyeShadow from "../three/makeup/eyeshadow";
 import Eyeliner from "../three/makeup/eyeliner";
 import { useCamera } from "../../context/recorder-context";
+import NailThumb from "../three/accesories/nails/nail-thumb";
+import NailMidlle from "../three/accesories/nails/nail-middle";
+import NailIndex from "../three/accesories/nails/nail-index";
+import NailRing from "../three/accesories/nails/nail-ring";
+import NailPinky from "../three/accesories/nails/nail-pinky";
 
 interface VirtualTryOnThreeSceneProps extends MeshProps {
   videoRef: React.RefObject<Webcam | HTMLVideoElement | HTMLImageElement>;
@@ -88,6 +93,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
     showHair,
     showEyeShadow,
     showEyeliner,
+    showNails,
   } = useMakeup();
 
   const {
@@ -417,6 +423,16 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
 
           {showRing && (
             <Ring planeSize={planeSize} handLandmarks={handlandmarks} />
+          )}
+
+          {showNails && (
+            <>
+              <NailThumb planeSize={planeSize} handLandmarks={handlandmarks} />
+              <NailMidlle planeSize={planeSize} handLandmarks={handlandmarks} />
+              <NailIndex planeSize={planeSize} handLandmarks={handlandmarks} />
+              <NailRing planeSize={planeSize} handLandmarks={handlandmarks} />
+              <NailPinky planeSize={planeSize} handLandmarks={handlandmarks} />
+            </>
           )}
         </>
       )}

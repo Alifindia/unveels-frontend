@@ -122,8 +122,8 @@ function Main() {
             delegate: "GPU",
           },
           runningMode: "IMAGE",
-          maxResults: 10,
-          scoreThreshold: 0.1,
+          maxResults: 5,
+          scoreThreshold: 0.25,
         },
       );
       modelsRef.current.accesoriesDetector = accesoriesDetectorInstance;

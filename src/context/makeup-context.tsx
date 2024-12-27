@@ -176,6 +176,17 @@ interface MakeupContextProps {
   hairColor: string;
   setHairColor: (color: string) => void;
 
+  // nails
+
+  showNails: boolean;
+  setShowNails: (show: boolean) => void;
+
+  nailsColor: string;
+  setNailsColor: (color: string) => void;
+
+  nailsTexture: "Matte" | "Shimmer" | "Glossy";
+  setNailsTexture: (mode: "Matte" | "Shimmer" | "Glossy") => void;
+
   envMapMakeup: Texture | null;
   setEnvMapMakeup: (texture: Texture | null) => void;
 }
@@ -236,7 +247,11 @@ type MakeupSelectables =
   | "lipTexture"
   // Hair
   | "showHair"
-  | "hairColor";
+  | "hairColor"
+  // Nails
+  | "showNails"
+  | "nailsColor"
+  | "nailsTexture";
 
 interface MakeupProviderProps {
   initialValues?: Partial<Pick<MakeupContextProps, MakeupSelectables>>;
@@ -414,6 +429,16 @@ export const MakeupProvider: React.FC<MakeupProviderProps> = ({
   const [eyebrowsVisibility, setEyebrowsVisibility] = useState(0.6);
   const [eyebrowsColor, setEyebrowsColor] = useState("#FFFF");
 
+  // nails
+
+  const [showNails, setShowNails] = useState(initialValues?.showNails ?? false);
+  const [nailsColor, setNailsColor] = useState(
+    initialValues?.nailsColor ?? "#FFFF",
+  );
+  const [nailsTexture, setNailsTexture] = useState<
+    "Matte" | "Shimmer" | "Glossy"
+  >(initialValues?.nailsTexture ?? "Matte");
+
   const [envMapMakeup, setEnvMapMakeup] = useState<Texture | null>(null);
 
   return (
@@ -568,6 +593,15 @@ export const MakeupProvider: React.FC<MakeupProviderProps> = ({
 
         hairColor,
         setHairColor,
+
+        showNails,
+        setShowNails,
+
+        nailsColor,
+        setNailsColor,
+
+        nailsTexture,
+        setNailsTexture,
 
         envMapMakeup,
         setEnvMapMakeup,

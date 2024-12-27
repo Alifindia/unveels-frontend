@@ -1,18 +1,22 @@
 import { Matrix4, Quaternion, Vector3 } from "three";
 import { Landmark } from "../types/landmark";
 
-export function handQuaternion(landmarks: Landmark[]): Quaternion | null {
+export function handQuaternion(
+  landmarks: Landmark[],
+  indexFingerIndex: number = 16,
+  pinkyFingerIndex: number = 12,
+): Quaternion | null {
   const wrist = new Vector3(landmarks[0].x, landmarks[0].y, landmarks[0].z);
 
   const indexFinger = new Vector3(
-    landmarks[5].x,
-    landmarks[5].y,
-    landmarks[5].z,
+    landmarks[indexFingerIndex].x,
+    landmarks[indexFingerIndex].y,
+    landmarks[indexFingerIndex].z,
   );
   const pinkyFinger = new Vector3(
-    landmarks[17].x,
-    landmarks[17].y,
-    landmarks[17].z,
+    landmarks[pinkyFingerIndex].x,
+    landmarks[pinkyFingerIndex].y,
+    landmarks[pinkyFingerIndex].z,
   );
 
   const v1 = new Vector3().subVectors(indexFinger, wrist).normalize();
