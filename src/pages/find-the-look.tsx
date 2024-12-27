@@ -51,8 +51,15 @@ import { FindTheLookItems } from "../types/findTheLookItems";
 import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
 import { VTOProductCard } from "../components/vto/vto-product-card";
 import { useCartContext } from "../context/cart-context";
+import { useTranslation } from "react-i18next";
 
 export function FindTheLook() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    i18n.changeLanguage("ar"); // Mengatur bahasa ke Arab saat komponen di-mount
+  }, [i18n]);
+
   return (
     <CameraProvider>
       <SkinAnalysisProvider>
@@ -239,6 +246,7 @@ function MakeupCategories({
     activeTab ?? makeups[0]?.label,
   );
   const { setView } = useFindTheLookContext();
+  const { t } = useTranslation();
 
   // Update the tab if activeTab changes
   useEffect(() => {
@@ -267,7 +275,7 @@ function MakeupCategories({
                   onTabChange(category.label); // Notify parent of the selected tab
                 }}
               >
-                {category.label}
+                {t(`categories_label.${category.label}`)}
               </button>
             </Fragment>
           );
@@ -282,7 +290,7 @@ function MakeupCategories({
             setView("all_categories");
           }}
         >
-          View all
+          {t("viewftl.view_all")}
         </button>
       </div>
 
@@ -305,6 +313,7 @@ function AccessoriesCategories({
     activeTab ?? capitalize(accessories[0]?.label),
   );
   const { setView } = useFindTheLookContext();
+  const { t } = useTranslation();
 
   // Update the tab if activeTab changes
   useEffect(() => {
@@ -337,7 +346,7 @@ function AccessoriesCategories({
                   onTabClick(capitalize(category.label));
                 }}
               >
-                {category.label}
+                {t(`categories_label.${category.label}`)}
               </button>
             </Fragment>
           );
@@ -352,7 +361,7 @@ function AccessoriesCategories({
             setView("all_categories");
           }}
         >
-          View all
+          {t("viewftl.view_all")}
         </button>
       </div>
 
@@ -448,6 +457,8 @@ function ProductList({ product_type }: { product_type: string }) {
     type_ids: mapTypes[product_type].values,
   });
 
+  const { t } = useTranslation();
+
   const { addItemToCart } = useCartContext();
 
   const handleAddToCart = async (id: string, url: string) => {
@@ -509,7 +520,7 @@ function ProductList({ product_type }: { product_type: string }) {
                     );
                   }}
                 >
-                  Add to cart
+                  {t("viewftl.addcart")}
                 </button>
               </div>
             </div>
@@ -625,6 +636,7 @@ function InferenceResults({
   onFaceClick?: () => void;
   onResultClick?: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <>
       <div className="absolute inset-x-0 bottom-32 flex items-center justify-center">
@@ -635,7 +647,7 @@ function InferenceResults({
             onResultClick?.();
           }}
         >
-          FIND THE LOOK
+          {t("viewftl.find_the_look")}
         </button>
       </div>
     </>
@@ -656,6 +668,7 @@ function ProductRecommendationsTabs({
   initialSection?: "makeup" | "accessories"; // New prop to initialize the section
   activeTab?: string; // Active tab for initializing the selected tab in categories
 }) {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<"makeup" | "accessories">(initialSection);
   const [localActiveTab, setLocalActiveTab] = useState<string | null>(
     activeTab ?? null,
@@ -697,7 +710,7 @@ function ProductRecommendationsTabs({
                       "text-white/70 blur-sm": isActive,
                     })}
                   >
-                    {section}
+                    {t(`tabOptionsftl.${section}`)}
                   </span>
                   {isActive ? (
                     <>
@@ -708,12 +721,12 @@ function ProductRecommendationsTabs({
                         )}
                       >
                         <span className="text-center text-sm capitalize md:text-lg">
-                          {section}
+                          {t(`tabOptionsftl.${section}`)}
                         </span>
                       </div>
                       <div className="absolute inset-0 flex items-center justify-center">
                         <span className="text-center text-sm capitalize text-white/70 md:text-lg">
-                          {section}
+                          {t(`tabOptionsftl.${section}`)}
                         </span>
                       </div>
                     </>
@@ -753,6 +766,7 @@ function AllProductsPage({
 }) {
   const [tab, setTab] = useState<"makeup" | "accessories">("makeup");
   const { selectedItems: cart, dispatch } = useFindTheLookContext();
+  const { t } = useTranslation();
 
   return (
     <div
@@ -813,7 +827,7 @@ function AllProductsPage({
               setTab(item as "makeup" | "accessories");
             }}
           >
-            Similar {item}
+            {t("viewftl.similar")} {t(`tabOptionsftl.${item}`)}
           </button>
         ))}
       </div>
@@ -830,13 +844,13 @@ function AllProductsPage({
             type="button"
             className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
           >
-            TRY NOW
+            {t("viewftl.try_now")}
           </button>
           <button
             type="button"
             className="flex h-10 w-full items-center justify-center border border-white bg-white text-xs font-semibold text-black"
           >
-            ADD ALL TO CART
+            {t("viewftl.add_all_to_cart")}
           </button>
         </div>
       </div>
@@ -899,6 +913,7 @@ function ProductHorizontalList({ category }: { category: string }) {
   });
 
   const { addItemToCart } = useCartContext();
+  const { t } = useTranslation();
 
   const handleAddToCart = async (id: string, url: string) => {
     try {
@@ -967,7 +982,7 @@ function ProductHorizontalList({ category }: { category: string }) {
                       );
                     }}
                   >
-                    ADD TO CART
+                    {t("viewftl.addcart")}
                   </button>
                   <button
                     type="button"
@@ -976,7 +991,7 @@ function ProductHorizontalList({ category }: { category: string }) {
                       dispatch({ type: "add", payload: product });
                     }}
                   >
-                    SELECT
+                    {t("viewftl.select")}
                   </button>
                 </div>
               </div>
@@ -1000,6 +1015,7 @@ function SingleCategoryView({
   const { data } = useLipsProductQuery({});
 
   const { addItemToCart } = useCartContext();
+  const { t } = useTranslation();
 
   const handleAddToCart = async (id: string, url: string) => {
     try {
@@ -1083,13 +1099,13 @@ function SingleCategoryView({
                           );
                         }}
                       >
-                        ADD TO CART
+                        {t("viewftl.addcart")}
                       </button>
                       <button
                         type="button"
                         className="flex h-10 w-full items-center justify-center border border-white bg-white text-xs font-semibold text-black"
                       >
-                        TRY ON
+                        {t("viewftl.try_on")}
                       </button>
                     </div>
                   </div>

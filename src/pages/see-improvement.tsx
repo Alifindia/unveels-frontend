@@ -28,8 +28,14 @@ import {
   useSkinImprovement,
 } from "../context/see-improvement-context";
 import { useCartContext } from "../context/cart-context";
+import { useTranslation } from "react-i18next";
 
 export function SeeImprovement() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    i18n.changeLanguage("ar"); // Mengatur bahasa ke Arab saat komponen di-mount
+  }, [i18n]);
   return (
     <CameraProvider>
       <SkinAnalysisProvider>
