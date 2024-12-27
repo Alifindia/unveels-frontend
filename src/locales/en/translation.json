@@ -359,5 +359,21 @@
     "firmness": "firmness",
     "dark circles": "dark circles",
     "dry": "dry"
+  },
+  "model_loading" : {"label" : "Powered By Unveels"},
+  "vto" : {
+   "makeup": "Makeup",
+   "accessories": "Accesories", 
+   "Lips": "Lips",
+   "Eyes": "Eyes",
+   "Face" : "Face",
+   "Hair": "Hair",
+   "Head Accessories": "Head Accessories",
+   "Neck Accessories": "Neck Accessories",
+   "Hand Accessories": "Hand Accessories",
+   "Nails": "Nails",
+   "Lip Color": "Lip Color",
+   "Lip Liner": "Lip Liner",
+   "Lip Plumper": "Lip Plumper"
   }
 }

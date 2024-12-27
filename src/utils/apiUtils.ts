@@ -10,10 +10,10 @@ type FilterGroup = {
   filters: Filter[];
 };
 
-export const baseApiUrl = "https://unveels.com/";
+export const baseApiUrl = "https://magento-1231949-4398885.cloudwaysapps.com/";
 export const baseUrl = import.meta.env.PROD ? baseApiUrl : "";
 export const baseMediaUrl =
-  "https://unveels.com/media/catalog/product/cache/df714aaa5e59335a5bf39a17764906ba";
+  "https://magento-1231949-4398885.cloudwaysapps.com/media/catalog/product/cache/df714aaa5e59335a5bf39a17764906ba";
 
 export function mediaUrl(imagePath: string | undefined) {
   if (!imagePath) {

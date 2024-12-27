@@ -28,8 +28,20 @@ import {
   useSkinImprovement,
 } from "../context/see-improvement-context";
 import { useCartContext } from "../context/cart-context";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
 
 export function SeeImprovement() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+        const storeLang = getCookie("store");
+    
+        const lang = storeLang === "ar" ? "ar" : "en";
+    
+        i18n.changeLanguage(lang);
+  }, [i18n]);
+
   return (
     <CameraProvider>
       <SkinAnalysisProvider>
