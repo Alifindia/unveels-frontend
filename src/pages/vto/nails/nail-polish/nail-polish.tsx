@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icons } from "../../../../components/icons";
 
 import { ColorPalette } from "../../../../components/color-palette";
@@ -16,6 +16,7 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { Product } from "../../../../api/shared";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 import { getNailPolishProductTypeIds } from "../../../../api/attributes/makeups";
+import { useMakeup } from "../../../../context/makeup-context";
 
 export function NailPolishSelector() {
   return (
@@ -161,10 +162,19 @@ function ProductList() {
     selectedTexture,
   } = useNailPolishContext();
 
+  const { setShowNails, setNailsColor, setNailsTexture } = useMakeup();
   const { data, isLoading } = useNailPolishQuery({
     color: colorFamily,
     texture: selectedTexture,
   });
+
+  useEffect(() => {
+    setNailsTexture(selectedTexture as "Matte" | "Shimmer" | "Glossy");
+    if (selectedColor) {
+      setNailsColor(selectedColor);
+      setShowNails(selectedColor.length > 0);
+    }
+  }, [selectedColor, selectedTexture]);
 
   if (colorFamilyToInclude == null && data?.items != null) {
     setColorFamilyToInclude(

@@ -90,6 +90,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
     showHair,
     showEyeShadow,
     showEyeliner,
+    showNails,
   } = useMakeup();
 
   const {
@@ -421,8 +422,12 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
             <Ring planeSize={planeSize} handLandmarks={handlandmarks} />
           )}
 
-          <Nails planeSize={planeSize} handLandmarks={handlandmarks} />
-          <NailThumb planeSize={planeSize} handLandmarks={handlandmarks} />
+          {showNails && (
+            <>
+              <Nails planeSize={planeSize} handLandmarks={handlandmarks} />
+              <NailThumb planeSize={planeSize} handLandmarks={handlandmarks} />
+            </>
+          )}
         </>
       )}
     </>

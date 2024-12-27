@@ -1,12 +1,13 @@
 import { MeshProps, useFrame, useThree } from "@react-three/fiber";
 import React, { useMemo, useRef, Suspense, useEffect } from "react";
-import { Mesh, MeshStandardMaterial, Object3D } from "three";
+import { BackSide, Mesh, MeshStandardMaterial, Object3D } from "three";
 import { Landmark } from "../../../types/landmark";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../utils/calculateDistance";
 import { handQuaternion } from "../../../utils/handOrientation";
 import { useAccesories } from "../../../context/accesories-context";
 import { NAILS } from "../../../utils/constants";
+import { useMakeup } from "../../../context/makeup-context";
 
 interface NailsProps extends MeshProps {
   handLandmarks: React.RefObject<Landmark[]>;
@@ -18,6 +19,7 @@ const NailsInner: React.FC<NailsProps> = React.memo(
     const nailsRefs = useRef<(Object3D | null)[]>([]); // Create an array of references
     const { scene, viewport } = useThree();
     const { envMapAccesories } = useAccesories();
+    const { nailsColor } = useMakeup();
 
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
@@ -40,6 +42,8 @@ const NailsInner: React.FC<NailsProps> = React.memo(
               const mesh = child as Mesh;
               if (mesh.material instanceof MeshStandardMaterial) {
                 mesh.material.envMap = envMapAccesories;
+                mesh.material.color.set(nailsColor); // Set the nails color
+                mesh.material.side = BackSide;
                 mesh.material.needsUpdate = true;
               }
               child.renderOrder = 2;
@@ -68,7 +72,7 @@ const NailsInner: React.FC<NailsProps> = React.memo(
           }
         });
       };
-    }, [scene]);
+    }, [scene, envMapAccesories, nailsColor]); // Add nailsColor to the dependency array
 
     useFrame(() => {
       if (!handLandmarks.current || nailsRefs.current.length === 0) return;
@@ -96,20 +100,26 @@ const NailsInner: React.FC<NailsProps> = React.memo(
           const scaleFactor =
             fingerSize * Math.min(scaleX, scaleY) * scaleMultiplier;
 
-          nailsRefs.current[i]?.position.set(
-            nailsFingerX,
-            nailsFingerY,
-            nailsFingerZ,
-          );
-          nailsRefs.current[i]?.scale.set(
-            scaleFactor,
-            scaleFactor,
-            scaleFactor,
-          );
+          const nail = nailsRefs.current[i];
+          if (nail) {
+            nail.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
+            nail.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-          const quaternion = handQuaternion(handLandmarks.current, 7, 11);
-          if (quaternion) {
-            nailsRefs.current[i]?.setRotationFromQuaternion(quaternion);
+            const quaternion = handQuaternion(handLandmarks.current, 7, 11);
+            if (quaternion) {
+              nail.setRotationFromQuaternion(quaternion);
+            }
+
+            // Update nail color dynamically
+            nail.traverse((child) => {
+              if ((child as Mesh).isMesh) {
+                const mesh = child as Mesh;
+                if (mesh.material instanceof MeshStandardMaterial) {
+                  mesh.material.color.set(nailsColor);
+                  mesh.material.needsUpdate = true;
+                }
+              }
+            });
           }
         }
       });
