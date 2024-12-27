@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 type VirtualTryOnProductContextType = {
   skus: string[];
@@ -18,11 +19,25 @@ export function VirtualTryOnProductProvider({
   children,
   initialSkus = [],
 }: VirtualTryOnProductProviderProps) {
-  const [skus, setSkus] = useState<string[]>(initialSkus);
+  const [searchParams] = useSearchParams();
+  const [skus, setSkus] = useState<string[]>(() => {
+    const sku = searchParams.get("sku");
+    if (sku) {
+      return sku.split(",");
+    }
+    return initialSkus;
+  });
 
   const clearSkus = () => {
     setSkus([]);
   };
+
+  useEffect(() => {
+    const skus = searchParams.get("sku");
+    if (skus) {
+      setSkus(skus.split(","));
+    }
+  }, [searchParams]);
 
   return (
     <VirtualTryOnProductContext.Provider

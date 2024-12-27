@@ -1,5 +1,10 @@
 import { Suspense, useEffect, useState } from "react";
-import { createMemoryRouter, Link, RouterProvider } from "react-router-dom";
+import {
+  createMemoryRouter,
+  Link,
+  Outlet,
+  RouterProvider,
+} from "react-router-dom";
 import { useBrandsQuerySuspense } from "./api/brands";
 import { useCategoriesQuerySuspense } from "./api/categories";
 import "./index.css";
@@ -61,149 +66,159 @@ import {
   TryOnSelectorAccesories,
   VirtualTryOnAccesories,
 } from "./pages/virtual-try-on-accesories";
+import { VirtualTryOnProductProvider } from "./context/virtual-try-on-product-context";
 
 // Define routes using object syntax
 const routes = [
   {
-    path: "/",
+    path: "",
     element: (
-      <Suspense fallback={<>Loading...</>}>
-        <Home />
-      </Suspense>
+      <VirtualTryOnProductProvider>
+        <Outlet />
+      </VirtualTryOnProductProvider>
     ),
-  },
-  { path: "/skin-tone-finder", element: <SkinToneFinder /> },
-  { path: "/personality-finder", element: <PersonalityFinder /> },
-  { path: "/face-analyzer", element: <FaceAnalyzer /> },
-  { path: "/skin-analysis", element: <SkinAnalysis /> },
-  { path: "/find-the-look", element: <FindTheLook /> },
-  { path: "/personality-finder-web", element: <PersonalityFinderWeb /> },
-  { path: "/find-the-look-web", element: <FindTheLookWeb /> },
-  { path: "/skin-tone-finder-web", element: <SkinToneFinderWeb /> },
-  { path: "/virtual-assistant", element: <VirtulAssistant /> },
-  { path: "/skin-analysis-web", element: <SkinAnalysisWeb /> },
-  { path: "/virtual-avatar-web", element: <VirtualAvatar /> },
-  { path: "/see-improvement-web", element: <SeeImprovementWeb /> },
-  { path: "/see-improvement", element: <SeeImprovement /> },
-  { path: "/virtual-try-on-web", element: <VirtualTryOnWeb /> },
-  {
-    path: "/virtual-try-on-product",
-    element: <SingleVirtualTryOn />,
-  },
-  {
-    path: "/virtual-try-on",
-    element: <VirtualTryOn />,
     children: [
-      { path: "makeups", element: <TryOnSelector /> },
-      // Lips
-      { path: "lips", element: <LipsMode /> },
-      { path: "lip-color", element: <LipColorSelector /> },
-      { path: "lip-liner", element: <LipLinerSelector /> },
-      { path: "lip-plumper", element: <LipPlumperSelector /> },
-      // Eyes
-      { path: "eyes", element: <EyesMode /> },
-      { path: "eyebrows", element: <EyebrowsSelector /> },
-      { path: "eye-shadow", element: <EyeShadowSelector /> },
-      { path: "eye-liner", element: <EyeLinerSelector /> },
-      { path: "lashes", element: <LashesSelector /> },
-      { path: "mascara", element: <MascaraSelector /> },
-      { path: "lenses", element: <LenseSelector /> },
-      // Face
-      { path: "face", element: <FaceMode /> },
-      { path: "foundation", element: <FoundationSelector /> },
-      { path: "concealer", element: <ConcealerSelector /> },
-      { path: "contour", element: <ContourSelector /> },
-      { path: "blush", element: <BlushSelector /> },
-      { path: "bronzer", element: <BronzerSelector /> },
-      { path: "highlighter", element: <HighlighterSelector /> },
-      // Nails
-      { path: "nails", element: <NailsMode /> },
-      { path: "nail-polish", element: <NailPolishSelector /> },
-      { path: "press-on-nails", element: <PressOnNailsSelector /> },
-      // Hair
-      { path: "hair", element: <HairMode /> },
-      { path: "hair-color", element: <HairColorSelector /> },
+      {
+        path: "/",
+        element: (
+          <Suspense fallback={<>Loading...</>}>
+            <Home />
+          </Suspense>
+        ),
+      },
+      { path: "/skin-tone-finder", element: <SkinToneFinder /> },
+      { path: "/personality-finder", element: <PersonalityFinder /> },
+      { path: "/face-analyzer", element: <FaceAnalyzer /> },
+      { path: "/skin-analysis", element: <SkinAnalysis /> },
+      { path: "/find-the-look", element: <FindTheLook /> },
+      { path: "/personality-finder-web", element: <PersonalityFinderWeb /> },
+      { path: "/find-the-look-web", element: <FindTheLookWeb /> },
+      { path: "/skin-tone-finder-web", element: <SkinToneFinderWeb /> },
+      { path: "/virtual-assistant", element: <VirtulAssistant /> },
+      { path: "/skin-analysis-web", element: <SkinAnalysisWeb /> },
+      { path: "/virtual-avatar-web", element: <VirtualAvatar /> },
+      { path: "/see-improvement-web", element: <SeeImprovementWeb /> },
+      { path: "/see-improvement", element: <SeeImprovement /> },
+      { path: "/virtual-try-on-web", element: <VirtualTryOnWeb /> },
+      {
+        path: "/virtual-try-on-product",
+        element: <SingleVirtualTryOn />,
+      },
+      {
+        path: "/virtual-try-on",
+        element: <VirtualTryOn />,
+        children: [
+          { path: "makeups", element: <TryOnSelector /> },
+          // Lips
+          { path: "lips", element: <LipsMode /> },
+          { path: "lip-color", element: <LipColorSelector /> },
+          { path: "lip-liner", element: <LipLinerSelector /> },
+          { path: "lip-plumper", element: <LipPlumperSelector /> },
+          // Eyes
+          { path: "eyes", element: <EyesMode /> },
+          { path: "eyebrows", element: <EyebrowsSelector /> },
+          { path: "eye-shadow", element: <EyeShadowSelector /> },
+          { path: "eye-liner", element: <EyeLinerSelector /> },
+          { path: "lashes", element: <LashesSelector /> },
+          { path: "mascara", element: <MascaraSelector /> },
+          { path: "lenses", element: <LenseSelector /> },
+          // Face
+          { path: "face", element: <FaceMode /> },
+          { path: "foundation", element: <FoundationSelector /> },
+          { path: "concealer", element: <ConcealerSelector /> },
+          { path: "contour", element: <ContourSelector /> },
+          { path: "blush", element: <BlushSelector /> },
+          { path: "bronzer", element: <BronzerSelector /> },
+          { path: "highlighter", element: <HighlighterSelector /> },
+          // Nails
+          { path: "nails", element: <NailsMode /> },
+          { path: "nail-polish", element: <NailPolishSelector /> },
+          { path: "press-on-nails", element: <PressOnNailsSelector /> },
+          // Hair
+          { path: "hair", element: <HairMode /> },
+          { path: "hair-color", element: <HairColorSelector /> },
 
-      // Head
-      { path: "sunglasses", element: <GlassesSelector /> },
-      { path: "glasses", element: <GlassesSelector /> },
-      { path: "earrings", element: <EarringsSelector /> },
-      { path: "headbands", element: <HeadbandSelector /> },
-      { path: "hats", element: <HatsSelector /> },
-      { path: "tiaras", element: <TiaraSelector /> },
-      // Neck
-      { path: "pendants", element: <NeckwearSelector /> },
-      { path: "necklaces", element: <NeckwearSelector /> },
-      { path: "chokers", element: <NeckwearSelector /> },
-      { path: "scarves", element: <ScarvesSelector /> },
-      // Hand
-      { path: "rings", element: <HandwearSelector /> },
-      { path: "bracelets", element: <HandwearSelector /> },
-      { path: "bangles", element: <HandwearSelector /> },
-      { path: "watches", element: <WatchesSelector /> },
-    ],
-  },
-  {
-    path: "/virtual-try-on-makeups",
-    element: <VirtualTryOnMakeups />,
-    children: [
-      { path: "makeups", element: <TryOnSelectorMakeups /> },
-      // Lips
-      { path: "lips", element: <LipsMode /> },
-      { path: "lip-color", element: <LipColorSelector /> },
-      { path: "lip-liner", element: <LipLinerSelector /> },
-      { path: "lip-plumper", element: <LipPlumperSelector /> },
-      // Eyes
-      { path: "eyes", element: <EyesMode /> },
-      { path: "eyebrows", element: <EyebrowsSelector /> },
-      { path: "eye-shadow", element: <EyeShadowSelector /> },
-      { path: "eye-liner", element: <EyeLinerSelector /> },
-      { path: "lashes", element: <LashesSelector /> },
-      { path: "mascara", element: <MascaraSelector /> },
-      { path: "lenses", element: <LenseSelector /> },
-      // Face
-      { path: "face", element: <FaceMode /> },
-      { path: "foundation", element: <FoundationSelector /> },
-      { path: "concealer", element: <ConcealerSelector /> },
-      { path: "contour", element: <ContourSelector /> },
-      { path: "blush", element: <BlushSelector /> },
-      { path: "bronzer", element: <BronzerSelector /> },
-      { path: "highlighter", element: <HighlighterSelector /> },
-      // Nails
-      { path: "nails", element: <NailsMode /> },
-      { path: "nail-polish", element: <NailPolishSelector /> },
-      { path: "press-on-nails", element: <PressOnNailsSelector /> },
-      // Hair
-      { path: "hair", element: <HairMode /> },
-      { path: "hair-color", element: <HairColorSelector /> },
-    ],
-  },
-  {
-    path: "/virtual-try-on-accesories",
-    element: <VirtualTryOnAccesories />,
-    children: [
-      { path: "accesories", element: <TryOnSelectorAccesories /> },
-      // Head
-      { path: "sunglasses", element: <GlassesSelector /> },
-      { path: "glasses", element: <GlassesSelector /> },
-      { path: "earrings", element: <EarringsSelector /> },
-      { path: "headbands", element: <HeadbandSelector /> },
-      { path: "hats", element: <HatsSelector /> },
-      { path: "tiaras", element: <TiaraSelector /> },
-      // Neck
-      { path: "pendants", element: <NeckwearSelector /> },
-      { path: "necklaces", element: <NeckwearSelector /> },
-      { path: "chokers", element: <NeckwearSelector /> },
-      { path: "scarves", element: <ScarvesSelector /> },
-      // Hand
-      { path: "rings", element: <HandwearSelector /> },
-      { path: "bracelets", element: <HandwearSelector /> },
-      { path: "bangles", element: <HandwearSelector /> },
-      { path: "watches", element: <WatchesSelector /> },
+          // Head
+          { path: "sunglasses", element: <GlassesSelector /> },
+          { path: "glasses", element: <GlassesSelector /> },
+          { path: "earrings", element: <EarringsSelector /> },
+          { path: "headbands", element: <HeadbandSelector /> },
+          { path: "hats", element: <HatsSelector /> },
+          { path: "tiaras", element: <TiaraSelector /> },
+          // Neck
+          { path: "pendants", element: <NeckwearSelector /> },
+          { path: "necklaces", element: <NeckwearSelector /> },
+          { path: "chokers", element: <NeckwearSelector /> },
+          { path: "scarves", element: <ScarvesSelector /> },
+          // Hand
+          { path: "rings", element: <HandwearSelector /> },
+          { path: "bracelets", element: <HandwearSelector /> },
+          { path: "bangles", element: <HandwearSelector /> },
+          { path: "watches", element: <WatchesSelector /> },
+        ],
+      },
+      {
+        path: "/virtual-try-on-makeups",
+        element: <VirtualTryOnMakeups />,
+        children: [
+          { path: "makeups", element: <TryOnSelectorMakeups /> },
+          // Lips
+          { path: "lips", element: <LipsMode /> },
+          { path: "lip-color", element: <LipColorSelector /> },
+          { path: "lip-liner", element: <LipLinerSelector /> },
+          { path: "lip-plumper", element: <LipPlumperSelector /> },
+          // Eyes
+          { path: "eyes", element: <EyesMode /> },
+          { path: "eyebrows", element: <EyebrowsSelector /> },
+          { path: "eye-shadow", element: <EyeShadowSelector /> },
+          { path: "eye-liner", element: <EyeLinerSelector /> },
+          { path: "lashes", element: <LashesSelector /> },
+          { path: "mascara", element: <MascaraSelector /> },
+          { path: "lenses", element: <LenseSelector /> },
+          // Face
+          { path: "face", element: <FaceMode /> },
+          { path: "foundation", element: <FoundationSelector /> },
+          { path: "concealer", element: <ConcealerSelector /> },
+          { path: "contour", element: <ContourSelector /> },
+          { path: "blush", element: <BlushSelector /> },
+          { path: "bronzer", element: <BronzerSelector /> },
+          { path: "highlighter", element: <HighlighterSelector /> },
+          // Nails
+          { path: "nails", element: <NailsMode /> },
+          { path: "nail-polish", element: <NailPolishSelector /> },
+          { path: "press-on-nails", element: <PressOnNailsSelector /> },
+          // Hair
+          { path: "hair", element: <HairMode /> },
+          { path: "hair-color", element: <HairColorSelector /> },
+        ],
+      },
+      {
+        path: "/virtual-try-on-accesories",
+        element: <VirtualTryOnAccesories />,
+        children: [
+          { path: "accesories", element: <TryOnSelectorAccesories /> },
+          // Head
+          { path: "sunglasses", element: <GlassesSelector /> },
+          { path: "glasses", element: <GlassesSelector /> },
+          { path: "earrings", element: <EarringsSelector /> },
+          { path: "headbands", element: <HeadbandSelector /> },
+          { path: "hats", element: <HatsSelector /> },
+          { path: "tiaras", element: <TiaraSelector /> },
+          // Neck
+          { path: "pendants", element: <NeckwearSelector /> },
+          { path: "necklaces", element: <NeckwearSelector /> },
+          { path: "chokers", element: <NeckwearSelector /> },
+          { path: "scarves", element: <ScarvesSelector /> },
+          // Hand
+          { path: "rings", element: <HandwearSelector /> },
+          { path: "bracelets", element: <HandwearSelector /> },
+          { path: "bangles", element: <HandwearSelector /> },
+          { path: "watches", element: <WatchesSelector /> },
+        ],
+      },
     ],
   },
 ];
-
 function Home() {
   useCategoriesQuerySuspense();
   useBrandsQuerySuspense();
