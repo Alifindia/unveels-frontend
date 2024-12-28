@@ -89,7 +89,6 @@
     "brown_skin": "Brown Skin",
     "deep_skin": "Deep Skin"
   },
-
   "tabsmenupf": {
     "personality": "Personality",
     "attributes": "Attributes",
@@ -327,8 +326,8 @@
 
   "viewskinan": {
     "analysis_result": "ANALYSIS RESULT",
-    "skin_health": " Skin Health Score :",
-    "skin_age": "Skin Age :",
+    "skin_health": " Skin Health Score ",
+    "skin_age": "Skin Age ",
     "detected_skin": "Detected Skin Problems",
     "detected_skin_con": "Detected Skin Condition",
     "skin_problem": "Skin Problems",
@@ -374,6 +373,35 @@
     "Nails": "Nails",
     "Lip Color": "Lip Color",
     "Lip Liner": "Lip Liner",
-    "Lip Plumper": "Lip Plumper"
+    "Lip Plumper": "Lip Plumper",
+    "Eyebrows": "Eyebrows",
+    "Eye Shadow": "Eye Shadow",
+    "Eye Liner": "Eye Liner",
+    "Lashes": "Lashes",
+    "Mascara": "Mascara",
+    "Lenses": "Lenses",
+    "Foundation": "Foundation",
+    "Concealer": "Concealer",
+    "Contour": "Contour",
+    "Blush": "Blush",
+    "Bronzer": "Bronzer",
+    "Highlighter": "Highlighter",
+    "Hair Color": "Hair Color",
+    "Sunglasses": "Sunglasses",
+    "Glasses": "Glasses",
+    "Earring": "Earring",
+    "Hats": "Hats",
+    "Tiaras": "Tiaras",
+    "Headbands": "Headbands",
+    "Pendants": "Pendants",
+    "Necklaces": "Necklaces",
+    "Chokers": "Chokers",
+    "Scarves": "Scarves",
+    "Watches": "Watches",
+    "Rings": "Rings",
+    "Bracelets": "Bracelets",
+    "Bangles": "Bangles",
+    "Nail Polish": "Nail Polish",
+    "Press on Nails": "Press on Nails"
   }
 }

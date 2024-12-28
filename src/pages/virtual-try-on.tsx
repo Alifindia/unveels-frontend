@@ -145,12 +145,12 @@ export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
 
 export function VirtualTryOn() {
   const { i18n } = useTranslation();
-  
+
   useEffect(() => {
     const storeLang = getCookie("store");
-    
-    const lang = storeLang === "ar" ? "ar" : "en";
-    
+
+    const lang = storeLang === "ar" ? "ar" : "ar";
+
     i18n.changeLanguage(lang);
   }, [i18n]);
 
@@ -326,7 +326,7 @@ export function TryOnSelector() {
                     isActive ? "text-white/70 blur-sm" : "",
                   )}
                 >
-                  {t('vto.'+shadeTab)}
+                  {t("vto." + shadeTab)}
                 </span>
                 {isActive ? (
                   <>
@@ -337,12 +337,12 @@ export function TryOnSelector() {
                       )}
                     >
                       <span className="text-center text-[12.6px] capitalize sm:text-lg lg:text-2xl">
-                      {t('vto.'+shadeTab)}
+                        {t("vto." + shadeTab)}
                       </span>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="text-center text-[12.6px] capitalize text-white/70 sm:text-lg lg:text-2xl">
-                      {t('vto.'+shadeTab)}
+                        {t("vto." + shadeTab)}
                       </span>
                     </div>
                   </>
@@ -375,14 +375,31 @@ export function Makeups() {
     {
       name: "Eyes",
       icon: <Icons.makeupEyes />,
+      items: [
+        "Eyebrows",
+        "Eye Shadow",
+        "Eye Liner",
+        "Lashes",
+        "Mascara",
+        "Lenses",
+      ],
     },
     {
       name: "Face",
       icon: <Icons.makeupFace />,
+      items: [
+        "Foundation",
+        "Concealer",
+        "Contour",
+        "Blush",
+        "Bronzer",
+        "Highlighter",
+      ],
     },
     {
       name: "Hair",
       icon: <Icons.makeupHair />,
+      items: ["Hair Color"],
     },
   ];
 
@@ -426,7 +443,7 @@ export function Makeups() {
                 />
               </div>
               <div className="text-center text-sm !leading-4 text-white lg:text-lg">
-                {t('vto.'+option.name)}
+                {t("vto." + option.name)}
               </div>
             </button>
           ))}
@@ -455,18 +472,29 @@ export function Accessories() {
     {
       name: "Head Accessories",
       icon: <Icons.accessoryHead />,
+      items: [
+        "Sunglasses",
+        "Glasses",
+        "Earring",
+        "Hats",
+        "Tiaras",
+        "Headbands",
+      ],
     },
     {
       name: "Neck Accessories",
       icon: <Icons.accessoryNeck />,
+      items: ["Pendants", "Necklaces", "Chokers", "Scarves"],
     },
     {
       name: "Hand Accessories",
       icon: <Icons.accessoryHand />,
+      items: ["Watches", "Rings", "Bracelets", "Bangles"],
     },
     {
       name: "Nails",
       icon: <Icons.makeupNails />,
+      items: ["Nail Polish", "Press on Nails"],
     },
   ];
 
@@ -512,7 +540,7 @@ export function Accessories() {
                 />
               </div>
               <div className="text-center text-[9.8px] !leading-4 text-white sm:text-sm lg:text-lg">
-                {t('vto.'+option.name)}
+                {t("vto." + option.name)}
               </div>
             </button>
           ))}
