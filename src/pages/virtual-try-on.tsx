@@ -69,7 +69,10 @@ import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-conte
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
 import VoiceCommand from "../components/voice-command/voice-command";
 import { VirtualTryOnMakeupsVoiceProvider } from "../context/virtual-try-on-makeups-voice-context";
-import { SelecProductNumberProvider, useSelecProductNumberContext } from "./vto/select-product-context";
+import {
+  SelecProductNumberProvider,
+  useSelecProductNumberContext,
+} from "./vto/select-product-context";
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
 import {
@@ -150,12 +153,12 @@ export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
 
 export function VirtualTryOn() {
   const { i18n } = useTranslation();
-  
+
   useEffect(() => {
     const storeLang = getCookie("store");
-    
+
     const lang = storeLang === "ar" ? "ar" : "en";
-    
+
     i18n.changeLanguage(lang);
   }, [i18n]);
 
@@ -333,7 +336,7 @@ export function TryOnSelector() {
                     isActive ? "text-white/70 blur-sm" : "",
                   )}
                 >
-                  {t('vto.'+shadeTab)}
+                  {t("vto." + shadeTab)}
                 </span>
                 {isActive ? (
                   <>
@@ -344,12 +347,12 @@ export function TryOnSelector() {
                       )}
                     >
                       <span className="text-center text-[12.6px] capitalize sm:text-lg lg:text-2xl">
-                      {t('vto.'+shadeTab)}
+                        {t("vto." + shadeTab)}
                       </span>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="text-center text-[12.6px] capitalize text-white/70 sm:text-lg lg:text-2xl">
-                      {t('vto.'+shadeTab)}
+                        {t("vto." + shadeTab)}
                       </span>
                     </div>
                   </>
@@ -394,7 +397,7 @@ export function Makeups() {
   ];
 
   const [selectedMakeup, setSelectedMakeup] = useState<string | null>(null);
-  const { setSelectedProductNumber } = useSelecProductNumberContext()
+  const { setSelectedProductNumber } = useSelecProductNumberContext();
 
   return (
     <>
@@ -406,8 +409,8 @@ export function Makeups() {
               className="flex flex-col items-center space-y-2"
               data-selected={selectedMakeup === option.name}
               onClick={() => {
-                setSelectedMakeup(option.name)
-                setSelectedProductNumber(null)
+                setSelectedMakeup(option.name);
+                setSelectedProductNumber(null);
               }}
             >
               <div
@@ -437,7 +440,7 @@ export function Makeups() {
                 />
               </div>
               <div className="text-center text-sm !leading-4 text-white lg:text-lg">
-                {t('vto.'+option.name)}
+                {t("vto." + option.name)}
               </div>
             </button>
           ))}
@@ -523,7 +526,7 @@ export function Accessories() {
                 />
               </div>
               <div className="text-center text-[9.8px] !leading-4 text-white sm:text-sm lg:text-lg">
-                {t('vto.'+option.name)}
+                {t("vto." + option.name)}
               </div>
             </button>
           ))}
@@ -545,51 +548,6 @@ export function Accessories() {
 
 function BottomContent() {
   return <Outlet />;
-}
-
-function RecorderStatus() {
-  const { isRecording, formattedTime, handleStartPause, handleStop, isPaused } =
-    useRecordingControls();
-  const { finish } = useCamera();
-
-  return (
-    <div className="absolute inset-x-0 top-14 flex items-center justify-center gap-4">
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={handleStartPause}
-      >
-        {isPaused ? (
-          <CirclePlay className="size-6 text-white" />
-        ) : isRecording ? (
-          <PauseCircle className="size-6 text-white" />
-        ) : null}
-      </button>
-      <span className="relative flex size-4">
-        {isRecording ? (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-        ) : null}
-        <span className="relative inline-flex size-4 rounded-full bg-red-500"></span>
-      </span>
-      <div className="font-serif text-white">{formattedTime}</div>
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={
-          isRecording
-            ? () => {
-                handleStop();
-                finish();
-              }
-            : handleStartPause
-        }
-      >
-        {isRecording || isPaused ? (
-          <StopCircle className="size-6 text-white" />
-        ) : (
-          <CirclePlay className="size-6 text-white" />
-        )}
-      </button>
-    </div>
-  );
 }
 
 export function TopNavigation({
@@ -666,7 +624,6 @@ function Sidebar({
         <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 
         <div className="flex flex-col gap-4 rounded-full bg-black/25 px-1.5 py-2 backdrop-blur-md">
-          <VoiceCommand />
           <button className="" onClick={screenShoot}>
             <Icons.camera className="size-4 text-white sm:size-6" />
           </button>

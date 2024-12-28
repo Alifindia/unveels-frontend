@@ -15,7 +15,7 @@ import { useSelecProductNumberContext } from "../../select-product-context";
 
 export function LipColorSelector() {
   console.log("render LipColorSelector");
-  
+
   return (
     <div className="mx-auto w-full divide-y px-4">
       <div>
@@ -78,31 +78,28 @@ function ColorSelector() {
   const { selectedColors, setSelectedColors, selectedMode, colorFamily } =
     useLipColorContext();
 
-     const { data } = useLipColorQuery({
-       color: colorFamily,
-       sub_color: null,
-       texture: null,
-     });
+  const { data } = useLipColorQuery({
+    color: colorFamily,
+    sub_color: null,
+    texture: null,
+  });
 
-     if (!colorFamily) {
-       return null;
-     }
+  if (!colorFamily) {
+    return null;
+  }
 
-     const extracted_sub_colors = extractUniqueCustomAttributes(
-       data?.items ?? [],
-       "hexacode",
-     ).flatMap((item) => item.split(","));
+  const extracted_sub_colors = extractUniqueCustomAttributes(
+    data?.items ?? [],
+    "hexacode",
+  ).flatMap((item) => item.split(","));
 
   const handleColorClick = (color: string) => {
-    console.log("handleColorClick");
-    console.log(data, "data");
-    
     if (!showLipColor) setShowLipColor(true);
 
     // Handle color deselection
     if (selectedColors.includes(color)) {
       const newColors = selectedColors.filter((c) => c !== color);
-    console.log(newColors, "newColors");
+      console.log(newColors, "newColors");
       setSelectedColors(newColors);
       setLipColors(newColors);
       return;
@@ -120,7 +117,7 @@ function ColorSelector() {
         ? [...selectedColors, color]
         : [...selectedColors.slice(1), color]; // Remove oldest, add new
     console.log(newColors, "newColors");
-    
+
     setSelectedColors(newColors);
     setLipColors(newColors);
   };
@@ -131,7 +128,6 @@ function ColorSelector() {
     setShowLipColor(false);
   };
 
- 
   return (
     <div className="mx-auto w-full py-1 sm:py-2">
       <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
@@ -246,7 +242,8 @@ function ShadesSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
+  const { selectedProductNumber, setSelectedProductNumber } =
+    useSelecProductNumberContext();
 
   const {
     colorFamily,
@@ -289,8 +286,8 @@ function ProductList() {
         );
         setColorFamily(
           matchedProduct.custom_attributes.find(
-            (item) => item.attribute_code === "color"
-          )?.value || null
+            (item) => item.attribute_code === "color",
+          )?.value || null,
         );
         setSelectedTexture(
           matchedProduct.custom_attributes.find(
@@ -300,24 +297,24 @@ function ProductList() {
       }
     }
   }, [data, selectedProductNumber]);
-  
+
   if (colorFamilyToInclude == null && data?.items != null) {
     setColorFamilyToInclude(
       data.items.map(
         (d) =>
-          d.custom_attributes.find((c) => c.attribute_code === "color")?.value
+          d.custom_attributes.find((c) => c.attribute_code === "color")?.value,
       ),
     );
   }
-  
+
   const handleProductClick = (product: Product) => {
     if (selectedProduct?.id === product.id) {
       setSelectedProduct(null);
       setSelectedProductNumber(null);
       setColorFamily(null);
       setSelectedColors([]);
-      setSelectedTexture(null)
-      return
+      setSelectedTexture(null);
+      return;
     }
     setSelectedProduct(product);
     setColorFamily(
@@ -345,7 +342,7 @@ function ProductList() {
           return (
             <VTOProductCard
               product={product}
-              productNumber={index+1}
+              productNumber={index + 1}
               key={product.id}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}

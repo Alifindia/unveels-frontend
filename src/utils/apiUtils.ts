@@ -10,10 +10,10 @@ type FilterGroup = {
   filters: Filter[];
 };
 
-export const baseApiUrl = "https://magento-1231949-4398885.cloudwaysapps.com/";
+export const baseApiUrl = "https://unveels.com/";
 export const baseUrl = import.meta.env.PROD ? baseApiUrl : "";
 export const baseMediaUrl =
-  "https://magento-1231949-4398885.cloudwaysapps.com/media/catalog/product/cache/df714aaa5e59335a5bf39a17764906ba";
+  "https://unveels.com/media/catalog/product/cache/df714aaa5e59335a5bf39a17764906ba";
 
 export function mediaUrl(imagePath: string | undefined) {
   if (!imagePath) {
@@ -365,4 +365,102 @@ export async function fetchAllProductsWithSort(
   return {
     items: sortedResults,
   };
+}
+
+export async function getProductTypeAndTexture(results: {
+  items: Array<Product>;
+}) {
+  const productType = [
+    "lips_makeup_product_type",
+    "eye_makeup_product_type",
+    "lash_makeup_product_type",
+    "lenses_product_type",
+    "face_makeup_product_type",
+    "brow_makeup_product_type",
+    "hand_accesories_product_type",
+    "head_accessories_product_type", // Fixed typo
+    "neck_accesories_product_type",
+    "nails_product_type",
+  ];
+
+  // Array untuk menampung hasil filter
+  const productList: Array<Product> = [];
+
+  // Gunakan for...of untuk menunggu proses async
+  for (const item of results.items) {
+    if (item.custom_attributes) {
+      const foundAttribute = item.custom_attributes.find((attribute) =>
+        productType.includes(attribute.attribute_code),
+      );
+
+      if (foundAttribute) {
+        productList.push(item);
+      } else {
+        const foundAttribute = item.extension_attributes.category_links.length;
+
+        const filters = [
+          {
+            filters: [
+              {
+                field: "category_id",
+                value:
+                  item.extension_attributes.category_links[foundAttribute - 1]
+                    .category_id,
+                condition_type: "eq",
+              },
+            ],
+          },
+          {
+            filters: [
+              {
+                field: "type_id",
+                value: "configurable",
+                condition_type: "eq",
+              },
+            ],
+          },
+        ];
+
+        const response = await fetch(
+          baseUrl + "/rest/V1/products?" + buildSearchParams(filters),
+          {
+            headers: defaultHeaders,
+          },
+        );
+
+        const configrableResponse = (await response.json()) as {
+          items: Array<Product>;
+        };
+
+        // Filter response untuk mencocokkan id items saat ini
+        configrableResponse.items.forEach((configurableItem) => {
+          if (
+            configurableItem.extension_attributes?.configurable_product_links?.includes(
+              item.id,
+            )
+          ) {
+            // Cari attribute_code yang cocok dengan productType
+            const matchingAttributes =
+              configurableItem.custom_attributes?.filter(
+                (attribute) =>
+                  productType.includes(attribute.attribute_code) ||
+                  attribute.attribute_code === "texture",
+              );
+
+            // Tambahkan attribute ke custom_attributes item saat ini
+            if (matchingAttributes && matchingAttributes.length > 0) {
+              item.custom_attributes = [
+                ...(item.custom_attributes || []),
+                ...matchingAttributes,
+              ];
+              productList.push(item);
+            }
+          }
+        });
+      }
+    }
+  }
+
+  console.log("from function ", productList);
+  return productList;
 }
