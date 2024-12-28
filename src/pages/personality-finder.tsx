@@ -49,11 +49,11 @@ export function PersonalityFinder() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-      const storeLang = getCookie("store");
-    
-      const lang = storeLang === "ar" ? "ar" : "en";
-    
-      i18n.changeLanguage(lang);
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
   }, [i18n]);
 
   return (
