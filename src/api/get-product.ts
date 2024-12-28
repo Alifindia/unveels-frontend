@@ -5,8 +5,10 @@ import {
   buildSearchParamsWithOrder,
   fetchAllProducts,
   fetchAllProductsWithSort,
+  getProductTypeAndTexture,
 } from "../utils/apiUtils";
 import { defaultHeaders, Product } from "./shared";
+import { result } from "lodash";
 
 const lipsKey = {
   product: ({ sku }: { sku: string }) => ["product", sku],
@@ -90,7 +92,9 @@ export function useMultipleProductsQuery({ skus }: { skus: string[] }) {
         throw new Error("No products found");
       }
 
-      return results.items;
+      const productList = await getProductTypeAndTexture(results);
+
+      return productList;
     },
   });
 }

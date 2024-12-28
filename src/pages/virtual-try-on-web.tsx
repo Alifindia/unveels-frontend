@@ -65,6 +65,9 @@ function Main() {
     setShowEyeliner,
     setEyelinerColor,
     setEyelinerPattern,
+    setShowNails,
+    setNailsTexture,
+    setNailsColor,
   } = useMakeup();
 
   const {
@@ -320,6 +323,19 @@ function Main() {
           if (data.showWatch !== undefined) {
             setShowWatch(data.showWatch);
           }
+
+          // nails
+          if (data.showNails !== undefined) {
+            setShowNails(data.showNails);
+          }
+
+          if (data.nailsColor !== undefined) {
+            setNailsColor(data.nailsColor);
+          }
+
+          if (data.nailsTexture !== undefined) {
+            setNailsTexture(data.nailsTexture);
+          }
         } catch (error) {
           console.error("Error parsing message:", error); // Menampilkan error jika parsing gagal
         }
@@ -341,9 +357,7 @@ function Main() {
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
       <div className="absolute inset-0">
         <VirtualTryOnScene />
-        <div
-          className="pointer-events-none absolute inset-0"
-        ></div>
+        <div className="pointer-events-none absolute inset-0"></div>
       </div>
     </div>
   );

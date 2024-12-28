@@ -3,6 +3,8 @@ import { Product } from "../../../../api/shared";
 import { Icons } from "../../../../components/icons";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useHairColorContext } from "./hair-color-context";
+import { useMakeup } from "../../../../context/makeup-context";
+import { useState } from "react";
 
 export function SingleHairColorSelector({ product }: { product: Product }) {
   return (
@@ -28,8 +30,8 @@ const haircolors = [
 ];
 
 function ColorSelector({ product }: { product: Product }) {
+  const { hairColor, setHairColor, showHair, setShowHair } = useMakeup();
   const { selectedColor, setSelectedColor } = useHairColorContext();
-  // const { setHairColor, showHairColor, setShowHairColor } = useMakeup();
 
   const handleClearSelection = () => {
     // if (showHairColor) {
@@ -48,7 +50,7 @@ function ColorSelector({ product }: { product: Product }) {
 
   return (
     <div className="mx-auto w-full py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-3 sm:space-x-4 overflow-x-auto no-scrollbar py-2 sm:py-2.5">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
@@ -77,10 +79,47 @@ function ColorSelector({ product }: { product: Product }) {
 }
 
 function ProductList({ product }: { product: Product }) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const {
+    colorFamily,
+    setColorFamily,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+  } = useHairColorContext();
+
+  if (colorFamilyToInclude == null && product != null) {
+    setColorFamilyToInclude(
+      product.custom_attributes.find((c) => c.attribute_code === "color")
+        ?.value,
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes
+        .find((item) => item.attribute_code === "hexacode")
+        ?.value.split(",")[0],
+    );
+  };
+
   return (
-    <div className="flex w-full gap-2 sm:gap-4 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing">
+    <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
       {[product].map((item) => (
-        <VTOProductCard key={item.id} product={item} />
+        <VTOProductCard
+          key={item.id}
+          product={item}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
+          onClick={() => handleProductClick(product)}
+        />
       ))}
     </div>
   );

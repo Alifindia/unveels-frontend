@@ -10,6 +10,7 @@ import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useLipPlumperContext } from "./lip-plumper-context";
 import { Product } from "../../../../api/shared";
 import { ColorPalette } from "../../../../components/color-palette";
+import { useEffect, useState } from "react";
 
 export function SingleLipPlumperSelector({ product }: { product: Product }) {
   return (
@@ -29,20 +30,22 @@ function ColorSelector({ product }: { product: Product }) {
   const { selectedColor, setSelectedColor } = useLipPlumperContext();
   const { setLipplumperColor, showLipplumper, setShowLipplumper } = useMakeup();
 
-  const handleClearSelection = () => {
+  function resetColor() {
     if (showLipplumper) {
       setShowLipplumper(false);
     }
-    setSelectedColor(null);
-  };
 
-  const handleColorSelection = (color: string) => {
+    setSelectedColor(null);
+  }
+
+  function setColor(color: string) {
     if (!showLipplumper) {
       setShowLipplumper(true);
     }
+
     setSelectedColor(color);
     setLipplumperColor(color);
-  };
+  }
 
   const extracted_sub_colors = extractUniqueCustomAttributes(
     [product],
@@ -55,25 +58,12 @@ function ColorSelector({ product }: { product: Product }) {
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
-          onClick={handleClearSelection}
+          onClick={() => {
+            resetColor();
+          }}
         >
           <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
-
-        {extracted_sub_colors.map((color, index) => (
-          <button
-            key={index}
-            type="button"
-            className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80",
-              {
-                "border-white/80": selectedColor === color,
-              },
-            )}
-            style={{ background: color }}
-            onClick={() => handleColorSelection(color)}
-          />
-        ))}
 
         {extracted_sub_colors.map((color, index) => (
           <ColorPalette
@@ -81,7 +71,7 @@ function ColorSelector({ product }: { product: Product }) {
             size="large"
             palette={{ color }}
             selected={selectedColor === color}
-            onClick={() => handleColorSelection(color)}
+            onClick={() => setColor(color)}
           />
         ))}
       </div>
@@ -99,7 +89,7 @@ function TextureSelector({ product }: { product: Product }) {
   return (
     <div className="mx-auto w-full py-1 sm:py-2">
       <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
-        {textures.map((texture) => (
+        {textures.map((texture, index) => (
           <button
             key={texture.label}
             type="button"
@@ -127,10 +117,47 @@ function TextureSelector({ product }: { product: Product }) {
 }
 
 function ProductList({ product }: { product: Product }) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const {
+    selectedColor,
+    setSelectedColor,
+    selectedTexture,
+    setSelectedTexture,
+  } = useLipPlumperContext();
+
+  const { setShowLipplumper, setLipplumperColor } = useMakeup();
+
+  useEffect(() => {
+    setLipplumperColor(selectedColor || "#ffffff");
+    setShowLipplumper(selectedColor != null);
+  }, [selectedColor]);
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+    setSelectedTexture(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "texture",
+      )?.value,
+    );
+  };
+
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
       {[product].map((item) => (
-        <VTOProductCard key={item.id} product={item} />
+        <VTOProductCard
+          key={item.id}
+          product={item}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
+          onClick={() => handleProductClick(product)}
+        />
       ))}
     </div>
   );

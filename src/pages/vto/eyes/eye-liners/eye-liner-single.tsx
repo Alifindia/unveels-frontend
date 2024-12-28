@@ -7,12 +7,13 @@ import { Icons } from "../../../../components/icons";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useEyeLinerContext } from "./eye-liner-context";
+import { useEffect, useState } from "react";
+import { useMakeup } from "../../../../context/makeup-context";
 
 export function SingleEyeLinerSelector({ product }: { product: Product }) {
   return (
     <div className="mx-auto w-full divide-y px-4">
       <div>
-        <FamilyColorSelector />
         <ColorSelector product={product} />
       </div>
 
@@ -22,52 +23,8 @@ export function SingleEyeLinerSelector({ product }: { product: Product }) {
   );
 }
 
-function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useEyeLinerContext();
-
-  return (
-    <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
-      {colors.map((item) => (
-        <button
-          key={item.value}
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() => setColorFamily(item.value)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{ background: item.hex }}
-          />
-          <span className="text-[0.625rem]">{item.label}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function ColorSelector({ product }: { product: Product }) {
-  const { selectedColor, setSelectedColor } = useEyeLinerContext();
-  // const { setEyelinerColor, showEyeliner, setShowEyeliner } = useMakeup();
-
-  const handleClearSelection = () => {
-    // if (showEyeliner) {
-    //   setShowEyeliner(false);
-    // }
-    setSelectedColor(null);
-  };
-
-  const handleColorSelection = (color: string) => {
-    // if (!showEyeliner) {
-    //   setShowEyeliner(true);
-    // }
-    setSelectedColor(color);
-    // setEyelinerColor(color);
-  };
+  const { colorFamily, selectedColor, setSelectedColor } = useEyeLinerContext();
 
   const extracted_sub_colors = extractUniqueCustomAttributes(
     [product],
@@ -76,26 +33,25 @@ function ColorSelector({ product }: { product: Product }) {
 
   return (
     <div className="mx-auto w-full py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
-          onClick={handleClearSelection}
+          onClick={() => {
+            setSelectedColor(null);
+          }}
         >
           <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
+
         {extracted_sub_colors.map((color, index) => (
-          <button
-            type="button"
-            key={index}
-            onClick={() => handleColorSelection(color)}
-          >
-            <ColorPalette
-              size="large"
-              palette={{ color }}
-              selected={selectedColor === color}
-            />
-          </button>
+          <ColorPalette
+            key={color}
+            size="large"
+            palette={{ color }}
+            selected={selectedColor === color}
+            onClick={() => setSelectedColor(color)}
+          />
         ))}
       </div>
     </div>
@@ -123,8 +79,8 @@ function ShapeSelector() {
   const { selectedShape, setSelectedShape } = useEyeLinerContext();
 
   return (
-    <div className="mx-auto w-full py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
+    <div className="mx-auto w-full py-4">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
         {patterns.eyeliners.map((pattern, index) => (
           <button
             key={index}
@@ -136,12 +92,16 @@ function ShapeSelector() {
               },
             )}
             onClick={() => {
-              setSelectedShape(pattern.value);
+              if (selectedShape === pattern.value) {
+                setSelectedShape(null);
+              } else {
+                setSelectedShape(pattern.value);
+              }
             }}
           >
             <img
               src={eyeliners[index % eyeliners.length]}
-              alt="Eyeliner shape"
+              alt="Eyebrow"
               className="size-[35px] rounded sm:size-[50px] lg:size-[65px]"
             />
           </button>
@@ -152,10 +112,60 @@ function ShapeSelector() {
 }
 
 function ProductList({ product }: { product: Product }) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const {
+    colorFamily,
+    setColorFamily,
+    selectedColor,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+    selectedShape,
+  } = useEyeLinerContext();
+
+  const { setEyelinerColor, setEyelinerPattern, setShowEyeliner } = useMakeup();
+
+  useEffect(() => {
+    setEyelinerColor(selectedColor || "#ffffff");
+    var pattern = patterns["eyeliners"].findIndex(
+      (e) => e.value == selectedShape,
+    );
+    setEyelinerPattern(pattern != -1 ? pattern : 0);
+    setShowEyeliner(selectedColor != null);
+  }, [selectedColor, selectedShape]);
+
+  if (colorFamilyToInclude == null && product != null) {
+    setColorFamilyToInclude(
+      product.custom_attributes.find((c) => c.attribute_code === "color")
+        ?.value,
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+  };
+
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
       {[product].map((item) => (
-        <VTOProductCard key={item.id} product={item} />
+        <VTOProductCard
+          key={item.id}
+          product={item}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
+          onClick={() => handleProductClick(product)}
+        />
       ))}
     </div>
   );

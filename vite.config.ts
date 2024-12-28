@@ -73,7 +73,7 @@ function mediaPipeExportsWorkaround() {
     name: "mediapipe_workaround",
     load(id: string) {
       const basename = path.basename(id);
-      
+
       if (basename === "face_mesh.js") {
         console.log("mediapipe workaround for face_mesh");
         let code = fs.readFileSync(id, "utf-8");
@@ -98,7 +98,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/rest": {
-        target: "https://magento-1231949-4398885.cloudwaysapps.com/",
+        target: "https://unveels.com/",
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/rest/, "/en/rest"),
