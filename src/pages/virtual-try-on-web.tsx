@@ -52,6 +52,21 @@ function Main() {
     setShowHighlighter,
     setHighlighterColor,
     setHighlighterPattern,
+    setShowEyeShadow,
+    setEyeShadowColor,
+    setEyeShadowMaterial,
+    setEyeShadowPattern,
+    setShowLashes,
+    setLashesColor,
+    setLashesPattern,
+    setShowMascara,
+    setMascaraColor,
+    setShowEyeliner,
+    setEyelinerColor,
+    setEyelinerPattern,
+    setShowNails,
+    setNailsTexture,
+    setNailsColor,
   } = useMakeup();
 
   const {
@@ -251,6 +266,19 @@ function Main() {
           if (data.showWatch !== undefined) {
             setShowWatch(data.showWatch);
           }
+
+          // nails
+          if (data.showNails !== undefined) {
+            setShowNails(data.showNails);
+          }
+
+          if (data.nailsColor !== undefined) {
+            setNailsColor(data.nailsColor);
+          }
+
+          if (data.nailsTexture !== undefined) {
+            setNailsTexture(data.nailsTexture);
+          }
         } catch (error) {
           console.error("Error parsing message:", error); // Menampilkan error jika parsing gagal
         }
@@ -272,12 +300,7 @@ function Main() {
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
       <div className="absolute inset-0">
         <VirtualTryOnScene />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-          }}
-        ></div>
+        <div className="pointer-events-none absolute inset-0"></div>
       </div>
     </div>
   );

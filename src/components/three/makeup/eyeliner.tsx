@@ -17,6 +17,16 @@ import {
   EYELINER_SIX,
   EYELINER_THREE,
   EYELINER_TWO,
+  EYELINER_EIGHT,
+  EYELINER_NINE,
+  EYELINER_TEN,
+  EYELINER_ELEVEN,
+  EYELINER_TWELVE,
+  EYELINER_FOURTEEN,
+  EYELINER_THIRTEEN,
+  EYELINER_FIVETEEN,
+  EYELINER_SIXTEEN,
+  EYELINER_SEVENTEEN,
 } from "../../../utils/constants";
 
 interface EyelinerProps extends MeshProps {
@@ -40,15 +50,27 @@ const EyelinerInner: React.FC<EyelinerProps> = ({
     EYELINER_FIVE,
     EYELINER_SIX,
     EYELINER_SEVEN,
+    EYELINER_EIGHT,
+    EYELINER_NINE,
+    EYELINER_TEN,
+    EYELINER_ELEVEN,
+    EYELINER_TWELVE,
+    EYELINER_FOURTEEN,
+    EYELINER_THIRTEEN,
+    EYELINER_FIVETEEN,
+    EYELINER_SIXTEEN,
+    EYELINER_SEVENTEEN,
   ]);
 
   const alphaMap = eyelinerTextures[eyelinerPattern] || null;
 
   const eyelinerMaterial = useMemo(() => {
+    console.log(eyelinerPattern);
+
     const materialOptions: Partial<MeshBasicMaterialParameters> = {
       color: new Color(eyelinerColor),
       transparent: !!alphaMap,
-      opacity: 2.5,
+      opacity: 0.5,
     };
 
     if (alphaMap) {

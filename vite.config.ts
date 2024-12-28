@@ -68,8 +68,33 @@ const inputObjects = Object.fromEntries(
   }),
 );
 
+function mediaPipeExportsWorkaround() {
+  return {
+    name: "mediapipe_workaround",
+    load(id: string) {
+      const basename = path.basename(id);
+
+      if (basename === "face_mesh.js") {
+        console.log("mediapipe workaround for face_mesh");
+        let code = fs.readFileSync(id, "utf-8");
+        code += "exports.FaceMesh = FaceMesh;";
+        return { code };
+      }
+
+      if (basename === "hands.js") {
+        console.log("mediapipe workaround for hands");
+        let code = fs.readFileSync(id, "utf-8");
+        code += "exports.Hands = Hands;";
+        return { code };
+      }
+
+      return null;
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), mediaPipeExportsWorkaround()],
   server: {
     proxy: {
       "/rest": {

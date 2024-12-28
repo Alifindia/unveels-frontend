@@ -6,12 +6,12 @@ import { Icons } from "../../../../components/icons";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useMascaraContext } from "./mascara-context";
+import { useState } from "react";
 
 export function SingleMascaraSelector({ product }: { product: Product }) {
   return (
     <div className="mx-auto w-full divide-y px-4">
       <div>
-        <FamilyColorSelector />
         <ColorSelector product={product} />
       </div>
 
@@ -20,36 +20,8 @@ export function SingleMascaraSelector({ product }: { product: Product }) {
   );
 }
 
-function FamilyColorSelector() {
-  const { colorFamily, setColorFamily, colorFamilyToInclude } = useMascaraContext();
-
-  return (
-    <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
-      {colors.map((item) => (
-        <button
-          key={item.value}
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() => setColorFamily(colorFamily === item.value ? null : item.value)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{ background: item.hex }}
-          />
-          <span className="text-[0.625rem]">{item.label}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function ColorSelector({ product }: { product: Product }) {
-  const { selectedColor, setSelectedColor } = useMascaraContext();
+  const { colorFamily, selectedColor, setSelectedColor } = useMascaraContext();
   // const { setMascaraColor, showMascara, setShowMascara } = useMakeup();
 
   const handleClearSelection = () => {
@@ -97,10 +69,47 @@ function ColorSelector({ product }: { product: Product }) {
 }
 
 function ProductList({ product }: { product: Product }) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const {
+    colorFamily,
+    setColorFamily,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+  } = useMascaraContext();
+
+  if (colorFamilyToInclude == null && product != null) {
+    setColorFamilyToInclude(
+      product.custom_attributes.find((c) => c.attribute_code === "color")
+        ?.value,
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
+  };
+
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
       {[product].map((item) => (
-        <VTOProductCard key={item.id} product={item} />
+        <VTOProductCard
+          key={item.id}
+          product={item}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
+          onClick={() => handleProductClick(product)}
+        />
       ))}
     </div>
   );

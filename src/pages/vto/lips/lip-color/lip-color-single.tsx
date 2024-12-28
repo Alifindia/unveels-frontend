@@ -8,6 +8,7 @@ import { useLipColorContext } from "./lip-color-context";
 import { Product } from "../../../../api/shared";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import { useEffect, useState } from "react";
 
 export function SingleLipColorSelector({ product }: { product: Product }) {
   return (
@@ -192,10 +193,61 @@ function ShadesSelector({ product }: { product: Product }) {
 }
 
 function ProductList({ product }: { product: Product }) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const {
+    colorFamily,
+    selectedTexture,
+    selectedColors,
+    setColorFamily,
+    setSelectedColors,
+    setSelectedTexture,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+    selectedMode,
+  } = useLipColorContext();
+
+  const { setLipColors, setLipColorMode, setShowLipColor } = useMakeup();
+
+  useEffect(() => {
+    setLipColors(selectedColors);
+    setLipColorMode(selectedMode as "One" | "Dual" | "Ombre");
+    setSelectedColors(selectedColors);
+    setShowLipColor(selectedColors.length > 0);
+  }, [selectedColors, selectedMode, selectedColors]);
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColors(
+      product.custom_attributes
+        .find((item) => item.attribute_code === "hexacode")
+        ?.value.split(","),
+    );
+    setSelectedTexture(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "texture",
+      )?.value,
+    );
+  };
+
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
       {[product].map((product, index) => {
-        return <VTOProductCard product={product} key={product.id} />;
+        return (
+          <VTOProductCard
+            product={product}
+            key={product.id}
+            selectedProduct={selectedProduct}
+            setSelectedProduct={setSelectedProduct}
+            onClick={() => handleProductClick(product)}
+          />
+        );
       })}
     </div>
   );

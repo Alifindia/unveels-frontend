@@ -10,6 +10,7 @@ import {
 import { Product } from "../../../../api/shared";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import { useEffect, useState } from "react";
 
 export function SingleContourSelector({ product }: { product: Product }) {
   return (
@@ -222,10 +223,49 @@ function TextureSelector({ product }: { product: Product }) {
 }
 
 function ProductList({ product }: { product: Product }) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const {
+    selectedColors,
+    selectedMode,
+    selectedTexture,
+    setSelectedColors,
+    setSelectedTexture,
+  } = useContourContext();
+
+  const { setContourColors, setContourShape, setShowContour, setContourMode } =
+    useMakeup();
+
+  useEffect(() => {
+    setContourColors(selectedColors);
+    setContourMode(selectedMode as "One" | "Dual");
+    setShowContour(selectedColors.length > 0);
+  }, [selectedColors, selectedMode, selectedColors]);
+
+  const handleProductClick = (product: Product) => {
+    console.log(product);
+    setSelectedProduct(product);
+    setSelectedColors([
+      product.custom_attributes
+        .find((item) => item.attribute_code === "hexacode")
+        ?.value.split(",")[0],
+    ]);
+    setSelectedTexture(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "texture",
+      )?.value,
+    );
+  };
+
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
       {[product].map((product) => (
-        <VTOProductCard product={product} key={product.id} />
+        <VTOProductCard
+          product={product}
+          key={product.id}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
+          onClick={() => handleProductClick(product)}
+        />
       ))}
     </div>
   );

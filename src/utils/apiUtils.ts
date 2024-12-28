@@ -366,3 +366,101 @@ export async function fetchAllProductsWithSort(
     items: sortedResults,
   };
 }
+
+export async function getProductTypeAndTexture(results: {
+  items: Array<Product>;
+}) {
+  const productType = [
+    "lips_makeup_product_type",
+    "eye_makeup_product_type",
+    "lash_makeup_product_type",
+    "lenses_product_type",
+    "face_makeup_product_type",
+    "brow_makeup_product_type",
+    "hand_accesories_product_type",
+    "head_accessories_product_type", // Fixed typo
+    "neck_accesories_product_type",
+    "nails_product_type",
+  ];
+
+  // Array untuk menampung hasil filter
+  const productList: Array<Product> = [];
+
+  // Gunakan for...of untuk menunggu proses async
+  for (const item of results.items) {
+    if (item.custom_attributes) {
+      const foundAttribute = item.custom_attributes.find((attribute) =>
+        productType.includes(attribute.attribute_code),
+      );
+
+      if (foundAttribute) {
+        productList.push(item);
+      } else {
+        const foundAttribute = item.extension_attributes.category_links.length;
+
+        const filters = [
+          {
+            filters: [
+              {
+                field: "category_id",
+                value:
+                  item.extension_attributes.category_links[foundAttribute - 1]
+                    .category_id,
+                condition_type: "eq",
+              },
+            ],
+          },
+          {
+            filters: [
+              {
+                field: "type_id",
+                value: "configurable",
+                condition_type: "eq",
+              },
+            ],
+          },
+        ];
+
+        const response = await fetch(
+          baseUrl + "/rest/V1/products?" + buildSearchParams(filters),
+          {
+            headers: defaultHeaders,
+          },
+        );
+
+        const configrableResponse = (await response.json()) as {
+          items: Array<Product>;
+        };
+
+        // Filter response untuk mencocokkan id items saat ini
+        configrableResponse.items.forEach((configurableItem) => {
+          if (
+            configurableItem.extension_attributes?.configurable_product_links?.includes(
+              item.id,
+            )
+          ) {
+            // Cari attribute_code yang cocok dengan productType
+            const matchingAttributes =
+              configurableItem.custom_attributes?.filter(
+                (attribute) =>
+                  productType.includes(attribute.attribute_code) ||
+                  attribute.attribute_code === "texture",
+              );
+
+            // Tambahkan attribute ke custom_attributes item saat ini
+            if (matchingAttributes && matchingAttributes.length > 0) {
+              item.custom_attributes = [
+                ...(item.custom_attributes || []),
+                ...matchingAttributes,
+              ];
+              productList.push(item);
+            }
+          }
+        });
+      }
+    }
+  }
+
+  console.log("from function ", productList);
+  return productList;
+}

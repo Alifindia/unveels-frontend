@@ -10,6 +10,8 @@ import FaceMesh from "../face-mesh";
 import { Landmark } from "../../../types/landmark";
 import { useMakeup } from "../../../context/makeup-context";
 import {
+  EYEBROW_TEXTURE_TEN,
+  EYEBROW_TEXTURE_NINE,
   EYEBROW_TEXTURE_EIGHT,
   EYEBROW_TEXTURE_FIVE,
   EYEBROW_TEXTURE_FOUR,
@@ -43,6 +45,8 @@ const EyebrowsInner: React.FC<EyebrowsProps> = ({
     EYEBROW_TEXTURE_SIX,
     EYEBROW_TEXTURE_SEVEN,
     EYEBROW_TEXTURE_EIGHT,
+    EYEBROW_TEXTURE_NINE,
+    EYEBROW_TEXTURE_TEN,
   ]);
 
   // Memilih tekstur yang sesuai berdasarkan blushPattern
