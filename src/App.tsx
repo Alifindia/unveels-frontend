@@ -284,19 +284,20 @@ function App() {
   return <RouterProvider router={router} />;
 }
 
-// Link button component
-function LinkButton({
-  to,
-  children,
-}: {
+interface LinkButtonProps {
   to: string;
   children: React.ReactNode;
-}) {
+  className?: string;
+}
+
+export function LinkButton({
+  to,
+  children,
+  className = "border border-black", // Default value for className
+}: LinkButtonProps) {
   return (
-    <Link to={to}>
-      <button type="button" className="border border-black">
-        {children}
-      </button>
+    <Link to={to} className={className}>
+      <button type="button">{children}</button>
     </Link>
   );
 }
