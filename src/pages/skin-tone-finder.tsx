@@ -67,7 +67,6 @@ import { BrandName } from "../components/product/brand";
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../utils/other";
 
-
 export function SkinToneFinder() {
   const { i18n } = useTranslation();
 

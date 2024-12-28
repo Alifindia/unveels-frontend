@@ -403,5 +403,13 @@
     "Bangles": "أساور صلبة",
     "Nail Polish": "طلاء الأظافر",
     "Press on Nails": "أظافر اصطناعية لاصقة"
+  },
+  "texture": {
+    "Matte": "مطفأ",
+    "Shimmer": "بريق",
+    "Glossy": "براق",
+    "Satin": "ساتان",
+    "Metalic": "معدني",
+    "Sheer": "شفاف"
   }
 }
