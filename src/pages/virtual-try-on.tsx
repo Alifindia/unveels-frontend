@@ -149,7 +149,7 @@ export function VirtualTryOn() {
   useEffect(() => {
     const storeLang = getCookie("store");
 
-    const lang = storeLang === "ar" ? "ar" : "ar";
+    const lang = storeLang === "ar" ? "ar" : "en";
 
     i18n.changeLanguage(lang);
   }, [i18n]);

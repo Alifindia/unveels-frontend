@@ -5,15 +5,20 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useTiaraContext } from "./tiaras-context";
 import { filterOccasionsByValue } from "../../../../api/attributes/occasion";
-import { filterMaterials } from "../../../../api/attributes/material";
+import {
+  filterMaterials,
+  filterMaterialsByValue,
+} from "../../../../api/attributes/material";
 import { Product } from "../../../../api/shared";
 import { ColorPalette } from "../../../../components/color-palette";
+import { useTiarasQuery } from "./tiaras-query";
+import { getHexCodeSubColor } from "../../../../api/attributes/sub_color";
+import { useState } from "react";
 
 export function SingleTiaraSelector({ product }: { product: Product }) {
   return (
     <div className="mx-auto w-full divide-y px-4">
       <div>
-        <FamilyColorSelector />
         <ColorSelector product={product} />
       </div>
       <ModeSelector product={product} />
@@ -22,61 +27,37 @@ export function SingleTiaraSelector({ product }: { product: Product }) {
   );
 }
 
-function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useTiaraContext();
-
-  return (
-    <div className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar">
-      {colors.map((item) => (
-        <button
-          key={item.value}
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() => setColorFamily(item.value)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{ background: item.hex }}
-          />
-          <span className="text-[0.625rem]">{item.label}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function ColorSelector({ product }: { product: Product }) {
   const { selectedColor, setSelectedColor } = useTiaraContext();
 
-  const handleClearSelection = () => {
-    setSelectedColor(null);
-  };
+  const { data } = useTiarasQuery({
+    color: product.custom_attributes.find(
+      (item) => item.attribute_code === "color",
+    )?.value,
+    material: null,
+    occasion: null,
+  });
 
-  const handleColorSelection = (color: string) => {
-    if (selectedColor === color) {
-      setSelectedColor(null);
-    } else {
-      setSelectedColor(color);
-    }
-  };
-
-  const extracted_sub_colors = extractUniqueCustomAttributes(
-    [product],
+  const extractHexa = extractUniqueCustomAttributes(
+    data?.items ?? [],
     "hexacode",
   ).flatMap((item) => item.split(","));
 
+  const extractSubColor = extractUniqueCustomAttributes(
+    data?.items ?? [],
+    "sub_color",
+  ).flatMap((item) => getHexCodeSubColor(item) ?? "");
+
+  const extracted_sub_colors =
+    extractHexa.length > 0 ? extractHexa : extractSubColor;
+
   return (
     <div className="mx-auto w-full py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
-          onClick={handleClearSelection}
+          onClick={() => setSelectedColor(null)}
         >
           <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
@@ -85,8 +66,8 @@ function ColorSelector({ product }: { product: Product }) {
             key={color}
             size="large"
             palette={{ color }}
-            selected={selectedColor === color}
-            onClick={() => handleColorSelection(color)}
+            selected={color == selectedColor}
+            onClick={() => setSelectedColor(color)}
           />
         ))}
       </div>
@@ -167,7 +148,7 @@ function FabricSelector({ product }: { product: Product }) {
   const { selectedMaterial, setSelectedMaterial } = useTiaraContext();
 
   const productMaterials = extractUniqueCustomAttributes([product], "material");
-  const materials = filterMaterials(productMaterials);
+  const materials = filterMaterialsByValue(productMaterials);
 
   return (
     <div className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar">
@@ -192,10 +173,61 @@ function FabricSelector({ product }: { product: Product }) {
 }
 
 function TiaraProductList({ product }: { product: Product }) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const {
+    colorFamily,
+    setColorFamily,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+    setSelectedMaterial,
+    selectedOccasion,
+    setSelectedOccasion,
+  } = useTiaraContext();
+
+  if (colorFamilyToInclude == null && product != null) {
+    setColorFamilyToInclude(
+      product.custom_attributes.find((c) => c.attribute_code === "color")
+        ?.value,
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      getHexCodeSubColor(
+        product.custom_attributes.find(
+          (item) => item.attribute_code === "sub_color",
+        )?.value,
+      ) ?? null,
+    );
+    setSelectedMaterial(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "material",
+      )?.value,
+    );
+    setSelectedOccasion(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "occasion",
+      )?.value,
+    );
+  };
+
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
       {[product].map((item) => (
-        <VTOProductCard key={item.id} product={item} />
+        <VTOProductCard
+          key={item.id}
+          product={item}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
+          onClick={() => handleProductClick(product)}
+        />
       ))}
     </div>
   );
