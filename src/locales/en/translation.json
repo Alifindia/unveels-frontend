@@ -89,11 +89,10 @@
     "brown_skin": "Brown Skin",
     "deep_skin": "Deep Skin"
   },
-
   "tabsmenupf": {
     "personality": "Personality",
     "attributes": "Attributes",
-    "recommendations: ": "Recommendations"
+    "recommendations": "Recommendations"
   },
   "scoreTypes": {
     "low": "Low",
@@ -121,19 +120,19 @@
     },
     "conscientiousness": {
       "title": "Conscientiousness",
-      "description": "Description for Conscientiousness..."
+      "description": "Conscientiousness is a key personality trait that reflects an individual's tendency to be organized, responsible, and goal-oriented. People high in conscientiousness are known for their reliability, diligence, and attention to detail; moreover, they're often diligent in their work, follow through on tasks, and are typically well-prepared. Unveels has unveiled the Conscientious side of your personality; and here's your recommended list based on it."
     },
     "openness": {
       "title": "Openness",
-      "description": "Description for Openness to Experience..."
+      "description": "People with an open personality are known for their vibrant imagination, curiosity, and eagerness to explore new ideas and experiences. You have a strong desire for novelty and diversity, and you're open to different perspectives and ways of thinking. With the trait of openness, you tend to be creative, flexible, and adaptable and are often receptive to change and innovation.You're obsessed with discovering new cultures, concepts, and opportunities, and are willing to challenge conventional norms and beliefs. Overall, those with an open personality bring a sense of wonder and enthusiasm to their interactions and endeavours. Thus, here is your recommendation list from Unveels based on having an Open Personality"
     },
     "agreeableness": {
       "title": "Agreeableness",
-      "description": "Description for Agreeableness..."
+      "description": "People with an Agreeable personality reveal their kind-hearted and compassionate nature; characterized by a strong desire to maintain harmonious relationships. People, high in agreeableness, are often cooperative, empathetic, and considerate towards others; making them valuable team players and supportive friends. They prioritize the needs of others and are willing to go out of their way to help and support those around them. Their warm and nurturing behaviour makes them approachable and easy to get along with, fostering a sense of trust and camaraderie in their social interactions. In short, your agreeable personality is a key aspect of your character and it influences your interactions and relationships with others. Unveels has prepared a customized recommendation list based on your agreeable personality."
     },
     "neuroticism": {
       "title": "Neuroticism",
-      "description": "Description for Neuroticism..."
+      "description": "Neuroticism , as a personality trait, reflects an individual's tendency to experience negative emotions such as anxiety, depression, and moodiness. People high in neuroticism may be more prone to worry, stress, and self-doubt, they often react strongly to perceived threats or challenges. Those low in neuroticism, on the other hand, tend to be more emotionally stable and resilient in the face of adversity. Thus, here's your bespoke recommendation list from Unveels based on your Neuroticism."
     }
   },
   "attributepf": {
@@ -157,7 +156,7 @@
     },
     "brows": {
       "title": "Brows",
-      "eyesattribute": {
+      "browsattribute": {
         "eyebrowshape": "Eyebrow Shape",
         "thickness": "Thickness ",
         "eyebrowdistance": "Eyebrow Distance",
@@ -327,8 +326,8 @@
 
   "viewskinan": {
     "analysis_result": "ANALYSIS RESULT",
-    "skin_health": " Skin Health Score :",
-    "skin_age": "Skin Age :",
+    "skin_health": " Skin Health Score ",
+    "skin_age": "Skin Age ",
     "detected_skin": "Detected Skin Problems",
     "detected_skin_con": "Detected Skin Condition",
     "skin_problem": "Skin Problems",
@@ -360,20 +359,49 @@
     "dark circles": "dark circles",
     "dry": "dry"
   },
-  "model_loading" : {"label" : "Powered By Unveels"},
-  "vto" : {
-   "makeup": "Makeup",
-   "accessories": "Accesories", 
-   "Lips": "Lips",
-   "Eyes": "Eyes",
-   "Face" : "Face",
-   "Hair": "Hair",
-   "Head Accessories": "Head Accessories",
-   "Neck Accessories": "Neck Accessories",
-   "Hand Accessories": "Hand Accessories",
-   "Nails": "Nails",
-   "Lip Color": "Lip Color",
-   "Lip Liner": "Lip Liner",
-   "Lip Plumper": "Lip Plumper"
+  "model_loading": { "label": "Powered By Unveels" },
+  "vto": {
+    "makeup": "Makeup",
+    "accessories": "Accesories",
+    "Lips": "Lips",
+    "Eyes": "Eyes",
+    "Face": "Face",
+    "Hair": "Hair",
+    "Head Accessories": "Head Accessories",
+    "Neck Accessories": "Neck Accessories",
+    "Hand Accessories": "Hand Accessories",
+    "Nails": "Nails",
+    "Lip Color": "Lip Color",
+    "Lip Liner": "Lip Liner",
+    "Lip Plumper": "Lip Plumper",
+    "Eyebrows": "Eyebrows",
+    "Eye Shadow": "Eye Shadow",
+    "Eye Liner": "Eye Liner",
+    "Lashes": "Lashes",
+    "Mascara": "Mascara",
+    "Lenses": "Lenses",
+    "Foundation": "Foundation",
+    "Concealer": "Concealer",
+    "Contour": "Contour",
+    "Blush": "Blush",
+    "Bronzer": "Bronzer",
+    "Highlighter": "Highlighter",
+    "Hair Color": "Hair Color",
+    "Sunglasses": "Sunglasses",
+    "Glasses": "Glasses",
+    "Earring": "Earring",
+    "Hats": "Hats",
+    "Tiaras": "Tiaras",
+    "Headbands": "Headbands",
+    "Pendants": "Pendants",
+    "Necklaces": "Necklaces",
+    "Chokers": "Chokers",
+    "Scarves": "Scarves",
+    "Watches": "Watches",
+    "Rings": "Rings",
+    "Bracelets": "Bracelets",
+    "Bangles": "Bangles",
+    "Nail Polish": "Nail Polish",
+    "Press on Nails": "Press on Nails"
   }
 }
