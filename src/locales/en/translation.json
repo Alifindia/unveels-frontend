@@ -403,5 +403,13 @@
     "Bangles": "Bangles",
     "Nail Polish": "Nail Polish",
     "Press on Nails": "Press on Nails"
+  },
+  "texture": {
+    "Matte": "Matte",
+    "Shimmer": "Shimmer",
+    "Glossy": "Glossy",
+    "Satin": "Satin",
+    "Metalic": "Metalic",
+    "Sheer": "Sheer"
   }
 }
