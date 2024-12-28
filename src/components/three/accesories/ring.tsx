@@ -75,14 +75,11 @@ const RingInner: React.FC<RingProps> = React.memo(
       const scaleX = viewport.width / outputWidth;
       const scaleY = viewport.height / outputHeight;
 
-      const ringFingerX =
-        (1 - ringFingerDIP.x) * outputWidth * scaleX - viewport.width / 2;
-      const ringFingerY =
-        -ringFingerDIP.y * outputHeight * scaleY + viewport.height / 2;
+      const ringFingerX = (1 - ringFingerDIP.x - 0.5) * outputWidth;
+      const ringFingerY = -(ringFingerDIP.y - 0.5) * outputHeight;
       const ringFingerZ = -ringFingerDIP.z * 100;
 
-      const scaleFactor =
-        fingerSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+      const scaleFactor = (fingerSize * outputWidth) / 6;
 
       ringRef.current.position.set(ringFingerX, ringFingerY, ringFingerZ);
       ringRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
