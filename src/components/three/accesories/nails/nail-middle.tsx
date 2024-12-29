@@ -82,22 +82,16 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
       const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
 
       // Scale coordinates proportionally with the viewport
-      const scaleX = viewport.width / outputWidth;
-      const scaleY = viewport.height / outputHeight;
-
-      const nailsFingerX =
-        (1 - nailsFingerDIP.x) * outputWidth * scaleX - viewport.width / 2;
-      const nailsFingerY =
-        -nailsFingerDIP.y * outputHeight * scaleY + viewport.height / 2;
+      const nailsFingerX = (1 - nailsFingerDIP.x - 0.5) * outputWidth;
+      const nailsFingerY = -(nailsFingerDIP.y - 0.5) * outputHeight;
       const nailsFingerZ = -nailsFingerDIP.z * 100;
 
-      const scaleFactor =
-        fingerSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+      const scaleFactor = fingerSize * outputWidth / 2;
 
       nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
       nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      const quaternion = handQuaternion(handLandmarks.current, 16, 10);
+      const quaternion = handQuaternion(handLandmarks.current, 15, 12);
 
       if (quaternion) {
         nailsRef.current.setRotationFromQuaternion(quaternion);

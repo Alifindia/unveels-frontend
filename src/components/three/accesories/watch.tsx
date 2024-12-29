@@ -1,6 +1,12 @@
 import { MeshProps, useFrame, useThree } from "@react-three/fiber";
 import React, { useMemo, useRef, Suspense, useEffect } from "react";
-import { Mesh, MeshStandardMaterial, Object3D, Quaternion, Vector3 } from "three";
+import {
+  Mesh,
+  MeshStandardMaterial,
+  Object3D,
+  Quaternion,
+  Vector3,
+} from "three";
 import { Landmark } from "../../../types/landmark";
 import { WATCH } from "../../../utils/constants";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
@@ -69,17 +75,11 @@ const WatchInner: React.FC<WatchProps> = React.memo(
       const thumbBase = handLandmarks.current[1];
 
       const wristSize = calculateDistance(wrist, thumbBase);
-
-      // Scale coordinates proportionally with the viewport
-      const scaleX = viewport.width / outputWidth;
-      const scaleY = viewport.height / outputHeight;
-
-      const wristX = (1 - wrist.x) * outputWidth * scaleX - viewport.width / 2;
-      const wristY = -wrist.y * outputHeight * scaleY + viewport.height / 2;
+      const wristX = (1 - wrist.x - 0.5) * outputWidth;
+      const wristY = -(wrist.y - 0.5) * outputHeight;
       const wristZ = -wrist.z * 100;
 
-      const scaleFactor =
-        wristSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+      const scaleFactor = wristSize * outputWidth / 3;
 
       watchRef.current.position.set(wristX, wristY, wristZ);
       watchRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);

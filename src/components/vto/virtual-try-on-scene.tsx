@@ -40,8 +40,6 @@ interface BeforeAfterCanvasProps {
 
 function BeforeAfterCanvas({ image, canvasRef, mode }: BeforeAfterCanvasProps) {
   useEffect(() => {
-    console.log("Canvas mode:", mode, "Image element:", image);
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -209,7 +207,7 @@ export function VirtualTryOnScene({
 
   const processLiveStream = async (
     faces: [{ x: number; y: number; z: number; name?: string | null }],
-    hands: [{ x: number; y: number; z: number; name?: string | null }],
+    hands: handPoseDetection.Hand[],
   ) => {
     if (
       webcamRef.current &&
@@ -259,13 +257,15 @@ export function VirtualTryOnScene({
             );
 
             const normalizedHandLandmarks = normalizeLandmarks(
-              hands,
+              hands[0].keypoints,
               video.videoWidth,
               video.videoHeight,
               drawWidth,
               drawHeight,
             );
-
+            for (let i = 0; i < normalizedHandLandmarks.length; i++) {
+              normalizedHandLandmarks[i].z = hands[0].keypoints3D[i].z || 0;
+            }
             landmarksRef.current = normalizedFaceLandmarks;
             handLandmarksRef.current = normalizedHandLandmarks;
           } catch (err) {
@@ -280,7 +280,7 @@ export function VirtualTryOnScene({
   // Image Detection Function
   const processImage = async (
     faces: [{ x: number; y: number; z: number; name?: string | null }],
-    hands: [{ x: number; y: number; z: number; name?: string | null }],
+    hands: handPoseDetection.Hand[],
   ) => {
     if (imageUploadRef.current) {
       const img = imageUploadRef.current;
@@ -325,13 +325,15 @@ export function VirtualTryOnScene({
             );
 
             const normalizedHandLandmarks = normalizeLandmarks(
-              hands,
-              img.width,
-              img.height,
+              hands[0].keypoints,
+              video.videoWidth,
+              video.videoHeight,
               drawWidth,
               drawHeight,
             );
-
+            for (let i = 0; i < normalizedHandLandmarks.length; i++) {
+              normalizedHandLandmarks[i].z = hands[0].keypoints3D[i].z || 0;
+            }
             landmarksRef.current = normalizedFaceLandmarks;
             handLandmarksRef.current = normalizedHandLandmarks;
           } catch (err) {
@@ -394,13 +396,15 @@ export function VirtualTryOnScene({
             );
 
             const normalizedHandLandmarks = normalizeLandmarks(
-              hands,
+              hands[0].keypoints,
               video.videoWidth,
               video.videoHeight,
               drawWidth,
               drawHeight,
             );
-
+            for (let i = 0; i < normalizedHandLandmarks.length; i++) {
+              normalizedHandLandmarks[i].z = hands[0].keypoints3D[i].z || 0;
+            }
             landmarksRef.current = normalizedFaceLandmarks;
             handLandmarksRef.current = normalizedHandLandmarks;
           } catch (err) {
@@ -457,16 +461,13 @@ export function VirtualTryOnScene({
           hands.length > 0
         ) {
           if (mode === "LIVE") {
-            processLiveStream(
-              faces[0]?.keypoints || [],
-              hands[0]?.keypoints || [],
-            );
+            processLiveStream(faces[0]?.keypoints || [], hands || []);
           }
           if (mode === "IMAGE") {
-            processImage(faces[0]?.keypoints || [], hands[0]?.keypoints || []);
+            processImage(faces[0]?.keypoints || [], hands|| []);
           }
           if (mode === "VIDEO") {
-            processVideo(faces[0]?.keypoints || [], hands[0]?.keypoints || []);
+            processVideo(faces[0]?.keypoints || [], hands || []);
           }
         }
 
