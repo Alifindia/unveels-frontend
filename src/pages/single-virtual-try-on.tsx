@@ -494,6 +494,10 @@ function MainContent({ product }: { product: Product }) {
     return <SingleEyebrowsSelector product={product} />;
   }
 
+  if (productTypeCheckers.isHandwearProduct(product)) {
+    return <SingleHandwearSelector product={product} />;
+  }
+
   if (productTypeCheckers.isFoundationProduct(product)) {
     return <SingleFoundationSelector product={product} />;
   }
@@ -522,9 +526,6 @@ function MainContent({ product }: { product: Product }) {
     return <SingleHairColorSelector product={product} />;
   }
 
-  if (productTypeCheckers.isHandwearProduct(product)) {
-    return <SingleHandwearSelector product={product} />;
-  }
   return (
     <>
       <div>No product found</div>

@@ -377,9 +377,9 @@ export async function getProductTypeAndTexture(results: {
     "lenses_product_type",
     "face_makeup_product_type",
     "brow_makeup_product_type",
-    "hand_accesories_product_type",
+    "hand_accessories_product_type",
     "head_accessories_product_type", // Fixed typo
-    "neck_accesories_product_type",
+    "neck_accessories_product_type",
     "nails_product_type",
   ];
 
