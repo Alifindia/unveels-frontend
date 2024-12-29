@@ -55,6 +55,7 @@ interface VirtualTryOnThreeSceneProps extends MeshProps {
   faceTransform: React.RefObject<number[]>;
   blendshape: React.RefObject<Blendshape[]>;
   sourceType: "LIVE" | "VIDEO" | "IMAGE";
+  hairMask: React.RefObject<ImageData>;
 }
 
 const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
@@ -64,6 +65,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   faceTransform,
   blendshape,
   sourceType,
+  hairMask,
   ...props
 }) => {
   const { gl } = useThree();
@@ -74,6 +76,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
     VideoTexture | Texture | null
   >(null);
   const { skinToneThreeSceneRef, setScreenshotImage } = useCamera();
+  const hairMaskTextureRef = useRef<Texture | null>(null);
 
   const [maskOpacity, setMaskOpacity] = useState(0.5);
 
@@ -115,6 +118,40 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   const [pinchFactor, setPinchFactor] = useState(0.0);
   const [horizontalShiftFactor, setHorizontalShiftFactor] = useState(0);
   const [verticalShiftFactor, setVerticalShiftFactor] = useState(0);
+
+  // Konversi ImageData menjadi RGBA dengan transparansi
+  const processImageDataWithTransparency = (
+    imageData: ImageData,
+  ): ImageData => {
+    const data = new Uint8ClampedArray(imageData.data); // Salin data
+    for (let i = 0; i < data.length; i += 4) {
+      const maskValue = data[i]; // Nilai mask disimpan di channel Red
+      if (maskValue === 0) {
+        // Jika bukan bagian mask, buat transparan
+        data[i + 3] = 0; // Alpha = 0
+      } else {
+        // Jika bagian mask, pastikan alpha penuh
+        data[i + 3] = 255; // Alpha = 255
+      }
+    }
+    return new ImageData(data, imageData.width, imageData.height);
+  };
+
+  const imageDataToImage = (imageData: ImageData): HTMLImageElement => {
+    const processedImageData = processImageDataWithTransparency(imageData);
+    const canvas = document.createElement("canvas");
+    canvas.width = processedImageData.width;
+    canvas.height = processedImageData.height;
+
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.putImageData(processedImageData, 0, 0);
+      const img = new Image();
+      img.src = canvas.toDataURL();
+      return img;
+    }
+    return new Image();
+  };
 
   // Handle source changes and create texture
   useEffect(() => {
@@ -224,6 +261,19 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   }, [videoTexture]);
 
   useFrame(() => {
+    if (hairMask.current) {
+      const image = imageDataToImage(hairMask.current);
+      const loader = new TextureLoader();
+
+      loader.load(image.src, (texture) => {
+        if (!hairMaskTextureRef.current) {
+          hairMaskTextureRef.current = texture;
+        } else {
+          hairMaskTextureRef.current.image = texture.image;
+          hairMaskTextureRef.current.needsUpdate = true;
+        }
+      });
+    }
     if (filterRef.current && landmarks.current) {
       const uniforms = filterRef.current.uniforms;
 
@@ -421,6 +471,27 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
           {/* <HeadOccluder planeSize={planeSize} landmarks={landmarks} />
           <NeckOccluder planeSize={planeSize} landmarks={landmarks} />
           <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} /> */}
+
+          {showHair && (
+            <>
+              {hairMaskTextureRef.current && (
+                <mesh
+                  position={[0, 0, -499]}
+                  scale={[-1, 1, 1]}
+                  {...props}
+                  renderOrder={3}
+                >
+                  <planeGeometry args={[planeSize[0], planeSize[1]]} />
+                  <meshBasicMaterial
+                    map={hairMaskTextureRef.current}
+                    side={DoubleSide}
+                    transparent
+                    opacity={maskOpacity}
+                  />
+                </mesh>
+              )}
+            </>
+          )}
 
           <>
             <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} />

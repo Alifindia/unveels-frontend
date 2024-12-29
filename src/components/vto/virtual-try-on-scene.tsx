@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import Webcam from "react-webcam";
 import {
   FaceLandmarker,
+  FilesetResolver,
   HandLandmarker,
   ImageSegmenter,
 } from "@mediapipe/tasks-vision";
@@ -158,13 +159,61 @@ export function VirtualTryOnScene({
   const handLandmarksRef = useRef<Landmark[]>([]);
   const blendshapeRef = useRef<Blendshape[]>([]);
 
+  const hairSegmenterRef = useRef<ImageSegmenter | null>(null);
+  const hairRef = useRef<Float32Array | null>(null);
+  const hairMaskRef = useRef<ImageData | null>(null);
+
   // Using CameraContext
   const { criterias, flipCamera } = useCamera();
   const { envMapAccesories, setEnvMapAccesories } = useAccesories();
   const { envMapMakeup, setEnvMapMakeup } = useMakeup();
 
+  const legendColors = [[225, 194, 150, 255]];
+
   useEffect(() => {
     // tf.enableDebugMode();
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const initializeFaceLandmarker = async () => {
+      try {
+        const filesetResolver = await FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.17/wasm",
+        );
+
+        const hairSegmenter = await ImageSegmenter.createFromOptions(
+          filesetResolver,
+          {
+            baseOptions: {
+              modelAssetPath:
+                "/media/unveels/models/hair/hair_segmenter.tflite",
+              delegate: "GPU",
+            },
+            runningMode: "VIDEO",
+            outputCategoryMask: true,
+            outputConfidenceMasks: false,
+          },
+        );
+
+        if (isMounted) {
+          hairSegmenterRef.current = hairSegmenter;
+        }
+      } catch (error) {
+        console.error("Gagal menginisialisasi FaceLandmarker:", error);
+        if (isMounted) setError(error as Error);
+      }
+    };
+
+    initializeFaceLandmarker();
+
+    // Cleanup pada unmount
+    return () => {
+      isMounted = false;
+      if (hairSegmenterRef.current) {
+        hairSegmenterRef.current.close();
+      }
+    };
   }, []);
 
   const normalizeLandmarks = (
@@ -205,6 +254,7 @@ export function VirtualTryOnScene({
     });
   };
 
+  // Livestream Detection Function
   const processLiveStream = async (
     faces: [{ x: number; y: number; z: number; name?: string | [] }],
     hands: handPoseDetection.Hand[],
@@ -212,7 +262,8 @@ export function VirtualTryOnScene({
     if (
       webcamRef.current &&
       webcamRef.current.video &&
-      webcamRef.current.video.readyState === 4
+      webcamRef.current.video.readyState === 4 &&
+      hairSegmenterRef.current
     ) {
       const video = webcamRef.current.video;
       const canvas = canvasRef.current;
@@ -247,6 +298,8 @@ export function VirtualTryOnScene({
 
           ctx.clearRect(0, 0, width, height);
 
+          const startTimeMs = performance.now();
+
           try {
             const normalizedFaceLandmarks = normalizeLandmarks(
               faces,
@@ -254,6 +307,11 @@ export function VirtualTryOnScene({
               video.videoHeight,
               drawWidth,
               drawHeight,
+            );
+
+            const hairResults = hairSegmenterRef.current.segmentForVideo(
+              video,
+              startTimeMs,
             );
 
             if (hands.length > 0) {
@@ -271,6 +329,51 @@ export function VirtualTryOnScene({
               handLandmarksRef.current = normalizedHandLandmarks;
             } else {
               handLandmarksRef.current = [];
+            }
+
+            if (hairResults?.categoryMask) {
+              hairRef.current = hairResults.categoryMask.getAsFloat32Array();
+              let imageData = ctx.getImageData(
+                0,
+                0,
+                video.videoWidth,
+                video.videoHeight,
+              ).data;
+
+              if (hairResults?.categoryMask) {
+                hairRef.current = hairResults.categoryMask.getAsFloat32Array();
+                let imageData = ctx.getImageData(
+                  0,
+                  0,
+                  video.videoWidth,
+                  video.videoHeight,
+                ).data;
+
+                let j = 0;
+                for (let i = 0; i < hairRef.current.length; ++i) {
+                  const maskVal = Math.round(hairRef.current[i] * 255.0);
+
+                  // Proses hanya untuk label index 1
+                  if (maskVal === 1) {
+                    const legendColor =
+                      legendColors[maskVal % legendColors.length];
+                    imageData[j] = (legendColor[0] + imageData[j]) / 2;
+                    imageData[j + 1] = (legendColor[1] + imageData[j + 1]) / 2;
+                    imageData[j + 2] = (legendColor[2] + imageData[j + 2]) / 2;
+                    imageData[j + 3] = (legendColor[3] + imageData[j + 3]) / 2;
+                  }
+                  j += 4;
+                }
+
+                const uint8Array = new Uint8ClampedArray(imageData.buffer);
+                const dataNew = new ImageData(
+                  uint8Array,
+                  video.videoWidth,
+                  video.videoHeight,
+                );
+
+                hairMaskRef.current = dataNew;
+              }
             }
 
             landmarksRef.current = normalizedFaceLandmarks;
@@ -738,6 +841,7 @@ export function VirtualTryOnScene({
           faceTransform={faceTransformRef}
           blendshape={blendshapeRef}
           sourceType={mode}
+          hairMask={hairMaskRef}
         />
       </Canvas>
 
