@@ -206,7 +206,7 @@ export function VirtualTryOnScene({
   };
 
   const processLiveStream = async (
-    faces: [{ x: number; y: number; z: number; name?: string | null }],
+    faces: [{ x: number; y: number; z: number; name?: string | [] }],
     hands: handPoseDetection.Hand[],
   ) => {
     if (
@@ -256,18 +256,24 @@ export function VirtualTryOnScene({
               drawHeight,
             );
 
-            const normalizedHandLandmarks = normalizeLandmarks(
-              hands[0].keypoints,
-              video.videoWidth,
-              video.videoHeight,
-              drawWidth,
-              drawHeight,
-            );
-            for (let i = 0; i < normalizedHandLandmarks.length; i++) {
-              normalizedHandLandmarks[i].z = hands[0].keypoints3D[i].z || 0;
+            if (hands.length > 0) {
+              const normalizedHandLandmarks = normalizeLandmarks(
+                hands[0].keypoints,
+                video.videoWidth,
+                video.videoHeight,
+                drawWidth,
+                drawHeight,
+              );
+
+              for (let i = 0; i < normalizedHandLandmarks.length; i++) {
+                normalizedHandLandmarks[i].z = hands[0].keypoints3D[i].z || 0;
+              }
+              handLandmarksRef.current = normalizedHandLandmarks;
+            } else {
+              handLandmarksRef.current = [];
             }
+
             landmarksRef.current = normalizedFaceLandmarks;
-            handLandmarksRef.current = normalizedHandLandmarks;
           } catch (err) {
             console.error("Detection error:", err);
             setError(err as Error);
@@ -349,8 +355,8 @@ export function VirtualTryOnScene({
 
   // Video Detection Function
   const processVideo = async (
-    faces: [{ x: number; y: number; z: number; name?: string | null }],
-    hands: [{ x: number; y: number; z: number; name?: string | null }],
+    faces: [{ x: number; y: number; z: number; name?: string | [] }],
+    hands: [{ x: number; y: number; z: number; name?: string | [] }],
   ) => {
     if (videoUploadRef.current && videoUploadRef.current.readyState === 4) {
       const video = videoUploadRef.current;
@@ -451,6 +457,7 @@ export function VirtualTryOnScene({
         const faces = await faceNet.estimateFaces(inputTensor, {
           flipHorizontal: false,
         });
+
         const hands = await handNet.estimateHands(media, {
           flipHorizontal: false,
         });
@@ -464,7 +471,7 @@ export function VirtualTryOnScene({
             processLiveStream(faces[0]?.keypoints || [], hands || []);
           }
           if (mode === "IMAGE") {
-            processImage(faces[0]?.keypoints || [], hands|| []);
+            processImage(faces[0]?.keypoints || [], hands || []);
           }
           if (mode === "VIDEO") {
             processVideo(faces[0]?.keypoints || [], hands || []);

@@ -69,39 +69,45 @@ const NailIndexInner: React.FC<NailIndexProps> = React.memo(
 
     useFrame(() => {
       if (!handLandmarks.current || !nailsRef.current) return;
-      const middleFingerMCP = handLandmarks.current[9];
-      const nailsFingerMCP = handLandmarks.current[13];
-      const nailsFingerDIP = handLandmarks.current[8];
+      if (handLandmarks.current.length > 0) {
+        nailsRef.current.visible = true;
 
-      const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
+        const middleFingerMCP = handLandmarks.current[9];
+        const nailsFingerMCP = handLandmarks.current[13];
+        const nailsFingerDIP = handLandmarks.current[8];
 
-      // Scale coordinates proportionally with the viewport
-      const nailsFingerX = (1 - nailsFingerDIP.x - 0.5) * outputWidth;
-      const nailsFingerY = -(nailsFingerDIP.y - 0.5) * outputHeight;
-      const nailsFingerZ = -nailsFingerDIP.z * 100;
+        const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
 
-      const scaleFactor = fingerSize * outputWidth / 2;
+        // Scale coordinates proportionally with the viewport
+        const nailsFingerX = (1 - nailsFingerDIP.x - 0.5) * outputWidth;
+        const nailsFingerY = -(nailsFingerDIP.y - 0.5) * outputHeight;
+        const nailsFingerZ = -nailsFingerDIP.z * 100;
 
-      nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
-      nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        const scaleFactor = (fingerSize * outputWidth) / 2;
 
-      const quaternion = handQuaternion(handLandmarks.current, 8, 12);
+        nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
+        nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      if (quaternion) {
-        nailsRef.current.setRotationFromQuaternion(quaternion);
-      }
+        const quaternion = handQuaternion(handLandmarks.current, 8, 12);
 
-      // Update nail color dynamically during the frame
-      if (nailsRef.current) {
-        nailsRef.current.traverse((child) => {
-          if ((child as Mesh).isMesh) {
-            const mesh = child as Mesh;
-            if (mesh.material instanceof MeshStandardMaterial) {
-              mesh.material.color.set(nailsColor); // Dynamically update color
-              mesh.material.needsUpdate = true;
+        if (quaternion) {
+          nailsRef.current.setRotationFromQuaternion(quaternion);
+        }
+
+        // Update nail color dynamically during the frame
+        if (nailsRef.current) {
+          nailsRef.current.traverse((child) => {
+            if ((child as Mesh).isMesh) {
+              const mesh = child as Mesh;
+              if (mesh.material instanceof MeshStandardMaterial) {
+                mesh.material.color.set(nailsColor); // Dynamically update color
+                mesh.material.needsUpdate = true;
+              }
             }
-          }
-        });
+          });
+        }
+      } else {
+        nailsRef.current.visible = false;
       }
     });
 

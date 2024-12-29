@@ -20,13 +20,6 @@ const HandOccluderInner: React.FC<HandOccluderProps> = React.memo(
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
 
-    const { scaleMultiplier } = useMemo(() => {
-      if (viewport.width > 1200) {
-        return { scaleMultiplier: 800 };
-      }
-      return { scaleMultiplier: 220 };
-    }, [viewport.width]);
-
     useEffect(() => {
       const loader = new GLTFLoader();
       loader.load(
@@ -37,9 +30,9 @@ const HandOccluderInner: React.FC<HandOccluderProps> = React.memo(
             if ((child as Mesh).isMesh) {
               const mesh = child as Mesh;
               mesh.material = new MeshBasicMaterial({
-                // color: "#FFFF",
-                colorWrite: false,
+                depthTest: true,
                 depthWrite: true,
+                colorWrite: false, // Ubah ini jika sudah yakin occluder muncul
               });
               mesh.renderOrder = 2;
             }
@@ -67,29 +60,34 @@ const HandOccluderInner: React.FC<HandOccluderProps> = React.memo(
 
     useFrame(() => {
       if (!handLandmarks.current || !occluderRef.current) return;
-      const wrist = handLandmarks.current[0];
-      const thumbBase = handLandmarks.current[1];
+      if (handLandmarks.current.length > 0) {
+        occluderRef.current.visible = true;
+        const wrist = handLandmarks.current[0];
+        const thumbBase = handLandmarks.current[1];
 
-      const wristSize = calculateDistance(wrist, thumbBase);
+        const wristSize = calculateDistance(wrist, thumbBase);
 
-      // Scale coordinates proportionally with the viewport
-      const scaleX = viewport.width / outputWidth;
-      const scaleY = viewport.height / outputHeight;
+        // Scale coordinates proportionally with the viewport
+        const scaleX = viewport.width / outputWidth;
+        const scaleY = viewport.height / outputHeight;
 
-      const wristX = (1 - wrist.x) * outputWidth * scaleX - viewport.width / 2;
-      const wristY = -wrist.y * outputHeight * scaleY + viewport.height / 2;
-      const wristZ = -wrist.z * 100;
+        const wristX =
+          (1 - wrist.x) * outputWidth * scaleX - viewport.width / 2;
+        const wristY = -wrist.y * outputHeight * scaleY + viewport.height / 2;
+        const wristZ = -wrist.z * 100;
 
-      const scaleFactor =
-        wristSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+        const scaleFactor = (wristSize * outputWidth) / 4;
 
-      occluderRef.current.position.set(wristX, wristY, wristZ);
-      occluderRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        occluderRef.current.position.set(wristX, wristY, wristZ);
+        occluderRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      const quaternion = handQuaternion(handLandmarks.current);
+        const quaternion = handQuaternion(handLandmarks.current);
 
-      if (quaternion) {
-        occluderRef.current.setRotationFromQuaternion(quaternion);
+        if (quaternion) {
+          occluderRef.current.setRotationFromQuaternion(quaternion);
+        }
+      } else {
+        occluderRef.current.visible = false;
       }
     });
 

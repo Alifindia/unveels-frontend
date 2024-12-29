@@ -46,6 +46,7 @@ import NailMidlle from "../three/accesories/nails/nail-middle";
 import NailIndex from "../three/accesories/nails/nail-index";
 import NailRing from "../three/accesories/nails/nail-ring";
 import NailPinky from "../three/accesories/nails/nail-pinky";
+import FingerOccluder from "../three/accesories/finger-occluder";
 
 interface VirtualTryOnThreeSceneProps extends MeshProps {
   videoRef: React.RefObject<Webcam | HTMLVideoElement | HTMLImageElement>;
@@ -396,15 +397,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
                   isFlipped={isFlipped}
                 />
               )}
-            </>
-          )}
 
-          {/* <HeadOccluder planeSize={planeSize} landmarks={landmarks} />
-          <NeckOccluder planeSize={planeSize} landmarks={landmarks} />
-          <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} /> */}
-
-          {handlandmarks.current && handlandmarks.current.length > 0 && (
-            <>
               {showHat && <Hat planeSize={planeSize} landmarks={landmarks} />}
 
               {showGlasess && (
@@ -422,41 +415,50 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
               {showNecklace && (
                 <Necklace planeSize={planeSize} landmarks={landmarks} />
               )}
-
-              {showWatch && (
-                <Watch planeSize={planeSize} handLandmarks={handlandmarks} />
-              )}
-
-              {showRing && (
-                <Ring planeSize={planeSize} handLandmarks={handlandmarks} />
-              )}
-
-              {showNails && (
-                <>
-                  <NailThumb
-                    planeSize={planeSize}
-                    handLandmarks={handlandmarks}
-                  />
-                  <NailMidlle
-                    planeSize={planeSize}
-                    handLandmarks={handlandmarks}
-                  />
-                  <NailIndex
-                    planeSize={planeSize}
-                    handLandmarks={handlandmarks}
-                  />
-                  <NailRing
-                    planeSize={planeSize}
-                    handLandmarks={handlandmarks}
-                  />
-                  <NailPinky
-                    planeSize={planeSize}
-                    handLandmarks={handlandmarks}
-                  />
-                </>
-              )}
             </>
           )}
+
+          {/* <HeadOccluder planeSize={planeSize} landmarks={landmarks} />
+          <NeckOccluder planeSize={planeSize} landmarks={landmarks} />
+          <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} /> */}
+
+          <>
+            <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} />
+            <FingerOccluder
+              planeSize={planeSize}
+              handLandmarks={handlandmarks}
+            />
+
+            {showWatch && (
+              <Watch planeSize={planeSize} handLandmarks={handlandmarks} />
+            )}
+
+            {showRing && (
+              <Ring planeSize={planeSize} handLandmarks={handlandmarks} />
+            )}
+
+            {showNails && (
+              <>
+                <NailThumb
+                  planeSize={planeSize}
+                  handLandmarks={handlandmarks}
+                />
+                <NailMidlle
+                  planeSize={planeSize}
+                  handLandmarks={handlandmarks}
+                />
+                <NailIndex
+                  planeSize={planeSize}
+                  handLandmarks={handlandmarks}
+                />
+                <NailRing planeSize={planeSize} handLandmarks={handlandmarks} />
+                <NailPinky
+                  planeSize={planeSize}
+                  handLandmarks={handlandmarks}
+                />
+              </>
+            )}
+          </>
         </>
       )}
     </>

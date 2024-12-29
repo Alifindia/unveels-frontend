@@ -28,13 +28,6 @@ const WatchInner: React.FC<WatchProps> = React.memo(
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
 
-    const { scaleMultiplier } = useMemo(() => {
-      if (viewport.width > 1200) {
-        return { scaleMultiplier: 800 };
-      }
-      return { scaleMultiplier: 250 };
-    }, [viewport.width]);
-
     useEffect(() => {
       const loader = new GLTFLoader();
       loader.load(
@@ -71,23 +64,28 @@ const WatchInner: React.FC<WatchProps> = React.memo(
 
     useFrame(() => {
       if (!handLandmarks.current || !watchRef.current) return;
-      const wrist = handLandmarks.current[0];
-      const thumbBase = handLandmarks.current[1];
+      if (handLandmarks.current.length > 0) {
+        watchRef.current.visible = true;
+        const wrist = handLandmarks.current[0];
+        const thumbBase = handLandmarks.current[1];
 
-      const wristSize = calculateDistance(wrist, thumbBase);
-      const wristX = (1 - wrist.x - 0.5) * outputWidth;
-      const wristY = -(wrist.y - 0.5) * outputHeight;
-      const wristZ = -wrist.z * 100;
+        const wristSize = calculateDistance(wrist, thumbBase);
+        const wristX = (1 - wrist.x - 0.5) * outputWidth;
+        const wristY = -(wrist.y - 0.5) * outputHeight;
+        const wristZ = -wrist.z * 100;
 
-      const scaleFactor = wristSize * outputWidth / 3;
+        const scaleFactor = (wristSize * outputWidth) / 3;
 
-      watchRef.current.position.set(wristX, wristY, wristZ);
-      watchRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        watchRef.current.position.set(wristX, wristY, wristZ);
+        watchRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      const quaternion = handQuaternion(handLandmarks.current);
+        const quaternion = handQuaternion(handLandmarks.current);
 
-      if (quaternion) {
-        watchRef.current.setRotationFromQuaternion(quaternion);
+        if (quaternion) {
+          watchRef.current.setRotationFromQuaternion(quaternion);
+        }
+      } else {
+        watchRef.current.visible = false;
       }
     });
 
