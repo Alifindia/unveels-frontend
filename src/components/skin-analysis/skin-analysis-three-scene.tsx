@@ -95,7 +95,7 @@ const SkinAnalysisThreeScene: React.FC<SkinAnalysisThreeSceneProps> = ({
   return (
     <>
       {texture && (
-        <mesh position={[0, 0, -10]} scale={[1, 1, 1]} {...props}>
+        <mesh position={[0, 0, -10]} scale={[-1, 1, 1]} {...props}>
           <planeGeometry args={[planeSize[0], planeSize[1]]} />
           <meshBasicMaterial map={texture} side={DoubleSide} />
         </mesh>
