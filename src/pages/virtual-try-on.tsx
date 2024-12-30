@@ -224,7 +224,7 @@ function Main() {
             <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
             <div className="pointer-events-none absolute inset-0"></div>
           </div>
-          <TopNavigation item={false} cart={false} />
+          <TopNavigation cart={false} />
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
             <Sidebar
@@ -233,7 +233,7 @@ function Main() {
               setMode={setMode}
               setShowChangeModel={setShowChangeModel}
             />
-            <div className="bg-black/10 p-0 shadow-lg backdrop-blur-sm">
+            <div className="bg-black/10 pt-1 shadow-lg backdrop-blur-sm">
               {isMainContentVisible && <MainContent />}
               <Footer />
             </div>
@@ -564,54 +564,50 @@ function BottomContent() {
   return <Outlet />;
 }
 
-export function TopNavigation({
-  item = false,
-  cart = false,
-}: {
-  item?: boolean;
-  cart?: boolean;
-}) {
+export function TopNavigation({ cart = false }: { cart?: boolean }) {
   const { flipCamera } = useCamera();
+  const [backClickCount, setBackClickCount] = useState(0);
+
+  const handleBackClick = () => {
+    if (process.env.NODE_ENV === "production") {
+      if (backClickCount === 0) {
+        setBackClickCount(1);
+        window.location.href = "/virtual-try-on/makeups";
+      } else {
+        window.location.href = "https://unveels.com/technologies";
+      }
+    } else {
+      window.location.href = "/virtual-try-on/makeups";
+    }
+  };
+
+  const handleCloseClick = () => {
+    if (process.env.NODE_ENV === "production") {
+      window.location.href = "https://unveels.com/technologies";
+    } else {
+      window.location.href = "/";
+    }
+  };
+
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
       <div className="flex flex-col gap-3">
-        <Link
+        <button
           className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          to="/virtual-try-on/makeups"
+          onClick={handleBackClick}
         >
           <ChevronLeft className="size-4 text-white" />
-        </Link>
-
-        {item ? (
-          <div className="space-y-1 pt-8">
-            <div className="flex gap-x-3">
-              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Heart className="size-4 text-white" />
-              </button>
-              <div>
-                <p className="text-sm font-semibold text-white">
-                  Pro Filt’r Soft Matte Longwear Liquid Found
-                </p>
-                <p className="text-xs text-white/60">Brand Name</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-x-3">
-              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Plus className="size-4 text-white" />
-              </button>
-              <p className="text-sm font-medium text-white">$52.00</p>
-            </div>
-          </div>
-        ) : null}
+        </button>
       </div>
+
       <div className="flex flex-col gap-3">
-        <Link
+        <button
           type="button"
           className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          to="/"
+          onClick={handleCloseClick}
         >
           <X className="size-4 text-white" />
-        </Link>
+        </button>
       </div>
     </div>
   );

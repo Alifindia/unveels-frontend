@@ -207,7 +207,7 @@ function Main() {
             <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
             <div className="pointer-events-none absolute inset-0"></div>
           </div>
-          <TopNavigation item={false} cart={false} />
+          <TopNavigation cart={false} />
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
             <Sidebar
@@ -216,7 +216,7 @@ function Main() {
               setMode={setMode}
               setShowChangeModel={setShowChangeModel}
             />
-            <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
+            <div className="bg-black/10 pt-1 shadow-lg backdrop-blur-sm">
               {isMainContentVisible && <MainContent />}
               <Footer />
             </div>
@@ -323,7 +323,7 @@ export function Makeups() {
             >
               <div
                 className={clsx(
-                  "text-dm relative flex w-12 shrink-0 items-center justify-center rounded-3xl border border-transparent py-2 text-center text-xs text-white transition-all",
+                  "text-dm relative flex w-10 shrink-0 items-center justify-center rounded-3xl border border-transparent py-1 text-center text-xs text-white transition-all",
                   {
                     "bg-gradient-to-r from-[#CA9C43] via-[#916E2B] to-[#473209]":
                       selectedMakeup === option.name,
@@ -331,7 +331,7 @@ export function Makeups() {
                 )}
               >
                 {cloneElement(option.icon, {
-                  className: "text-white size-6",
+                  className: "text-white size-5",
                 })}
 
                 <div
@@ -347,7 +347,7 @@ export function Makeups() {
                   }
                 />
               </div>
-              <div className="text-center text-sm !leading-4 text-white lg:text-lg">
+              <div className="text-center text-[10px] !leading-4 text-white lg:text-sm">
                 {option.name}
               </div>
             </button>
@@ -374,54 +374,50 @@ function BottomContent() {
   return <Outlet />;
 }
 
-export function TopNavigation({
-  item = false,
-  cart = false,
-}: {
-  item?: boolean;
-  cart?: boolean;
-}) {
+export function TopNavigation({ cart = false }: { cart?: boolean }) {
   const { flipCamera } = useCamera();
-  return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
-      <div className="flex flex-col gap-4">
-        <Link
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          to="/virtual-try-on/makeups"
-        >
-          <ChevronLeft className="size-6 text-white" />
-        </Link>
+  const [backClickCount, setBackClickCount] = useState(0);
 
-        {item ? (
-          <div className="space-y-2 pt-10">
-            <div className="flex gap-x-4">
-              <button className="flex size-8 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Heart className="size-5 text-white" />
-              </button>
-              <div>
-                <p className="font-semibold leading-4 text-white">
-                  Pro Filt’r Soft Matte Longwear Liquid Found
-                </p>
-                <p className="text-white/60">Brand Name</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-x-4">
-              <button className="flex size-8 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Plus className="size-5 text-white" />
-              </button>
-              <p className="font-medium text-white">$52.00</p>
-            </div>
-          </div>
-        ) : null}
-      </div>
-      <div className="flex flex-col gap-4">
-        <Link
-          type="button"
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          to="/"
+  const handleBackClick = () => {
+    if (process.env.NODE_ENV === "production") {
+      if (backClickCount === 0) {
+        setBackClickCount(1);
+        window.location.href = "/virtual-try-on/makeups";
+      } else {
+        window.location.href = "https://unveels.com/technologies";
+      }
+    } else {
+      window.location.href = "/virtual-try-on/makeups";
+    }
+  };
+
+  const handleCloseClick = () => {
+    if (process.env.NODE_ENV === "production") {
+      window.location.href = "https://unveels.com/technologies";
+    } else {
+      window.location.href = "/";
+    }
+  };
+
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <div className="flex flex-col gap-3">
+        <button
+          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          onClick={handleBackClick}
         >
-          <X className="size-6 text-white" />
-        </Link>
+          <ChevronLeft className="size-4 text-white" />
+        </button>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <button
+          type="button"
+          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          onClick={handleCloseClick}
+        >
+          <X className="size-4 text-white" />
+        </button>
       </div>
     </div>
   );

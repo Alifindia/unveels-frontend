@@ -15,12 +15,17 @@ export function TopNavigation({
   const { flipCamera } = useCamera();
   const { summaryCount } = useCartContext();
 
+  const isDevelopment = process.env.NODE_ENV === "development";
+
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
       <div className="flex flex-col gap-4">
-        <button className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl">
+        <a
+          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          href="https://unveels.com/technologies"
+        >
           <ChevronLeft className="size-6 text-white" />
-        </button>
+        </a>
 
         {item ? (
           <div className="space-y-2 pt-10">
@@ -46,26 +51,34 @@ export function TopNavigation({
       </div>
 
       <div className="flex flex-col gap-4">
-        <Link
-          type="button"
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          to="/"
-        >
-          <X className="size-6 text-white" />
-        </Link>
+        {isDevelopment ? (
+          <Link
+            type="button"
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+            to="/"
+          >
+            <X className="size-6 text-white" />
+          </Link>
+        ) : (
+          <a
+            type="button"
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+            href="https://unveels.com/technologies"
+          >
+            <X className="size-6 text-white" />
+          </a>
+        )}
 
         <div className="relative -m-0.5 p-0.5">
           <div
             className="absolute inset-0 rounded-full border-2 border-transparent"
-            style={
-              {
-                background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
-                "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-                mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-                "-webkit-mask-composite": "destination-out",
-                "mask-composite": "exclude",
-              } as CSSProperties
-            }
+            style={{
+              background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
+              WebkitMask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+              mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+              WebkitMaskComposite: "destination-out",
+              maskComposite: "exclude",
+            }}
           />
           <button
             type="button"
