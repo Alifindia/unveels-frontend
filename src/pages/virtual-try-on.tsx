@@ -233,7 +233,7 @@ function Main() {
               setMode={setMode}
               setShowChangeModel={setShowChangeModel}
             />
-            <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
+            <div className="bg-black/10 p-2 shadow-lg backdrop-blur-sm">
               {isMainContentVisible && <MainContent />}
               <Footer />
             </div>
@@ -313,7 +313,7 @@ export function TryOnSelector() {
             <Fragment key={shadeTab}>
               <button
                 key={shadeTab}
-                className={`relative h-10 grow border-b font-luxury text-[12.6px] sm:text-lg lg:text-2xl ${
+                className={`relative h-10 grow border-b font-luxury text-[10px] sm:text-[12px] lg:text-[14px] ${
                   isActive
                     ? activeClassNames
                     : "border-transparent text-gray-500"
@@ -332,16 +332,16 @@ export function TryOnSelector() {
                   <>
                     <div
                       className={clsx(
-                        "absolute inset-0 flex items-center justify-center text-[12.6px] blur-sm sm:text-lg lg:text-2xl",
+                        "absolute inset-0 flex items-center justify-center text-[10px] blur-sm sm:text-[12px] lg:text-[14px]",
                         activeClassNames,
                       )}
                     >
-                      <span className="text-center text-[12.6px] capitalize sm:text-lg lg:text-2xl">
+                      <span className="text-center text-[10px] capitalize sm:text-[12px] lg:text-[14px]">
                         {t("vto." + shadeTab)}
                       </span>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-center text-[12.6px] capitalize text-white/70 sm:text-lg lg:text-2xl">
+                      <span className="text-center text-[10px] capitalize text-white/70 sm:text-[12px] lg:text-[14px]">
                         {t("vto." + shadeTab)}
                       </span>
                     </div>
@@ -418,7 +418,7 @@ export function Makeups() {
             >
               <div
                 className={clsx(
-                  "text-dm relative flex w-12 shrink-0 items-center justify-center rounded-3xl border border-transparent py-2 text-center text-xs text-white transition-all",
+                  "text-dm relative flex w-10 shrink-0 items-center justify-center rounded-3xl border border-transparent py-1 text-center text-xs text-white transition-all",
                   {
                     "bg-gradient-to-r from-[#CA9C43] via-[#916E2B] to-[#473209]":
                       selectedMakeup === option.name,
@@ -426,7 +426,7 @@ export function Makeups() {
                 )}
               >
                 {cloneElement(option.icon, {
-                  className: "text-white size-6",
+                  className: "text-white size-5", // Reduce icon size here
                 })}
 
                 <div
@@ -442,8 +442,8 @@ export function Makeups() {
                   }
                 />
               </div>
-              <div className="text-center text-sm !leading-4 text-white lg:text-lg">
-                {t("vto." + option.name)}
+              <div className="text-center text-[10px] !leading-4 text-white lg:text-sm">
+                {t("vto." + option.name)} {/* Reduce text size here */}
               </div>
             </button>
           ))}
@@ -515,7 +515,7 @@ export function Accessories() {
             >
               <div
                 className={clsx(
-                  "relative flex h-[34px] w-[42px] shrink-0 items-center justify-center rounded-3xl border border-transparent py-2 text-center text-xs text-white transition-all sm:h-[44.2px] sm:w-[54.6px]",
+                  "relative flex h-[30px] w-[36px] shrink-0 items-center justify-center rounded-3xl border border-transparent py-1 text-center text-xs text-white transition-all sm:h-[38px] sm:w-[46px]",
                   {
                     "bg-gradient-to-r from-[#CA9C43] via-[#916E2B] to-[#473209]":
                       selectedAccessory === option.name,
@@ -523,7 +523,7 @@ export function Accessories() {
                 )}
               >
                 {cloneElement(option.icon, {
-                  className: "text-white size-6",
+                  className: "text-white size-5", // Reduce icon size here
                 })}
 
                 <div
@@ -539,8 +539,8 @@ export function Accessories() {
                   }
                 />
               </div>
-              <div className="text-center text-[9.8px] !leading-4 text-white sm:text-sm lg:text-lg">
-                {t("vto." + option.name)}
+              <div className="text-center text-[10px] !leading-4 text-white sm:text-xs lg:text-sm">
+                {t("vto." + option.name)} {/* Reduce text size here */}
               </div>
             </button>
           ))}
