@@ -20,13 +20,6 @@ const HeadOccluderInner: React.FC<HeadOccluderProps> = React.memo(
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
 
-    const { scaleMultiplier } = useMemo(() => {
-      if (viewport.width > 1200) {
-        return { scaleMultiplier: 300 };
-      }
-      return { scaleMultiplier: 90 };
-    }, [viewport.width]);
-
     useEffect(() => {
       const loader = new GLTFLoader();
       loader.load(
@@ -66,35 +59,32 @@ const HeadOccluderInner: React.FC<HeadOccluderProps> = React.memo(
 
     useFrame(() => {
       if (!landmarks.current || !occluderRef.current) return;
+      if (landmarks.current.length > 0) {
+        occluderRef.current.visible = true;
+        const centerHead = landmarks.current[1];
 
-      const centerHead = landmarks.current[1];
+        const centerHeadX = (1 - centerHead.x - 0.5) * outputWidth;
+        const centerHeadY = -(centerHead.y - 0.5) * outputHeight;
+        const centerHeadZ = -centerHead.z * 100;
 
-      // Scale coordinates proportionally with the viewport
-      const scaleX = viewport.width / outputWidth;
-      const scaleY = viewport.height / outputHeight;
+        const faceSize = calculateDistance(
+          landmarks.current[162],
+          landmarks.current[389],
+        );
 
-      const centerHeadX =
-        (1 - centerHead.x) * outputWidth * scaleX - viewport.width / 2;
-      const centerHeadY =
-        -centerHead.y * outputHeight * scaleY + viewport.height / 2;
-      const centerHeadZ = -centerHead.z * 100;
-
-      const faceSize = calculateDistance(
-        landmarks.current[162],
-        landmarks.current[389],
-      );
-
-      const scaleFactor = faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
-
-      if (centerHead) {
         occluderRef.current.position.set(centerHeadX, centerHeadY, centerHeadZ);
+
+        const scaleFactor = (faceSize * outputWidth) / 14;
+
         occluderRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      }
 
-      const quaternion = calculateFaceOrientation(landmarks.current);
+        const quaternion = calculateFaceOrientation(landmarks.current);
 
-      if (quaternion) {
-        occluderRef.current.setRotationFromQuaternion(quaternion);
+        if (quaternion) {
+          occluderRef.current.setRotationFromQuaternion(quaternion);
+        }
+      } else {
+        occluderRef.current.visible = false;
       }
     });
 

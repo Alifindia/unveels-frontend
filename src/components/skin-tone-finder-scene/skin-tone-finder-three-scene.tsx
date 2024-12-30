@@ -6,6 +6,7 @@ import Foundation from "../three/makeup/foundation";
 import { LinearFilter, RGBFormat } from "three";
 import { useCamera } from "../../context/recorder-context";
 import { useMakeup } from "../../context/makeup-context";
+import FoundationSTF from "../three/makeup/foundation-stf";
 
 interface SkinToneFinderThreeSceneProps extends MeshProps {
   imageSrc: string;
@@ -103,7 +104,7 @@ const SkinToneFinderThreeScene: React.FC<SkinToneFinderThreeSceneProps> = ({
       </mesh>
 
       {foundationColor != "" && (
-        <Foundation
+        <FoundationSTF
           planeSize={planeSize}
           landmarks={landmarks}
           isFlipped={true}

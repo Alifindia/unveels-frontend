@@ -1,11 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import Webcam from "react-webcam";
-import {
-  FaceLandmarker,
-  FilesetResolver,
-  HandLandmarker,
-  ImageSegmenter,
-} from "@mediapipe/tasks-vision";
+import { FilesetResolver, ImageSegmenter } from "@mediapipe/tasks-vision";
 import { useCamera } from "../../context/recorder-context";
 import {
   VIDEO_WIDTH,
@@ -170,38 +165,12 @@ export function VirtualTryOnScene({
 
   const legendColors = [[225, 194, 150, 255]];
 
-  const {
-    showFoundation,
-    showBlush,
-    showConcealer,
-    showHighlighter,
-    showContour,
-    showLipliner,
-    showLipplumper,
-    showLipColor,
-    showBronzer,
-    showLens,
-    showEyebrows,
-    showHair,
-    showEyeShadow,
-    showEyeliner,
-    showNails,
-  } = useMakeup();
-
-  const {
-    showHat,
-    showGlasess,
-    showHeadband,
-    showEarring,
-    showNecklace,
-    showWatch,
-    showBracelet,
-    showRing,
-  } = useAccesories();
+  const { showHair } = useMakeup();
 
   useEffect(() => {
     // tf.enableDebugMode();
-  }, []);
+    console.log(showHair);
+  }, [showHair]);
 
   useEffect(() => {
     let isMounted = true;
@@ -330,18 +299,19 @@ export function VirtualTryOnScene({
           const startTimeMs = performance.now();
 
           try {
-            const normalizedFaceLandmarks = normalizeLandmarks(
-              faces,
-              video.videoWidth,
-              video.videoHeight,
-              drawWidth,
-              drawHeight,
-            );
+            if (faces.length > 0) {
+              const normalizedFaceLandmarks = normalizeLandmarks(
+                faces,
+                video.videoWidth,
+                video.videoHeight,
+                drawWidth,
+                drawHeight,
+              );
 
-            const hairResults = hairSegmenterRef.current.segmentForVideo(
-              video,
-              startTimeMs,
-            );
+              landmarksRef.current = normalizedFaceLandmarks;
+            } else {
+              landmarksRef.current = [];
+            }
 
             if (hands.length > 0) {
               const normalizedHandLandmarks = normalizeLandmarks(
@@ -360,14 +330,11 @@ export function VirtualTryOnScene({
               handLandmarksRef.current = [];
             }
 
-            if (hairResults?.categoryMask) {
-              hairRef.current = hairResults.categoryMask.getAsFloat32Array();
-              let imageData = ctx.getImageData(
-                0,
-                0,
-                video.videoWidth,
-                video.videoHeight,
-              ).data;
+            if (showHair) {
+              const hairResults = hairSegmenterRef.current.segmentForVideo(
+                video,
+                startTimeMs,
+              );
 
               if (hairResults?.categoryMask) {
                 hairRef.current = hairResults.categoryMask.getAsFloat32Array();
@@ -378,34 +345,46 @@ export function VirtualTryOnScene({
                   video.videoHeight,
                 ).data;
 
-                let j = 0;
-                for (let i = 0; i < hairRef.current.length; ++i) {
-                  const maskVal = Math.round(hairRef.current[i] * 255.0);
+                if (hairResults?.categoryMask) {
+                  hairRef.current =
+                    hairResults.categoryMask.getAsFloat32Array();
+                  let imageData = ctx.getImageData(
+                    0,
+                    0,
+                    video.videoWidth,
+                    video.videoHeight,
+                  ).data;
 
-                  // Proses hanya untuk label index 1
-                  if (maskVal === 1) {
-                    const legendColor =
-                      legendColors[maskVal % legendColors.length];
-                    imageData[j] = (legendColor[0] + imageData[j]) / 2;
-                    imageData[j + 1] = (legendColor[1] + imageData[j + 1]) / 2;
-                    imageData[j + 2] = (legendColor[2] + imageData[j + 2]) / 2;
-                    imageData[j + 3] = (legendColor[3] + imageData[j + 3]) / 2;
+                  let j = 0;
+                  for (let i = 0; i < hairRef.current.length; ++i) {
+                    const maskVal = Math.round(hairRef.current[i] * 255.0);
+
+                    // Proses hanya untuk label index 1
+                    if (maskVal === 1) {
+                      const legendColor =
+                        legendColors[maskVal % legendColors.length];
+                      imageData[j] = (legendColor[0] + imageData[j]) / 2;
+                      imageData[j + 1] =
+                        (legendColor[1] + imageData[j + 1]) / 2;
+                      imageData[j + 2] =
+                        (legendColor[2] + imageData[j + 2]) / 2;
+                      imageData[j + 3] =
+                        (legendColor[3] + imageData[j + 3]) / 2;
+                    }
+                    j += 4;
                   }
-                  j += 4;
+
+                  const uint8Array = new Uint8ClampedArray(imageData.buffer);
+                  const dataNew = new ImageData(
+                    uint8Array,
+                    video.videoWidth,
+                    video.videoHeight,
+                  );
+
+                  hairMaskRef.current = dataNew;
                 }
-
-                const uint8Array = new Uint8ClampedArray(imageData.buffer);
-                const dataNew = new ImageData(
-                  uint8Array,
-                  video.videoWidth,
-                  video.videoHeight,
-                );
-
-                hairMaskRef.current = dataNew;
               }
             }
-
-            landmarksRef.current = normalizedFaceLandmarks;
           } catch (err) {
             console.error("Detection error:", err);
             setError(err as Error);
@@ -594,20 +573,14 @@ export function VirtualTryOnScene({
           flipHorizontal: false,
         });
 
-        // Process if faces or hands are detected
-        if (
-          (faces.length > 0 && faces[0].keypoints.length > 0) ||
-          hands.length > 0
-        ) {
-          if (mode === "LIVE") {
-            processLiveStream(faces[0]?.keypoints || [], hands || []);
-          }
-          if (mode === "IMAGE") {
-            processImage(faces[0]?.keypoints || [], hands || []);
-          }
-          if (mode === "VIDEO") {
-            processVideo(faces[0]?.keypoints || [], hands || []);
-          }
+        if (mode === "LIVE") {
+          processLiveStream(faces[0]?.keypoints || [], hands || []);
+        }
+        if (mode === "IMAGE") {
+          processImage(faces[0]?.keypoints || [], hands || []);
+        }
+        if (mode === "VIDEO") {
+          processVideo(faces[0]?.keypoints || [], hands || []);
         }
 
         // Always call detect recursively to continue the video feed processing

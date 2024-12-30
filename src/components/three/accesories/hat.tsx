@@ -21,13 +21,6 @@ const HatInner: React.FC<Hatrops> = React.memo(({ landmarks, planeSize }) => {
   const outputWidth = planeSize[0];
   const outputHeight = planeSize[1];
 
-  const { scaleMultiplier, scaleYPosition } = useMemo(() => {
-    if (viewport.width > 1200) {
-      return { scaleMultiplier: 800, scaleYPosition: 5 };
-    }
-    return { scaleMultiplier: 200, scaleYPosition: 1.2 };
-  }, [viewport.width]);
-
   useEffect(() => {
     const loader = new GLTFLoader();
     loader.load(
@@ -65,33 +58,33 @@ const HatInner: React.FC<Hatrops> = React.memo(({ landmarks, planeSize }) => {
   useFrame(() => {
     if (!landmarks.current || !hatRef.current) return;
 
-    const topHead = landmarks.current[10];
+    if (landmarks.current.length > 0) {
+      hatRef.current.visible = true;
+      const topHead = landmarks.current[10];
 
-    // Scale coordinates proportionally with the viewport
-    const scaleX = viewport.width / outputWidth;
-    const scaleY = viewport.height / outputHeight;
+      const topHeadX = (1 - topHead.x - 0.5) * outputWidth;
+      const topHeadY = -(topHead.y - 0.5) * outputHeight;
+      const topHeadZ = -topHead.z * 100;
 
-    const topHeadX = (1 - topHead.x - 0.5) * outputWidth;
-    const topHeadY = -(topHead.y - 0.5) * outputHeight;
-    const topHeadZ = -topHead.z * 100;
+      const faceSize = calculateDistance(
+        landmarks.current[162],
+        landmarks.current[389],
+      );
 
-    const faceSize = calculateDistance(
-      landmarks.current[162],
-      landmarks.current[389],
-    );
+      // Set position and scale
+      hatRef.current.position.set(topHeadX, topHeadY, topHeadZ);
 
-    // Set position and scale
-    hatRef.current.position.set(topHeadX, topHeadY, topHeadZ);
+      const scaleFactor = (faceSize * outputWidth) / 5;
 
+      hatRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-    const scaleFactor = faceSize * outputWidth / 5;
-
-    hatRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-    const quaternion = calculateFaceOrientation(landmarks.current);
-    // Set the rotation of the hat object from the final quaternion
-    if (quaternion) {
-      hatRef.current.setRotationFromQuaternion(quaternion);
+      const quaternion = calculateFaceOrientation(landmarks.current);
+      // Set the rotation of the hat object from the final quaternion
+      if (quaternion) {
+        hatRef.current.setRotationFromQuaternion(quaternion);
+      }
+    } else {
+      hatRef.current.visible = false;
     }
   });
 

@@ -32,7 +32,7 @@ const HandOccluderInner: React.FC<HandOccluderProps> = React.memo(
               mesh.material = new MeshBasicMaterial({
                 depthTest: true,
                 depthWrite: true,
-                colorWrite: false, // Ubah ini jika sudah yakin occluder muncul
+                colorWrite: false, 
               });
               mesh.renderOrder = 2;
             }

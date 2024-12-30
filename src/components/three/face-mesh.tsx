@@ -83,33 +83,41 @@ const FaceMesh: React.FC<FaceMeshProps> = ({
   }, [geometry]);
 
   useFrame(() => {
-    if (
-      geometryRef.current &&
-      geometryRef.current.attributes.position &&
-      landmarks.current &&
-      landmarks.current.length > 0
-    ) {
-      const position = geometryRef.current.attributes
-        .position as Float32BufferAttribute;
+    if (!landmarks.current) return;
+    if (landmarks.current.length > 0) {
+      if (
+        geometryRef.current &&
+        geometryRef.current.attributes.position &&
+        landmarks.current &&
+        landmarks.current.length > 0
+      ) {
+        const position = geometryRef.current.attributes
+          .position as Float32BufferAttribute;
 
-      const outputWidth = planeSize[0];
-      const outputHeight = planeSize[1];
-      const modifiedLandmarks = applyStretchedLandmarks(landmarks.current);
-      const minCount = Math.min(modifiedLandmarks.length, position.count);
+        const outputWidth = planeSize[0];
+        const outputHeight = planeSize[1];
+        const modifiedLandmarks = applyStretchedLandmarks(landmarks.current);
+        const minCount = Math.min(modifiedLandmarks.length, position.count);
 
-      for (let i = 0; i < minCount; i++) {
-        const landmark = modifiedLandmarks[i];
-        const x = (landmark.x - 0.5) * outputWidth;
-        const y = -(landmark.y - 0.5) * outputHeight;
-        const z = -landmark.z;
-        position.setXYZ(i, x, y, z);
+        for (let i = 0; i < minCount; i++) {
+          const landmark = modifiedLandmarks[i];
+          const x = (landmark.x - 0.5) * outputWidth;
+          const y = -(landmark.y - 0.5) * outputHeight;
+          const z = -landmark.z;
+          position.setXYZ(i, x, y, z);
+        }
+
+        position.needsUpdate = true;
       }
 
-      position.needsUpdate = true;
-    }
-
-    if (meshRef.current) {
-      meshRef.current.scale.set(flipHorizontal ? -1 : 1, 1, 1);
+      if (meshRef.current) {
+        meshRef.current.visible = true;
+        meshRef.current.scale.set(flipHorizontal ? -1 : 1, 1, 1);
+      }
+    } else {
+      if (meshRef.current) {
+        meshRef.current.visible = false;
+      }
     }
   });
 

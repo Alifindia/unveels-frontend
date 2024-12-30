@@ -21,13 +21,6 @@ const NecklaceInner: React.FC<NecklaceProps> = React.memo(
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
 
-    const { scaleMultiplier, neckDistanceY } = useMemo(() => {
-      if (viewport.width > 1200) {
-        return { scaleMultiplier: 300, neckDistanceY: 1000 };
-      }
-      return { scaleMultiplier: 60, neckDistanceY: 50 };
-    }, [viewport.width]);
-
     useEffect(() => {
       const loader = new GLTFLoader();
       loader.load(
@@ -67,35 +60,37 @@ const NecklaceInner: React.FC<NecklaceProps> = React.memo(
 
     useFrame(() => {
       if (!landmarks.current || !necklaceRef.current) return;
+      if (landmarks.current.length > 0) {
+        necklaceRef.current.visible = true;
+        const neckLandmark = landmarks.current[0];
 
-      const neckLandmark = landmarks.current[0];
+        const neckDistance =
+          calculateDistance(landmarks.current[197], landmarks.current[152]) *
+          outputWidth *
+          1.5;
 
-      const neckDistance =
-        calculateDistance(landmarks.current[197], landmarks.current[152]) * outputWidth * 1.5;
+        const neckLandmarkX = (1 - neckLandmark.x - 0.5) * outputWidth;
+        const neckLandmarkY = -(neckLandmark.y - 0.5) * outputHeight;
+        const neckLandmarkZ = -neckLandmark.z * 100;
 
-      // Scale coordinates proportionally with the viewport
-      const scaleX = viewport.width / outputWidth;
-      const scaleY = viewport.height / outputHeight;
-
-      const neckLandmarkX = (1 - neckLandmark.x - 0.5) * outputWidth;
-      const neckLandmarkY = -(neckLandmark.y - 0.5) * outputHeight;
-      const neckLandmarkZ = -neckLandmark.z * 100;
-
-      const faceSize = calculateDistance(
-        landmarks.current[162],
-        landmarks.current[389],
-      );
-
-      const scaleFactor = (faceSize * outputWidth) / 15;
-
-      if (neckLandmark) {
-        necklaceRef.current.position.set(
-          (neckLandmarkX / 6) * 2,
-          neckLandmarkY - neckDistance,
-          0,
+        const faceSize = calculateDistance(
+          landmarks.current[162],
+          landmarks.current[389],
         );
 
-        necklaceRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        const scaleFactor = (faceSize * outputWidth) / 15;
+
+        if (neckLandmark) {
+          necklaceRef.current.position.set(
+            (neckLandmarkX / 6) * 2,
+            neckLandmarkY - neckDistance,
+            0,
+          );
+
+          necklaceRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        }
+      } else {
+        necklaceRef.current.visible = false;
       }
     });
 

@@ -55,7 +55,7 @@ interface VirtualTryOnThreeSceneProps extends MeshProps {
   faceTransform: React.RefObject<number[]>;
   blendshape: React.RefObject<Blendshape[]>;
   sourceType: "LIVE" | "VIDEO" | "IMAGE";
-  hairMask: React.RefObject<ImageData>;
+  hairMask: React.RefObject<ImageData> | null;
 }
 
 const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
@@ -261,18 +261,20 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   }, [videoTexture]);
 
   useFrame(() => {
-    if (hairMask.current) {
-      const image = imageDataToImage(hairMask.current);
-      const loader = new TextureLoader();
+    if (hairMask) {
+      if (hairMask.current) {
+        const image = imageDataToImage(hairMask.current);
+        const loader = new TextureLoader();
 
-      loader.load(image.src, (texture) => {
-        if (!hairMaskTextureRef.current) {
-          hairMaskTextureRef.current = texture;
-        } else {
-          hairMaskTextureRef.current.image = texture.image;
-          hairMaskTextureRef.current.needsUpdate = true;
-        }
-      });
+        loader.load(image.src, (texture) => {
+          if (!hairMaskTextureRef.current) {
+            hairMaskTextureRef.current = texture;
+          } else {
+            hairMaskTextureRef.current.image = texture.image;
+            hairMaskTextureRef.current.needsUpdate = true;
+          }
+        });
+      }
     }
     if (filterRef.current && landmarks.current) {
       const uniforms = filterRef.current.uniforms;
@@ -346,131 +348,128 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
             />
           </mesh>
 
-          {landmarks.current && landmarks.current?.length > 0 && (
-            <>
-              {showFoundation && (
-                <Foundation
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+          <>
+            {showFoundation && (
+              <Foundation
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showBlush && (
-                <Blush
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+            {showBlush && (
+              <Blush
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showConcealer && (
-                <Concealer
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+            {showConcealer && (
+              <Concealer
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showHighlighter && (
-                <Highlighter
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+            {showHighlighter && (
+              <Highlighter
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showContour && (
-                <Contour
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+            {showContour && (
+              <Contour
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showLipliner && (
-                <Lipliner
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+            {showLipliner && (
+              <Lipliner
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showLipplumper && (
-                <Lipplumper
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+            {showLipplumper && (
+              <Lipplumper
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showLipColor && (
-                <LipColor
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+            {showLipColor && (
+              <LipColor
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showBronzer && (
-                <Bronzer
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+            {showBronzer && (
+              <Bronzer
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showLens && (
-                <ContactLens planeSize={planeSize} landmarks={landmarks} />
-              )}
+            {showLens && (
+              <ContactLens planeSize={planeSize} landmarks={landmarks} />
+            )}
 
-              {showEyebrows && (
-                <Eyebrows
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+            {showEyebrows && (
+              <Eyebrows
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showEyeShadow && (
-                <EyeShadow
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+            {showEyeShadow && (
+              <EyeShadow
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showEyeliner && (
-                <Eyeliner
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
+            {showEyeliner && (
+              <Eyeliner
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
 
-              {showHat && <Hat planeSize={planeSize} landmarks={landmarks} />}
+            {showHat && <Hat planeSize={planeSize} landmarks={landmarks} />}
 
-              {showGlasess && (
-                <Glasess planeSize={planeSize} landmarks={landmarks} />
-              )}
+            {showGlasess && (
+              <Glasess planeSize={planeSize} landmarks={landmarks} />
+            )}
 
-              {showHeadband && (
-                <Headband planeSize={planeSize} landmarks={landmarks} />
-              )}
+            {showHeadband && (
+              <Headband planeSize={planeSize} landmarks={landmarks} />
+            )}
 
-              {showEarring && (
-                <Earring planeSize={planeSize} landmarks={landmarks} />
-              )}
+            {showEarring && (
+              <Earring planeSize={planeSize} landmarks={landmarks} />
+            )}
 
-              {showNecklace && (
-                <Necklace planeSize={planeSize} landmarks={landmarks} />
-              )}
-            </>
-          )}
+            {showNecklace && (
+              <Necklace planeSize={planeSize} landmarks={landmarks} />
+            )}
 
-          {/* <HeadOccluder planeSize={planeSize} landmarks={landmarks} />
-          <NeckOccluder planeSize={planeSize} landmarks={landmarks} />
-          <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} /> */}
+            <HeadOccluder planeSize={planeSize} landmarks={landmarks} />
+            <NeckOccluder planeSize={planeSize} landmarks={landmarks} />
+          </>
 
           {showHair && (
             <>
