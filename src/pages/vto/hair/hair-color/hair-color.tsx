@@ -138,6 +138,8 @@ function ProductList() {
     setColorFamilyToInclude,
   } = useHairColorContext();
 
+  const { setShowHair } = useMakeup();
+
   const { data, isLoading } = useHairColorQuery({
     color: colorFamily,
     shape: null,
@@ -192,6 +194,7 @@ function ProductList() {
         .find((item) => item.attribute_code === "hexacode")
         ?.value.split(",")[0],
     );
+    setShowHair(true);
   };
 
   return (

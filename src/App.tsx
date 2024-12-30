@@ -254,7 +254,7 @@ function Home() {
       <LinkButton to="/virtual-try-on-accesories/accesories">
         Virtual Try On Accesories
       </LinkButton>
-      <LinkButton to="/virtual-try-on-product?sku=689304320030,716170201894,5910711100,3348901523615,3348901491228,716170144153,689304181594,716170020501,9126000000039,689304044066,689304181907,716170007861,716170273907">
+      <LinkButton to="/virtual-try-on-product?sku=31012490021,FA1258222">
         Virtual Try On Product
       </LinkButton>
       <LinkButton to="/virtual-assistant">Virtual Assistant</LinkButton>
@@ -291,19 +291,20 @@ function App() {
   return <RouterProvider router={router} />;
 }
 
-// Link button component
-function LinkButton({
-  to,
-  children,
-}: {
+interface LinkButtonProps {
   to: string;
   children: React.ReactNode;
-}) {
+  className?: string;
+}
+
+export function LinkButton({
+  to,
+  children,
+  className = "border border-black", // Default value for className
+}: LinkButtonProps) {
   return (
-    <Link to={to}>
-      <button type="button" className="border border-black">
-        {children}
-      </button>
+    <Link to={to} className={className}>
+      <button type="button">{children}</button>
     </Link>
   );
 }

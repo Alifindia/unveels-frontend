@@ -265,19 +265,11 @@ export function SingleVirtualTryOn() {
 
   return (
     <VTOProviders>
-      <SKUSelector
+      <Main
+        product={selectedSKU ?? data[0]}
         skus={data}
-        selected={selectedSKU?.sku || null}
-        onSelect={(selected) => {
-          const product = data.find((d) => d.sku === selected);
-
-          if (!product) {
-            return;
-          }
-          setSelectedSKU(product);
-        }}
+        setSelectedSKU={setSelectedSKU}
       />
-      <Main product={selectedSKU ?? data[0]} />
     </VTOProviders>
   );
 }
@@ -300,58 +292,15 @@ function VTOProviders({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SKUSelector({
+function Main({
+  product,
   skus,
-  selected,
-  onSelect,
+  setSelectedSKU,
 }: {
+  product: Product;
   skus: Product[];
-  selected: string | null;
-  onSelect: (selectedSKUs: string) => void;
+  setSelectedSKU: React.Dispatch<React.SetStateAction<Product | null>>;
 }) {
-  console.log("items : ", skus);
-
-  return (
-    <div className="pointer-events-none fixed inset-y-0 bottom-60 left-2 z-10 flex flex-col items-center justify-center [&_button]:pointer-events-auto">
-      <div
-        className="flex max-h-64 flex-col items-center justify-center gap-4 overflow-y-auto rounded-lg bg-black/25 p-4 backdrop-blur-3xl"
-        style={{
-          scrollbarWidth: "none" /* Firefox */,
-          msOverflowStyle: "none" /* IE and Edge */,
-        }}
-      >
-        <div className="flex flex-col items-center justify-center gap-4">
-          {skus.map((sku) => {
-            const imageUrl = mediaUrl(sku.media_gallery_entries[0].file);
-            return (
-              <button
-                key={sku.sku}
-                type="button"
-                onClick={() => {
-                  onSelect(sku.sku);
-                }}
-                className={clsx(
-                  "flex flex-col items-center justify-center gap-2 border-2 border-transparent p-1 transition-all",
-                  {
-                    "scale-125": sku.sku === selected,
-                  },
-                )}
-              >
-                <img
-                  src={imageUrl}
-                  alt={sku.name}
-                  className="size-16 rounded-lg object-cover"
-                />
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Main({ product }: { product: Product }) {
   const { criterias } = useCamera();
   const [isMainContentVisible, setMainContentVisible] = useState(true);
   const [mediaFile, setMediaFile] = useState<File | null>(null);
@@ -367,42 +316,58 @@ function Main({ product }: { product: Product }) {
       </div>
       <TopNavigation />
 
-      <div className="absolute inset-x-0 top-24 space-y-2.5 px-5">
+      <div className="absolute inset-x-0 top-24 space-y-2 px-4 sm:px-5">
         <div className="flex items-center">
           <button
             type="button"
-            className="flex size-[1.875rem] items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl"
+            className="flex size-[1.25rem] items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl sm:size-[1.5rem]"
           >
-            <HeartIcon className="size-4 text-white" />
+            <HeartIcon className="text-[0.75rem] text-white sm:text-[1rem]" />
           </button>
-          <div className="w-full pl-4">
-            <div className="font-semibold text-white">{product.name}</div>
-            <div className="text-white/60">
+          <div className="w-full pl-3 sm:pl-4">
+            <div className="text-[0.75rem] font-semibold text-white sm:text-xs md:text-sm">
+              {product.name}
+            </div>
+            <div className="text-[0.75rem] text-white/60 sm:text-xs md:text-sm">
               <BrandName brandId={getProductAttributes(product, "brand")} />
             </div>
           </div>
         </div>
+
         <div className="flex items-center">
           <button
             type="button"
-            className="flex size-[1.875rem] items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl"
+            className="flex size-[1.25rem] items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl sm:size-[1.5rem]"
           >
-            <PlusIcon className="size-4 text-white" />
+            <PlusIcon className="text-[0.75rem] text-white sm:text-[1rem]" />
           </button>
-          <div className="w-full pl-4">
-            <div className="font-medium text-white">${product.price}</div>
+          <div className="w-full pl-3 sm:pl-4">
+            <div className="text-[0.75rem] font-medium text-white sm:text-xs md:text-sm">
+              ${product.price}
+            </div>
           </div>
         </div>
       </div>
 
       <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-        <Sidebar
-          onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
-          setMediaFile={setMediaFile}
-          setMode={setMode}
-          setShowChangeModel={setShowChangeModel}
-        />{" "}
-        <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
+        <div className="flex w-full">
+          {/* SKUSelector Component */}
+          <SKUSelector
+            skus={skus}
+            product={product}
+            setSelectedSKU={setSelectedSKU}
+          />
+
+          {/* Sidebar Component */}
+          <Sidebar
+            onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
+            setMediaFile={setMediaFile}
+            setMode={setMode}
+            setShowChangeModel={setShowChangeModel}
+          />
+        </div>
+
+        <div className="bg-black/10 p-1 shadow-lg backdrop-blur-sm">
           {isMainContentVisible && <MainContent product={product} />}
           <Footer />
         </div>
@@ -494,6 +459,10 @@ function MainContent({ product }: { product: Product }) {
     return <SingleEyebrowsSelector product={product} />;
   }
 
+  if (productTypeCheckers.isHandwearProduct(product)) {
+    return <SingleHandwearSelector product={product} />;
+  }
+
   if (productTypeCheckers.isFoundationProduct(product)) {
     return <SingleFoundationSelector product={product} />;
   }
@@ -522,9 +491,6 @@ function MainContent({ product }: { product: Product }) {
     return <SingleHairColorSelector product={product} />;
   }
 
-  if (productTypeCheckers.isHandwearProduct(product)) {
-    return <SingleHandwearSelector product={product} />;
-  }
   return (
     <>
       <div>No product found</div>
@@ -542,7 +508,7 @@ function MainContent({ product }: { product: Product }) {
   );
 }
 
-export function TopNavigation({
+function TopNavigation({
   item = false,
   cart = false,
 }: {
@@ -551,56 +517,94 @@ export function TopNavigation({
 }) {
   const { flipCamera } = useCamera();
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
-      <div className="flex flex-col gap-4">
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <div className="flex flex-col gap-3">
         <Link
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           to="/virtual-try-on/makeups"
         >
-          <ChevronLeft className="size-6 text-white" />
+          <ChevronLeft className="size-4 text-white" />
         </Link>
 
         {item ? (
-          <div className="space-y-2 pt-10">
-            <div className="flex gap-x-4">
-              <button className="flex size-8 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Heart className="size-5 text-white" />
+          <div className="space-y-1 pt-8">
+            <div className="flex gap-x-3">
+              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
+                <Heart className="size-4 text-white" />
               </button>
               <div>
-                <p className="font-semibold leading-4 text-white">
+                <p className="text-sm font-semibold text-white">
                   Pro Filt’r Soft Matte Longwear Liquid Found
                 </p>
-                <p className="text-white/60">Brand Name</p>
+                <p className="text-xs text-white/60">Brand Name</p>
               </div>
             </div>
-            <div className="flex items-center gap-x-4">
-              <button className="flex size-8 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Plus className="size-5 text-white" />
+            <div className="flex items-center gap-x-3">
+              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
+                <Plus className="size-4 text-white" />
               </button>
-              <p className="font-medium text-white">$52.00</p>
+              <p className="text-sm font-medium text-white">$52.00</p>
             </div>
           </div>
         ) : null}
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         <Link
           type="button"
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           to="/"
         >
-          <X className="size-6 text-white" />
+          <X className="size-4 text-white" />
         </Link>
-
-        <button
-          type="button"
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-        >
-          <Icons.myCart className="size-6 text-white" />
-        </button>
       </div>
     </div>
   );
 }
+
+interface SKUSelectorProps {
+  skus: Product[];
+  product: Product;
+  setSelectedSKU: React.Dispatch<React.SetStateAction<Product | null>>;
+}
+
+const SKUSelector: React.FC<SKUSelectorProps> = ({
+  skus,
+  product,
+  setSelectedSKU,
+}) => {
+  return (
+    <div className="ms-3 flex flex-1 flex-col items-start justify-start pb-4 pr-5 [&_button]:pointer-events-auto">
+      {/* Kontainer scrollable */}
+      <div className="flex max-h-64 flex-col items-center justify-center gap-4 overflow-y-auto rounded-lg bg-black/25 px-2 pb-6 backdrop-blur-3xl [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-1">
+        {/* Daftar item SKU */}
+        <div className="flex flex-col items-center justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-5">
+          {skus.map((sku) => {
+            const imageUrl = mediaUrl(sku.media_gallery_entries[0].file);
+            return (
+              <button
+                key={sku.sku}
+                type="button"
+                onClick={() => setSelectedSKU(sku)}
+                className={clsx(
+                  "flex flex-col items-center justify-center gap-2 border-2 border-transparent p-1 transition-all",
+                  {
+                    "scale-125": sku.sku === product.sku,
+                  },
+                )}
+              >
+                <img
+                  src={imageUrl}
+                  alt={sku.name}
+                  className="h-8 w-8 rounded-lg object-cover sm:h-10 sm:w-10 md:h-12 md:w-12 lg:h-14 lg:w-14"
+                />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface SidebarProps {
   onExpandClick: () => void;
@@ -618,7 +622,7 @@ function Sidebar({
   const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
 
   return (
-    <div className="pointer-events-none flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
+    <div className="pointer-events-none flex flex-col items-end justify-end place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
       <div className="relative p-0.5">
         <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 

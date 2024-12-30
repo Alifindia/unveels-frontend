@@ -1,6 +1,12 @@
 import { MeshProps, useFrame, useThree } from "@react-three/fiber";
 import React, { useMemo, useRef, Suspense, useEffect } from "react";
-import { Mesh, MeshStandardMaterial, Object3D, Quaternion, Vector3 } from "three";
+import {
+  Mesh,
+  MeshStandardMaterial,
+  Object3D,
+  Quaternion,
+  Vector3,
+} from "three";
 import { Landmark } from "../../../types/landmark";
 import { WATCH } from "../../../utils/constants";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
@@ -22,13 +28,6 @@ const WatchInner: React.FC<WatchProps> = React.memo(
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
 
-    const { scaleMultiplier } = useMemo(() => {
-      if (viewport.width > 1200) {
-        return { scaleMultiplier: 800 };
-      }
-      return { scaleMultiplier: 250 };
-    }, [viewport.width]);
-
     useEffect(() => {
       const loader = new GLTFLoader();
       loader.load(
@@ -42,7 +41,7 @@ const WatchInner: React.FC<WatchProps> = React.memo(
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.needsUpdate = true;
               }
-              child.renderOrder = 2;
+              child.renderOrder = 4;
             }
           });
 
@@ -65,29 +64,28 @@ const WatchInner: React.FC<WatchProps> = React.memo(
 
     useFrame(() => {
       if (!handLandmarks.current || !watchRef.current) return;
-      const wrist = handLandmarks.current[0];
-      const thumbBase = handLandmarks.current[1];
+      if (handLandmarks.current.length > 0) {
+        watchRef.current.visible = true;
+        const wrist = handLandmarks.current[0];
+        const thumbBase = handLandmarks.current[1];
 
-      const wristSize = calculateDistance(wrist, thumbBase);
+        const wristSize = calculateDistance(wrist, thumbBase);
+        const wristX = (1 - wrist.x - 0.5) * outputWidth;
+        const wristY = -(wrist.y - 0.5) * outputHeight;
+        const wristZ = 200;
 
-      // Scale coordinates proportionally with the viewport
-      const scaleX = viewport.width / outputWidth;
-      const scaleY = viewport.height / outputHeight;
+        const scaleFactor = (wristSize * outputWidth) / 3;
 
-      const wristX = (1 - wrist.x) * outputWidth * scaleX - viewport.width / 2;
-      const wristY = -wrist.y * outputHeight * scaleY + viewport.height / 2;
-      const wristZ = -wrist.z * 100;
+        watchRef.current.position.set(wristX, wristY, wristZ);
+        watchRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      const scaleFactor =
-        wristSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+        const quaternion = handQuaternion(handLandmarks.current);
 
-      watchRef.current.position.set(wristX, wristY, wristZ);
-      watchRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-      const quaternion = handQuaternion(handLandmarks.current);
-
-      if (quaternion) {
-        watchRef.current.setRotationFromQuaternion(quaternion);
+        if (quaternion) {
+          watchRef.current.setRotationFromQuaternion(quaternion);
+        }
+      } else {
+        watchRef.current.visible = false;
       }
     });
 

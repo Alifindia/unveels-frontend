@@ -24,35 +24,6 @@ const EarringInner: React.FC<EarringProps> = React.memo(
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
 
-    // Menggunakan useMemo untuk menentukan scaleMultiplier
-    const { scaleMultiplier, bottomEarPosX, bottomEarPosY } = useMemo(() => {
-      if (viewport.width > 1200) {
-        return {
-          scaleMultiplier: 800,
-          bottomEarPosX: 1.05,
-          bottomEarPosY: 3,
-        };
-      }
-
-      if (viewport.width > 500 && viewport.width < 800) {
-        return {
-          scaleMultiplier: 200,
-          bottomEarPosX: 2,
-          bottomEarPosY: 1.3,
-        };
-      }
-
-      if (viewport.width > 800 && viewport.width < 1200) {
-        return {
-          scaleMultiplier: 200,
-          bottomEarPosX: 1.08,
-          bottomEarPosY: 1.7,
-        };
-      }
-
-      return { scaleMultiplier: 200, bottomEarPosX: 1.8, bottomEarPosY: 1.3 };
-    }, [viewport.width]);
-
     useEffect(() => {
       const loader = new GLTFLoader();
       loader.load(
@@ -114,70 +85,67 @@ const EarringInner: React.FC<EarringProps> = React.memo(
       )
         return;
 
-      // Earring kiri menggunakan landmark 132
-      const leftBottomEar = currentLandmarks[93];
+      if (landmarks.current.length > 0) {
+        leftEarringRef.current.visible = true;
+        leftEarringRef.current.visible = true;
+        // Earring kiri menggunakan landmark 132
+        const leftBottomEar = currentLandmarks[93];
 
-      // Earring kanan menggunakan landmark 323
-      const rightBottomEar = currentLandmarks[323];
+        // Earring kanan menggunakan landmark 323
+        const rightBottomEar = currentLandmarks[323];
 
-      // Skala koordinat proporsional dengan viewport
-      const scaleX = viewport.width / outputWidth;
-      const scaleY = viewport.height / outputHeight;
+        // Posisi kiri
+        const leftBottomEarX = (1 - leftBottomEar.x - 0.48) * outputWidth;
+        const leftBottomEarY = -(leftBottomEar.y - 0.45) * outputHeight;
+        const leftBottomEarZ = -leftBottomEar.z * 100;
 
-      // Posisi kiri
-      const leftBottomEarX =
-        (1 - leftBottomEar.x) * outputWidth * scaleX - viewport.width / 2;
-      const leftBottomEarY =
-        -leftBottomEar.y * outputHeight * scaleY + viewport.height / 2;
-      const leftBottomEarZ = -leftBottomEar.z * 100;
+        // Posisi kanan
+        const rightBottomEarX = (1 - rightBottomEar.x - 0.52) * outputWidth;
+        const rightBottomEarY = -(rightBottomEar.y - 0.45) * outputHeight;
+        const rightBottomEarZ = -rightBottomEar.z * 100;
 
-      // Posisi kanan
-      const rightBottomEarX =
-        (1 - rightBottomEar.x) * outputWidth * scaleX - viewport.width / 2;
-      const rightBottomEarY =
-        -rightBottomEar.y * outputHeight * scaleY + viewport.height / 2;
-      const rightBottomEarZ = -rightBottomEar.z * 100;
+        const faceSize = calculateDistance(
+          currentLandmarks[447],
+          currentLandmarks[454],
+        );
 
-      const faceSize = calculateDistance(
-        currentLandmarks[447],
-        currentLandmarks[454],
-      );
+        // Set posisi dan skala untuk left earring
+        leftEarringRef.current.position.set(
+          leftBottomEarX,
+          leftBottomEarY,
+          leftBottomEarZ - 40,
+        );
 
-      // Set posisi dan skala untuk left earring
-      leftEarringRef.current.position.set(
-        leftBottomEarX * bottomEarPosX,
-        leftBottomEarY * bottomEarPosY,
-        leftBottomEarZ - 40,
-      );
+        const leftScaleFactor = (faceSize * outputWidth) / 2;
+        leftEarringRef.current.scale.set(
+          leftScaleFactor,
+          leftScaleFactor,
+          leftScaleFactor,
+        );
 
-      const leftScaleFactor =
-        faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
-      leftEarringRef.current.scale.set(
-        leftScaleFactor,
-        leftScaleFactor,
-        leftScaleFactor,
-      );
+        // Set posisi dan skala untuk right earring
+        rightEarringRef.current.position.set(
+          rightBottomEarX, // Tambahkan offset jika diperlukan
+          rightBottomEarY,
+          rightBottomEarZ - 40, // Tambahkan offset jika diperlukan
+        );
 
-      // Set posisi dan skala untuk right earring
-      rightEarringRef.current.position.set(
-        rightBottomEarX * bottomEarPosX, // Tambahkan offset jika diperlukan
-        rightBottomEarY * bottomEarPosY,
-        rightBottomEarZ - 40, // Tambahkan offset jika diperlukan
-      );
+        const rightScaleFactor = (faceSize * outputWidth) / 2;
+        rightEarringRef.current.scale.set(
+          rightScaleFactor,
+          rightScaleFactor,
+          rightScaleFactor,
+        );
 
-      const rightScaleFactor =
-        faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
-      rightEarringRef.current.scale.set(
-        rightScaleFactor,
-        rightScaleFactor,
-        rightScaleFactor,
-      );
-
-      // Menghitung rotasi wajah menggunakan fungsi terpisah
-      const quaternion = calculateFaceOrientation(currentLandmarks);
-      if (quaternion) {
-        leftEarringRef.current.setRotationFromQuaternion(quaternion);
-        rightEarringRef.current.setRotationFromQuaternion(quaternion);
+        // Menghitung rotasi wajah menggunakan fungsi terpisah
+        const quaternion = calculateFaceOrientation(currentLandmarks);
+        if (quaternion) {
+          leftEarringRef.current.setRotationFromQuaternion(quaternion);
+          rightEarringRef.current.setRotationFromQuaternion(quaternion);
+        }
+      } else {
+        leftEarringRef.current.visible = false;
+        leftEarringRef.current.visible = false;
       }
     });
 

@@ -48,12 +48,12 @@ export function SkinAnalysis() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-      const storeLang = getCookie("store");
-  
-      const lang = storeLang === "ar" ? "ar" : "en";
-  
-      i18n.changeLanguage(lang);
-    }, [i18n]);
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
 
   return (
     <CameraProvider>
@@ -652,7 +652,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between space-x-4 bg-black px-10 text-white">
+          <div className="flex items-center justify-between space-x-4 bg-black px-10 capitalize text-white">
             {/* Left Column */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2.5">
@@ -709,7 +709,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        <div className="mx-auto hidden w-full max-w-3xl items-center gap-x-4 md:flex">
+        <div className="mx-auto hidden w-full max-w-3xl items-center gap-x-4 capitalize md:flex">
           <div className="flex flex-1 items-start justify-between space-x-4 bg-black px-10 text-white">
             <div className="space-y-4">
               <div className="flex items-center space-x-2.5">
@@ -803,7 +803,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        <h2 className="pt-12 text-center text-xl font-medium">
+        <h2 className="pt-12 text-center text-xl font-medium capitalize">
           {t("viewskinan.detected_skin_con")}
         </h2>
 
@@ -905,7 +905,7 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        <div className="mx-auto hidden w-full max-w-3xl items-center gap-x-4 md:flex">
+        <div className="mx-auto hidden w-full max-w-3xl items-center gap-x-4 capitalize md:flex">
           <div className="flex flex-1 items-start justify-between space-x-4 bg-black px-10 text-white">
             <div className="space-y-4">
               <div className="flex items-center space-x-2.5">
@@ -1118,7 +1118,7 @@ function ProblemSection({
         <Icons.personalityTriangle className="size-8 shrink-0" />
 
         <h2 className="text-3xl font-bold capitalize text-white">
-          {t(`skinlabel.${title.toLocaleLowerCase()}`).toLocaleUpperCase()}
+          {t(`skinlabel.${title.toLocaleLowerCase()}`)}
         </h2>
       </div>
       <span className="text-xl font-bold">{t("viewskinan.detected")}</span>

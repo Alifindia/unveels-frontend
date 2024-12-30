@@ -260,6 +260,8 @@ function WatchesProductList() {
 
   useEffect(() => {
     if (selectedProduct == null && colorFamily == null) return;
+    console.log("set product");
+
     setShowWatch(true);
   }, [selectedProduct]);
 

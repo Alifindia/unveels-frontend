@@ -46,6 +46,7 @@ import NailMidlle from "../three/accesories/nails/nail-middle";
 import NailIndex from "../three/accesories/nails/nail-index";
 import NailRing from "../three/accesories/nails/nail-ring";
 import NailPinky from "../three/accesories/nails/nail-pinky";
+import FingerOccluder from "../three/accesories/finger-occluder";
 
 interface VirtualTryOnThreeSceneProps extends MeshProps {
   videoRef: React.RefObject<Webcam | HTMLVideoElement | HTMLImageElement>;
@@ -54,6 +55,7 @@ interface VirtualTryOnThreeSceneProps extends MeshProps {
   faceTransform: React.RefObject<number[]>;
   blendshape: React.RefObject<Blendshape[]>;
   sourceType: "LIVE" | "VIDEO" | "IMAGE";
+  hairMask: React.RefObject<ImageData> | null;
 }
 
 const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
@@ -63,6 +65,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   faceTransform,
   blendshape,
   sourceType,
+  hairMask,
   ...props
 }) => {
   const { gl } = useThree();
@@ -73,6 +76,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
     VideoTexture | Texture | null
   >(null);
   const { skinToneThreeSceneRef, setScreenshotImage } = useCamera();
+  const hairMaskTextureRef = useRef<Texture | null>(null);
 
   const [maskOpacity, setMaskOpacity] = useState(0.5);
 
@@ -114,6 +118,40 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   const [pinchFactor, setPinchFactor] = useState(0.0);
   const [horizontalShiftFactor, setHorizontalShiftFactor] = useState(0);
   const [verticalShiftFactor, setVerticalShiftFactor] = useState(0);
+
+  // Konversi ImageData menjadi RGBA dengan transparansi
+  const processImageDataWithTransparency = (
+    imageData: ImageData,
+  ): ImageData => {
+    const data = new Uint8ClampedArray(imageData.data); // Salin data
+    for (let i = 0; i < data.length; i += 4) {
+      const maskValue = data[i]; // Nilai mask disimpan di channel Red
+      if (maskValue === 0) {
+        // Jika bukan bagian mask, buat transparan
+        data[i + 3] = 0; // Alpha = 0
+      } else {
+        // Jika bagian mask, pastikan alpha penuh
+        data[i + 3] = 255; // Alpha = 255
+      }
+    }
+    return new ImageData(data, imageData.width, imageData.height);
+  };
+
+  const imageDataToImage = (imageData: ImageData): HTMLImageElement => {
+    const processedImageData = processImageDataWithTransparency(imageData);
+    const canvas = document.createElement("canvas");
+    canvas.width = processedImageData.width;
+    canvas.height = processedImageData.height;
+
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.putImageData(processedImageData, 0, 0);
+      const img = new Image();
+      img.src = canvas.toDataURL();
+      return img;
+    }
+    return new Image();
+  };
 
   // Handle source changes and create texture
   useEffect(() => {
@@ -223,6 +261,21 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   }, [videoTexture]);
 
   useFrame(() => {
+    if (hairMask) {
+      if (hairMask.current) {
+        const image = imageDataToImage(hairMask.current);
+        const loader = new TextureLoader();
+
+        loader.load(image.src, (texture) => {
+          if (!hairMaskTextureRef.current) {
+            hairMaskTextureRef.current = texture;
+          } else {
+            hairMaskTextureRef.current.image = texture.image;
+            hairMaskTextureRef.current.needsUpdate = true;
+          }
+        });
+      }
+    }
     if (filterRef.current && landmarks.current) {
       const uniforms = filterRef.current.uniforms;
 
@@ -295,168 +348,187 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
             />
           </mesh>
 
-          {landmarks.current && landmarks.current?.length > 0 && (
+          <>
+            {showFoundation && (
+              <Foundation
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showBlush && (
+              <Blush
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showConcealer && (
+              <Concealer
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showHighlighter && (
+              <Highlighter
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showContour && (
+              <Contour
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showLipliner && (
+              <Lipliner
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showLipplumper && (
+              <Lipplumper
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showLipColor && (
+              <LipColor
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showBronzer && (
+              <Bronzer
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showLens && (
+              <ContactLens planeSize={planeSize} landmarks={landmarks} />
+            )}
+
+            {showEyebrows && (
+              <Eyebrows
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showEyeShadow && (
+              <EyeShadow
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showEyeliner && (
+              <Eyeliner
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showHat && <Hat planeSize={planeSize} landmarks={landmarks} />}
+
+            {showGlasess && (
+              <Glasess planeSize={planeSize} landmarks={landmarks} />
+            )}
+
+            {showHeadband && (
+              <Headband planeSize={planeSize} landmarks={landmarks} />
+            )}
+
+            {showEarring && (
+              <Earring planeSize={planeSize} landmarks={landmarks} />
+            )}
+
+            {showNecklace && (
+              <Necklace planeSize={planeSize} landmarks={landmarks} />
+            )}
+
+            <HeadOccluder planeSize={planeSize} landmarks={landmarks} />
+            <NeckOccluder planeSize={planeSize} landmarks={landmarks} />
+          </>
+
+          {showHair && (
             <>
-              {showFoundation && (
-                <Foundation
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
-
-              {showBlush && (
-                <Blush
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
-
-              {showConcealer && (
-                <Concealer
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
-
-              {showHighlighter && (
-                <Highlighter
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
-
-              {showContour && (
-                <Contour
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
-
-              {showLipliner && (
-                <Lipliner
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
-
-              {showLipplumper && (
-                <Lipplumper
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
-
-              {showLipColor && (
-                <LipColor
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
-
-              {showBronzer && (
-                <Bronzer
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
-
-              {showLens && (
-                <ContactLens planeSize={planeSize} landmarks={landmarks} />
-              )}
-
-              {showEyebrows && (
-                <Eyebrows
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
-
-              {showEyeShadow && (
-                <EyeShadow
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
-              )}
-
-              {showEyeliner && (
-                <Eyeliner
-                  planeSize={planeSize}
-                  landmarks={landmarks}
-                  isFlipped={isFlipped}
-                />
+              {hairMaskTextureRef.current && (
+                <mesh
+                  position={[0, 0, 100]}
+                  scale={[-1, 1, 1]}
+                  {...props}
+                  renderOrder={3}
+                >
+                  <planeGeometry args={[planeSize[0], planeSize[1]]} />
+                  <meshBasicMaterial
+                    map={hairMaskTextureRef.current}
+                    side={DoubleSide}
+                    transparent
+                    opacity={maskOpacity}
+                  />
+                </mesh>
               )}
             </>
           )}
 
-          {/* <HeadOccluder planeSize={planeSize} landmarks={landmarks} />
-          <NeckOccluder planeSize={planeSize} landmarks={landmarks} />
-          <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} /> */}
+          <>
+            <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} />
+            <FingerOccluder
+              planeSize={planeSize}
+              handLandmarks={handlandmarks}
+            />
 
-          {handlandmarks.current && handlandmarks.current.length > 0 && (
-            <>
-              {showHat && <Hat planeSize={planeSize} landmarks={landmarks} />}
+            {showWatch && (
+              <Watch planeSize={planeSize} handLandmarks={handlandmarks} />
+            )}
 
-              {showGlasess && (
-                <Glasess planeSize={planeSize} landmarks={landmarks} />
-              )}
+            {showRing && (
+              <Ring planeSize={planeSize} handLandmarks={handlandmarks} />
+            )}
 
-              {showHeadband && (
-                <Headband planeSize={planeSize} landmarks={landmarks} />
-              )}
-
-              {showEarring && (
-                <Earring planeSize={planeSize} landmarks={landmarks} />
-              )}
-
-              {showNecklace && (
-                <Necklace planeSize={planeSize} landmarks={landmarks} />
-              )}
-
-              {showWatch && (
-                <Watch planeSize={planeSize} handLandmarks={handlandmarks} />
-              )}
-
-              {showRing && (
-                <Ring planeSize={planeSize} handLandmarks={handlandmarks} />
-              )}
-
-              {showNails && (
-                <>
-                  <NailThumb
-                    planeSize={planeSize}
-                    handLandmarks={handlandmarks}
-                  />
-                  <NailMidlle
-                    planeSize={planeSize}
-                    handLandmarks={handlandmarks}
-                  />
-                  <NailIndex
-                    planeSize={planeSize}
-                    handLandmarks={handlandmarks}
-                  />
-                  <NailRing
-                    planeSize={planeSize}
-                    handLandmarks={handlandmarks}
-                  />
-                  <NailPinky
-                    planeSize={planeSize}
-                    handLandmarks={handlandmarks}
-                  />
-                </>
-              )}
-            </>
-          )}
+            {showNails && (
+              <>
+                <NailThumb
+                  planeSize={planeSize}
+                  handLandmarks={handlandmarks}
+                />
+                <NailMidlle
+                  planeSize={planeSize}
+                  handLandmarks={handlandmarks}
+                />
+                <NailIndex
+                  planeSize={planeSize}
+                  handLandmarks={handlandmarks}
+                />
+                <NailRing planeSize={planeSize} handLandmarks={handlandmarks} />
+                <NailPinky
+                  planeSize={planeSize}
+                  handLandmarks={handlandmarks}
+                />
+              </>
+            )}
+          </>
         </>
       )}
     </>

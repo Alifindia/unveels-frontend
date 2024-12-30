@@ -22,13 +22,6 @@ const GlasessInner: React.FC<Glasessrops> = React.memo(
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
 
-    const { scaleMultiplier } = useMemo(() => {
-      if (viewport.width > 1200) {
-        return { scaleMultiplier: 800 };
-      }
-      return { scaleMultiplier: 200 };
-    }, [viewport.width]);
-
     useEffect(() => {
       const loader = new GLTFLoader();
       loader.load(
@@ -65,35 +58,35 @@ const GlasessInner: React.FC<Glasessrops> = React.memo(
 
     useFrame(() => {
       if (!landmarks.current || !glasessRef.current) return;
+      // console.log(landmarks.current);
 
-      const centerEye = landmarks.current[168];
+      if (landmarks.current.length > 0) {
+        glasessRef.current.visible = true;
+        const centerEye = landmarks.current[168];
 
-      // Scale coordinates proportionally with the viewport
-      const scaleX = viewport.width / outputWidth;
-      const scaleY = viewport.height / outputHeight;
+        const centerEyeX = (1 - centerEye.x - 0.5) * outputWidth;
+        const centerEyeY = -(centerEye.y - 0.5) * outputHeight;
+        const centerEyeZ = -centerEye.z * 100;
 
-      const centerEyeX =
-        (1 - centerEye.x) * outputWidth * scaleX - viewport.width / 2;
-      const centerEyeY =
-        -centerEye.y * outputHeight * scaleY + viewport.height / 2;
-      const centerEyeZ = -centerEye.z * 100;
+        const faceSize = calculateDistance(
+          landmarks.current[162],
+          landmarks.current[389],
+        );
 
-      const faceSize = calculateDistance(
-        landmarks.current[162],
-        landmarks.current[389],
-      );
+        // Set position and scale
+        glasessRef.current.position.set(centerEyeX, centerEyeY, centerEyeZ);
 
-      // Set position and scale
-      glasessRef.current.position.set(centerEyeX, centerEyeY, centerEyeZ);
+        const scaleFactor = (faceSize * outputWidth) / 5.5;
 
-      const scaleFactor = faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+        glasessRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      glasessRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-      const quaternion = calculateFaceOrientation(landmarks.current);
-      // Set the rotation of the glasess object from the final quaternion
-      if (quaternion) {
-        glasessRef.current.setRotationFromQuaternion(quaternion);
+        const quaternion = calculateFaceOrientation(landmarks.current);
+        // Set the rotation of the glasess object from the final quaternion
+        if (quaternion) {
+          glasessRef.current.setRotationFromQuaternion(quaternion);
+        }
+      } else {
+        glasessRef.current.visible = false;
       }
     });
 

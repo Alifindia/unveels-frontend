@@ -83,38 +83,37 @@ const HeadbandInner: React.FC<Headbandrops> = React.memo(
 
     useFrame(() => {
       if (!landmarks.current || !headbandRef.current) return;
+      if (landmarks.current.length > 0) {
+        headbandRef.current.visible = true;
+        const topHead = landmarks.current[10];
 
-      const topHead = landmarks.current[10];
+        const topHeadX = (1 - topHead.x - 0.5) * outputWidth;
+        const topHeadY = -(topHead.y - 0.45) * outputHeight;
+        const topHeadZ = -topHead.z * 100;
 
-      // Scale coordinates proportionally with the viewport
-      const scaleX = viewport.width / outputWidth;
-      const scaleY = viewport.height / outputHeight;
+        const faceSize = calculateDistance(
+          landmarks.current[162],
+          landmarks.current[389],
+        );
 
-      const topHeadX =
-        (1 - topHead.x) * outputWidth * scaleX - viewport.width / 2;
-      const topHeadY = -topHead.y * outputHeight * scaleY + viewport.height / 2;
-      const topHeadZ = -topHead.z * 100;
+        // Set position and scale
+        headbandRef.current.position.set(
+          topHeadX - topHeadXPosition,
+          topHeadY - topHeadYPosition,
+          topHeadZ - topHeadZPosition,
+        );
 
-      const faceSize = calculateDistance(
-        landmarks.current[162],
-        landmarks.current[389],
-      );
+        const scaleFactor = (faceSize * outputWidth) / 8;
 
-      // Set position and scale
-      headbandRef.current.position.set(
-        topHeadX - topHeadXPosition,
-        topHeadY - topHeadYPosition,
-        topHeadZ - topHeadZPosition,
-      );
+        headbandRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-      const scaleFactor = faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
-
-      headbandRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-      const quaternion = calculateFaceOrientation(landmarks.current);
-      // Set the rotation of the headband object from the final quaternion
-      if (quaternion) {
-        headbandRef.current.setRotationFromQuaternion(quaternion);
+        const quaternion = calculateFaceOrientation(landmarks.current);
+        // Set the rotation of the headband object from the final quaternion
+        if (quaternion) {
+          headbandRef.current.setRotationFromQuaternion(quaternion);
+        }
+      } else {
+        headbandRef.current.visible = false;
       }
     });
 

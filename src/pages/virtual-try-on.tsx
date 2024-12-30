@@ -150,12 +150,12 @@ export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
 
 export function VirtualTryOn() {
   const { i18n } = useTranslation();
-  
+
   useEffect(() => {
     const storeLang = getCookie("store");
-    
+
     const lang = storeLang === "ar" ? "ar" : "en";
-    
+
     i18n.changeLanguage(lang);
   }, [i18n]);
 
@@ -240,7 +240,7 @@ function Main() {
               setMode={setMode}
               setShowChangeModel={setShowChangeModel}
             />
-            <div className="bg-black/10 p-4 shadow-lg backdrop-blur-sm">
+            <div className="bg-black/10 p-2 shadow-lg backdrop-blur-sm">
               {isMainContentVisible && <MainContent />}
               <Footer />
             </div>
@@ -320,7 +320,7 @@ export function TryOnSelector() {
             <Fragment key={shadeTab}>
               <button
                 key={shadeTab}
-                className={`relative h-10 grow border-b font-luxury text-[12.6px] sm:text-lg lg:text-2xl ${
+                className={`relative h-10 grow border-b font-luxury text-[10px] sm:text-[12px] lg:text-[14px] ${
                   isActive
                     ? activeClassNames
                     : "border-transparent text-gray-500"
@@ -333,23 +333,23 @@ export function TryOnSelector() {
                     isActive ? "text-white/70 blur-sm" : "",
                   )}
                 >
-                  {t('vto.'+shadeTab)}
+                  {t("vto." + shadeTab)}
                 </span>
                 {isActive ? (
                   <>
                     <div
                       className={clsx(
-                        "absolute inset-0 flex items-center justify-center text-[12.6px] blur-sm sm:text-lg lg:text-2xl",
+                        "absolute inset-0 flex items-center justify-center text-[10px] blur-sm sm:text-[12px] lg:text-[14px]",
                         activeClassNames,
                       )}
                     >
-                      <span className="text-center text-[12.6px] capitalize sm:text-lg lg:text-2xl">
-                      {t('vto.'+shadeTab)}
+                      <span className="text-center text-[10px] capitalize sm:text-[12px] lg:text-[14px]">
+                        {t("vto." + shadeTab)}
                       </span>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-center text-[12.6px] capitalize text-white/70 sm:text-lg lg:text-2xl">
-                      {t('vto.'+shadeTab)}
+                      <span className="text-center text-[10px] capitalize text-white/70 sm:text-[12px] lg:text-[14px]">
+                        {t("vto." + shadeTab)}
                       </span>
                     </div>
                   </>
@@ -382,14 +382,31 @@ export function Makeups() {
     {
       name: "Eyes",
       icon: <Icons.makeupEyes />,
+      items: [
+        "Eyebrows",
+        "Eye Shadow",
+        "Eye Liner",
+        "Lashes",
+        "Mascara",
+        "Lenses",
+      ],
     },
     {
       name: "Face",
       icon: <Icons.makeupFace />,
+      items: [
+        "Foundation",
+        "Concealer",
+        "Contour",
+        "Blush",
+        "Bronzer",
+        "Highlighter",
+      ],
     },
     {
       name: "Hair",
       icon: <Icons.makeupHair />,
+      items: ["Hair Color"],
     },
   ];
 
@@ -412,7 +429,7 @@ export function Makeups() {
             >
               <div
                 className={clsx(
-                  "text-dm relative flex w-12 shrink-0 items-center justify-center rounded-3xl border border-transparent py-2 text-center text-xs text-white transition-all",
+                  "text-dm relative flex w-10 shrink-0 items-center justify-center rounded-3xl border border-transparent py-1 text-center text-xs text-white transition-all",
                   {
                     "bg-gradient-to-r from-[#CA9C43] via-[#916E2B] to-[#473209]":
                       selectedMakeup === option.name,
@@ -420,7 +437,7 @@ export function Makeups() {
                 )}
               >
                 {cloneElement(option.icon, {
-                  className: "text-white size-6",
+                  className: "text-white size-5", // Reduce icon size here
                 })}
 
                 <div
@@ -436,8 +453,8 @@ export function Makeups() {
                   }
                 />
               </div>
-              <div className="text-center text-sm !leading-4 text-white lg:text-lg">
-                {t('vto.'+option.name)}
+              <div className="text-center text-[10px] !leading-4 text-white lg:text-sm">
+                {t("vto." + option.name)} {/* Reduce text size here */}
               </div>
             </button>
           ))}
@@ -466,18 +483,29 @@ export function Accessories() {
     {
       name: "Head Accessories",
       icon: <Icons.accessoryHead />,
+      items: [
+        "Sunglasses",
+        "Glasses",
+        "Earring",
+        "Hats",
+        "Tiaras",
+        "Headbands",
+      ],
     },
     {
       name: "Neck Accessories",
       icon: <Icons.accessoryNeck />,
+      items: ["Pendants", "Necklaces", "Chokers", "Scarves"],
     },
     {
       name: "Hand Accessories",
       icon: <Icons.accessoryHand />,
+      items: ["Watches", "Rings", "Bracelets", "Bangles"],
     },
     {
       name: "Nails",
       icon: <Icons.makeupNails />,
+      items: ["Nail Polish", "Press on Nails"],
     },
   ];
 
@@ -498,7 +526,7 @@ export function Accessories() {
             >
               <div
                 className={clsx(
-                  "relative flex h-[34px] w-[42px] shrink-0 items-center justify-center rounded-3xl border border-transparent py-2 text-center text-xs text-white transition-all sm:h-[44.2px] sm:w-[54.6px]",
+                  "relative flex h-[30px] w-[36px] shrink-0 items-center justify-center rounded-3xl border border-transparent py-1 text-center text-xs text-white transition-all sm:h-[38px] sm:w-[46px]",
                   {
                     "bg-gradient-to-r from-[#CA9C43] via-[#916E2B] to-[#473209]":
                       selectedAccessory === option.name,
@@ -506,7 +534,7 @@ export function Accessories() {
                 )}
               >
                 {cloneElement(option.icon, {
-                  className: "text-white size-6",
+                  className: "text-white size-5", // Reduce icon size here
                 })}
 
                 <div
@@ -522,8 +550,8 @@ export function Accessories() {
                   }
                 />
               </div>
-              <div className="text-center text-[9.8px] !leading-4 text-white sm:text-sm lg:text-lg">
-                {t('vto.'+option.name)}
+              <div className="text-center text-[10px] !leading-4 text-white sm:text-xs lg:text-sm">
+                {t("vto." + option.name)} {/* Reduce text size here */}
               </div>
             </button>
           ))}
@@ -601,44 +629,44 @@ export function TopNavigation({
 }) {
   const { flipCamera } = useCamera();
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
-      <div className="flex flex-col gap-4">
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <div className="flex flex-col gap-3">
         <Link
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           to="/virtual-try-on/makeups"
         >
-          <ChevronLeft className="size-6 text-white" />
+          <ChevronLeft className="size-4 text-white" />
         </Link>
 
         {item ? (
-          <div className="space-y-2 pt-10">
-            <div className="flex gap-x-4">
-              <button className="flex size-8 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Heart className="size-5 text-white" />
+          <div className="space-y-1 pt-8">
+            <div className="flex gap-x-3">
+              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
+                <Heart className="size-4 text-white" />
               </button>
               <div>
-                <p className="font-semibold leading-4 text-white">
+                <p className="text-sm font-semibold text-white">
                   Pro Filt’r Soft Matte Longwear Liquid Found
                 </p>
-                <p className="text-white/60">Brand Name</p>
+                <p className="text-xs text-white/60">Brand Name</p>
               </div>
             </div>
-            <div className="flex items-center gap-x-4">
-              <button className="flex size-8 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Plus className="size-5 text-white" />
+            <div className="flex items-center gap-x-3">
+              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
+                <Plus className="size-4 text-white" />
               </button>
-              <p className="font-medium text-white">$52.00</p>
+              <p className="text-sm font-medium text-white">$52.00</p>
             </div>
           </div>
         ) : null}
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         <Link
           type="button"
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           to="/"
         >
-          <X className="size-6 text-white" />
+          <X className="size-4 text-white" />
         </Link>
       </div>
     </div>

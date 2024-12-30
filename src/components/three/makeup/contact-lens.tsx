@@ -42,6 +42,29 @@ const getEyeTransform = (
   return { position, scale };
 };
 
+// Fungsi menghitung jarak Euclidean
+const calculateDistance = (point1: Landmark, point2: Landmark): number => {
+  return Math.sqrt(
+    Math.pow(point1.x - point2.x, 2) +
+      Math.pow(point1.y - point2.y, 2) +
+      Math.pow(point1.z - point2.z, 2),
+  );
+};
+
+// Fungsi menghitung Eye Aspect Ratio (EAR)
+const calculateEAR = (
+  upper: Landmark,
+  lower: Landmark,
+  left: Landmark,
+  right: Landmark,
+): number => {
+  const vertical = calculateDistance(upper, lower);
+  const horizontal = calculateDistance(left, right);
+  return vertical / horizontal;
+};
+
+const EAR_THRESHOLD = 0.2; // Threshold EAR untuk mendeteksi mata menutup
+
 const ContactLenses: React.FC<ContactLensProps> = React.memo(
   ({ landmarks, planeSize }) => {
     const { lensPattern } = useMakeup();
@@ -64,66 +87,84 @@ const ContactLenses: React.FC<ContactLensProps> = React.memo(
       return new MeshBasicMaterial({
         map: selectedTexture,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0.5,
       });
     }, [selectedTexture]);
 
     useFrame(() => {
       if (!landmarks.current) return;
 
-      // Ekstrak landmarks untuk mata kiri
-      const leftEyeCenter = landmarks.current[468];
-      const leftEyeCornerRight = landmarks.current[471];
-      const leftEyeCornerLeft = landmarks.current[469];
+      if (landmarks.current.length > 0) {
+        // Ekstrak landmarks untuk mata kiri
+        const leftEye = {
+          upper: landmarks.current[159],
+          lower: landmarks.current[145],
+          left: landmarks.current[33],
+          right: landmarks.current[133],
+        };
 
-      // Ekstrak landmarks untuk mata kanan
-      const rightEyeCenter = landmarks.current[473];
-      const rightEyeCornerRight = landmarks.current[476];
-      const rightEyeCornerLeft = landmarks.current[474];
+        // Ekstrak landmarks untuk mata kanan
+        const rightEye = {
+          upper: landmarks.current[386],
+          lower: landmarks.current[374],
+          left: landmarks.current[362],
+          right: landmarks.current[263],
+        };
 
-      // Pastikan semua landmark yang diperlukan ada
-      if (
-        !leftEyeCenter ||
-        !leftEyeCornerRight ||
-        !leftEyeCornerLeft ||
-        !rightEyeCenter ||
-        !rightEyeCornerRight ||
-        !rightEyeCornerLeft
-      )
-        return;
-
-      // Hitung transformasi
-      const leftEyeTransform = getEyeTransform(
-        leftEyeCenter,
-        leftEyeCornerLeft,
-        leftEyeCornerRight,
-        planeSize,
-      );
-      const rightEyeTransform = getEyeTransform(
-        rightEyeCenter,
-        rightEyeCornerLeft,
-        rightEyeCornerRight,
-        planeSize,
-      );
-
-      // Update posisi dan skala lensa kiri
-      if (leftLensRef.current) {
-        leftLensRef.current.position.copy(leftEyeTransform.position);
-        leftLensRef.current.scale.set(
-          leftEyeTransform.scale,
-          leftEyeTransform.scale,
-          leftEyeTransform.scale,
+        // Hitung EAR untuk mata kiri dan kanan
+        const leftEAR = calculateEAR(
+          leftEye.upper,
+          leftEye.lower,
+          leftEye.left,
+          leftEye.right,
         );
-      }
-
-      // Update posisi dan skala lensa kanan
-      if (rightLensRef.current) {
-        rightLensRef.current.position.copy(rightEyeTransform.position);
-        rightLensRef.current.scale.set(
-          rightEyeTransform.scale,
-          rightEyeTransform.scale,
-          rightEyeTransform.scale,
+        const rightEAR = calculateEAR(
+          rightEye.upper,
+          rightEye.lower,
+          rightEye.left,
+          rightEye.right,
         );
+
+        // Update visibilitas lensa kiri berdasarkan EAR
+        if (leftLensRef.current) {
+          leftLensRef.current.visible = leftEAR > EAR_THRESHOLD;
+        }
+
+        // Update visibilitas lensa kanan berdasarkan EAR
+        if (rightLensRef.current) {
+          rightLensRef.current.visible = rightEAR > EAR_THRESHOLD;
+        }
+
+        // Transformasi dan posisi lensa tetap dilakukan jika EAR di atas threshold
+        if (leftEAR > EAR_THRESHOLD && leftLensRef.current) {
+          const leftEyeTransform = getEyeTransform(
+            landmarks.current[468],
+            landmarks.current[469],
+            landmarks.current[471],
+            planeSize,
+          );
+          leftLensRef.current.position.copy(leftEyeTransform.position);
+          leftLensRef.current.scale.set(
+            leftEyeTransform.scale,
+            leftEyeTransform.scale,
+            leftEyeTransform.scale,
+          );
+        }
+
+        if (rightEAR > EAR_THRESHOLD && rightLensRef.current) {
+          const rightEyeTransform = getEyeTransform(
+            landmarks.current[473],
+            landmarks.current[474],
+            landmarks.current[476],
+            planeSize,
+          );
+          rightLensRef.current.position.copy(rightEyeTransform.position);
+          rightLensRef.current.scale.set(
+            rightEyeTransform.scale,
+            rightEyeTransform.scale,
+            rightEyeTransform.scale,
+          );
+        }
       }
     });
 

@@ -58,12 +58,12 @@ export function FindTheLook() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-      const storeLang = getCookie("store");
-  
-      const lang = storeLang === "ar" ? "ar" : "en";
-  
-      i18n.changeLanguage(lang);
-    }, [i18n]);
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
 
   return (
     <CameraProvider>
@@ -128,7 +128,7 @@ function Main() {
           },
           runningMode: "IMAGE",
           maxResults: 5,
-          scoreThreshold: 0.25,
+          scoreThreshold: 0.4,
         },
       );
       modelsRef.current.accesoriesDetector = accesoriesDetectorInstance;

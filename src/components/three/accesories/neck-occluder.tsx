@@ -66,37 +66,36 @@ const NeckOccluderInner: React.FC<NeckOccluderProps> = React.memo(
 
     useFrame(() => {
       if (!landmarks.current || !occluderRef.current) return;
+      if (landmarks.current.length > 0) {
+        occluderRef.current.visible = true;
+        const neckLandmark = landmarks.current[0];
 
-      const neckLandmark = landmarks.current[0];
+        const neckDistance =
+          calculateDistance(landmarks.current[197], landmarks.current[152]) *
+          800;
 
-      const neckDistance =
-        calculateDistance(landmarks.current[197], landmarks.current[152]) * 800;
+        const neckLandmarkX = (1 - neckLandmark.x - 0.5) * outputWidth;
+        const neckLandmarkY = -(neckLandmark.y - 0.5) * outputHeight;
+        const neckLandmarkZ = -neckLandmark.z * 200;
 
-      // Scale coordinates proportionally with the viewport
-      const scaleX = viewport.width / outputWidth;
-      const scaleY = viewport.height / outputHeight;
-
-      const neckLandmarkX =
-        (1 - neckLandmark.x) * outputWidth * scaleX - viewport.width / 2;
-      const neckLandmarkY =
-        -neckLandmark.y * outputHeight * scaleY + viewport.height / 2;
-      const neckLandmarkZ = -neckLandmark.z * 100;
-
-      const faceSize = calculateDistance(
-        landmarks.current[162],
-        landmarks.current[389],
-      );
-
-      const scaleFactor = faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
-
-      if (neckLandmark) {
-        occluderRef.current.position.set(
-          (neckLandmarkX / 6) * 2,
-          neckLandmarkY - neckDistance + neckDistance - neckDistanceY,
-          0,
+        const faceSize = calculateDistance(
+          landmarks.current[162],
+          landmarks.current[389],
         );
 
-        occluderRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        const scaleFactor = (faceSize * outputWidth) / 14;
+
+        if (neckLandmark) {
+          occluderRef.current.position.set(
+            (neckLandmarkX / 6) * 2,
+            neckLandmarkY - neckDistance + neckDistance - neckDistanceY,
+            0,
+          );
+
+          occluderRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+        }
+      } else {
+        occluderRef.current.visible = false;
       }
     });
 

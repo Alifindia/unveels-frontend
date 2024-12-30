@@ -44,16 +44,17 @@ import { useCartContext } from "../context/cart-context";
 import { TopNavigation } from "../components/top-navigation";
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../utils/other";
+import { LinkButton } from "../App";
 
 export function PersonalityFinder() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-      const storeLang = getCookie("store");
-    
-      const lang = storeLang === "ar" ? "ar" : "en";
-    
-      i18n.changeLanguage(lang);
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
   }, [i18n]);
 
   return (
@@ -251,7 +252,7 @@ function MainContent() {
         </>
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          <VideoScene />
+          {!criterias.isCaptured && <VideoScene />}
           <Footer />
         </div>
       </div>
@@ -276,8 +277,6 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
   const [selectedTab, setTab] = useState(tabs[0].title);
 
   const { criterias } = useCamera();
-
-  const navigate = useNavigate();
 
   return (
     <div className="flex h-screen flex-col bg-black font-sans text-white">
@@ -683,9 +682,11 @@ function PersonalitySection({
 
 function RecommendationsTab({ personality }: { personality: string }) {
   const { t } = useTranslation();
+
   const { data: fragrances } = useFragrancesProductQuery({
     personality,
   });
+
   const { data: lips } = useLipsProductQuery({
     personality,
   });
@@ -694,7 +695,7 @@ function RecommendationsTab({ personality }: { personality: string }) {
     personality,
   });
 
-  const { guestCartId, addItemToCart } = useCartContext(); // Mengakses CartContext
+  const { addItemToCart } = useCartContext();
 
   const handleAddToCart = async (id: string, url: string) => {
     try {
@@ -823,12 +824,14 @@ function RecommendationsTab({ personality }: { personality: string }) {
                     >
                       {t("viewpersonality.addcart")}
                     </button>
-                    <button
-                      type="button"
+                    <LinkButton
+                      to={`/virtual-try-on-product?sku=${profile.products
+                        .map((product) => product.sku)
+                        .join(",")}`}
                       className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
                     >
                       {t("viewftl.try_on")}
-                    </button>
+                    </LinkButton>
                   </div>
                 </div>
               );
@@ -905,15 +908,12 @@ function RecommendationsTab({ personality }: { personality: string }) {
                     >
                       {t("viewpersonality.addcart")}
                     </button>
-                    <button
-                      type="button"
+                    <LinkButton
+                      to={`/virtual-try-on-product?sku=${product.sku}`}
                       className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                      }}
                     >
                       {t("viewftl.try_on")}
-                    </button>
+                    </LinkButton>
                   </div>
                 </div>
               );
@@ -1117,43 +1117,6 @@ function FeatureSection({
         </div>
       </div>
       <div className="flex-1 border-b border-white/50 py-4"></div>
-    </div>
-  );
-}
-
-function RecorderStatus() {
-  const { isRecording, formattedTime, handleStartPause, handleStop, isPaused } =
-    useRecordingControls();
-
-  return (
-    <div className="absolute inset-x-0 top-14 flex items-center justify-center gap-4">
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={handleStartPause}
-      >
-        {isPaused ? (
-          <CirclePlay className="size-6 text-white" />
-        ) : isRecording ? (
-          <PauseCircle className="size-6 text-white" />
-        ) : null}
-      </button>
-      <span className="relative flex size-4">
-        {isRecording ? (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-        ) : null}
-        <span className="relative inline-flex size-4 rounded-full bg-red-500"></span>
-      </span>
-      <div className="font-serif text-white">{formattedTime}</div>
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={isRecording ? handleStop : handleStartPause}
-      >
-        {isRecording || isPaused ? (
-          <StopCircle className="size-6 text-white" />
-        ) : (
-          <CirclePlay className="size-6 text-white" />
-        )}
-      </button>
     </div>
   );
 }
