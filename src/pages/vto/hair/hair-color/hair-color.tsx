@@ -6,7 +6,7 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useHairColorContext } from "./hair-color-context";
 import { useHairColorQuery } from "./hair-color-query";
 import { useMakeup } from "../../../../context/makeup-context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 import { getHairColorProductTypeIds } from "../../../../api/attributes/makeups";
@@ -132,11 +132,19 @@ function ProductList() {
     colorFamily,
     setColorFamily,
     setSelectedColor,
+    selectedColor,
     colorFamilyToInclude,
     setColorFamilyToInclude,
   } = useHairColorContext();
 
-  const { setShowHair } = useMakeup();
+  const { setShowHair, setHairColor } = useMakeup();
+
+  useEffect(() => {
+    if (selectedColor) {
+      setHairColor(selectedColor);
+      setShowHair(true);
+    }
+  }, [selectedColor]);
 
   const { data, isLoading } = useHairColorQuery({
     color: colorFamily,
@@ -164,7 +172,6 @@ function ProductList() {
         .find((item) => item.attribute_code === "hexacode")
         ?.value.split(",")[0],
     );
-    setShowHair(true);
   };
 
   return (

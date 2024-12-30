@@ -242,7 +242,25 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
         canvas.toBlob((blob) => {
           if (blob) {
             const imageUrl = URL.createObjectURL(blob);
-            setScreenshotImage(imageUrl);
+            if ((window as any).flutter_inappwebview) {
+              const reader = new FileReader();
+              reader.onload = function () {
+                const base64Image = reader.result as string;
+                const resultString = JSON.stringify(base64Image);
+                console.log("Scrrenshot as Base64:", resultString);
+
+                (window as any).flutter_inappwebview
+                  .callHandler("screenshotResult", resultString)
+                  .then((result: any) => {
+                    console.log("Flutter responded with:", result);
+                  })
+                  .catch((error: any) => {
+                    console.error("Error calling Flutter handler:", error);
+                  });
+              };
+            } else {
+              setScreenshotImage(imageUrl);
+            }
           }
         });
       }
