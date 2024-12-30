@@ -70,12 +70,6 @@ function Main() {
         <div className="absolute inset-0">
           <VideoStream debugMode={false} />
           <SkinToneFinderScene faceLandmarker={faceLandmarkerRef.current} />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-            }}
-          ></div>
         </div>
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">

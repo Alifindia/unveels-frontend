@@ -35,11 +35,11 @@ export function SeeImprovement() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-        const storeLang = getCookie("store");
-    
-        const lang = storeLang === "ar" ? "ar" : "en";
-    
-        i18n.changeLanguage(lang);
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
   }, [i18n]);
 
   return (
@@ -102,12 +102,6 @@ function Main() {
           ) : (
             <VideoStream debugMode={false} />
           )}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-            }}
-          ></div>
         </div>
         <TopNavigation cart={false} />
 
@@ -126,54 +120,8 @@ interface MainContentProps {
 }
 
 function MainContent({ collapsed, setCollapsed }: MainContentProps) {
-  const { criterias, exit } = useCamera();
-  const [shareOpen, setShareOpen] = useState(false);
-
-  const onClose = () => {
-    setShareOpen(false);
-  };
-
-  if (criterias.isFinished) {
-    return shareOpen ? (
-      <ShareModal onClose={onClose} />
-    ) : (
-      <div className="flex space-x-5 px-5 pb-10 font-serif">
-        <button
-          onClick={exit}
-          type="button"
-          className="h-10 w-full rounded border border-[#CA9C43] text-white"
-        >
-          Exit
-        </button>
-        <button
-          type="button"
-          className="h-10 w-full rounded bg-gradient-to-r from-[#CA9C43] to-[#92702D] text-white"
-          onClick={() => setShareOpen(true)}
-        >
-          Share <Icons.share className="ml-4 inline-block size-6" />
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <>
-      {collapsed ? null : <BottomContent />}
-      <div className="flex justify-center">
-        <button
-          type="button"
-          onClick={() => {
-            setCollapsed(!collapsed);
-          }}
-        >
-          {collapsed ? (
-            <ChevronUp className="size-6 text-white" />
-          ) : (
-            <ChevronDown className="size-6 text-white" />
-          )}
-        </button>
-      </div>
-    </>
+    <>{collapsed ? null : <BottomContent setCollapsed={setCollapsed} />}</>
   );
 }
 
@@ -197,12 +145,29 @@ const tabs = [
   "wrinkles",
 ] as const;
 
-function SkinProblems({ onClose }: { onClose: () => void }) {
+function SkinProblems({
+  onClose,
+  setCollapsed,
+}: {
+  onClose: () => void;
+  setCollapsed: (collapsed: boolean) => void;
+}) {
   const { tab, setTab, getTotalScoreByLabel } = useSkinAnalysis();
 
   return (
     <>
-      <div className="relative space-y-2 px-4 pb-4">
+      <div className="relative space-y-2 bg-black/10 p-2 px-4 pb-4 shadow-lg backdrop-blur-sm">
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              setCollapsed(true);
+            }}
+            className="flex hidden h-3 w-full items-center justify-center bg-transparent"
+          >
+            <div className="h-1 w-10 rounded-full bg-gray-400" />
+          </button>
+        </div>
         <div className="flex w-full items-center space-x-3.5 overflow-x-auto overflow-y-visible pt-7 no-scrollbar">
           {tabs.map((problemTab) => {
             const isActive = tab === problemTab;
@@ -335,7 +300,11 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
   );
 }
 
-function BottomContent() {
+interface BottomContentProps {
+  setCollapsed: (collapsed: boolean) => void;
+}
+
+function BottomContent({ setCollapsed }: BottomContentProps) {
   const { criterias, setCriterias } = useCamera();
   const { view, setView } = useSkinAnalysis();
 
@@ -345,6 +314,7 @@ function BottomContent() {
         onClose={() => {
           setView("face");
         }}
+        setCollapsed={setCollapsed}
       />
     );
   }

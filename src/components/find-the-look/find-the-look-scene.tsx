@@ -84,15 +84,6 @@ export function FindTheLookScene({ models }: FindTheLookSceneProps) {
             display: isInferenceCompleted ? "flex" : "none", // Hide when scanning
           }}
         >
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-              zIndex: 200,
-              pointerEvents: "none",
-            }}
-          ></div>
-
           <canvas
             ref={findTheLookCanvasRef}
             className="absolute left-0 top-0 h-full w-screen"

@@ -4,15 +4,7 @@ import { useTexture } from "@react-three/drei";
 import FaceMesh from "../three/face-mesh";
 import { Landmark } from "../../types/landmark";
 import { BilateralFilterShader } from "../../shaders/BilateralFilterShader";
-import {
-  Vector2,
-  ShaderMaterial,
-  LinearFilter,
-  CanvasTexture,
-  RGBFormat,
-  DoubleSide,
-  RedFormat,
-} from "three";
+import { DoubleSide } from "three";
 import { computeConvexHull } from "../../utils/imageProcessing";
 import Wrinkles from "../three/face/wrinkles";
 import Eyebag from "../three/face/eyebag";

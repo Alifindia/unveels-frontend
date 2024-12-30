@@ -131,16 +131,6 @@ export function SkinImprovementScene() {
           landmarks={landmarks}
         />
       </Canvas>
-
-      {/* Gradient Overlay */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-          zIndex: 200,
-          pointerEvents: "none",
-        }}
-      ></div>
     </div>
   );
 }

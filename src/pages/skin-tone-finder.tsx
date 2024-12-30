@@ -154,20 +154,19 @@ function Main() {
         <div className="absolute inset-0">
           <VideoStream debugMode={false} />
           <SkinToneFinderScene faceLandmarker={faceLandmarkerRef.current} />
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-            }}
-          ></div>
         </div>
         <TopNavigation cart={isInferenceFinished} />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
           {criterias.isCaptured ? "" : <VideoScene />}
           {isInferenceFinished && <Sidebar setCollapsed={setCollapsed} />}
-          <MainContent collapsed={collapsed} setCollapsed={setCollapsed} />
-          <Footer />
+          {isInferenceFinished && (
+            <div className="bg-black/10 p-2 shadow-lg backdrop-blur-sm">
+              <MainContent collapsed={collapsed} setCollapsed={setCollapsed} />
+              <Footer />
+            </div>
+          )}
+          {!isInferenceFinished && <Footer />}
         </div>
       </div>
     </>
@@ -180,53 +179,20 @@ interface MainContentProps {
 }
 
 function MainContent({ collapsed, setCollapsed }: MainContentProps) {
-  const { criterias, exit } = useCamera();
-  const [shareOpen, setShareOpen] = useState(false);
-
-  const onClose = () => {
-    setShareOpen(false);
-  };
-
-  if (criterias.isFinished) {
-    return shareOpen ? (
-      <ShareModal onClose={onClose} />
-    ) : (
-      <div className="flex space-x-5 px-5 pb-10 font-serif">
-        <button
-          onClick={exit}
-          type="button"
-          className="h-10 w-full rounded border border-[#CA9C43] text-white"
-        >
-          Exit
-        </button>
-        <button
-          type="button"
-          className="h-10 w-full rounded bg-gradient-to-r from-[#CA9C43] to-[#92702D] text-white"
-          onClick={() => setShareOpen(true)}
-        >
-          Share <Icons.share className="ml-4 inline-block size-6" />
-        </button>
-      </div>
-    );
-  }
-
   return (
     <>
-      {collapsed ? null : <BottomContent />}
       <div className="flex justify-center">
         <button
           type="button"
           onClick={() => {
             setCollapsed(!collapsed);
           }}
+          className="flex h-3 w-full items-center justify-center bg-transparent"
         >
-          {collapsed ? (
-            <ChevronUp className="size-6 text-white" />
-          ) : (
-            <ChevronDown className="size-6 text-white" />
-          )}
+          <div className="h-1 w-10 rounded-full bg-gray-400" />
         </button>
       </div>
+      {collapsed ? null : <BottomContent />}
     </>
   );
 }
@@ -601,18 +567,7 @@ function Sidebar({ setCollapsed }: SidebarProps) {
   return (
     <div className="pointer-events-none flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
       <div className="relative p-0.5">
-        <div
-          className="absolute inset-0 rounded-full border-2 border-transparent"
-          style={
-            {
-              background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
-              "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-              mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-              "-webkit-mask-composite": "destination-out",
-              "mask-composite": "exclude",
-            } as CSSProperties
-          }
-        />
+        <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 
         <div className="flex flex-col gap-4 rounded-full bg-black/25 px-1.5 py-2 backdrop-blur-md">
           <button className="" onClick={screenShoot}>
@@ -629,18 +584,6 @@ function Sidebar({ setCollapsed }: SidebarProps) {
           </button>
           <button className="" onClick={compareCapture}>
             <Icons.compare className="size-4 text-white sm:size-6" />
-          </button>
-          <button className="">
-            <Icons.reset
-              onClick={resetCapture}
-              className="size-4 text-white sm:size-6"
-            />
-          </button>
-          <button className="hidden">
-            <Icons.upload className="size-4 text-white sm:size-6" />
-          </button>
-          <button className="hidden">
-            <Icons.share className="size-4 text-white sm:size-6" />
           </button>
         </div>
       </div>

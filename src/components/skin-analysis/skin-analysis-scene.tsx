@@ -164,16 +164,6 @@ export function SkinAnalysisScene({ data }: SkinAnalysisSceneProps) {
         />
       </Canvas>
 
-      {/* Gradient Overlay */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-          zIndex: 200,
-          pointerEvents: "none",
-        }}
-      ></div>
-
       {/* Overlay Canvas untuk Labels */}
       <canvas
         ref={overlayCanvasRef}

@@ -225,13 +225,6 @@ function MainContent() {
             ) : (
               <>
                 <VideoStream />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-                    zIndex: 0,
-                  }}
-                ></div>
               </>
             )}
           </>
@@ -698,43 +691,6 @@ function FeatureSection({
         ))}
       </div>
       <div className="flex-1 border-b border-white/50 py-4"></div>
-    </div>
-  );
-}
-
-function RecorderStatus() {
-  const { isRecording, formattedTime, handleStartPause, handleStop, isPaused } =
-    useRecordingControls();
-
-  return (
-    <div className="absolute inset-x-0 top-14 flex items-center justify-center gap-4">
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={handleStartPause}
-      >
-        {isPaused ? (
-          <CirclePlay className="size-6 text-white" />
-        ) : isRecording ? (
-          <PauseCircle className="size-6 text-white" />
-        ) : null}
-      </button>
-      <span className="relative flex size-4">
-        {isRecording ? (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-        ) : null}
-        <span className="relative inline-flex size-4 rounded-full bg-red-500"></span>
-      </span>
-      <div className="font-serif text-white">{formattedTime}</div>
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={isRecording ? handleStop : handleStartPause}
-      >
-        {isRecording || isPaused ? (
-          <StopCircle className="size-6 text-white" />
-        ) : (
-          <CirclePlay className="size-6 text-white" />
-        )}
-      </button>
     </div>
   );
 }

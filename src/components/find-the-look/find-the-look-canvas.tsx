@@ -444,7 +444,7 @@ export function FindTheLookCanvas({
               // Draw landmark point
               ctx.beginPath();
               ctx.arc(drawX, drawY, 10, 0, 2 * Math.PI);
-              ctx.fillStyle = "white)"; // Red color
+              ctx.fillStyle = "white"; // Red color
               ctx.fill();
               ctx.closePath();
 
