@@ -79,7 +79,7 @@ function Main() {
           },
           runningMode: "IMAGE",
           maxResults: 5,
-          scoreThreshold: 0.25,
+          scoreThreshold: 0.4,
         },
       );
       modelsRef.current.accesoriesDetector = accesoriesDetectorInstance;

@@ -29,7 +29,7 @@ import { useFindTheLookContext } from "../../../../context/find-the-look-context
 
 export function ContourSelector() {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <ColorSelector />
       <ModeSelector />
       <ShapeSelector />

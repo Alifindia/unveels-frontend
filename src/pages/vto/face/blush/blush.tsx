@@ -17,7 +17,7 @@ import { getFaceMakeupProductTypeIds } from "../../../../api/attributes/makeups"
 
 export function BlushSelector() {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <ColorSelector />
 
       <TextureSelector />

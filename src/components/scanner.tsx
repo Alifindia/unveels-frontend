@@ -125,12 +125,6 @@ export function Scanner() {
           style={{}}
         />
       </div>
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-        }}
-      ></div>
     </>
   );
 }

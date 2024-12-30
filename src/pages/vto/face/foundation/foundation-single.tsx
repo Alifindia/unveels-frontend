@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 
 export function SingleFoundationSelector({ product }: { product: Product }) {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <div>
         <ColorSelector product={product} />
       </div>

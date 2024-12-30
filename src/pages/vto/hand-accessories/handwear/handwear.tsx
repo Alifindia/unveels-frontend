@@ -42,7 +42,7 @@ function useActiveHandwear(): "Rings" | "Bracelets" | "Bangles" {
 
 export function HandwearSelector() {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <FamilyColorSelector />
       <ColorSelector />
       <MaterialSelector />

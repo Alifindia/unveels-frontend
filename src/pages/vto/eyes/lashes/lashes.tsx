@@ -18,7 +18,7 @@ const colorFamilies = [{ name: "Black", value: "#000000" }];
 
 export function LashesSelector() {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <FamilyColorSelector />
 
       <ColorSelector />

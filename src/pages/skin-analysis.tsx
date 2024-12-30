@@ -82,6 +82,8 @@ function Main() {
     setIsInferenceRunning,
   } = useInferenceContext();
 
+  const { view } = useSkinAnalysis();
+
   const [inferenceResult, setInferenceResult] = useState<FaceResults[] | null>(
     null,
   );
@@ -191,13 +193,6 @@ function Main() {
                 ) : (
                   <>
                     <VideoStream />
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-                        zIndex: 0,
-                      }}
-                    ></div>
                   </>
                 )}
               </>
@@ -207,8 +202,9 @@ function Main() {
         <TopNavigation cart={isInferenceCompleted} />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
+          {!criterias.isCaptured && <VideoScene />}
           <MainContent isInferenceCompleted={isInferenceCompleted} />
-          <Footer />
+          {!isInferenceCompleted && <Footer />}
         </div>
       </div>
     </>
@@ -220,35 +216,6 @@ function MainContent({
 }: {
   isInferenceCompleted: boolean;
 }) {
-  const { criterias } = useCamera();
-  const [shareOpen, setShareOpen] = useState(false);
-
-  if (criterias.isFinished) {
-    return shareOpen ? (
-      <ShareModal
-        onClose={() => {
-          setShareOpen(false);
-        }}
-      />
-    ) : (
-      <div className="flex space-x-5 px-5 pb-10 font-serif">
-        <button
-          type="button"
-          className="h-10 w-full rounded border border-[#CA9C43] text-white"
-        >
-          Exit
-        </button>
-        <button
-          type="button"
-          className="h-10 w-full rounded bg-gradient-to-r from-[#CA9C43] to-[#92702D] text-white"
-          onClick={() => setShareOpen(true)}
-        >
-          Share <Icons.share className="ml-4 inline-block size-6" />
-        </button>
-      </div>
-    );
-  }
-
   return <BottomContent isInferenceCompleted={isInferenceCompleted} />;
 }
 
@@ -277,9 +244,6 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
-  const activeClassNames =
-    "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text";
-
   useEffect(() => {
     if (tabRefs.current[tab]) {
       tabRefs.current[tab]?.scrollIntoView({
@@ -297,7 +261,7 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
           onClose();
         }}
       ></div>
-      <div className="relative space-y-1 px-4 pb-2 sm:space-y-2">
+      <div className="relative space-y-1 bg-black/10 p-2 px-4 pb-2 shadow-lg backdrop-blur-sm sm:space-y-2">
         <div className="flex w-full items-center space-x-3.5 overflow-x-auto overflow-y-visible pt-7 no-scrollbar">
           {tabs.map((problemTab) => {
             const isActive = tab === problemTab;
@@ -332,7 +296,7 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
           })}
         </div>
 
-        <div className="px-8">
+        <div className="px-4">
           {tab && <DescriptionText text={labelsDescription[tab]} />}
         </div>
 
@@ -346,6 +310,8 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
         </div>
 
         {tab && <ProductList skinConcern={tab} />}
+
+        <Footer />
       </div>
     </>
   );
@@ -507,7 +473,7 @@ function BottomContent({
     );
   }
 
-  return <VideoScene />;
+  return <></>;
 }
 
 function ProblemResults({
@@ -534,6 +500,7 @@ function ProblemResults({
           </div>
         </>
       )}
+      {view == "face" && <Footer />}
     </>
   );
 }
@@ -1147,51 +1114,6 @@ function ProblemSection({
 
         <ProductList skinConcern={title} />
       </div>
-    </div>
-  );
-}
-
-function RecorderStatus() {
-  const { isRecording, formattedTime, handleStartPause, handleStop, isPaused } =
-    useRecordingControls();
-  const { finish } = useCamera();
-
-  return (
-    <div className="absolute inset-x-0 top-14 flex items-center justify-center gap-4">
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={handleStartPause}
-      >
-        {isPaused ? (
-          <CirclePlay className="size-6 text-white" />
-        ) : isRecording ? (
-          <PauseCircle className="size-6 text-white" />
-        ) : null}
-      </button>
-      <span className="relative flex size-4">
-        {isRecording ? (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-        ) : null}
-        <span className="relative inline-flex size-4 rounded-full bg-red-500"></span>
-      </span>
-      <div className="font-serif text-white">{formattedTime}</div>
-      <button
-        className="flex size-8 items-center justify-center"
-        onClick={
-          isRecording
-            ? () => {
-                handleStop();
-                finish();
-              }
-            : handleStartPause
-        }
-      >
-        {isRecording || isPaused ? (
-          <StopCircle className="size-6 text-white" />
-        ) : (
-          <CirclePlay className="size-6 text-white" />
-        )}
-      </button>
     </div>
   );
 }

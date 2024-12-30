@@ -231,7 +231,7 @@ function Main() {
             <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
             <div className="pointer-events-none absolute inset-0"></div>
           </div>
-          <TopNavigation item={false} cart={false} />
+          <TopNavigation />
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
             <Sidebar
@@ -240,7 +240,7 @@ function Main() {
               setMode={setMode}
               setShowChangeModel={setShowChangeModel}
             />
-            <div className="bg-black/10 p-2 shadow-lg backdrop-blur-sm">
+            <div className="bg-black/10 pt-1 shadow-lg backdrop-blur-sm">
               {isMainContentVisible && <MainContent />}
               <Footer />
             </div>
@@ -620,54 +620,51 @@ function RecorderStatus() {
   );
 }
 
-export function TopNavigation({
-  item = false,
-  cart = false,
-}: {
-  item?: boolean;
-  cart?: boolean;
-}) {
-  const { flipCamera } = useCamera();
-  return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
-      <div className="flex flex-col gap-3">
-        <Link
-          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          to="/virtual-try-on/makeups"
-        >
-          <ChevronLeft className="size-4 text-white" />
-        </Link>
+export function TopNavigation({}: {}) {
+  const isDevelopment = process.env.NODE_ENV === "development";
 
-        {item ? (
-          <div className="space-y-1 pt-8">
-            <div className="flex gap-x-3">
-              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Heart className="size-4 text-white" />
-              </button>
-              <div>
-                <p className="text-sm font-semibold text-white">
-                  Pro Filt’r Soft Matte Longwear Liquid Found
-                </p>
-                <p className="text-xs text-white/60">Brand Name</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-x-3">
-              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Plus className="size-4 text-white" />
-              </button>
-              <p className="text-sm font-medium text-white">$52.00</p>
-            </div>
-          </div>
-        ) : null}
-      </div>
-      <div className="flex flex-col gap-3">
-        <Link
-          type="button"
-          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          to="/"
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <div className="flex flex-col gap-4">
+        <a
+          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          href="https://unveels.com/technologies"
         >
-          <X className="size-4 text-white" />
-        </Link>
+          <ChevronLeft className="size-6 text-white" />
+        </a>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {isDevelopment ? (
+          <Link
+            type="button"
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+            to="/"
+          >
+            <X className="size-6 text-white" />
+          </Link>
+        ) : (
+          <a
+            type="button"
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+            href="https://unveels.com/technologies"
+          >
+            <X className="size-6 text-white" />
+          </a>
+        )}
+
+        <div className="relative -m-0.5 p-0.5">
+          <div
+            className="absolute inset-0 rounded-full border-2 border-transparent"
+            style={{
+              background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
+              WebkitMask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+              mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+              WebkitMaskComposite: "destination-out",
+              maskComposite: "exclude",
+            }}
+          />
+        </div>
       </div>
     </div>
   );

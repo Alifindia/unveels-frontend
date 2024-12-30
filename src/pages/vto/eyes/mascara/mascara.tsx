@@ -17,7 +17,7 @@ import { getLashMakeupProductTypeIds } from "../../../../api/attributes/makeups"
 
 export function MascaraSelector() {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <FamilyColorSelector />
 
       <ColorSelector />

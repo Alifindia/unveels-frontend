@@ -12,7 +12,7 @@ import { useMakeup } from "../../../../context/makeup-context";
 
 export function SingleEyeLinerSelector({ product }: { product: Product }) {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <div>
         <ColorSelector product={product} />
       </div>

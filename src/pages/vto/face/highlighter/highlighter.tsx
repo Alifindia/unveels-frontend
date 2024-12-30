@@ -32,7 +32,7 @@ import { useFindTheLookContext } from "../../../../context/find-the-look-context
 
 export function HighlighterSelector() {
   return (
-    <div className="mx-auto w-full px-4">
+    <div className="mx-auto w-full px-2">
       <ColorSelector />
 
       <TextureSelector />

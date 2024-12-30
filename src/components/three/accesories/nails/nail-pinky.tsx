@@ -37,6 +37,8 @@ const NailPinkyInner: React.FC<NailPinkyProps> = React.memo(
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.color.set(nailsColor); // Set initial color
                 mesh.material.side = BackSide;
+                mesh.material.transparent = true;
+                mesh.material.opacity = 0.3;
                 mesh.material.needsUpdate = true;
               }
               child.renderOrder = 4;
@@ -75,7 +77,7 @@ const NailPinkyInner: React.FC<NailPinkyProps> = React.memo(
         const nailsFingerY = -(nailsFingerDIP.y - 0.5) * outputHeight;
         const nailsFingerZ = 200;
 
-        const scaleFactor = (fingerSize * outputWidth) / 2;
+        const scaleFactor = (fingerSize * outputWidth) / 2.4;
 
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
         nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);

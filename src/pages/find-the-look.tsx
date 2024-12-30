@@ -170,6 +170,9 @@ function Main() {
     return <ModelLoadingScreen progress={progress} />;
   }
 
+  const { view, setView, findTheLookItems, tab, section, setTab, setSection } =
+    useFindTheLookContext();
+
   return (
     <>
       {!selectionMade && (
@@ -183,13 +186,6 @@ function Main() {
             ) : (
               <>
                 <VideoStream />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-                    zIndex: 0,
-                  }}
-                ></div>
               </>
             )}
           </div>
@@ -197,7 +193,7 @@ function Main() {
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
             <MainContent />
-            <Footer />
+            {view == "face" && <Footer />}
           </div>
         </div>
       )}
@@ -206,35 +202,6 @@ function Main() {
 }
 
 function MainContent() {
-  const { criterias } = useCamera();
-  const [shareOpen, setShareOpen] = useState(false);
-
-  if (criterias.isFinished) {
-    return shareOpen ? (
-      <ShareModal
-        onClose={() => {
-          setShareOpen(false);
-        }}
-      />
-    ) : (
-      <div className="flex space-x-5 px-5 pb-10 font-serif">
-        <button
-          type="button"
-          className="h-10 w-full rounded border border-[#CA9C43] text-white"
-        >
-          Exit
-        </button>
-        <button
-          type="button"
-          className="h-10 w-full rounded bg-gradient-to-r from-[#CA9C43] to-[#92702D] text-white"
-          onClick={() => setShareOpen(true)}
-        >
-          Share <Icons.share className="ml-4 inline-block size-6" />
-        </button>
-      </div>
-    );
-  }
-
   return <BottomContent />;
 }
 
@@ -426,7 +393,7 @@ const mapTypes: {
     attributeName: "head_accessories_product_type",
     values: headAccessoriesProductTypeFilter(["Hats"]),
   },
-  Hats: {
+  Hat: {
     attributeName: "head_accessories_product_type",
     values: headAccessoriesProductTypeFilter(["Hats"]),
   },
@@ -561,6 +528,10 @@ function BottomContent() {
   });
 
   useEffect(() => {
+    console.log(tab);
+  }, [tab]);
+
+  useEffect(() => {
     if (findTheLookItems) {
       const grouped = groupedItems(findTheLookItems);
       setGroupedItemsData(grouped);
@@ -574,16 +545,19 @@ function BottomContent() {
   if (criterias.isCaptured) {
     if (tab && section) {
       return (
-        <ProductRecommendationsTabs
-          groupedItemsData={groupedItemsData}
-          initialSection={initialSection}
-          activeTab={tab}
-          onClose={() => {
-            setTab(null);
-            setSection(null);
-            setView("face");
-          }}
-        />
+        <div className="bg-black/10 p-2 shadow-lg backdrop-blur-sm">
+          <ProductRecommendationsTabs
+            groupedItemsData={groupedItemsData}
+            initialSection={initialSection}
+            activeTab={tab}
+            onClose={() => {
+              setTab(null);
+              setSection(null);
+              setView("face");
+            }}
+          />
+          <Footer />
+        </div>
       );
     }
 
@@ -602,11 +576,14 @@ function BottomContent() {
 
     if (view === "recommendations") {
       return (
-        <ProductRecommendationsTabs
-          groupedItemsData={groupedItemsData}
-          initialSection="makeup"
-          onClose={() => setView("face")}
-        />
+        <div className="bg-black/10 p-2 shadow-lg backdrop-blur-sm">
+          <ProductRecommendationsTabs
+            groupedItemsData={groupedItemsData}
+            initialSection="makeup"
+            onClose={() => setView("face")}
+          />
+          <Footer />
+        </div>
       );
     }
 
