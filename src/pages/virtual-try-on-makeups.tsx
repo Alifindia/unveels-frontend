@@ -382,42 +382,55 @@ export function TopNavigation({ cart = false }: { cart?: boolean }) {
     if (process.env.NODE_ENV === "production") {
       if (backClickCount === 0) {
         setBackClickCount(1);
-        window.location.href = "/virtual-try-on/makeups";
+        window.location.href = "/virtual-try-on/accesories";
       } else {
         window.location.href = "https://unveels.com/technologies";
       }
-    } else {
-      window.location.href = "/virtual-try-on/makeups";
     }
   };
 
   const handleCloseClick = () => {
     if (process.env.NODE_ENV === "production") {
       window.location.href = "https://unveels.com/technologies";
-    } else {
-      window.location.href = "/";
     }
   };
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
       <div className="flex flex-col gap-3">
-        <button
-          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          onClick={handleBackClick}
-        >
-          <ChevronLeft className="size-4 text-white" />
-        </button>
+        {process.env.NODE_ENV === "development" ? (
+          <Link
+            to="/virtual-try-on/accesories"
+            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          >
+            <ChevronLeft className="size-4 text-white" />
+          </Link>
+        ) : (
+          <button
+            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+            onClick={handleBackClick}
+          >
+            <ChevronLeft className="size-4 text-white" />
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col gap-3">
-        <button
-          type="button"
-          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          onClick={handleCloseClick}
-        >
-          <X className="size-4 text-white" />
-        </button>
+        {process.env.NODE_ENV === "development" ? (
+          <Link
+            to="/"
+            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          >
+            <X className="size-4 text-white" />
+          </Link>
+        ) : (
+          <button
+            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+            onClick={handleCloseClick}
+          >
+            <X className="size-4 text-white" />
+          </button>
+        )}
       </div>
     </div>
   );
