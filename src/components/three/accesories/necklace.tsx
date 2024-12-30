@@ -71,16 +71,14 @@ const NecklaceInner: React.FC<NecklaceProps> = React.memo(
       const neckLandmark = landmarks.current[0];
 
       const neckDistance =
-        calculateDistance(landmarks.current[197], landmarks.current[152]) * 800;
+        calculateDistance(landmarks.current[197], landmarks.current[152]) * outputWidth * 1.5;
 
       // Scale coordinates proportionally with the viewport
       const scaleX = viewport.width / outputWidth;
       const scaleY = viewport.height / outputHeight;
 
-      const neckLandmarkX =
-        (1 - neckLandmark.x) * outputWidth * scaleX - viewport.width / 2;
-      const neckLandmarkY =
-        -neckLandmark.y * outputHeight * scaleY + viewport.height / 2;
+      const neckLandmarkX = (1 - neckLandmark.x - 0.5) * outputWidth;
+      const neckLandmarkY = -(neckLandmark.y - 0.5) * outputHeight;
       const neckLandmarkZ = -neckLandmark.z * 100;
 
       const faceSize = calculateDistance(
@@ -88,12 +86,12 @@ const NecklaceInner: React.FC<NecklaceProps> = React.memo(
         landmarks.current[389],
       );
 
-      const scaleFactor = faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+      const scaleFactor = (faceSize * outputWidth) / 15;
 
       if (neckLandmark) {
         necklaceRef.current.position.set(
           (neckLandmarkX / 6) * 2,
-          neckLandmarkY - neckDistance - neckDistanceY,
+          neckLandmarkY - neckDistance,
           0,
         );
 

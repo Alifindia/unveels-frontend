@@ -71,9 +71,8 @@ const HatInner: React.FC<Hatrops> = React.memo(({ landmarks, planeSize }) => {
     const scaleX = viewport.width / outputWidth;
     const scaleY = viewport.height / outputHeight;
 
-    const topHeadX =
-      (1 - topHead.x) * outputWidth * scaleX - viewport.width / 2;
-    const topHeadY = -topHead.y * outputHeight * scaleY + viewport.height / 2;
+    const topHeadX = (1 - topHead.x - 0.5) * outputWidth;
+    const topHeadY = -(topHead.y - 0.5) * outputHeight;
     const topHeadZ = -topHead.z * 100;
 
     const faceSize = calculateDistance(
@@ -82,13 +81,10 @@ const HatInner: React.FC<Hatrops> = React.memo(({ landmarks, planeSize }) => {
     );
 
     // Set position and scale
-    hatRef.current.position.set(
-      topHeadX,
-      topHeadY * scaleY * scaleYPosition,
-      topHeadZ,
-    );
+    hatRef.current.position.set(topHeadX, topHeadY, topHeadZ);
 
-    const scaleFactor = faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+
+    const scaleFactor = faceSize * outputWidth / 5;
 
     hatRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 

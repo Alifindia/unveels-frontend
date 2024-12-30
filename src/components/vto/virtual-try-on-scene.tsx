@@ -248,7 +248,7 @@ export function VirtualTryOnScene({
         ((normalizedX / canvasWidth) * 2 - 1) * scaleFactor + xShift;
       const threeY =
         ((normalizedY / canvasHeight) * 2 - 1) * scaleFactor + yShift;
-      const threeZ = z !== undefined ? -z * 0.1 : 0;
+      const threeZ = z !== undefined ? z * 0.001 : 0;
 
       return { x: threeX, y: threeY, z: threeZ };
     });
