@@ -32,9 +32,9 @@ const HandOccluderInner: React.FC<HandOccluderProps> = React.memo(
               mesh.material = new MeshBasicMaterial({
                 depthTest: true,
                 depthWrite: true,
-                colorWrite: false, 
+                colorWrite: false,
               });
-              mesh.renderOrder = 2;
+              mesh.renderOrder = 4;
             }
           });
 
@@ -74,7 +74,7 @@ const HandOccluderInner: React.FC<HandOccluderProps> = React.memo(
         const wristX =
           (1 - wrist.x) * outputWidth * scaleX - viewport.width / 2;
         const wristY = -wrist.y * outputHeight * scaleY + viewport.height / 2;
-        const wristZ = -wrist.z * 100;
+        const wristZ = 200;
 
         const scaleFactor = (wristSize * outputWidth) / 4;
 

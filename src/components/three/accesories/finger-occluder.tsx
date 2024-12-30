@@ -34,7 +34,7 @@ const FingerOccluderInner: React.FC<FingerOccluderProps> = React.memo(
                 depthWrite: true,
                 colorWrite: false, // Ubah ini jika sudah yakin occluder muncul
               });
-              mesh.renderOrder = 2;
+              mesh.renderOrder = 4;
             }
           });
 
@@ -68,13 +68,9 @@ const FingerOccluderInner: React.FC<FingerOccluderProps> = React.memo(
 
         const fingerSize = calculateDistance(middleFingerMCP, ringFingerMCP);
 
-        // Scale coordinates proportionally with the viewport
-        const scaleX = viewport.width / outputWidth;
-        const scaleY = viewport.height / outputHeight;
-
         const ringFingerX = (1 - ringFingerDIP.x - 0.5) * outputWidth;
         const ringFingerY = -(ringFingerDIP.y - 0.5) * outputHeight;
-        const ringFingerZ = -ringFingerDIP.z * 100;
+        const ringFingerZ = 200;
 
         const scaleFactor = (fingerSize * outputWidth) / 6.5;
 

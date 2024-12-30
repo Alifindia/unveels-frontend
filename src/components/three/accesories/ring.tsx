@@ -22,13 +22,6 @@ const RingInner: React.FC<RingProps> = React.memo(
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
 
-    const { scaleMultiplier } = useMemo(() => {
-      if (viewport.width > 1200) {
-        return { scaleMultiplier: 500 };
-      }
-      return { scaleMultiplier: 200 };
-    }, [viewport.width]);
-
     useEffect(() => {
       const loader = new GLTFLoader();
       loader.load(
@@ -42,7 +35,7 @@ const RingInner: React.FC<RingProps> = React.memo(
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.needsUpdate = true;
               }
-              child.renderOrder = 2;
+              child.renderOrder = 4;
             }
           });
 
@@ -74,13 +67,9 @@ const RingInner: React.FC<RingProps> = React.memo(
 
         const fingerSize = calculateDistance(middleFingerMCP, ringFingerMCP);
 
-        // Scale coordinates proportionally with the viewport
-        const scaleX = viewport.width / outputWidth;
-        const scaleY = viewport.height / outputHeight;
-
         const ringFingerX = (1 - ringFingerDIP.x - 0.5) * outputWidth;
         const ringFingerY = -(ringFingerDIP.y - 0.5) * outputHeight;
-        const ringFingerZ = -ringFingerDIP.z * 100;
+        const ringFingerZ = 200;
 
         const scaleFactor = (fingerSize * outputWidth) / 6;
 

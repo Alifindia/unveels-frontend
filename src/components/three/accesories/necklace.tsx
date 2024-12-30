@@ -71,7 +71,7 @@ const NecklaceInner: React.FC<NecklaceProps> = React.memo(
 
         const neckLandmarkX = (1 - neckLandmark.x - 0.5) * outputWidth;
         const neckLandmarkY = -(neckLandmark.y - 0.5) * outputHeight;
-        const neckLandmarkZ = -neckLandmark.z * 100;
+        const neckLandmarkZ = -neckLandmark.z * 200;
 
         const faceSize = calculateDistance(
           landmarks.current[162],

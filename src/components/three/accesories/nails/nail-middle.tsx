@@ -30,13 +30,6 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
 
-    const { scaleMultiplier } = useMemo(() => {
-      if (viewport.width > 1200) {
-        return { scaleMultiplier: 500 };
-      }
-      return { scaleMultiplier: 500 };
-    }, [viewport.width]);
-
     useEffect(() => {
       const loader = new GLTFLoader();
       loader.load(
@@ -52,7 +45,7 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
                 mesh.material.side = FrontSide;
                 mesh.material.needsUpdate = true;
               }
-              child.renderOrder = 2;
+              child.renderOrder = 4;
             }
           });
 
@@ -86,7 +79,7 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
         // Scale coordinates proportionally with the viewport
         const nailsFingerX = (1 - nailsFingerDIP.x - 0.5) * outputWidth;
         const nailsFingerY = -(nailsFingerDIP.y - 0.5) * outputHeight;
-        const nailsFingerZ = -nailsFingerDIP.z * 100;
+        const nailsFingerZ = 200;
 
         const scaleFactor = (fingerSize * outputWidth) / 2;
 

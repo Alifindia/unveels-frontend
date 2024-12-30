@@ -41,7 +41,7 @@ const WatchInner: React.FC<WatchProps> = React.memo(
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.needsUpdate = true;
               }
-              child.renderOrder = 2;
+              child.renderOrder = 4;
             }
           });
 
@@ -72,7 +72,7 @@ const WatchInner: React.FC<WatchProps> = React.memo(
         const wristSize = calculateDistance(wrist, thumbBase);
         const wristX = (1 - wrist.x - 0.5) * outputWidth;
         const wristY = -(wrist.y - 0.5) * outputHeight;
-        const wristZ = -wrist.z * 100;
+        const wristZ = 200;
 
         const scaleFactor = (wristSize * outputWidth) / 3;
 
