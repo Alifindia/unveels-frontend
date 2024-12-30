@@ -125,17 +125,13 @@ const EarringInner: React.FC<EarringProps> = React.memo(
       const scaleY = viewport.height / outputHeight;
 
       // Posisi kiri
-      const leftBottomEarX =
-        (1 - leftBottomEar.x) * outputWidth * scaleX - viewport.width / 2;
-      const leftBottomEarY =
-        -leftBottomEar.y * outputHeight * scaleY + viewport.height / 2;
+      const leftBottomEarX = (1 - leftBottomEar.x - 0.48) * outputWidth;
+      const leftBottomEarY = -(leftBottomEar.y - 0.45) * outputHeight;
       const leftBottomEarZ = -leftBottomEar.z * 100;
 
       // Posisi kanan
-      const rightBottomEarX =
-        (1 - rightBottomEar.x) * outputWidth * scaleX - viewport.width / 2;
-      const rightBottomEarY =
-        -rightBottomEar.y * outputHeight * scaleY + viewport.height / 2;
+      const rightBottomEarX = (1 - rightBottomEar.x - 0.52) * outputWidth;
+      const rightBottomEarY = -(rightBottomEar.y - 0.45) * outputHeight;
       const rightBottomEarZ = -rightBottomEar.z * 100;
 
       const faceSize = calculateDistance(
@@ -145,13 +141,12 @@ const EarringInner: React.FC<EarringProps> = React.memo(
 
       // Set posisi dan skala untuk left earring
       leftEarringRef.current.position.set(
-        leftBottomEarX * bottomEarPosX,
-        leftBottomEarY * bottomEarPosY,
+        leftBottomEarX,
+        leftBottomEarY,
         leftBottomEarZ - 40,
       );
 
-      const leftScaleFactor =
-        faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+      const leftScaleFactor = faceSize * outputWidth / 2;
       leftEarringRef.current.scale.set(
         leftScaleFactor,
         leftScaleFactor,
@@ -160,13 +155,12 @@ const EarringInner: React.FC<EarringProps> = React.memo(
 
       // Set posisi dan skala untuk right earring
       rightEarringRef.current.position.set(
-        rightBottomEarX * bottomEarPosX, // Tambahkan offset jika diperlukan
-        rightBottomEarY * bottomEarPosY,
+        rightBottomEarX, // Tambahkan offset jika diperlukan
+        rightBottomEarY,
         rightBottomEarZ - 40, // Tambahkan offset jika diperlukan
       );
 
-      const rightScaleFactor =
-        faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+      const rightScaleFactor = faceSize * outputWidth / 2;
       rightEarringRef.current.scale.set(
         rightScaleFactor,
         rightScaleFactor,

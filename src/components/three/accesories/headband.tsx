@@ -90,9 +90,8 @@ const HeadbandInner: React.FC<Headbandrops> = React.memo(
       const scaleX = viewport.width / outputWidth;
       const scaleY = viewport.height / outputHeight;
 
-      const topHeadX =
-        (1 - topHead.x) * outputWidth * scaleX - viewport.width / 2;
-      const topHeadY = -topHead.y * outputHeight * scaleY + viewport.height / 2;
+      const topHeadX = (1 - topHead.x - 0.5) * outputWidth;
+      const topHeadY = -(topHead.y - 0.45) * outputHeight;
       const topHeadZ = -topHead.z * 100;
 
       const faceSize = calculateDistance(
@@ -107,7 +106,7 @@ const HeadbandInner: React.FC<Headbandrops> = React.memo(
         topHeadZ - topHeadZPosition,
       );
 
-      const scaleFactor = faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+      const scaleFactor = faceSize * outputWidth / 8;
 
       headbandRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 

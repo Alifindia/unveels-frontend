@@ -72,10 +72,8 @@ const GlasessInner: React.FC<Glasessrops> = React.memo(
       const scaleX = viewport.width / outputWidth;
       const scaleY = viewport.height / outputHeight;
 
-      const centerEyeX =
-        (1 - centerEye.x) * outputWidth * scaleX - viewport.width / 2;
-      const centerEyeY =
-        -centerEye.y * outputHeight * scaleY + viewport.height / 2;
+      const centerEyeX = (1 - centerEye.x - 0.5) * outputWidth;
+      const centerEyeY = -(centerEye.y - 0.5) * outputHeight;
       const centerEyeZ = -centerEye.z * 100;
 
       const faceSize = calculateDistance(
@@ -86,7 +84,7 @@ const GlasessInner: React.FC<Glasessrops> = React.memo(
       // Set position and scale
       glasessRef.current.position.set(centerEyeX, centerEyeY, centerEyeZ);
 
-      const scaleFactor = faceSize * Math.min(scaleX, scaleY) * scaleMultiplier;
+      const scaleFactor = faceSize * outputWidth / 5;
 
       glasessRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
