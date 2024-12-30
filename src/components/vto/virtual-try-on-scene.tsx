@@ -166,10 +166,11 @@ export function VirtualTryOnScene({
   const legendColors = [[225, 194, 150, 255]];
 
   const { showHair } = useMakeup();
+  const showHairRef = useRef(showHair);
 
   useEffect(() => {
     // tf.enableDebugMode();
-    console.log(showHair);
+    showHairRef.current = showHair;
   }, [showHair]);
 
   useEffect(() => {
@@ -330,7 +331,7 @@ export function VirtualTryOnScene({
               handLandmarksRef.current = [];
             }
 
-            if (showHair) {
+            if (showHairRef.current) {
               const hairResults = hairSegmenterRef.current.segmentForVideo(
                 video,
                 startTimeMs,
@@ -338,12 +339,6 @@ export function VirtualTryOnScene({
 
               if (hairResults?.categoryMask) {
                 hairRef.current = hairResults.categoryMask.getAsFloat32Array();
-                let imageData = ctx.getImageData(
-                  0,
-                  0,
-                  video.videoWidth,
-                  video.videoHeight,
-                ).data;
 
                 if (hairResults?.categoryMask) {
                   hairRef.current =

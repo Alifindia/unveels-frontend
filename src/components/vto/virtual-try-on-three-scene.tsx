@@ -475,7 +475,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
             <>
               {hairMaskTextureRef.current && (
                 <mesh
-                  position={[0, 0, -499]}
+                  position={[0, 0, 100]}
                   scale={[-1, 1, 1]}
                   {...props}
                   renderOrder={3}

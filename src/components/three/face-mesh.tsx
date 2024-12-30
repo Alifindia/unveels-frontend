@@ -103,7 +103,7 @@ const FaceMesh: React.FC<FaceMeshProps> = ({
           const landmark = modifiedLandmarks[i];
           const x = (landmark.x - 0.5) * outputWidth;
           const y = -(landmark.y - 0.5) * outputHeight;
-          const z = -landmark.z;
+          const z = landmark.z;
           position.setXYZ(i, x, y, z);
         }
 
