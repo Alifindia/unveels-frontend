@@ -247,7 +247,7 @@ function Home() {
       <LinkButton to="/virtual-try-on-accesories/accesories">
         Virtual Try On Accesories
       </LinkButton>
-      <LinkButton to="/virtual-try-on-product?sku=1000364909,CK522120249,6821300800,1000038339">
+      <LinkButton to="/virtual-try-on-product?sku=31012490021,FA1258222">
         Virtual Try On Product
       </LinkButton>
       <LinkButton to="/virtual-assistant">Virtual Assistant</LinkButton>

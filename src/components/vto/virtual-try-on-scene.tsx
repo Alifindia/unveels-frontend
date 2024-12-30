@@ -170,6 +170,35 @@ export function VirtualTryOnScene({
 
   const legendColors = [[225, 194, 150, 255]];
 
+  const {
+    showFoundation,
+    showBlush,
+    showConcealer,
+    showHighlighter,
+    showContour,
+    showLipliner,
+    showLipplumper,
+    showLipColor,
+    showBronzer,
+    showLens,
+    showEyebrows,
+    showHair,
+    showEyeShadow,
+    showEyeliner,
+    showNails,
+  } = useMakeup();
+
+  const {
+    showHat,
+    showGlasess,
+    showHeadband,
+    showEarring,
+    showNecklace,
+    showWatch,
+    showBracelet,
+    showRing,
+  } = useAccesories();
+
   useEffect(() => {
     // tf.enableDebugMode();
   }, []);

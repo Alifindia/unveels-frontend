@@ -243,6 +243,7 @@ function ProductList({ product }: { product: Product }) {
         (item) => item.attribute_code === "material",
       )?.value,
     );
+    setShowWatch(true);
   };
 
   return (
