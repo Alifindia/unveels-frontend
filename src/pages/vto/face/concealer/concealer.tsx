@@ -18,7 +18,7 @@ import { getEyeMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
 export function ConcealerSelector() {
   return (
-    <div className="mx-auto w-full px-4">
+    <div className="mx-auto w-full px-2">
       <FamilyColorSelector />
 
       <ColorSelector />

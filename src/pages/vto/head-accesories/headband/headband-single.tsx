@@ -17,7 +17,7 @@ import { useAccesories } from "../../../../context/accesories-context";
 
 export function SingleHeadbandSelector({ product }: { product: Product }) {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <div>
         <ColorSelector product={product} />
       </div>

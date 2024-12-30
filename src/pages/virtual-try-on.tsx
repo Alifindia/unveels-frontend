@@ -233,7 +233,7 @@ function Main() {
               setMode={setMode}
               setShowChangeModel={setShowChangeModel}
             />
-            <div className="bg-black/10 p-2 shadow-lg backdrop-blur-sm">
+            <div className="bg-black/10 p-0 shadow-lg backdrop-blur-sm">
               {isMainContentVisible && <MainContent />}
               <Footer />
             </div>

@@ -10,7 +10,7 @@ import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 
 export function SingleBlushSelector({ product }: { product: Product }) {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <div>
         <ColorSelector product={product} />
       </div>

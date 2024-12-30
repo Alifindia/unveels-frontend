@@ -15,7 +15,7 @@ import { getLipsMakeupProductTypeIds } from "../../../../api/attributes/makeups"
 
 export function LipLinerSelector() {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <div>
         <FamilyColorSelector />
 

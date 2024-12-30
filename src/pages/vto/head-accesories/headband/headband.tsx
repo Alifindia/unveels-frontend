@@ -18,7 +18,7 @@ import { headAccessoriesProductTypeFilter } from "../../../../api/attributes/acc
 
 export function HeadbandSelector() {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <HeadbandFamilyColorSelector />
       <HeadbandColorSelector />
       <HeadbandFabricSelector />
