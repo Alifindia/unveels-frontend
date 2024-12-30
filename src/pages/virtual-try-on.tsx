@@ -224,7 +224,7 @@ function Main() {
             <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
             <div className="pointer-events-none absolute inset-0"></div>
           </div>
-          <TopNavigation cart={false} />
+          <TopNavigation />
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
             <Sidebar
@@ -564,63 +564,51 @@ function BottomContent() {
   return <Outlet />;
 }
 
-export function TopNavigation({ cart = false }: { cart?: boolean }) {
-  const { flipCamera } = useCamera();
-  const [backClickCount, setBackClickCount] = useState(0);
-
-  const handleBackClick = () => {
-    if (process.env.NODE_ENV === "production") {
-      if (backClickCount === 0) {
-        setBackClickCount(1);
-        window.location.href = "/virtual-try-on/accesories";
-      } else {
-        window.location.href = "https://unveels.com/technologies";
-      }
-    }
-  };
-
-  const handleCloseClick = () => {
-    if (process.env.NODE_ENV === "production") {
-      window.location.href = "https://unveels.com/technologies";
-    }
-  };
+export function TopNavigation({}: {}) {
+  const isDevelopment = process.env.NODE_ENV === "development";
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
-      <div className="flex flex-col gap-3">
-        {process.env.NODE_ENV === "development" ? (
-          <Link
-            to="/virtual-try-on/accesories"
-            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          >
-            <ChevronLeft className="size-4 text-white" />
-          </Link>
-        ) : (
-          <button
-            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            onClick={handleBackClick}
-          >
-            <ChevronLeft className="size-4 text-white" />
-          </button>
-        )}
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <div className="flex flex-col gap-4">
+        <a
+          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          href="https://unveels.com/technologies"
+        >
+          <ChevronLeft className="size-6 text-white" />
+        </a>
       </div>
 
-      <div className="flex flex-col gap-3">
-        {process.env.NODE_ENV === "development" ? (
+      <div className="flex flex-col gap-4">
+        {isDevelopment ? (
           <Link
+            type="button"
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
             to="/"
-            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           >
-            <X className="size-4 text-white" />
+            <X className="size-6 text-white" />
           </Link>
         ) : (
-          <button
-            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            onClick={handleCloseClick}
+          <a
+            type="button"
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+            href="https://unveels.com/technologies"
           >
-            <X className="size-4 text-white" />
-          </button>
+            <X className="size-6 text-white" />
+          </a>
         )}
+
+        <div className="relative -m-0.5 p-0.5">
+          <div
+            className="absolute inset-0 rounded-full border-2 border-transparent"
+            style={{
+              background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
+              WebkitMask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+              mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+              WebkitMaskComposite: "destination-out",
+              maskComposite: "exclude",
+            }}
+          />
+        </div>
       </div>
     </div>
   );

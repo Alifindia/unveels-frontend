@@ -382,7 +382,7 @@ export function TopNavigation({ cart = false }: { cart?: boolean }) {
     if (process.env.NODE_ENV === "production") {
       if (backClickCount === 0) {
         setBackClickCount(1);
-        window.location.href = "/virtual-try-on/accesories";
+        window.location.href = "/virtual-try-on/makeups";
       } else {
         window.location.href = "https://unveels.com/technologies";
       }
