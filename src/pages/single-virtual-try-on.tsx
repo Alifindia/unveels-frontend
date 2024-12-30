@@ -316,19 +316,19 @@ function Main({
       </div>
       <TopNavigation />
 
-      <div className="absolute inset-x-0 top-24 space-y-2.5 px-5">
+      <div className="absolute inset-x-0 top-24 space-y-2 px-4 sm:px-5">
         <div className="flex items-center">
           <button
             type="button"
-            className="flex size-[1.5rem] items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl sm:size-[1.875rem]"
+            className="flex size-[1.25rem] items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl sm:size-[1.5rem]"
           >
-            <HeartIcon className="sm:text-4 text-xs text-white" />
+            <HeartIcon className="text-[0.75rem] text-white sm:text-[1rem]" />
           </button>
-          <div className="w-full pl-4">
-            <div className="text-xs font-semibold text-white sm:text-sm md:text-base">
+          <div className="w-full pl-3 sm:pl-4">
+            <div className="text-[0.75rem] font-semibold text-white sm:text-xs md:text-sm">
               {product.name}
             </div>
-            <div className="text-xs text-white/60 sm:text-xs md:text-sm">
+            <div className="text-[0.75rem] text-white/60 sm:text-xs md:text-sm">
               <BrandName brandId={getProductAttributes(product, "brand")} />
             </div>
           </div>
@@ -337,12 +337,12 @@ function Main({
         <div className="flex items-center">
           <button
             type="button"
-            className="flex size-[1.5rem] items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl sm:size-[1.875rem]"
+            className="flex size-[1.25rem] items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl sm:size-[1.5rem]"
           >
-            <PlusIcon className="sm:text-4 text-xs text-white" />
+            <PlusIcon className="text-[0.75rem] text-white sm:text-[1rem]" />
           </button>
-          <div className="w-full pl-4">
-            <div className="text-xs font-medium text-white sm:text-sm md:text-base">
+          <div className="w-full pl-3 sm:pl-4">
+            <div className="text-[0.75rem] font-medium text-white sm:text-xs md:text-sm">
               ${product.price}
             </div>
           </div>
@@ -517,30 +517,45 @@ function TopNavigation({
 }) {
   const { flipCamera } = useCamera();
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
-      <div className="flex flex-col gap-4">
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <div className="flex flex-col gap-3">
         <Link
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           to="/virtual-try-on/makeups"
         >
-          <ChevronLeft className="size-6 text-white" />
-        </Link>
-      </div>
-      <div className="flex flex-col gap-4">
-        <Link
-          type="button"
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          to="/"
-        >
-          <X className="size-6 text-white" />
+          <ChevronLeft className="size-4 text-white" />
         </Link>
 
-        <button
+        {item ? (
+          <div className="space-y-1 pt-8">
+            <div className="flex gap-x-3">
+              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
+                <Heart className="size-4 text-white" />
+              </button>
+              <div>
+                <p className="text-sm font-semibold text-white">
+                  Pro Filt’r Soft Matte Longwear Liquid Found
+                </p>
+                <p className="text-xs text-white/60">Brand Name</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-x-3">
+              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
+                <Plus className="size-4 text-white" />
+              </button>
+              <p className="text-sm font-medium text-white">$52.00</p>
+            </div>
+          </div>
+        ) : null}
+      </div>
+      <div className="flex flex-col gap-3">
+        <Link
           type="button"
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          to="/"
         >
-          <Icons.myCart className="size-6 text-white" />
-        </button>
+          <X className="size-4 text-white" />
+        </Link>
       </div>
     </div>
   );

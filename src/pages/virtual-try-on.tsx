@@ -573,44 +573,44 @@ export function TopNavigation({
 }) {
   const { flipCamera } = useCamera();
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
-      <div className="flex flex-col gap-4">
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <div className="flex flex-col gap-3">
         <Link
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           to="/virtual-try-on/makeups"
         >
-          <ChevronLeft className="size-6 text-white" />
+          <ChevronLeft className="size-4 text-white" />
         </Link>
 
         {item ? (
-          <div className="space-y-2 pt-10">
-            <div className="flex gap-x-4">
-              <button className="flex size-8 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Heart className="size-5 text-white" />
+          <div className="space-y-1 pt-8">
+            <div className="flex gap-x-3">
+              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
+                <Heart className="size-4 text-white" />
               </button>
               <div>
-                <p className="font-semibold leading-4 text-white">
+                <p className="text-sm font-semibold text-white">
                   Pro Filt’r Soft Matte Longwear Liquid Found
                 </p>
-                <p className="text-white/60">Brand Name</p>
+                <p className="text-xs text-white/60">Brand Name</p>
               </div>
             </div>
-            <div className="flex items-center gap-x-4">
-              <button className="flex size-8 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
-                <Plus className="size-5 text-white" />
+            <div className="flex items-center gap-x-3">
+              <button className="flex size-6 shrink-0 items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl">
+                <Plus className="size-4 text-white" />
               </button>
-              <p className="font-medium text-white">$52.00</p>
+              <p className="text-sm font-medium text-white">$52.00</p>
             </div>
           </div>
         ) : null}
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         <Link
           type="button"
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           to="/"
         >
-          <X className="size-6 text-white" />
+          <X className="size-4 text-white" />
         </Link>
       </div>
     </div>
