@@ -123,24 +123,6 @@ function MainContent() {
       );
       modelPersonalityFinderRef.current = model;
     },
-    async () => {
-      // Warmup for modelFaceShape
-      if (modelFaceShapeRef.current) {
-        const warmupFace = modelFaceShapeRef.current.predict(
-          tf.zeros([1, 224, 224, 3], "float32"),
-        );
-
-        tf.dispose([warmupFace]);
-      }
-      // Warmup for modelPersonalityFinder
-      if (modelPersonalityFinderRef.current) {
-        const warmupPersonality = modelPersonalityFinderRef.current.predict(
-          tf.zeros([1, 224, 224, 3], "float32"),
-        );
-
-        tf.dispose([warmupPersonality]);
-      }
-    },
   ];
 
   const {

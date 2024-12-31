@@ -40,6 +40,7 @@ import {
   runTFLiteInference,
 } from "../utils/tfliteInference";
 import { useCartContext } from "../context/cart-context";
+import { LinkButton } from "../App";
 
 export function FaceAnalyzer() {
   return (
@@ -108,24 +109,6 @@ function MainContent() {
         "/media/unveels/models/personality-finder/personality_finder.tflite",
       );
       modelPersonalityFinderRef.current = model;
-    },
-    async () => {
-      // Warmup for modelFaceShape
-      if (modelFaceShapeRef.current) {
-        const warmupFace = modelFaceShapeRef.current.predict(
-          tf.zeros([1, 224, 224, 3], "float32"),
-        );
-
-        tf.dispose([warmupFace]);
-      }
-      // Warmup for modelPersonalityFinder
-      if (modelPersonalityFinderRef.current) {
-        const warmupPersonality = modelPersonalityFinderRef.current.predict(
-          tf.zeros([1, 224, 224, 3], "float32"),
-        );
-
-        tf.dispose([warmupPersonality]);
-      }
     },
   ];
 
@@ -482,12 +465,14 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                     >
                       ADD TO CART
                     </button>
-                    <button
-                      type="button"
+                    <LinkButton
+                      to={`/virtual-try-on-product?sku=${profile.products
+                        .map((product) => product.sku)
+                        .join(",")}`}
                       className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
                     >
                       TRY ON
-                    </button>
+                    </LinkButton>
                   </div>
                 </div>
               );
@@ -553,12 +538,12 @@ function RecommendationsTab({ faceShape }: { faceShape: string }) {
                     >
                       ADD TO CART
                     </button>
-                    <button
-                      type="button"
+                    <LinkButton
+                      to={`/virtual-try-on-product?sku=${product.sku}`}
                       className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
                     >
                       TRY ON
-                    </button>
+                    </LinkButton>
                   </div>
                 </div>
               );

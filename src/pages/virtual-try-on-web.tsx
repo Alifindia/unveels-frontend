@@ -354,7 +354,7 @@ function Main() {
 
           //before after
           if (data.beforeAfter !== undefined) {
-            compareCapture();
+            compareCapture;
           }
 
           //flip camera
