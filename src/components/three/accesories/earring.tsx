@@ -89,19 +89,19 @@ const EarringInner: React.FC<EarringProps> = React.memo(
         leftEarringRef.current.visible = true;
         leftEarringRef.current.visible = true;
         // Earring kiri menggunakan landmark 132
-        const leftBottomEar = currentLandmarks[93];
+        const leftBottomEar = currentLandmarks[132];
 
         // Earring kanan menggunakan landmark 323
-        const rightBottomEar = currentLandmarks[323];
+        const rightBottomEar = currentLandmarks[361];
 
         // Posisi kiri
-        const leftBottomEarX = (1 - leftBottomEar.x - 0.48) * outputWidth;
-        const leftBottomEarY = -(leftBottomEar.y - 0.45) * outputHeight;
+        const leftBottomEarX = (1 - leftBottomEar.x - 0.49) * outputWidth;
+        const leftBottomEarY = -(leftBottomEar.y - 0.49) * outputHeight;
         const leftBottomEarZ = -leftBottomEar.z * 100;
 
         // Posisi kanan
-        const rightBottomEarX = (1 - rightBottomEar.x - 0.52) * outputWidth;
-        const rightBottomEarY = -(rightBottomEar.y - 0.45) * outputHeight;
+        const rightBottomEarX = (1 - rightBottomEar.x - 0.51) * outputWidth;
+        const rightBottomEarY = -(rightBottomEar.y - 0.49) * outputHeight;
         const rightBottomEarZ = -rightBottomEar.z * 100;
 
         const faceSize = calculateDistance(
