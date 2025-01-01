@@ -324,7 +324,7 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
             <button
               key={index}
               className={clsx(
-                "w-full translate-y-0.5 border-b-2 py-2",
+                "w-full translate-y-0.5 border-b-2 py-2 text-sm md:text-base", // text-sm untuk mobile, md:text-base untuk layar lebih besar
                 tab.title === selectedTab
                   ? "border-[#CA9C43] bg-gradient-to-r from-[#92702D] to-[#CA9C43] bg-clip-text text-transparent"
                   : "border-transparent text-[#9E9E9E]",
