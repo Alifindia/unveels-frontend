@@ -26,13 +26,17 @@ export function VTOProductCard({
       }
     : {};
 
+  const truncateText = (text: string, charLimit: number) => {
+    return text.length > charLimit ? text.slice(0, charLimit) + "..." : text;
+  };
+
   return (
     <div
       style={cardStyle}
-      className="w-[70px] cursor-pointer sm:w-[100px]"
+      className="w-[100px] cursor-pointer sm:w-[130px]"
       onClick={onClick} // Memanggil onClick saat produk diklik
     >
-      <div className="relative h-[47.6px] w-[70px] overflow-hidden sm:h-[70px] sm:w-[100px]">
+      <div className="relative h-[68px] w-[100px] overflow-hidden sm:h-[88.4px] sm:w-[130px]">
         <img
           src={imageUrl}
           alt="Product"
@@ -40,14 +44,14 @@ export function VTOProductCard({
         />
       </div>
 
-      <h3 className="line-clamp-2 h-6 py-1 text-[0.425rem] font-semibold text-white sm:h-10 sm:py-2 sm:text-[0.625rem]">
-        {product.name}
+      <h3 className="mb-3 line-clamp-2 h-6 py-1 text-[0.6rem] font-semibold text-white sm:h-10 sm:py-2 sm:text-[0.75rem]">
+        {truncateText(product.name || "", 20)}
       </h3>
-      <p className="h-3 text-[0.425rem] text-white/60 sm:h-4 sm:text-[0.625rem]">
-        <BrandName brandId={getProductAttributes(product, "brand")} />
-      </p>
+      {/* <p className="h-3 text-[0.425rem] text-white/60 sm:h-4 sm:text-[0.625rem]">
+        <BrandName brandId={getProductAttributes(product, "brand") || ""} />
+      </p> */}
       <div className="flex items-end justify-between space-x-1 pt-1">
-        <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.4375rem] text-transparent sm:text-[0.625rem]">
+        <div className="bg-gradient-to-r bg-clip-text text-[0.5rem] text-transparent text-white sm:text-[0.625rem]">
           ${product.price}
         </div>
         <button
