@@ -66,16 +66,6 @@ function Main() {
       );
       modelSkinAnalysisRef.current = model;
     },
-    async () => {
-      if (modelSkinAnalysisRef.current) {
-        console.log("warming up model");
-
-        const warmupModel = await modelSkinAnalysisRef.current.predict(
-          tf.zeros([1, 640, 640, 3], "float32"),
-        );
-        tf.dispose([warmupModel]);
-      }
-    },
   ];
 
   const {

@@ -109,12 +109,21 @@ function FamilyColorSelector() {
 
 function ColorSelector() {
   const { colorFamily, selectedColor, setSelectedColor } = useGlassesContext();
+  const { setShowGlasess } = useAccesories();
 
   const { data } = useGlassesQuery({
     color: colorFamily,
     material: null,
     shape: null,
   });
+
+  useEffect(() => {
+    if (selectedColor === null) {
+      setShowGlasess(false);
+    } else {
+      setShowGlasess(true);
+    }
+  }, [selectedColor]);
 
   const extractHexa = extractUniqueCustomAttributes(
     data?.items ?? [],

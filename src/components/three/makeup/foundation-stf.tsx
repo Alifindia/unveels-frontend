@@ -13,14 +13,15 @@ interface FoundationSTFProps extends MeshProps {
 
 const FoundationSTFInner: React.FC<FoundationSTFProps> = React.memo(
   ({ landmarks, planeSize, isFlipped }) => {
-    const { foundationColor } = useMakeup();
+    const { foundationColor, showFoundation } = useMakeup();
 
     // Membuat material dengan useMemo hanya saat foundationColor berubah
     const foundationMaterial = useMemo(() => {
       return new MeshBasicMaterial({
         color: new Color(foundationColor),
         transparent: true,
-        opacity: 0.2,
+        opacity: 0.05,
+        visible: showFoundation,
       });
     }, [foundationColor]);
 

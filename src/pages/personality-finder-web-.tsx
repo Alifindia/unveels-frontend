@@ -82,24 +82,6 @@ function MainContent() {
       );
       modelPersonalityFinderRef.current = model;
     },
-    async () => {
-      // Warmup for modelFaceShape
-      if (modelFaceShapeRef.current) {
-        const warmupFace = modelFaceShapeRef.current.predict(
-          tf.zeros([1, 224, 224, 3], "float32"),
-        );
-
-        tf.dispose([warmupFace]);
-      }
-      // Warmup for modelPersonalityFinder
-      if (modelPersonalityFinderRef.current) {
-        const warmupPersonality = modelPersonalityFinderRef.current.predict(
-          tf.zeros([1, 224, 224, 3], "float32"),
-        );
-
-        tf.dispose([warmupPersonality]);
-      }
-    },
   ];
 
   const {
@@ -235,15 +217,8 @@ function MainContent() {
                       <img
                         src={criterias.capturedImage}
                         alt="Captured"
-                        className="h-full w-full object-cover"
+                        className={`h-full w-full ${criterias.flipped ? "" : "scale-x-[-1]"} transform object-cover`}
                       />
-                      <div
-                        className="absolute inset-0"
-                        style={{
-                          background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-                          zIndex: 0,
-                        }}
-                      ></div>
                     </>
                   )}
                 </>

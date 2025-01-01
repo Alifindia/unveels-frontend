@@ -93,9 +93,19 @@ function FamilyColorSelector() {
 function ColorSelector() {
   const { colorFamily, selectedColor, setSelectedColor } = useNeckwearContext();
   const neckwearType = useActiveNeckwear();
+  const { setShowNecklace } = useAccesories();
+
   const { data } = useNeckwearQuery(neckwearType, {
     color: colorFamily,
   });
+
+  useEffect(() => {
+    if (selectedColor === null) {
+      setShowNecklace(false);
+    } else {
+      setShowNecklace(true);
+    }
+  }, [selectedColor]);
 
   const extractHexa = extractUniqueCustomAttributes(
     data?.items ?? [],

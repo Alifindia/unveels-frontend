@@ -72,11 +72,20 @@ function FamilyColorSelector() {
 
 function ColorSelector() {
   const { colorFamily, selectedColor, setSelectedColor } = useEarringsContext();
+  const { setShowEarring } = useAccesories();
 
   const { data } = useEarringsQuery({
     color: colorFamily,
     shape: null,
   });
+
+  useEffect(() => {
+    if (selectedColor === null) {
+      setShowEarring(false);
+    } else {
+      setShowEarring(true);
+    }
+  }, [selectedColor]);
 
   const extractHexa = extractUniqueCustomAttributes(
     data?.items ?? [],

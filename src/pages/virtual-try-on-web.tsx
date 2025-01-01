@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { VirtualTryOnScene } from "../components/vto/virtual-try-on-scene";
 import {
   AccesoriesProvider,
   useAccesories,
 } from "../context/accesories-context";
 import { MakeupProvider, useMakeup } from "../context/makeup-context";
-import { CameraProvider } from "../context/recorder-context";
+import { CameraProvider, useCamera } from "../context/recorder-context";
+import { atan } from "@tensorflow/tfjs-core";
 
 export function VirtualTryOnWeb() {
   return (
@@ -67,6 +68,8 @@ function Main() {
     setShowNails,
     setNailsTexture,
     setNailsColor,
+    setShowHair,
+    setHairColor,
   } = useMakeup();
 
   const {
@@ -79,6 +82,11 @@ function Main() {
     setShowRing,
     setShowWatch,
   } = useAccesories();
+
+  const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
+
+  const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
 
   useEffect(() => {
     // Handler untuk menerima pesan
@@ -143,7 +151,6 @@ function Main() {
           }
 
           // lens
-
           if (data.showLens !== undefined) {
             setShowLens(data.setShowLens);
           }
@@ -153,7 +160,6 @@ function Main() {
           }
 
           // foundation
-
           if (data.showFoundation !== undefined) {
             setShowFoundation(data.showFoundation);
           }
@@ -279,6 +285,42 @@ function Main() {
           if (data.nailsTexture !== undefined) {
             setNailsTexture(data.nailsTexture);
           }
+
+          // hair
+          if (data.showHair !== undefined) {
+            setShowHair(data.showHair);
+          }
+
+          if (data.hairColor !== undefined) {
+            setHairColor(data.hairColor);
+          }
+
+          //before after
+          if (data.beforeAfter !== undefined) {
+            compareCapture;
+          }
+
+          //flip camera
+          if (data.flipCamera !== undefined) {
+            flipCamera();
+          }
+
+          // screenshoot
+          if (data.screenShoot !== undefined) {
+            screenShoot();
+          }
+
+          // media
+          if (data.mode !== undefined) {
+            setMode(data.mode);
+          }
+
+          // set media file
+          if (data.media !== undefined) {
+            setMediaFile(data.media);
+          }
+
+          //handle add media
         } catch (error) {
           console.error("Error parsing message:", error); // Menampilkan error jika parsing gagal
         }
@@ -294,12 +336,12 @@ function Main() {
     return () => {
       window.removeEventListener("message", handleMessage);
     };
-  }, []); // Empty dependency array berarti hanya dijalankan saat mount dan unmount
+  }, []);
 
   return (
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
       <div className="absolute inset-0">
-        <VirtualTryOnScene />
+        <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
         <div className="pointer-events-none absolute inset-0"></div>
       </div>
     </div>

@@ -134,11 +134,19 @@ function ProductList() {
     colorFamily,
     setColorFamily,
     setSelectedColor,
+    selectedColor,
     colorFamilyToInclude,
     setColorFamilyToInclude,
   } = useHairColorContext();
 
-  const { setShowHair } = useMakeup();
+  const { setShowHair, setHairColor } = useMakeup();
+
+  useEffect(() => {
+    if (selectedColor) {
+      setHairColor(selectedColor);
+      setShowHair(true);
+    }
+  }, [selectedColor]);
 
   const { data, isLoading } = useHairColorQuery({
     color: colorFamily,
@@ -194,7 +202,6 @@ function ProductList() {
         .find((item) => item.attribute_code === "hexacode")
         ?.value.split(",")[0],
     );
-    setShowHair(true);
   };
 
   return (

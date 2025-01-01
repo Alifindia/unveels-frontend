@@ -1,7 +1,3 @@
-import {
-  preprocessTFLiteImage,
-  runTFLiteInference,
-} from "../utils/tfliteInference";
 import { FaceLandmarker } from "@mediapipe/tasks-vision";
 import {
   thickNessLabels,

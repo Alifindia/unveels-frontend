@@ -664,7 +664,7 @@ export function VideoStream({
           <img
             src={capturedImageSrc}
             alt="Captured"
-            className={`h-full w-full scale-x-[-1] transform object-cover`}
+            className={`h-full w-full ${criterias.flipped ? "" : "scale-x-[-1]"} transform object-cover`}
           />
         </div>
       ) : (

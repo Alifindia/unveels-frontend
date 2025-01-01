@@ -28,14 +28,17 @@ export function VTOProductCard({
       }
     : {};
 
+  const truncateText = (text: string, charLimit: number) => {
+    return text.length > charLimit ? text.slice(0, charLimit) + "..." : text;
+  };
+
   return (
     <div
       style={cardStyle}
-      className="w-[50px] cursor-pointer sm:w-[70px] md:w-[90px] lg:w-[100px]"
+      className="w-[100px] cursor-pointer sm:w-[130px]"
       onClick={onClick} // Memanggil onClick saat produk diklik
     >
-      {/* Gambar responsif */}
-      <div className="relative h-[35px] w-[50px] overflow-hidden sm:h-[50px] sm:w-[70px] md:h-[65px] md:w-[90px] lg:h-[75px] lg:w-[100px]">
+      <div className="relative h-[68px] w-[100px] overflow-hidden sm:h-[88.4px] sm:w-[130px]">
         <img
           src={imageUrl}
           alt="Product"
@@ -43,26 +46,19 @@ export function VTOProductCard({
         />
       </div>
 
-      {/* Nama Produk */}
-      <h3 className="line-clamp-2 h-4 py-1 text-[0.35rem] font-semibold text-white sm:h-6 sm:py-1 sm:text-[0.5rem] md:h-8 md:text-[0.55rem] lg:text-[0.625rem]">
-        {product.name}
+      <h3 className="mb-3 line-clamp-2 h-6 py-1 text-[0.6rem] font-semibold text-white sm:h-10 sm:py-2 sm:text-[0.75rem]">
+        {truncateText(product.name || "", 20)}
       </h3>
-
-      {/* Brand */}
-      <p className="h-3 text-[0.35rem] text-white/60 sm:h-3 sm:text-[0.45rem] md:h-4 md:text-[0.5rem] lg:text-[0.55rem]">
-        <BrandName brandId={getProductAttributes(product, "brand")} />
-      </p>
-
-      {/* Harga dan Tombol */}
+      {/* <p className="h-3 text-[0.425rem] text-white/60 sm:h-4 sm:text-[0.625rem]">
+        <BrandName brandId={getProductAttributes(product, "brand") || ""} />
+      </p> */}
       <div className="flex items-end justify-between space-x-1 pt-1">
-        {/* Harga */}
-        <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.35rem] text-transparent sm:text-[0.45rem] md:text-[0.5rem] lg:text-[0.55rem]">
+        <div className="bg-gradient-to-r bg-clip-text text-[0.5rem] text-transparent text-white sm:text-[0.625rem]">
           ${product.price}
         </div>
-        {/* Tombol */}
         <button
           type="button"
-          className="flex h-3 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-0.5 text-[0.3rem] font-semibold text-white sm:h-4 sm:px-1 sm:text-[0.45rem] md:h-5 md:px-1 md:text-[0.5rem] lg:h-6 lg:px-1.5 lg:text-[0.55rem]"
+          className="flex h-4 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-0.5 text-[0.4rem] font-semibold text-white sm:h-7 sm:px-1.5 sm:text-[0.625rem]"
         >
           Add to cart
         </button>

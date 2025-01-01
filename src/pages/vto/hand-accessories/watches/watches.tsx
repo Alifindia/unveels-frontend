@@ -69,11 +69,21 @@ function FamilyColorSelector() {
 
 function ColorSelector() {
   const { colorFamily, selectedColor, setSelectedColor } = useWatchesContext();
+  const { setShowWatch } = useAccesories();
+
   const { data } = useWatchesQuery({
     color: colorFamily,
     material: null,
     shape: null,
   });
+
+  useEffect(() => {
+    if (selectedColor === null) {
+      setShowWatch(false);
+    } else {
+      setShowWatch(true);
+    }
+  }, [selectedColor]);
 
   const extractHexa = extractUniqueCustomAttributes(
     data?.items ?? [],

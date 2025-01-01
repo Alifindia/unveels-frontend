@@ -17,7 +17,7 @@ const GlasessInner: React.FC<Glasessrops> = React.memo(
   ({ landmarks, planeSize }) => {
     const glasessRef = useRef<Object3D | null>(null);
     const { scene, viewport } = useThree(); // Ambil ukuran viewport dan layar
-    const { envMapAccesories } = useAccesories();
+    const { envMapAccesories, showGlasess } = useAccesories();
 
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
@@ -34,6 +34,7 @@ const GlasessInner: React.FC<Glasessrops> = React.memo(
               if (mesh.material instanceof MeshStandardMaterial) {
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.needsUpdate = true;
+                mesh.material.visible = showGlasess;
               }
               child.renderOrder = 2;
             }

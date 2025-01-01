@@ -108,11 +108,13 @@ function SkinToneFinderInnerScene({
   const { criterias } = useCamera();
   const [imageLoaded, setImageLoaded] = useState<HTMLImageElement | null>(null);
 
+  const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
+
   // Replace useState with useRef for landmarks
   const landmarksRef = useRef<Landmark[]>([]);
 
-  const { setSkinColor, setHexColor } = useSkinColor();
-  const { setFoundationColor } = useMakeup();
+  const { setSkinColor } = useSkinColor();
+  const { setFoundationColor, setShowFoundation } = useMakeup();
 
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const divRef = useRef<HTMLCanvasElement>(null);
@@ -137,11 +139,53 @@ function SkinToneFinderInnerScene({
     }
   }, [criterias.capturedImage]);
 
-  // for flutter webView
-  function changeHex(data: string) {
-    setHexColor(data);
-    setFoundationColor(data);
-  }
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      console.log("Message received:", event);
+
+      if (event.data) {
+        try {
+          const data = JSON.parse(event.data);
+          console.log("Parsed data:", data);
+
+          if (data.showFoundation !== undefined) {
+            setShowFoundation(data.showFoundation);
+          }
+
+          if (data.foundationColor !== undefined) {
+            setFoundationColor(data.foundationColor);
+          }
+
+          //before after
+          if (data.beforeAfter !== undefined) {
+            compareCapture();
+          }
+
+          //flip camera
+          if (data.flipCamera !== undefined) {
+            flipCamera();
+          }
+
+          // screenshoot
+          if (data.screenShoot !== undefined) {
+            screenShoot();
+          }
+        } catch (error) {
+          console.error("Error parsing message:", error);
+        }
+      } else {
+        console.warn("No data received in message event");
+      }
+    };
+
+    // Menambahkan event listener untuk menerima pesan
+    window.addEventListener("message", handleMessage);
+
+    // Membersihkan event listener saat komponen unmount
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
 
   // Memproses gambar dan mendeteksi landmark
   useEffect(() => {
