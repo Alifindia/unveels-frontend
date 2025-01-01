@@ -10,7 +10,6 @@ const MainContent = ({
 }) => {
   return (
     <div className="relative mx-auto flex h-full min-h-dvh w-full flex-col bg-black pt-20">
-      <RecorderStatus />
       <TopNavigation onBack={onBack} />
       <div className="text-center text-[11.2px] font-extrabold text-white sm:text-base lg:text-xl">
         How would you like to communicate with me today
