@@ -16,7 +16,7 @@ interface Hatrops extends MeshProps {
 const HatInner: React.FC<Hatrops> = React.memo(({ landmarks, planeSize }) => {
   const hatRef = useRef<Object3D | null>(null);
   const { scene, viewport } = useThree(); // Ambil ukuran viewport dan layar
-  const { envMapAccesories } = useAccesories();
+  const { envMapAccesories, showHat } = useAccesories();
 
   const outputWidth = planeSize[0];
   const outputHeight = planeSize[1];
@@ -33,6 +33,7 @@ const HatInner: React.FC<Hatrops> = React.memo(({ landmarks, planeSize }) => {
             if (mesh.material instanceof MeshStandardMaterial) {
               mesh.material.envMap = envMapAccesories;
               mesh.material.needsUpdate = true;
+              mesh.material.visible = showHat;
             }
             child.renderOrder = 2;
           }

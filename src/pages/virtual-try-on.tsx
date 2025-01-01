@@ -249,34 +249,7 @@ function Main() {
 function MainContent() {
   const [collapsed, setCollapsed] = useState(false);
   const { criterias } = useCamera();
-  const [shareOpen, setShareOpen] = useState(false);
   const navigate = useNavigate();
-
-  if (criterias.isFinished) {
-    return shareOpen ? (
-      <ShareModal
-        onClose={() => {
-          setShareOpen(false);
-        }}
-      />
-    ) : (
-      <div className="flex space-x-5 px-5 pb-10 font-serif">
-        <button
-          type="button"
-          className="h-10 w-full rounded border border-[#CA9C43] text-white"
-        >
-          Exit
-        </button>
-        <button
-          type="button"
-          className="h-10 w-full rounded bg-gradient-to-r from-[#CA9C43] to-[#92702D] text-white"
-          onClick={() => setShareOpen(true)}
-        >
-          Share <Icons.share className="ml-4 inline-block size-6" />
-        </button>
-      </div>
-    );
-  }
 
   return (
     <>

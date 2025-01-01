@@ -17,6 +17,7 @@ import { Product } from "../../../../api/shared";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 import { getNailPolishProductTypeIds } from "../../../../api/attributes/makeups";
 import { useMakeup } from "../../../../context/makeup-context";
+import { useAccesories } from "../../../../context/accesories-context";
 
 export function NailPolishSelector() {
   return (
@@ -75,10 +76,19 @@ function ColorSelector() {
   const { colorFamily, selectedColor, setSelectedColor } =
     useNailPolishContext();
 
+  const { setShowNails } = useMakeup();
   const { data } = useNailPolishQuery({
     color: colorFamily,
     texture: null,
   });
+
+  useEffect(() => {
+    if (selectedColor === null) {
+      setShowNails(false);
+    } else {
+      setShowNails(true);
+    }
+  }, [selectedColor]);
 
   const extracted_sub_colors = extractUniqueCustomAttributes(
     data?.items ?? [],

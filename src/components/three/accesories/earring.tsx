@@ -19,7 +19,7 @@ const EarringInner: React.FC<EarringProps> = React.memo(
     const leftEarringRef = useRef<Object3D | null>(null);
     const rightEarringRef = useRef<Object3D | null>(null);
     const { scene, viewport } = useThree();
-    const { envMapAccesories } = useAccesories();
+    const { envMapAccesories, showEarring } = useAccesories();
 
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
@@ -39,6 +39,7 @@ const EarringInner: React.FC<EarringProps> = React.memo(
                 if (mesh.material instanceof MeshStandardMaterial) {
                   mesh.material.envMap = envMapAccesories;
                   mesh.material.needsUpdate = true;
+                  mesh.material.visible = showEarring;
                 }
                 child.renderOrder = 2;
               }

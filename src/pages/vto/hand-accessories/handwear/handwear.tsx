@@ -90,12 +90,23 @@ function FamilyColorSelector() {
 
 function ColorSelector() {
   const { colorFamily, selectedColor, setSelectedColor } = useHandwearContext();
+
+  const { setShowRing } = useAccesories();
+
   const handwearType = useActiveHandwear();
 
   const { data } = useHandwearQuery(handwearType, {
     color: colorFamily,
     material: null,
   });
+
+  useEffect(() => {
+    if (selectedColor === null) {
+      setShowRing(false);
+    } else {
+      setShowRing(true);
+    }
+  }, [selectedColor]);
 
   const extractHexa = extractUniqueCustomAttributes(
     data?.items ?? [],

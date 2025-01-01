@@ -16,7 +16,7 @@ const NecklaceInner: React.FC<NecklaceProps> = React.memo(
   ({ landmarks, planeSize }) => {
     const necklaceRef = useRef<Object3D | null>(null);
     const { scene, viewport } = useThree();
-    const { envMapAccesories } = useAccesories();
+    const { envMapAccesories, showNecklace } = useAccesories();
 
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
@@ -33,6 +33,7 @@ const NecklaceInner: React.FC<NecklaceProps> = React.memo(
               if (mesh.material instanceof MeshStandardMaterial) {
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.needsUpdate = true;
+                mesh.material.visible = showNecklace;
               }
               child.renderOrder = 2;
             }

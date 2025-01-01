@@ -17,7 +17,7 @@ const HeadbandInner: React.FC<Headbandrops> = React.memo(
   ({ landmarks, planeSize }) => {
     const headbandRef = useRef<Object3D | null>(null);
     const { scene, viewport } = useThree(); // Ambil ukuran viewport dan layar
-    const { envMapAccesories } = useAccesories();
+    const { envMapAccesories, showHeadband } = useAccesories();
 
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
@@ -56,6 +56,7 @@ const HeadbandInner: React.FC<Headbandrops> = React.memo(
               if (mesh.material instanceof MeshStandardMaterial) {
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.needsUpdate = true;
+                mesh.material.visible = showHeadband;
               }
               child.renderOrder = 2;
             }
