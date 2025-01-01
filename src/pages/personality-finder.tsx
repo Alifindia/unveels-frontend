@@ -257,43 +257,31 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
     <div className="flex h-screen flex-col bg-black font-sans text-white">
       {/* Navigation */}
       <div className="mb-14">
-        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
-          <button className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-white/25 backdrop-blur-3xl">
-            <ChevronLeft className="size-6 text-white" />
-          </button>
-
-          <Link
-            type="button"
-            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-white/25 backdrop-blur-3xl"
-            to="/"
-          >
-            <X className="size-6 text-white" />
-          </Link>
-
+        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-3 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
           <TopNavigation cart={inferenceResult.length > 0} />
         </div>
       </div>
 
       {/* Profile Section */}
-      <div className="flex items-start space-x-1 px-5 py-6">
-        <div className="shrink-0 px-5">
+      <div className="flex items-start space-x-1 px-3 py-4">
+        <div className="shrink-0 px-3">
           <div className="flex items-center justify-center rounded-full bg-gradient-to-b from-[#CA9C43] to-[#644D21] p-1">
             {criterias.capturedImage ? (
               <img
-                className="size-20 rounded-full object-fill sm:size-24"
+                className="size-16 rounded-full object-fill sm:size-20"
                 src={criterias.capturedImage}
                 alt="Captured Profile"
               />
             ) : (
               <img
-                className="size-24 rounded-full"
+                className="size-20 rounded-full"
                 src="https://avatar.iran.liara.run/public/30"
                 alt="Profile"
               />
             )}
           </div>
 
-          <div className="pt-2 text-center text-sm">
+          <div className="pt-1 text-center text-xs">
             {t(
               `personalityLabels.${inferenceResult?.[15]?.outputLabel.toLocaleLowerCase() || ""}`,
             )}
@@ -301,12 +289,12 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
         </div>
         <div>
           <div className="flex items-center gap-x-1">
-            <Icons.hashtagCircle className="size-4" />
-            <div className="text-sm">
+            <Icons.hashtagCircle className="size-3" />
+            <div className="text-xs">
               {t("viewpersonality.aiPersonalityAnalysis")} :
             </div>
           </div>
-          <div className="mt-1 pl-5 pr-8 text-[10.8px] sm:text-xs lg:pl-0 lg:pt-7">
+          <div className="mt-1 pl-4 pr-6 text-[9px] sm:text-[10.8px] lg:pl-0 lg:pt-5">
             {inferenceResult?.[15]?.outputIndex !== undefined
               ? t(
                   `personalityAnalysisResult.${inferenceResult[15].outputIndex}`,
@@ -318,13 +306,13 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
 
       {/* Tabs */}
 
-      <div className="mx-auto w-full max-w-[430px] px-5">
+      <div className="mx-auto w-full max-w-[400px] px-3">
         <div className="flex border-b-2 border-white/50">
           {tabs.map((tab, index) => (
             <button
               key={index}
               className={clsx(
-                "w-full translate-y-0.5 border-b-2 py-2",
+                "w-full translate-y-0.5 border-b-2 py-1.5 text-xs md:text-sm", // text-xs untuk mobile, md:text-sm untuk layar lebih besar
                 tab.title === selectedTab
                   ? "border-[#CA9C43] bg-gradient-to-r from-[#92702D] to-[#CA9C43] bg-clip-text text-transparent"
                   : "border-transparent text-[#9E9E9E]",
@@ -362,8 +350,8 @@ function PersonalityTab({ data }: { data: Classifier[] | null }) {
   }
 
   return (
-    <div className="flex-1 space-y-6 overflow-auto px-5 py-6 md:px-10">
-      <h2 className="text-center text-xl font-medium">
+    <div className="flex-1 space-y-6 overflow-auto px-5 py-6 md:px-5">
+      <h2 className="text-center text-lg font-medium md:text-xl">
         {t("viewpersonality.personality_traits")}
       </h2>
 
@@ -404,87 +392,51 @@ function PersonalityTab({ data }: { data: Classifier[] | null }) {
           className="mx-auto w-full max-w-96"
         />
         <div className="flex items-center justify-between space-x-4 bg-black text-white">
-          {/* Left Column */}
-          <div className="space-y-4">
-            {/* Extraversion */}
-            <div className="flex items-center space-x-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#FFC300] text-sm font-bold text-white">
-                {data?.[15]?.outputData !== undefined
-                  ? (data[15].outputData[0] * 100).toFixed(1)
-                  : ""}
-              </div>
-              <span>{t("personality.extraversion.title")}</span>
-            </div>
-
-            {/* Conscientiousness */}
-            <div className="flex items-center space-x-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#F72585] text-sm font-bold text-white">
-                {data?.[15]?.outputData !== undefined
-                  ? (data[15].outputData[3] * 100).toFixed(1)
-                  : ""}
-              </div>
-              <span>{t("personality.conscientiousness.title")}</span>
-            </div>
-
-            {/* Openness to Experience */}
-            <div className="flex items-center space-x-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#4CC9F0] text-sm font-bold text-white">
-                {data?.[15]?.outputData !== undefined
-                  ? (data[15].outputData[4] * 100).toFixed(1)
-                  : ""}
-              </div>
-              <span>{t("personality.openness.title")}</span>
-            </div>
+          <div className="space-y-3">
+            <TraitItem
+              color="#FFC300"
+              score={data?.[15]?.outputData?.[0]}
+              title={t("personality.extraversion.title")}
+            />
+            <TraitItem
+              color="#F72585"
+              score={data?.[15]?.outputData?.[3]}
+              title={t("personality.conscientiousness.title")}
+            />
+            <TraitItem
+              color="#4CC9F0"
+              score={data?.[15]?.outputData?.[4]}
+              title={t("personality.openness.title")}
+            />
           </div>
-
-          {/* Right Column */}
-          <div className="space-y-4">
-            {/* Agreeableness */}
-            <div className="flex items-center space-x-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#5ED400] text-sm font-bold text-white">
-                {data?.[15]?.outputData !== undefined
-                  ? (data[15].outputData[2] * 100).toFixed(1)
-                  : ""}
-              </div>
-              <span>{t("personality.agreeableness.title")}</span>
-            </div>
-
-            {/* Neuroticism */}
-            <div className="flex items-center space-x-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#B5179E] text-sm font-bold text-white">
-                {data?.[15]?.outputData !== undefined
-                  ? (data[15].outputData[1] * 100).toFixed(1)
-                  : ""}
-              </div>
-              <span>{t("personality.neuroticism.title")}</span>
-            </div>
+          <div className="space-y-3">
+            <TraitItem
+              color="#5ED400"
+              score={data?.[15]?.outputData?.[2]}
+              title={t("personality.agreeableness.title")}
+            />
+            <TraitItem
+              color="#B5179E"
+              score={data?.[15]?.outputData?.[1]}
+              title={t("personality.neuroticism.title")}
+            />
           </div>
         </div>
       </div>
 
       <div className="mx-auto hidden w-full max-w-3xl items-center gap-x-4 md:flex">
         <div className="flex flex-1 items-center justify-between space-x-4 bg-black text-white">
-          {/* Right Column */}
           <div className="space-y-4">
-            {/* Agreeableness */}
-            <div className="flex items-center space-x-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#5ED400] text-sm font-bold text-white">
-                {data?.[15]?.outputData !== undefined
-                  ? (data[15].outputData[2] * 100).toFixed(1)
-                  : ""}
-              </div>
-              <span>{t("personality.agreeableness.title")}</span>
-            </div>
-
-            {/* Neuroticism */}
-            <div className="flex items-center space-x-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#B5179E] text-sm font-bold text-white">
-                {data?.[15]?.outputData !== undefined
-                  ? (data[15].outputData[1] * 100).toFixed(1)
-                  : ""}
-              </div>
-              <span>{t("personality.neuroticism.title")}</span>
-            </div>
+            <TraitItem
+              color="#5ED400"
+              score={data?.[15]?.outputData?.[2]}
+              title={t("personality.agreeableness.title")}
+            />
+            <TraitItem
+              color="#B5179E"
+              score={data?.[15]?.outputData?.[1]}
+              title={t("personality.neuroticism.title")}
+            />
           </div>
         </div>
 
@@ -495,118 +447,98 @@ function PersonalityTab({ data }: { data: Classifier[] | null }) {
                   {
                     percentage: data[15].outputData[0] * 100,
                     color: "#FFC300",
-                  }, // Extraversion
+                  },
                   {
                     percentage: data[15].outputData[1] * 100,
                     color: "#B5179E",
-                  }, // Neuroticism
+                  },
                   {
                     percentage: data[15].outputData[2] * 100,
                     color: "#5ED400",
-                  }, // Agreeableness
+                  },
                   {
                     percentage: data[15].outputData[3] * 100,
                     color: "#F72585",
-                  }, // Conscientiousness
+                  },
                   {
                     percentage: data[15].outputData[4] * 100,
                     color: "#4CC9F0",
-                  }, // Openness to Experience
+                  },
                 ]
               : [
-                  { percentage: 90, color: "#FFC300" }, // Extraversion
-                  { percentage: 75, color: "#B5179E" }, // Neuroticism
-                  { percentage: 60, color: "#5ED400" }, // Agreeableness
-                  { percentage: 45, color: "#F72585" }, // Conscientiousness
-                  { percentage: 30, color: "#4CC9F0" }, // Openness to Experience
+                  { percentage: 90, color: "#FFC300" },
+                  { percentage: 75, color: "#B5179E" },
+                  { percentage: 60, color: "#5ED400" },
+                  { percentage: 45, color: "#F72585" },
+                  { percentage: 30, color: "#4CC9F0" },
                 ]
           }
           className="mx-auto size-96"
         />
 
         <div className="flex flex-1 items-center justify-between space-x-4 bg-black text-white">
-          {/* Left Column */}
           <div className="space-y-4">
-            {/* Extraversion */}
-            <div className="flex items-center space-x-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#FFC300] text-sm font-bold text-white">
-                {data?.[15]?.outputData !== undefined
-                  ? (data[15].outputData[0] * 100).toFixed(1)
-                  : ""}
-              </div>
-              <span>{t("personality.extraversion.title")}</span>
-            </div>
-
-            {/* Conscientiousness */}
-            <div className="flex items-center space-x-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#F72585] text-sm font-bold text-white">
-                {data?.[15]?.outputData !== undefined
-                  ? (data[15].outputData[3] * 100).toFixed(1)
-                  : ""}
-              </div>
-              <span>{t("personality.conscientiousness.title")}</span>
-            </div>
-
-            {/* Openness to Experience */}
-            <div className="flex items-center space-x-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#4CC9F0] text-sm font-bold text-white">
-                {data?.[15]?.outputData !== undefined
-                  ? (data[15].outputData[4] * 100).toFixed(1)
-                  : ""}
-              </div>
-              <span>{t("personality.openness.title")}</span>
-            </div>
+            <TraitItem
+              color="#FFC300"
+              score={data?.[15]?.outputData?.[0]}
+              title={t("personality.extraversion.title")}
+            />
+            <TraitItem
+              color="#F72585"
+              score={data?.[15]?.outputData?.[3]}
+              title={t("personality.conscientiousness.title")}
+            />
+            <TraitItem
+              color="#4CC9F0"
+              score={data?.[15]?.outputData?.[4]}
+              title={t("personality.openness.title")}
+            />
           </div>
         </div>
       </div>
 
       <div className="divide-y divide-white/50">
-        <PersonalitySection
-          title={t("personality.openness.title")}
-          description={t("personality.openness.description")}
-          score={
-            data?.[15]?.outputData !== undefined
-              ? parseFloat((data[15].outputData[4] * 100).toFixed(1))
-              : 0
-          }
-        />
-        <PersonalitySection
-          title={t("personality.neuroticism.title")}
-          description={t("personality.neuroticism.description")}
-          score={
-            data?.[15]?.outputData !== undefined
-              ? parseFloat((data[15].outputData[1] * 100).toFixed(1))
-              : 0
-          }
-        />
-        <PersonalitySection
-          title={t("personality.agreeableness.title")}
-          description={t("personality.agreeableness.description")}
-          score={
-            data?.[15]?.outputData !== undefined
-              ? parseFloat((data[15].outputData[2] * 100).toFixed(1))
-              : 0
-          }
-        />
-        <PersonalitySection
-          title={t("personality.extraversion.title")}
-          description={t("personality.extraversion.description")}
-          score={
-            data?.[15]?.outputData !== undefined
-              ? parseFloat((data[15].outputData[0] * 100).toFixed(1))
-              : 0
-          }
-        />
-        <PersonalitySection
-          title={t("personality.conscientiousness.title")}
-          description={t("personality.conscientiousness.description")}
-          score={
-            data?.[15]?.outputData !== undefined
-              ? parseFloat((data[15].outputData[3] * 100).toFixed(1))
-              : 0
-          }
-        />
+        {[
+          "openness",
+          "neuroticism",
+          "agreeableness",
+          "extraversion",
+          "conscientiousness",
+        ].map((trait, index) => (
+          <PersonalitySection
+            key={trait}
+            title={t(`personality.${trait}.title`)}
+            description={t(`personality.${trait}.description`)}
+            score={
+              data?.[15]?.outputData
+                ? parseFloat((data[15].outputData[index] * 100).toFixed(1))
+                : 0
+            }
+          />
+        ))}
       </div>
+    </div>
+  );
+}
+
+function TraitItem({
+  color,
+  score,
+  title,
+}: {
+  color: string;
+  score?: number;
+  title: string;
+}) {
+  return (
+    <div className="flex items-center space-x-2.5">
+      <div
+        className="flex size-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
+        style={{ backgroundColor: color }}
+      >
+        {score !== undefined ? (score * 100).toFixed(1) : ""}
+      </div>
+      <span className="text-xs md:text-sm">{title}</span>
     </div>
   );
 }
@@ -620,25 +552,23 @@ function PersonalitySection({
   description: string;
   score: number;
 }) {
-  // High -> 70% - 100%
-  // Moderate -> above 40% - 69%
-  // low -> 0% - 39%
   const { t } = useTranslation();
   const scoreType = score < 40 ? "Low" : score < 70 ? "Moderate" : "High";
   return (
     <div className="py-5">
       <div className="flex items-center space-x-2 pb-6">
         <Icons.personalityTriangle className="size-8" />
-
-        <h2 className="text-3xl font-bold text-white">{title}</h2>
+        <h2 className="text-lg font-bold text-white md:text-3xl">{title}</h2>
       </div>
 
-      <span className="text-xl font-bold">
+      <span className="text-base font-bold md:text-xl">
         {t("viewpersonality.description")}
       </span>
-      <p className="pb-6 pt-1 text-sm">{description}</p>
+      <p className="pb-6 pt-1 text-xs md:text-sm">{description}</p>
 
-      <span className="text-xl font-bold">{t("viewpersonality.score")}</span>
+      <span className="text-base font-bold md:text-xl">
+        {t("viewpersonality.score")}
+      </span>
       <div
         className={clsx(
           "text-sm",
@@ -909,9 +839,9 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
   }
 
   return (
-    <div className="grid flex-1 grid-cols-1 gap-4 space-y-6 overflow-auto px-10 py-6 md:grid-cols-2 md:space-y-0">
+    <div className="grid flex-1 grid-cols-1 gap-2 space-y-4 overflow-auto px-10 py-3 text-xs md:grid-cols-2 md:gap-4 md:space-y-0 md:px-40 md:py-6 md:text-base">
       <FeatureSection
-        icon={<Icons.face className="size-12" />}
+        icon={<Icons.face className="size-6 md:size-12" />}
         title={t("attributepf.face.title")}
         features={[
           {
@@ -929,7 +859,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
-        icon={<Icons.eye className="size-12" />}
+        icon={<Icons.eye className="size-6 md:size-12" />}
         title={t("attributepf.eyes.title")}
         features={[
           {
@@ -965,7 +895,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
-        icon={<Icons.brows className="size-12" />}
+        icon={<Icons.brows className="size-6 md:size-12" />}
         title={t("attributepf.brows.title")}
         features={[
           {
@@ -993,7 +923,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
-        icon={<Icons.lips className="size-12" />}
+        icon={<Icons.lips className="size-6 md:size-12" />}
         title={t("attributepf.lips.title")}
         features={[
           {
@@ -1011,7 +941,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
-        icon={<Icons.cheekbones className="size-12" />}
+        icon={<Icons.cheekbones className="size-6 md:size-12" />}
         title={t("attributepf.cheekbones.title")}
         features={[
           {
@@ -1023,7 +953,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
-        icon={<Icons.nose className="size-12" />}
+        icon={<Icons.nose className="size-6 md:size-12" />}
         title={t("attributepf.nose.title")}
         features={[
           {
@@ -1035,7 +965,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
-        icon={<Icons.hair className="size-12" />}
+        icon={<Icons.hair className="size-6 md:size-12" />}
         title={t("attributepf.hair.title")}
         features={[
           {
@@ -1065,24 +995,31 @@ function FeatureSection({
   }[];
 }) {
   return (
-    <div className="flex h-full flex-col border-white/50 md:even:border-l md:even:pl-4">
+    <div className="flex h-full flex-col border-white/50 md:py-4 md:even:border-l md:even:pl-4">
       <div className="flex flex-col space-y-2">
-        <div className="flex items-center space-x-2 pb-5">
-          <span className="text-2xl">{icon}</span>
-          <h2 className="text-3xl font-semibold">{title}</h2>
+        {/* Section Title */}
+        <div className="flex items-center space-x-3 pb-4">
+          <span className="text-xl md:text-2xl">{icon}</span> {/* Icon size */}
+          <h2 className="text-xl font-semibold md:text-2xl">{title}</h2>{" "}
+          {/* Title size */}
         </div>
-        <div className="grid grid-cols-2 gap-4">
+
+        {/* Feature Items */}
+        <div className="grid grid-cols-2 gap-y-4">
           {features.map((feature, index) => (
-            <div key={index} className="">
-              <div className="text-xl font-bold">{feature.name}</div>
+            <div key={index}>
+              <div className="text-base font-bold md:text-lg">
+                {feature.name}
+              </div>{" "}
+              {/* Feature name */}
               {feature.color ? (
                 <div
-                  className="w-ful h-6"
+                  className="h-6 w-full"
                   style={{ backgroundColor: feature.hex }}
                 ></div>
               ) : (
                 <ul>
-                  <li className="list-inside list-disc text-sm">
+                  <li className="list-inside list-disc text-xs md:text-sm">
                     {feature.value}
                   </li>
                 </ul>
@@ -1091,7 +1028,9 @@ function FeatureSection({
           ))}
         </div>
       </div>
-      <div className="flex-1 border-b border-white/50 py-4"></div>
+
+      {/* Divider */}
+      <div className="mt-4 flex-1 border-b border-white/50"></div>
     </div>
   );
 }

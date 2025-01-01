@@ -17,7 +17,7 @@ const RingInner: React.FC<RingProps> = React.memo(
   ({ handLandmarks, planeSize }) => {
     const ringRef = useRef<Object3D | null>(null);
     const { scene, viewport } = useThree();
-    const { envMapAccesories } = useAccesories();
+    const { envMapAccesories, showRing } = useAccesories();
 
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
@@ -34,6 +34,7 @@ const RingInner: React.FC<RingProps> = React.memo(
               if (mesh.material instanceof MeshStandardMaterial) {
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.needsUpdate = true;
+                mesh.material.visible = showRing;
               }
               child.renderOrder = 4;
             }

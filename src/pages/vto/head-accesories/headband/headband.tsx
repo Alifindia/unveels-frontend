@@ -66,10 +66,20 @@ function HeadbandFamilyColorSelector() {
 
 function HeadbandColorSelector() {
   const { colorFamily, selectedColor, setSelectedColor } = useHeadbandContext();
+  const { setShowHeadband } = useAccesories();
+
   const { data } = useHeadbandQuery({
     color: colorFamily,
     fabric: null,
   });
+
+  useEffect(() => {
+    if (selectedColor === null) {
+      setShowHeadband(false);
+    } else {
+      setShowHeadband(true);
+    }
+  }, [selectedColor]);
 
   const extractHexa = extractUniqueCustomAttributes(
     data?.items ?? [],

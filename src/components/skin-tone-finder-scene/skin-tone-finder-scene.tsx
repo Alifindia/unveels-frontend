@@ -139,7 +139,6 @@ function SkinToneFinderInnerScene({
     }
   }, [criterias.capturedImage]);
 
-  // for flutter webView
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       console.log("Message received:", event);

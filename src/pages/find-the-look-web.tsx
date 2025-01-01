@@ -135,19 +135,12 @@ function Main() {
             ) : (
               <>
                 <VideoStream />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: `linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 100%)`,
-                    zIndex: 0,
-                  }}
-                ></div>
               </>
             )}
           </div>
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-            <VideoScene />
+            {!criterias.isCaptured && <VideoScene />}
             <Footer />
           </div>
         </div>

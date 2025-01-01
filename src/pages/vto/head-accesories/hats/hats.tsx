@@ -64,11 +64,21 @@ function FamilyColorSelector() {
 
 function ColorSelector() {
   const { colorFamily, selectedColor, setSelectedColor } = useHatsContext();
+  const { setShowHat } = useAccesories();
+
   const { data } = useHatsQuery({
     color: colorFamily,
     fabric: null,
     occasion: null,
   });
+
+  useEffect(() => {
+    if (selectedColor === null) {
+      setShowHat(false);
+    } else {
+      setShowHat(true);
+    }
+  }, [selectedColor]);
 
   const extractHexa = extractUniqueCustomAttributes(
     data?.items ?? [],

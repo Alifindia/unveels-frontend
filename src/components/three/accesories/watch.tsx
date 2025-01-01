@@ -23,7 +23,7 @@ const WatchInner: React.FC<WatchProps> = React.memo(
   ({ handLandmarks, planeSize }) => {
     const watchRef = useRef<Object3D | null>(null);
     const { scene, viewport } = useThree();
-    const { envMapAccesories } = useAccesories();
+    const { envMapAccesories, showWatch } = useAccesories();
 
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
@@ -40,6 +40,7 @@ const WatchInner: React.FC<WatchProps> = React.memo(
               if (mesh.material instanceof MeshStandardMaterial) {
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.needsUpdate = true;
+                mesh.material.visible = showWatch;
               }
               child.renderOrder = 4;
             }
