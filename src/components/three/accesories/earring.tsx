@@ -144,7 +144,7 @@ const EarringInner: React.FC<EarringProps> = React.memo(
           leftEarringRef.current.setRotationFromQuaternion(quaternion);
           rightEarringRef.current.setRotationFromQuaternion(quaternion);
         }
-        console.log(rightScaleFactor);
+
         rightEarringRef.current.translateX(-(rightScaleFactor * 1.1));
         rightEarringRef.current.translateY(-(rightScaleFactor * 1.2));
         rightEarringRef.current.translateZ(-(rightScaleFactor * 2));
