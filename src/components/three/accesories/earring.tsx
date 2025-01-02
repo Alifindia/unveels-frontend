@@ -88,7 +88,7 @@ const EarringInner: React.FC<EarringProps> = React.memo(
 
       if (landmarks.current.length > 0) {
         leftEarringRef.current.visible = true;
-        leftEarringRef.current.visible = true;
+        rightEarringRef.current.visible = true;
         // Earring kiri menggunakan landmark 132
         const leftBottomEar = currentLandmarks[132];
 
@@ -117,7 +117,7 @@ const EarringInner: React.FC<EarringProps> = React.memo(
           leftBottomEarZ,
         );
 
-        const leftScaleFactor = (faceSize * outputWidth) / 2;
+        const leftScaleFactor = (faceSize * outputWidth) / 4;
         leftEarringRef.current.scale.set(
           leftScaleFactor,
           leftScaleFactor,
@@ -131,7 +131,7 @@ const EarringInner: React.FC<EarringProps> = React.memo(
           rightBottomEarZ, // Tambahkan offset jika diperlukan
         );
 
-        const rightScaleFactor = (faceSize * outputWidth) / 2;
+        const rightScaleFactor = (faceSize * outputWidth) / 4;
         rightEarringRef.current.scale.set(
           rightScaleFactor,
           rightScaleFactor,
@@ -145,15 +145,22 @@ const EarringInner: React.FC<EarringProps> = React.memo(
           rightEarringRef.current.setRotationFromQuaternion(quaternion);
         }
 
-        rightEarringRef.current.translateX(-(rightScaleFactor * 1.1));
-        rightEarringRef.current.translateY(-(rightScaleFactor * 1.2));
+        rightEarringRef.current.translateX(-(rightScaleFactor * 0.8));
+        rightEarringRef.current.translateY(-(rightScaleFactor * 1.8));
         rightEarringRef.current.translateZ(-(rightScaleFactor * 2));
-        leftEarringRef.current.translateX(leftScaleFactor * 1);
-        leftEarringRef.current.translateY(-(leftScaleFactor * 1.2));
+        leftEarringRef.current.translateX(leftScaleFactor * 0.8);
+        leftEarringRef.current.translateY(-(leftScaleFactor * 1.8));
         leftEarringRef.current.translateZ(-(leftScaleFactor * 2));
+        if (leftBottomEar.z > 0.19) {
+          leftEarringRef.current.visible = false;
+        }
+        console.log(rightBottomEar.z);
+        if (rightBottomEar.z > 0.19) {
+          rightEarringRef.current.visible = false;
+        }
       } else {
         leftEarringRef.current.visible = false;
-        leftEarringRef.current.visible = false;
+        rightEarringRef.current.visible = false;
       }
     });
 
