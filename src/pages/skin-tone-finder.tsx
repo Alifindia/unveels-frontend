@@ -54,7 +54,6 @@ import { exchangeRates } from "../utils/constants";
 import { AllProductsPage } from "../components/all-product/all-product-page";
 import { FilterProvider } from "../context/filter-context";
 import { getFaceMakeupProductTypeIds } from "../api/attributes/makeups";
-import { LinkButton } from "../App";
 
 export function SkinToneFinder() {
   const { i18n } = useTranslation();
@@ -141,23 +140,10 @@ function Main() {
     };
   } = {
     Foundations: {
-      attributeName: "category_id",
+      attributeName: "face_makeup_product_type",
       values: getFaceMakeupProductTypeIds(["Foundations"]),
     },
   };
-
-  if (view === "all_categories") {
-    return (
-      <AllProductsPage
-        onClose={() => {
-          setView("face");
-        }}
-        groupedItemsData={groupedItemsData}
-        name={"Foundation"}
-        mapTypes={mapTypes}
-      />
-    );
-  }
 
   return (
     <>
@@ -176,10 +162,34 @@ function Main() {
           <ScreenshotPreview />
         </div>
       )}
+      {view === "all_categories" && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 10,
+          }}
+        >
+          <AllProductsPage
+            onClose={() => {
+              setView("face");
+            }}
+            groupedItemsData={groupedItemsData}
+            name={"Foundation"}
+            mapTypes={mapTypes}
+          />
+        </div>
+      )}
       <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
         <div className="absolute inset-0">
-          <VideoStream debugMode={false} />
-          <SkinToneFinderScene faceLandmarker={faceLandmarkerRef.current} />
+          {!criterias.isCaptured ? (
+            <VideoStream debugMode={false} />
+          ) : (
+            <SkinToneFinderScene faceLandmarker={faceLandmarkerRef.current} />
+          )}
         </div>
         <TopNavigation cart={isInferenceFinished} />
 

@@ -44,7 +44,6 @@ import { useCartContext } from "../context/cart-context";
 import { TopNavigation } from "../components/top-navigation";
 import { useTranslation } from "react-i18next";
 import { getCookie, getCurrencyAndRate } from "../utils/other";
-import { LinkButton } from "../App";
 import { RecommendationsTab } from "../components/personality-analyzer/recomendations-tab";
 
 export function PersonalityFinder() {

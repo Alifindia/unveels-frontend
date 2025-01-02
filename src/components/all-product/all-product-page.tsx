@@ -254,7 +254,7 @@ function ProductHorizontalList({
                   </p>
                   <div className="flex flex-wrap items-center justify-end gap-x-1">
                     <span className="text-sm font-bold text-white">
-                      {currency} (product.price * rate)
+                      {currency} {product.price * rate}
                     </span>
                   </div>
                 </div>
