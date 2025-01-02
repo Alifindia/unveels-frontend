@@ -110,7 +110,6 @@ function SkinToneFinderInnerScene({
 
   const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
 
-  // Replace useState with useRef for landmarks
   const landmarksRef = useRef<Landmark[]>([]);
 
   const { setSkinColor } = useSkinColor();

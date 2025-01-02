@@ -229,16 +229,16 @@ function ProductList() {
           className="p-0 text-[0.625rem] text-white sm:py-2"
           onClick={() => {
             setMapTypes({
-              Foundation: {
+              Foundations: {
                 attributeName: "face_makeup_product_types",
-                values: getFaceMakeupProductTypeIds(["Foundation"]),
+                values: getFaceMakeupProductTypeIds(["Foundations"]),
               },
             });
             setGroupedItemsData({
-              makeup: [{ label: "Foundation", section: "makeup" }],
+              makeup: [{ label: "Foundations", section: "makeup" }],
               accessories: [],
             });
-            setSectionName("Foundation");
+            setSectionName("Foundations");
             setView("all_categories");
           }}
         >

@@ -149,11 +149,6 @@ export function useProducts({
   });
 }
 
-type SortOrder = {
-  field: string;
-  direction: "ASC" | "DESC"; // Add the possible values for sorting direction
-};
-
 export function useProductsVTOAll({
   product_type_key,
   type_ids,
@@ -269,27 +264,8 @@ export function useProductsVTOAll({
         });
       }
 
-      filters.push({
-        filters: [
-          {
-            field: "price",
-            value: minPrice.toString(),
-            condition_type: "from",
-          },
-        ],
-      });
-
-      filters.push({
-        filters: [
-          {
-            field: "price",
-            value: maxPrice.toString(),
-            condition_type: "to",
-          },
-        ],
-      });
-
       // Fetch products with the appropriate filters and sorting
+
       const [productsList] = await Promise.all([
         fetch(baseUrl + "/rest/V1/products?" + buildSearchParams(filters), {
           headers: defaultHeaders,
@@ -311,6 +287,8 @@ export function useProductsVTOAll({
         [],
         "name",
         sortOrder,
+        maxPrice,
+        minPrice,
       );
     },
   });

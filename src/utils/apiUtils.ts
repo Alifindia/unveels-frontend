@@ -286,6 +286,8 @@ export async function fetchAllProductsWithSort(
   parentFilters: FilterGroup[] = [],
   sortField: SortField = "name", // Default sorting field
   sortOrder: "asc" | "desc" = "asc", // Default sorting order
+  maxPrice: number,
+  minPrice: number,
 ) {
   // Filter produk dengan type_id configurable dan simple
   const productFound = results.items.filter(
@@ -323,6 +325,26 @@ export async function fetchAllProductsWithSort(
       ],
     },
   ];
+
+  filters.push({
+    filters: [
+      {
+        field: "price",
+        value: minPrice.toString(),
+        condition_type: "from",
+      },
+    ],
+  });
+
+  filters.push({
+    filters: [
+      {
+        field: "price",
+        value: maxPrice.toString(),
+        condition_type: "to",
+      },
+    ],
+  });
 
   const response = await fetch(
     baseUrl + "/rest/V1/products?" + buildSearchParams(filters),
