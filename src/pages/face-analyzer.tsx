@@ -1,14 +1,6 @@
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
-import * as tf from "@tensorflow/tfjs-core";
 import * as tflite from "@tensorflow/tfjs-tflite";
 import clsx from "clsx";
-import {
-  ChevronLeft,
-  CirclePlay,
-  PauseCircle,
-  StopCircle,
-  X,
-} from "lucide-react";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useFragrancesProductQuery } from "../api/fragrances";
@@ -30,7 +22,6 @@ import {
 } from "../context/inference-context";
 import { CameraProvider, useCamera } from "../context/recorder-context";
 import { useModelLoader } from "../hooks/useModelLoader";
-import { useRecordingControls } from "../hooks/useRecorder";
 import { personalityInference } from "../inference/personalityInference";
 import { Classifier } from "../types/classifier";
 import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
@@ -42,7 +33,9 @@ import {
 import { useCartContext } from "../context/cart-context";
 import { LinkButton } from "../App";
 import { useTranslation } from "react-i18next";
-import { getCookie } from "../utils/other";
+import { getCookie, getCurrencyAndRate } from "../utils/other";
+import { exchangeRates } from "../utils/constants";
+import { RecommendationsTab } from "../components/personality-analyzer/recomendations-tab";
 
 export function FaceAnalyzer() {
   const { i18n } = useTranslation();
@@ -317,242 +310,6 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
           faceShape={inferenceResult ? inferenceResult[14].outputLabel : ""}
         />
       ) : null}
-    </div>
-  );
-}
-
-function RecommendationsTab({ faceShape }: { faceShape: string }) {
-  const { data: fragrances } = useFragrancesProductQuery({
-    faceShape,
-  });
-  const { data: lips } = useLipsProductQuery({
-    faceShape,
-  });
-
-  const { data: items } = useLookbookProductQuery({
-    faceShape,
-  });
-
-  const { addItemToCart } = useCartContext();
-
-  const handleAddToCart = async (id: string, url: string) => {
-    try {
-      await addItemToCart(id, url);
-      console.log(`Product ${id} added to cart!`);
-    } catch (error) {
-      console.error("Failed to add product to cart:", error);
-    }
-  };
-
-  return (
-    <div className="w-full overflow-auto px-4 py-8">
-      <div className="pb-14">
-        <h2 className="pb-4 text-xl font-bold lg:text-2xl">
-          Perfumes Recommendations
-        </h2>
-        {fragrances ? (
-          <div className="flex w-full gap-4 overflow-x-auto no-scrollbar">
-            {fragrances.items.map((product, index) => {
-              const imageUrl =
-                mediaUrl(product.media_gallery_entries[0].file) ??
-                "https://picsum.photos/id/237/200/300";
-
-              return (
-                <div
-                  key={product.id}
-                  className="w-[150px] rounded"
-                  onClick={() => {
-                    window.open(
-                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                      "_blank",
-                    );
-                  }}
-                >
-                  <div className="relative h-[150px] w-[150px] overflow-hidden">
-                    <img
-                      src={imageUrl}
-                      alt="Product"
-                      className="rounded object-cover"
-                    />
-                  </div>
-
-                  <div className="flex items-start justify-between py-2">
-                    <div className="w-full">
-                      <h3 className="text-xsfont-semibold line-clamp-1 text-white">
-                        {product.name}
-                      </h3>
-                      <p className="text-[0.625rem] text-white/60">
-                        <BrandName
-                          brandId={getProductAttributes(product, "brand")}
-                        />
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
-                      <span className="text-sm font-bold text-white">
-                        ${product.price}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Rating rating={4} />
-
-                  <div className="flex space-x-1">
-                    <button
-                      type="button"
-                      className="flex h-7 w-full items-center justify-center border border-white text-[0.5rem] font-semibold"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleAddToCart(
-                          product.id.toString(),
-                          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                        );
-                      }}
-                    >
-                      ADD TO CART
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <LoadingProducts />
-        )}
-      </div>
-      <div className="pb-14">
-        <h2 className="text-xl font-bold">Look Recommendations</h2>
-        <p className="pb-4 text-sm font-bold">
-          A bold red lipstick and defined brows, mirror your strong, vibrant
-          personality
-        </p>
-        {items ? (
-          <div className="flex w-full gap-4 overflow-x-auto no-scrollbar">
-            {items.profiles.map((profile, index) => {
-              const imageUrl = baseApiUrl + "/media/" + profile.image;
-              return (
-                <div key={profile.identifier} className="w-[150px] rounded">
-                  <div className="relative h-[150px] w-[150px] overflow-hidden">
-                    <img
-                      src={imageUrl}
-                      alt="Product"
-                      className="h-full w-full rounded object-cover"
-                    />
-                  </div>
-
-                  <div className="flex items-start justify-between py-2">
-                    <div className="w-full">
-                      <h3 className="text-xsfont-semibold line-clamp-1 text-white">
-                        {profile.name}
-                      </h3>
-                    </div>
-                    <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
-                      <span className="text-sm font-bold text-white">
-                        $
-                        {profile.products.reduce(
-                          (acc, product) => acc + product.price,
-                          0,
-                        )}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Rating rating={4} />
-
-                  <div className="flex space-x-1">
-                    <button
-                      type="button"
-                      className="flex h-7 w-full items-center justify-center border border-white text-[0.5rem] font-semibold"
-                    >
-                      ADD TO CART
-                    </button>
-                    <LinkButton
-                      to={`/virtual-try-on-product?sku=${profile.products
-                        .map((product) => product.sku)
-                        .join(",")}`}
-                      className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
-                    >
-                      TRY ON
-                    </LinkButton>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <LoadingProducts />
-        )}
-      </div>
-      <div className="pb-14">
-        <h2 className="text-xl font-bold">Lip Color Recommendations</h2>
-        <p className="pb-4 text-sm font-bold">
-          The best lip color for you are orange shades
-        </p>
-        {lips ? (
-          <div className="flex w-full gap-4 overflow-x-auto no-scrollbar">
-            {lips.items.map((product, index) => {
-              const imageUrl =
-                mediaUrl(product.media_gallery_entries[0].file) ??
-                "https://picsum.photos/id/237/200/300";
-
-              return (
-                <div key={product.id} className="w-[150px] rounded">
-                  <div className="relative h-[150px] w-[150px] overflow-hidden">
-                    <img
-                      src={imageUrl}
-                      alt="Product"
-                      className="rounded object-cover"
-                    />
-                  </div>
-
-                  <div className="flex items-start justify-between py-2">
-                    <div className="w-full">
-                      <h3 className="text-xsfont-semibold line-clamp-1 text-white">
-                        {product.name}
-                      </h3>
-                      <p className="text-[0.625rem] text-white/60">
-                        <BrandName
-                          brandId={getProductAttributes(product, "brand")}
-                        />
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
-                      <span className="text-sm font-bold text-white">
-                        ${product.price}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Rating rating={4} />
-
-                  <div className="flex space-x-1">
-                    <button
-                      type="button"
-                      className="flex h-7 w-full items-center justify-center border border-white text-[0.5rem] font-semibold"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleAddToCart(
-                          product.id.toString(),
-                          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                        );
-                      }}
-                    >
-                      ADD TO CART
-                    </button>
-                    <LinkButton
-                      to={`/virtual-try-on-product?sku=${product.sku}`}
-                      className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black"
-                    >
-                      TRY ON
-                    </LinkButton>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <LoadingProducts />
-        )}
-      </div>
     </div>
   );
 }

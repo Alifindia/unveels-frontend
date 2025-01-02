@@ -1,5 +1,7 @@
 import { Product } from "../../api/shared";
 import { getProductAttributes, mediaUrl } from "../../utils/apiUtils";
+import { exchangeRates } from "../../utils/constants";
+import { getCurrencyAndRate } from "../../utils/other";
 import { BrandName } from "../product/brand";
 
 export function VTOProductCard({
@@ -14,6 +16,8 @@ export function VTOProductCard({
   onClick: () => void;
 }) {
   const imageUrl = mediaUrl(product.media_gallery_entries?.[0]?.file);
+
+  const { currency, rate } = getCurrencyAndRate(exchangeRates);
 
   const isSelected = selectedProduct?.id === product.id;
 
@@ -50,7 +54,7 @@ export function VTOProductCard({
 
       <div className="flex items-end justify-between space-x-1 pt-1">
         <div className="bg-gradient-to-r bg-clip-text text-[0.6rem] text-transparent text-white sm:text-[0.85rem]">
-          ${product.price}
+          {currency} {product.price * rate}
         </div>
         <button
           type="button"

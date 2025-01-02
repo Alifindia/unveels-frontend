@@ -52,7 +52,8 @@ import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
 import { VTOProductCard } from "../components/vto/vto-product-card";
 import { useCartContext } from "../context/cart-context";
 import { useTranslation } from "react-i18next";
-import { getCookie } from "../utils/other";
+import { getCookie, getCurrencyAndRate } from "../utils/other";
+import { exchangeRates } from "../utils/constants";
 
 export function FindTheLook() {
   const { i18n } = useTranslation();
@@ -881,7 +882,8 @@ function AccessoriesAllView({
 }
 
 function ProductHorizontalList({ category }: { category: string }) {
-  const { selectedItems: cart, dispatch } = useFindTheLookContext(); // Assuming dispatch is here
+  const { selectedItems: cart, dispatch } = useFindTheLookContext();
+  const { currency, rate } = getCurrencyAndRate(exchangeRates);
 
   if (!mapTypes[category]) {
     console.warn(`Category "${category}" is not defined in mapTypes.`);
@@ -948,7 +950,7 @@ function ProductHorizontalList({ category }: { category: string }) {
                   </p>
                   <div className="flex flex-wrap items-center justify-end gap-x-1">
                     <span className="text-sm font-bold text-white">
-                      ${product.price.toFixed(2)}
+                      {currency} {product.price * rate}
                     </span>
                   </div>
                 </div>

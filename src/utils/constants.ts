@@ -1,6 +1,24 @@
 import { metalness, roughness } from "three/webgpu";
 import { SkinAnalysisItem } from "../types/skinAnalysisItem";
 
+export const exchangeRates = [
+  { currency_to: "AUD", rate: 4.8591093 },
+  { currency_to: "BHD", rate: 1.2227026 },
+  { currency_to: "GBP", rate: 2.4923792 },
+  { currency_to: "CAD", rate: 4.503793 },
+  { currency_to: "CNY", rate: 23.194321 },
+  { currency_to: "EUR", rate: 2.9960894 },
+  { currency_to: "IQD", rate: 4272.0767 },
+  { currency_to: "JPY", rate: 486.53677 },
+  { currency_to: "KWD", rate: 1 },
+  { currency_to: "OMR", rate: 1.2519683 },
+  { currency_to: "QAR", rate: 11.837119 },
+  { currency_to: "RUB", rate: 316.77132 },
+  { currency_to: "SAR", rate: 12.194834 },
+  { currency_to: "USD", rate: 3.2519557 },
+  { currency_to: "AED", rate: 11.973715 },
+];
+
 export const BRIGHTNESS_THRESHOLD = 60;
 export const POSITION_THRESHOLD_X = 0.1;
 export const POSITION_THRESHOLD_Y = 0.1;

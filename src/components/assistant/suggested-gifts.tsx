@@ -1,11 +1,15 @@
 import { Product } from "../../api/shared";
 import { baseApiUrl, mediaUrl } from "../../utils/apiUtils";
+import { exchangeRates } from "../../utils/constants";
+import { getCurrencyAndRate } from "../../utils/other";
 
 interface SuggestedGiftsProps {
   product: Product[];
 }
 
 const SuggestedGifts = ({ product }: SuggestedGiftsProps) => {
+  const { currency, rate } = getCurrencyAndRate(exchangeRates);
+
   return (
     <div className="w-full space-y-4 bg-gradient-to-b from-[#1B1404] to-[#2C1F06] py-4">
       <h3 className="px-8 text-2xl font-bold text-white">Suggested Gifts</h3>
@@ -37,7 +41,7 @@ const SuggestedGifts = ({ product }: SuggestedGiftsProps) => {
                 <p className="text-[0.5rem] text-white/60">Brand Name</p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.625rem] font-bold text-white">
-                    ${item.price.toFixed(2)}
+                    {currency} {item.price * rate}
                   </span>
                 </div>
               </div>
