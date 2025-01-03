@@ -112,4 +112,12 @@ export default defineConfig({
       input: inputObjects,
     },
   },
+  optimizeDeps: {
+    include: ['@tensorflow/tfjs-tflite'],
+  },
+  resolve: {
+    alias: {
+      '@tensorflow/tfjs-tflite': '@tensorflow/tfjs-tflite/dist/tflite_web_api_cc_simd.js'
+    }
+  }
 });
