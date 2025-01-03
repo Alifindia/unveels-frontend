@@ -67,24 +67,47 @@ const WatchInner: React.FC<WatchProps> = React.memo(
       if (!handLandmarks.current || !watchRef.current) return;
       if (handLandmarks.current.length > 0) {
         watchRef.current.visible = true;
-        const wrist = handLandmarks.current[0];
-        const thumbBase = handLandmarks.current[1];
-
+    
+        const wrist = handLandmarks.current[0]; // Landmark untuk pergelangan tangan
+        const thumbBase = handLandmarks.current[1]; // Landmark untuk pangkal ibu jari
+        const indexBase = handLandmarks.current[5]; // Landmark untuk pangkal jari telunjuk
+    
         const wristSize = calculateDistance(wrist, thumbBase);
         const wristX = (1 - wrist.x - 0.5) * outputWidth;
         const wristY = -(wrist.y - 0.5) * outputHeight;
         const wristZ = 200;
-
+    
         const scaleFactor = (wristSize * outputWidth) / 3;
-
+    
         watchRef.current.position.set(wristX, wristY, wristZ);
         watchRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
+    
+        // Deteksi apakah tangan kiri atau tangan kanan
+        const isRightHand = thumbBase.x < indexBase.x;
+    
         const quaternion = handQuaternion(handLandmarks.current);
-
+    
         if (quaternion) {
-          watchRef.current.setRotationFromQuaternion(quaternion);
+          // Set quaternion berdasarkan sisi tangan
+          if (isRightHand) {
+            const adjustment = new Quaternion().setFromAxisAngle(
+              new Vector3(0, 0, 1), // Rotasi di sekitar sumbu Z
+              Math.PI, // Rotasi 180 derajat
+            );
+            watchRef.current.quaternion.copy(quaternion).multiply(adjustment);
+          } else {
+            watchRef.current.setRotationFromQuaternion(quaternion);
+          }
         }
+
+        // Memeriksa apakah pergelangan tangan menekuk
+        const isWristBent = wristSize < 0.1; // Jika pergelangan tangan menekuk lebih tajam dari threshold ini
+        if (isWristBent) {
+          watchRef.current.visible = false; // Sembunyikan jam tangan jika pergelangan tangan menekuk
+        } else {
+          watchRef.current.visible = true; // Tampilkan jam tangan jika pergelangan tangan tidak menekuk
+        }
+
       } else {
         watchRef.current.visible = false;
       }
