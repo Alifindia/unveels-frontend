@@ -595,7 +595,7 @@ function Sidebar({ setCollapsed }: SidebarProps) {
           <button className="" onClick={compareCapture}>
             <Icons.compare className="size-4 text-white sm:size-6" />
           </button>
-          <button className="" onClick={resetCapture}>
+          <button className="" onClick={() => window.location.reload()}>
             <Icons.reset className="size-4 text-white sm:size-6" />
           </button>
         </div>

@@ -40,7 +40,6 @@ import {
 import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { Scanner } from "../components/scanner";
-import { useCartContext } from "../context/cart-context";
 import { TopNavigation } from "../components/top-navigation";
 import { useTranslation } from "react-i18next";
 import { getCookie, getCurrencyAndRate } from "../utils/other";
