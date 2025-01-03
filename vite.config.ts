@@ -103,6 +103,11 @@ export default defineConfig({
         secure: true,
         rewrite: (path) => path.replace(/^\/rest/, "/en/rest"),
       },
+      '/tflite_web_api_cc_simd.js': {
+        target: 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.9/dist/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/tflite_web_api_cc_simd\.js$/, 'tflite_web_api_cc_simd.js'),
+      },
     },
   },
   build: {
@@ -112,12 +117,4 @@ export default defineConfig({
       input: inputObjects,
     },
   },
-  optimizeDeps: {
-    include: ['@tensorflow/tfjs-tflite'],
-  },
-  resolve: {
-    alias: {
-      '@tensorflow/tfjs-tflite': '@tensorflow/tfjs-tflite/dist/tflite_web_api_cc_simd.js'
-    }
-  }
 });

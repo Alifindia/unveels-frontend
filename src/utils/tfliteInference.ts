@@ -11,7 +11,7 @@ export const loadTFLiteModel = async (
     let tfliteModel: tflite.TFLiteModel | null = null;
 
     tflite.setWasmPath(
-      "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.9/wasm/",
+      "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.10/wasm/",
     );
 
     tfliteModel = await tflite.loadTFLiteModel(modelUrl);
