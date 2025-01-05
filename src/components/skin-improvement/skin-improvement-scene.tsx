@@ -50,7 +50,7 @@ export function SkinImprovementScene() {
             baseOptions: {
               modelAssetPath:
                 "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-              delegate: "GPU", // Opsional: gunakan "GPU" jika didukung
+              delegate: "CPU", // Opsional: gunakan "GPU" jika didukung
             },
             runningMode: "IMAGE",
             numFaces: 1,
