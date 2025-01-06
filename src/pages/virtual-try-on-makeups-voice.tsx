@@ -29,13 +29,13 @@ import { ShareModal } from "../components/share-modal";
 import { SkinColorProvider } from "../components/skin-tone-finder-scene/skin-color-context";
 import { usePage } from "../hooks/usePage";
 import { useRecordingControls } from "../hooks/useRecorder";
-import { EyesMode } from "./vto/eyes/eyes-makeup";
-import { FaceMode } from "./vto/face/face-makeup";
-import { HairMode } from "./vto/hair/hair-makeup";
+import { EyesMode } from "./vto/smart-beauty/eyes/eyes-makeup";
+import { FaceMode } from "./vto/smart-beauty/face/face-makeup";
+import { HairMode } from "./vto/smart-beauty/hair/hair-makeup";
 import { HandAccessoriesMode } from "./vto/hand-accessories/hand-accessories";
 import { HeadAccessoriesMode } from "./vto/head-accesories/head-accessories";
-import { LipsMode } from "./vto/lips/lips-makeup";
-import { NailsMode } from "./vto/nails/nails-makeup";
+import { LipsMode } from "./vto/smart-beauty/lips/lips-makeup";
+import { NailsMode } from "./vto/smart-beauty/nails/nails-makeup";
 import { NeckAccessoriesMode } from "./vto/neck-accessories/neck-accessories";
 import { VirtualTryOnScene } from "../components/vto/virtual-try-on-scene";
 import { MakeupProvider } from "../context/makeup-context";
@@ -69,6 +69,7 @@ import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-conte
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
 import VoiceCommand from "../components/voice-command/voice-command";
 import { useVirtualTryOnMakeupsVoice, VirtualTryOnMakeupsVoiceProvider } from "../context/virtual-try-on-makeups-voice-context";
+import { SelecProductNumberProvider } from "./vto/select-product-context";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -76,6 +77,7 @@ interface VirtualTryOnProvider {
 
 export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
   return (
+  <SelecProductNumberProvider>
     <WatchesProvider>
       <HandwearProvider>
         <ScarvesProvider>
@@ -131,6 +133,7 @@ export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
         </ScarvesProvider>
       </HandwearProvider>
     </WatchesProvider>
+  </SelecProductNumberProvider>
   );
 }
 
@@ -212,17 +215,18 @@ function MainContent() {
 
   return (
     <>
-      {collapsed ? null : <BottomContent />}
       <div className="flex justify-center">
         <button
           type="button"
           onClick={() => {
-            navigate("/virtual-try-on/makeups");
+            navigate("/smart-beauty/makeups");
           }}
+          className="flex h-3 w-full items-center justify-center bg-transparent"
         >
-          <ChevronDown className="size-6 text-white" />
+          <div className="h-1 w-10 rounded-full bg-gray-400" />
         </button>
       </div>
+      {collapsed ? null : <BottomContent />}
     </>
   );
 }
