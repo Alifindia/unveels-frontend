@@ -162,9 +162,11 @@ function Main() {
     faceAnalyzerInference();
   }, [criterias.isCaptured, criterias.capturedImage]);
 
+  if (modelLoading) {
+    return <ModelLoadingScreen progress={progress} />;
+  }
   return (
     <>
-      {modelLoading && <ModelLoadingScreen progress={progress} />}
       <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
         <div className="absolute inset-0">
           <>
@@ -191,7 +193,7 @@ function Main() {
         </div>
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          <VideoScene />
+          {!criterias.capturedImage && <VideoScene />}
           <Footer />
         </div>
       </div>

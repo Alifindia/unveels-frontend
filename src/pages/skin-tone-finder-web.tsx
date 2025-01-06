@@ -63,9 +63,11 @@ function Main() {
     loadModels();
   }, []);
 
+  if (modelLoading) {
+    return <ModelLoadingScreen progress={progress} />;
+  }
   return (
     <>
-      {modelLoading && <ModelLoadingScreen progress={progress} />}
       <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
         <div className="absolute inset-0">
           <VideoStream debugMode={false} />
