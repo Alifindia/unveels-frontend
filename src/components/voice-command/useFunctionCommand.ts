@@ -397,7 +397,7 @@ export function useFunctionCommand() {
           e.name.split(" ").join("").toLowerCase() == section.toLowerCase(),
       )?.path || null;
     if (path) {
-      navigate(`/virtual-try-on/${path}`);
+      navigate(`/smart-beauty/${path}`);
     }
   };
 
