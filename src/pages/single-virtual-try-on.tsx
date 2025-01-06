@@ -240,7 +240,7 @@ export function SingleVirtualTryOn() {
   });
 
   useEffect(() => {
-    console.log("Data from useQuery:", data); // Pastikan data benar-benar berisi banyak produk
+    console.log("Data from useQuery:", data);
   }, [data]);
 
   if (isLoading) {
@@ -571,7 +571,7 @@ const SKUSelector: React.FC<SKUSelectorProps> = ({
   return (
     <div className="ms-3 flex flex-1 flex-col items-start justify-start pb-4 pr-5 [&_button]:pointer-events-auto">
       {/* Kontainer scrollable */}
-      <div className="flex max-h-64 flex-col items-center justify-center gap-4 overflow-y-auto rounded-lg bg-black/25 px-2 pb-6 backdrop-blur-3xl [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-1">
+      <div className="flex max-h-64 flex-col items-center justify-center gap-4 overflow-y-auto bg-black/25 px-2 pb-2 backdrop-blur-3xl [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-1">
         {/* Daftar item SKU */}
         <div className="flex flex-col items-center justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-5">
           {skus.map((sku) => {
@@ -582,7 +582,7 @@ const SKUSelector: React.FC<SKUSelectorProps> = ({
                 type="button"
                 onClick={() => setSelectedSKU(sku)}
                 className={clsx(
-                  "flex flex-col items-center justify-center gap-2 border-2 border-transparent p-1 transition-all",
+                  "flex flex-col items-center justify-center gap-1 border-2 border-transparent p-1 transition-all",
                   {
                     "scale-125": sku.sku === product.sku,
                   },
@@ -591,7 +591,7 @@ const SKUSelector: React.FC<SKUSelectorProps> = ({
                 <img
                   src={imageUrl}
                   alt={sku.name}
-                  className="h-8 w-8 rounded-lg object-cover sm:h-10 sm:w-10 md:h-12 md:w-12 lg:h-14 lg:w-14"
+                  className="h-7 w-7 object-cover sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-9 lg:w-9"
                 />
               </button>
             );

@@ -55,7 +55,7 @@ function Main() {
         {
           baseOptions: {
             modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-            delegate: "GPU",
+            delegate: "CPU",
           },
           runningMode: "IMAGE",
           numFaces: 1,
@@ -75,7 +75,7 @@ function Main() {
           baseOptions: {
             modelAssetPath:
               "/media/unveels/models/find-the-look/accesories_model.tflite",
-            delegate: "GPU",
+            delegate: "CPU",
           },
           runningMode: "IMAGE",
           maxResults: 5,
@@ -92,7 +92,7 @@ function Main() {
         {
           baseOptions: {
             modelAssetPath: "/media/unveels/models/find-the-look/makeup.tflite",
-            delegate: "GPU",
+            delegate: "CPU",
           },
           runningMode: "IMAGE",
           maxResults: 4,

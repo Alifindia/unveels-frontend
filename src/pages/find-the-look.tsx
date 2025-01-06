@@ -52,7 +52,9 @@ import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
 import { VTOProductCard } from "../components/vto/vto-product-card";
 import { useCartContext } from "../context/cart-context";
 import { useTranslation } from "react-i18next";
-import { getCookie } from "../utils/other";
+import { getCookie, getCurrencyAndRate } from "../utils/other";
+import { exchangeRates } from "../utils/constants";
+import { LinkButton } from "../App";
 
 export function FindTheLook() {
   const { i18n } = useTranslation();
@@ -104,7 +106,7 @@ function Main() {
         {
           baseOptions: {
             modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-            delegate: "GPU",
+            delegate: "CPU",
           },
           runningMode: "IMAGE",
           numFaces: 1,
@@ -124,7 +126,7 @@ function Main() {
           baseOptions: {
             modelAssetPath:
               "/media/unveels/models/find-the-look/accesories_model.tflite",
-            delegate: "GPU",
+            delegate: "CPU",
           },
           runningMode: "IMAGE",
           maxResults: 5,
@@ -141,7 +143,7 @@ function Main() {
         {
           baseOptions: {
             modelAssetPath: "/media/unveels/models/find-the-look/makeup.tflite",
-            delegate: "GPU",
+            delegate: "CPU",
           },
           runningMode: "IMAGE",
           maxResults: 4,
@@ -193,7 +195,7 @@ function Main() {
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
             <MainContent />
-            {view == "face" && <Footer />}
+            {view == "face" && tab === null && <Footer />}
           </div>
         </div>
       )}
@@ -287,7 +289,6 @@ function AccessoriesCategories({
   const { setView } = useFindTheLookContext();
   const { t } = useTranslation();
 
-  // Update the tab if activeTab changes
   useEffect(() => {
     if (activeTab) {
       setTab(capitalize(activeTab));
@@ -296,7 +297,7 @@ function AccessoriesCategories({
 
   function onTabClick(label: string) {
     setTab(label);
-    onTabChange(label); // Notify parent of the selected tab
+    onTabChange(label);
   }
 
   return (
@@ -750,6 +751,8 @@ function AllProductsPage({
   const { selectedItems: cart, dispatch } = useFindTheLookContext();
   const { t } = useTranslation();
 
+  const addItemToCart = () => {};
+
   return (
     <div
       className={clsx(
@@ -774,7 +777,7 @@ function AllProductsPage({
               product.media_gallery_entries[0].file,
             ) as string;
             return (
-              <div className="relative size-9">
+              <div className="relative size-9" key={product.id}>
                 <img src={imageUrl} className="h-full w-full object-cover" />
 
                 <div className="absolute right-0 top-0">
@@ -822,15 +825,32 @@ function AllProductsPage({
 
       <div className="h-20">
         <div className="mx-auto flex max-w-sm space-x-2.5 pb-6 pt-4 lg:space-x-6">
-          <button
-            type="button"
-            className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
-          >
-            {t("viewftl.try_now")}
-          </button>
+          {cart.items.length > 0 ? (
+            <>
+              <LinkButton
+                to={`/virtual-try-on-product?sku=${cart.items
+                  .map((product) => product.sku)
+                  .join(",")}`}
+                className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
+              >
+                {t("viewftl.try_now")}
+              </LinkButton>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
+              >
+                {t("viewftl.try_now")}
+              </button>
+            </>
+          )}
+
           <button
             type="button"
             className="flex h-10 w-full items-center justify-center border border-white bg-white text-xs font-semibold text-black"
+            onClick={addItemToCart}
           >
             {t("viewftl.add_all_to_cart")}
           </button>
@@ -881,7 +901,8 @@ function AccessoriesAllView({
 }
 
 function ProductHorizontalList({ category }: { category: string }) {
-  const { selectedItems: cart, dispatch } = useFindTheLookContext(); // Assuming dispatch is here
+  const { selectedItems: cart, dispatch } = useFindTheLookContext();
+  const { currency, rate } = getCurrencyAndRate(exchangeRates);
 
   if (!mapTypes[category]) {
     console.warn(`Category "${category}" is not defined in mapTypes.`);
@@ -922,33 +943,27 @@ function ProductHorizontalList({ category }: { category: string }) {
               <div
                 key={product.id}
                 className="w-[calc(50%-0.5rem)] shrink-0 rounded shadow lg:w-[calc(16.667%-0.5rem)]"
-                onClick={() => {
-                  window.open(
-                    `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                    "_blank",
-                  );
-                }}
               >
                 <div className="relative aspect-square w-full overflow-hidden">
                   <img
                     src={imageUrl}
                     alt="Product"
-                    className="h-full w-full rounded object-cover"
+                    className="h-full w-full rounded object-cover md:h-28 md:w-28"
                   />
                 </div>
 
-                <h3 className="line-clamp-2 h-10 pt-2.5 text-xs font-semibold text-white">
+                <h3 className="line-clamp-2 h-10 pt-2.5 text-[0.5rem] font-semibold text-white md:text-[10px]">
                   {product.name}
                 </h3>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-white/60">
+                  <p className="text-xs text-white/60 md:text-[8px]">
                     <BrandName
                       brandId={getProductAttributes(product, "brand")}
                     />
                   </p>
                   <div className="flex flex-wrap items-center justify-end gap-x-1">
-                    <span className="text-sm font-bold text-white">
-                      ${product.price.toFixed(2)}
+                    <span className="text-[0.5rem] font-bold text-white md:text-[10px]">
+                      {currency} {product.price * rate}
                     </span>
                   </div>
                 </div>
@@ -956,7 +971,7 @@ function ProductHorizontalList({ category }: { category: string }) {
                 <div className="flex space-x-1 pt-1">
                   <button
                     type="button"
-                    className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
+                    className="flex h-10 w-full items-center justify-center border border-white text-[0.5rem] font-semibold text-white md:h-8 md:text-[10px]"
                     onClick={() => {
                       handleAddToCart(
                         product.id.toString(),
@@ -968,7 +983,7 @@ function ProductHorizontalList({ category }: { category: string }) {
                   </button>
                   <button
                     type="button"
-                    className="flex h-10 w-full items-center justify-center border border-white bg-white text-xs font-semibold text-black"
+                    className="flex h-10 w-full items-center justify-center border border-white bg-white text-[0.5rem] font-semibold text-black md:h-8 md:text-[10px]"
                     onClick={() => {
                       dispatch({ type: "add", payload: product });
                     }}
@@ -1036,16 +1051,7 @@ function SingleCategoryView({
                   product.media_gallery_entries[0].file,
                 ) as string;
                 return (
-                  <div
-                    key={product.id}
-                    className="w-full rounded shadow"
-                    // onClick={() => {
-                    //   window.open(
-                    //     `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                    //     "_blank",
-                    //   );
-                    // }}
-                  >
+                  <div key={product.id} className="w-full rounded shadow">
                     <div className="relative aspect-square overflow-hidden">
                       <img
                         src={imageUrl}

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { FindTheLookItems } from "../../types/findTheLookItems";
-import clsx from "clsx";
 import { ChevronLeft, Currency, Heart } from "lucide-react";
 import { Icons } from "../icons";
 import { useFindTheLookContext } from "../../context/find-the-look-context";
@@ -18,7 +17,7 @@ import { useFilterContext } from "../../context/filter-context";
 import { getCurrencyAndRate } from "../../utils/other";
 import { exchangeRates } from "../../utils/constants";
 
-export function VTOAllProductsPage({
+export function AllProductsPage({
   onClose,
   groupedItemsData,
   name,
@@ -255,7 +254,7 @@ function ProductHorizontalList({
                   </p>
                   <div className="flex flex-wrap items-center justify-end gap-x-1">
                     <span className="text-sm font-bold text-white">
-                      {currency} (product.price * rate)
+                      {currency} {product.price * rate}
                     </span>
                   </div>
                 </div>

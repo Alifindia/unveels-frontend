@@ -83,7 +83,8 @@ function Main() {
     setShowWatch,
   } = useAccesories();
 
-  const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
+  const { criterias, flipCamera, compareCapture, resetCapture, screenShoot } =
+    useCamera();
 
   const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
   const [mediaFile, setMediaFile] = useState<File | null>(null);
@@ -337,6 +338,43 @@ function Main() {
       window.removeEventListener("message", handleMessage);
     };
   }, []);
+
+  useEffect(() => {
+    if (criterias.screenshotImage) {
+      // Jika screenshotImage adalah URL objek Blob, ambil Blob-nya menggunakan fetch
+      fetch(criterias.screenshotImage)
+        .then((response) => response.blob())
+        .then((blob) => {
+          const fileReader = new FileReader();
+
+          fileReader.onloadend = () => {
+            // Coba stringify hasilnya
+            const resultString = JSON.stringify(fileReader.result);
+            console.log("Personality Result as JSON:", resultString);
+
+            if ((window as any).flutter_inappwebview) {
+              // Kirim data sebagai JSON string
+              (window as any).flutter_inappwebview
+                .callHandler("screenshootResult", resultString)
+                .then((result: any) => {
+                  console.log("Flutter responded with:", result);
+                })
+                .catch((error: any) => {
+                  console.error("Error calling Flutter handler:", error);
+                });
+            }
+
+            console.log(resultString);
+          };
+
+          // Mengubah blob menjadi base64
+          fileReader.readAsDataURL(blob);
+        })
+        .catch((error) => {
+          console.error("Error fetching Blob:", error);
+        });
+    }
+  }, [criterias.screenshotImage]);
 
   return (
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">

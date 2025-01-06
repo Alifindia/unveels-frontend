@@ -1,5 +1,7 @@
 import { Product } from "../../api/shared";
 import { getProductAttributes, mediaUrl } from "../../utils/apiUtils";
+import { exchangeRates } from "../../utils/constants";
+import { getCurrencyAndRate } from "../../utils/other";
 import { BrandName } from "../product/brand";
 
 export function VTOProductCard({
@@ -16,6 +18,8 @@ export function VTOProductCard({
   onClick: () => void;
 }) {
   const imageUrl = mediaUrl(product.media_gallery_entries?.[0]?.file);
+
+  const { currency, rate } = getCurrencyAndRate(exchangeRates);
 
   const isSelected = selectedProduct?.id === product.id;
 
@@ -49,16 +53,14 @@ export function VTOProductCard({
       <h3 className="mb-3 line-clamp-2 h-6 py-1 text-[0.6rem] font-semibold text-white sm:h-10 sm:py-2 sm:text-[0.75rem]">
         {truncateText(product.name || "", 20)}
       </h3>
-      {/* <p className="h-3 text-[0.425rem] text-white/60 sm:h-4 sm:text-[0.625rem]">
-        <BrandName brandId={getProductAttributes(product, "brand") || ""} />
-      </p> */}
+
       <div className="flex items-end justify-between space-x-1 pt-1">
-        <div className="bg-gradient-to-r bg-clip-text text-[0.5rem] text-transparent text-white sm:text-[0.625rem]">
-          ${product.price}
+        <div className="bg-gradient-to-r bg-clip-text text-[0.6rem] text-transparent text-white sm:text-[0.85rem]">
+          {currency} {product.price * rate}
         </div>
         <button
           type="button"
-          className="flex h-4 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-0.5 text-[0.4rem] font-semibold text-white sm:h-7 sm:px-1.5 sm:text-[0.625rem]"
+          className="flex h-5 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-1.5 text-[0.55rem] font-semibold text-white sm:h-8 sm:px-2 sm:text-[0.75rem]"
         >
           Add to cart
         </button>

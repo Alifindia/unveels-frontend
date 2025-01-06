@@ -1,6 +1,6 @@
 // EarringInner.tsx
 import React, { useMemo, useEffect, useRef, Suspense } from "react";
-import { Object3D, Mesh, MeshStandardMaterial } from "three";
+import { Object3D, Mesh, MeshStandardMaterial, Quaternion } from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { Landmark } from "../../../types/landmark";
@@ -88,7 +88,7 @@ const EarringInner: React.FC<EarringProps> = React.memo(
 
       if (landmarks.current.length > 0) {
         leftEarringRef.current.visible = true;
-        leftEarringRef.current.visible = true;
+        rightEarringRef.current.visible = true;
         // Earring kiri menggunakan landmark 132
         const leftBottomEar = currentLandmarks[132];
 
@@ -96,13 +96,13 @@ const EarringInner: React.FC<EarringProps> = React.memo(
         const rightBottomEar = currentLandmarks[361];
 
         // Posisi kiri
-        const leftBottomEarX = (1 - leftBottomEar.x - 0.49) * outputWidth;
-        const leftBottomEarY = -(leftBottomEar.y - 0.49) * outputHeight;
+        const leftBottomEarX = (1 - leftBottomEar.x - 0.5) * outputWidth;
+        const leftBottomEarY = -(leftBottomEar.y - 0.5) * outputHeight;
         const leftBottomEarZ = -leftBottomEar.z * 100;
 
         // Posisi kanan
-        const rightBottomEarX = (1 - rightBottomEar.x - 0.51) * outputWidth;
-        const rightBottomEarY = -(rightBottomEar.y - 0.49) * outputHeight;
+        const rightBottomEarX = (1 - rightBottomEar.x - 0.5) * outputWidth;
+        const rightBottomEarY = -(rightBottomEar.y - 0.5) * outputHeight;
         const rightBottomEarZ = -rightBottomEar.z * 100;
 
         const faceSize = calculateDistance(
@@ -114,10 +114,10 @@ const EarringInner: React.FC<EarringProps> = React.memo(
         leftEarringRef.current.position.set(
           leftBottomEarX,
           leftBottomEarY,
-          leftBottomEarZ - 40,
+          leftBottomEarZ,
         );
 
-        const leftScaleFactor = (faceSize * outputWidth) / 2;
+        const leftScaleFactor = (faceSize * outputWidth) / 4;
         leftEarringRef.current.scale.set(
           leftScaleFactor,
           leftScaleFactor,
@@ -128,10 +128,10 @@ const EarringInner: React.FC<EarringProps> = React.memo(
         rightEarringRef.current.position.set(
           rightBottomEarX, // Tambahkan offset jika diperlukan
           rightBottomEarY,
-          rightBottomEarZ - 40, // Tambahkan offset jika diperlukan
+          rightBottomEarZ, // Tambahkan offset jika diperlukan
         );
 
-        const rightScaleFactor = (faceSize * outputWidth) / 2;
+        const rightScaleFactor = (faceSize * outputWidth) / 4;
         rightEarringRef.current.scale.set(
           rightScaleFactor,
           rightScaleFactor,
@@ -144,9 +144,23 @@ const EarringInner: React.FC<EarringProps> = React.memo(
           leftEarringRef.current.setRotationFromQuaternion(quaternion);
           rightEarringRef.current.setRotationFromQuaternion(quaternion);
         }
+
+        rightEarringRef.current.translateX(-(rightScaleFactor * 0.8));
+        rightEarringRef.current.translateY(-(rightScaleFactor * 1.8));
+        rightEarringRef.current.translateZ(-(rightScaleFactor * 2));
+        leftEarringRef.current.translateX(leftScaleFactor * 0.8);
+        leftEarringRef.current.translateY(-(leftScaleFactor * 1.8));
+        leftEarringRef.current.translateZ(-(leftScaleFactor * 2));
+        if (leftBottomEar.z > 0.19) {
+          leftEarringRef.current.visible = false;
+        }
+        console.log(rightBottomEar.z);
+        if (rightBottomEar.z > 0.19) {
+          rightEarringRef.current.visible = false;
+        }
       } else {
         leftEarringRef.current.visible = false;
-        leftEarringRef.current.visible = false;
+        rightEarringRef.current.visible = false;
       }
     });
 

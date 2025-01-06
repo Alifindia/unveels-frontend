@@ -28,7 +28,7 @@ import {
 } from "../context/skin-analysis-context";
 import { SkinAnalysisResult } from "../types/skinAnalysisResult";
 import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
-import { labelsDescription } from "../utils/constants";
+import { exchangeRates, labelsDescription } from "../utils/constants";
 import { TopNavigation } from "../components/top-navigation";
 import {
   InferenceProvider,
@@ -42,7 +42,7 @@ import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { Scanner } from "../components/scanner";
 import { useCartContext } from "../context/cart-context";
 import { useTranslation } from "react-i18next";
-import { getCookie } from "../utils/other";
+import { getCookie, getCurrencyAndRate } from "../utils/other";
 
 export function SkinAnalysis() {
   const { i18n } = useTranslation();
@@ -344,6 +344,8 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
 
   const { addItemToCart } = useCartContext();
 
+  const { currency, rate } = getCurrencyAndRate(exchangeRates);
+
   const handleAddToCart = async (id: string, url: string) => {
     try {
       await addItemToCart(id, url);
@@ -393,7 +395,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                 </p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.48125rem] font-bold text-white sm:text-[0.625rem]">
-                    ${product.price.toFixed(2)}
+                    {currency} {product.price * rate}
                   </span>
                 </div>
               </div>

@@ -32,11 +32,10 @@ const SkinAnalysisThreeScene: React.FC<SkinAnalysisThreeSceneProps> = ({
   ...props
 }) => {
   const texture = useTexture(imageSrc);
-
   const { viewport } = useThree();
-  const [planeSize, setPlaneSize] = useState<[number, number]>([1, 1]);
+  const [loadedStages, setLoadedStages] = useState<number>(0); // Track stages loaded
 
-  // State for window size and DPR
+  // State untuk ukuran window dan DPR
   const [windowSize, setWindowSize] = useState<{
     width: number;
     height: number;
@@ -47,42 +46,49 @@ const SkinAnalysisThreeScene: React.FC<SkinAnalysisThreeSceneProps> = ({
     dpr: window.devicePixelRatio || 1,
   });
 
-  // Handle window resize to update windowSize state
+  // Handle window resize dengan debounce
   useEffect(() => {
-    const handleResize = () => {
+    const debounce = (func: () => void, delay: number) => {
+      let timer: NodeJS.Timeout;
+      return () => {
+        clearTimeout(timer);
+        timer = setTimeout(func, delay);
+      };
+    };
+
+    const handleResize = debounce(() => {
       setWindowSize({
         width: window.innerWidth,
         height: window.innerHeight,
         dpr: window.devicePixelRatio || 1,
       });
-    };
+    }, 200);
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Calculate plane size based on image aspect ratio and viewport
-  useEffect(() => {
-    if (!texture.image) return;
+  // Perhitungan ukuran plane menggunakan useMemo
+  const planeSize = useMemo(() => {
+    if (!texture.image) return [1, 1];
 
     const imageAspect = texture.image.width / texture.image.height;
     const viewportAspect = viewport.width / viewport.height;
 
-    let planeWidth: number;
-    let planeHeight: number;
-
     if (imageAspect > viewportAspect) {
-      // Image is wider than viewport
-      planeHeight = viewport.height;
-      planeWidth = viewport.height * imageAspect;
+      return [viewport.height * imageAspect, viewport.height];
     } else {
-      // Image is taller or same aspect as viewport
-      planeWidth = viewport.width;
-      planeHeight = viewport.width / imageAspect;
+      return [viewport.width, viewport.width / imageAspect];
     }
-
-    setPlaneSize([planeWidth, planeHeight]);
   }, [texture, viewport]);
+
+  // Load stages incrementally
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLoadedStages((prev) => Math.min(prev + 1, 9)); // Increment stage
+    }, 500); // Adjust delay as needed
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
@@ -93,36 +99,54 @@ const SkinAnalysisThreeScene: React.FC<SkinAnalysisThreeSceneProps> = ({
         </mesh>
       )}
 
-      <Wrinkles
-        landmarks={landmarksRef}
-        planeSize={[planeSize[0], planeSize[1]]}
-      />
-      <Eyebag
-        landmarks={landmarksRef}
-        planeSize={[planeSize[0], planeSize[1]]}
-      />
-      <Droppy
-        landmarks={landmarksRef}
-        planeSize={[planeSize[0], planeSize[1]]}
-      />
-      <DarkCircle
-        landmarks={landmarksRef}
-        planeSize={[planeSize[0], planeSize[1]]}
-      />
-      <Dry landmarks={landmarksRef} planeSize={[planeSize[0], planeSize[1]]} />
-      <Firmness
-        landmarks={landmarksRef}
-        planeSize={[planeSize[0], planeSize[1]]}
-      />
-      <Moistures
-        landmarks={landmarksRef}
-        planeSize={[planeSize[0], planeSize[1]]}
-      />
-      <Oily landmarks={landmarksRef} planeSize={[planeSize[0], planeSize[1]]} />
-      <Redness
-        landmarks={landmarksRef}
-        planeSize={[planeSize[0], planeSize[1]]}
-      />
+      {loadedStages > 0 && (
+        <Wrinkles
+          landmarks={landmarksRef}
+          planeSize={[planeSize[0], planeSize[1]]}
+        />
+      )}
+      {loadedStages > 1 && (
+        <Eyebag
+          landmarks={landmarksRef}
+          planeSize={[planeSize[0], planeSize[1]]}
+        />
+      )}
+      {loadedStages > 2 && (
+        <Droppy
+          landmarks={landmarksRef}
+          planeSize={[planeSize[0], planeSize[1]]}
+        />
+      )}
+      {loadedStages > 3 && (
+        <DarkCircle
+          landmarks={landmarksRef}
+          planeSize={[planeSize[0], planeSize[1]]}
+        />
+      )}
+      {loadedStages > 4 && (
+        <Dry landmarks={landmarksRef} planeSize={[planeSize[0], planeSize[1]]} />
+      )}
+      {loadedStages > 5 && (
+        <Firmness
+          landmarks={landmarksRef}
+          planeSize={[planeSize[0], planeSize[1]]}
+        />
+      )}
+      {loadedStages > 6 && (
+        <Moistures
+          landmarks={landmarksRef}
+          planeSize={[planeSize[0], planeSize[1]]}
+        />
+      )}
+      {loadedStages > 7 && (
+        <Oily landmarks={landmarksRef} planeSize={[planeSize[0], planeSize[1]]} />
+      )}
+      {loadedStages > 8 && (
+        <Redness
+          landmarks={landmarksRef}
+          planeSize={[planeSize[0], planeSize[1]]}
+        />
+      )}
     </>
   );
 };

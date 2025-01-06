@@ -1,5 +1,7 @@
 import clsx from "clsx";
 import AudioWave from "./audio-wave";
+import { getCurrencyAndRate } from "../../utils/other";
+import { exchangeRates } from "../../utils/constants";
 
 type Message =
   | {
@@ -37,6 +39,8 @@ interface MessageItemProps {
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
+  const { currency, rate } = getCurrencyAndRate(exchangeRates);
+
   const isUser = message.sender === "user";
   const isAudioConnection =
     "mode" in message && message.mode === "audio-connection";
@@ -91,10 +95,10 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                 <p className="text-[0.5rem] text-white/60">{message.brand}</p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.625rem] font-bold text-white">
-                    {message.price}
+                    {currency} {+message.price * rate}
                   </span>
                   <span className="text-[0.5rem] text-white/50 line-through">
-                    {message.originalPrice}
+                    {currency} {+message.originalPrice * rate}
                   </span>
                 </div>
               </div>

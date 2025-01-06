@@ -17,7 +17,7 @@ import {
   useSkinAnalysis,
 } from "../context/skin-analysis-context";
 import clsx from "clsx";
-import { labelsDescription } from "../utils/constants";
+import { exchangeRates, labelsDescription } from "../utils/constants";
 import { useSkincareProductQuery } from "../api/skin-care";
 import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
 import { BrandName } from "../components/product/brand";
@@ -29,7 +29,7 @@ import {
 } from "../context/see-improvement-context";
 import { useCartContext } from "../context/cart-context";
 import { useTranslation } from "react-i18next";
-import { getCookie } from "../utils/other";
+import { getCookie, getCurrencyAndRate } from "../utils/other";
 
 export function SeeImprovement() {
   const { i18n } = useTranslation();
@@ -71,7 +71,7 @@ function Main() {
           baseOptions: {
             modelAssetPath:
               "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-            delegate: "GPU",
+            delegate: "CPU",
           },
           outputFaceBlendshapes: true,
           runningMode: "IMAGE",
@@ -103,7 +103,7 @@ function Main() {
             <VideoStream debugMode={false} />
           )}
         </div>
-        <TopNavigation cart={false} />
+        <TopNavigation />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
           <MainContent collapsed={collapsed} setCollapsed={setCollapsed} />
@@ -214,6 +214,8 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
 
   const { addItemToCart } = useCartContext();
 
+  const { currency, rate } = getCurrencyAndRate(exchangeRates);
+
   const handleAddToCart = async (id: string, url: string) => {
     try {
       await addItemToCart(id, url);
@@ -259,7 +261,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                 </p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.625rem] font-bold text-white">
-                    ${product.price.toFixed(2)}
+                    {currency} {product.price * rate}
                   </span>
                   {/* <span className="text-[0.5rem] text-white/50 line-through">
                 ${product.originalPrice.toFixed(2)}

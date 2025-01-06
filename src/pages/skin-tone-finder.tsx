@@ -1,16 +1,5 @@
 import clsx from "clsx";
 import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronUp,
-  CirclePlay,
-  Heart,
-  PauseCircle,
-  Plus,
-  StopCircle,
-  X,
-} from "lucide-react";
-import {
   CSSProperties,
   Dispatch,
   Fragment,
@@ -59,13 +48,12 @@ import {
   useFindTheLookContext,
 } from "../context/find-the-look-context";
 import { FindTheLookItems } from "../types/findTheLookItems";
-import { getFaceMakeupProductTypeIds } from "../api/attributes/makeups";
-import { useProducts } from "../api/get-product";
-import { useCartContext } from "../context/cart-context";
-import { Rating } from "../components/rating";
-import { BrandName } from "../components/product/brand";
 import { useTranslation } from "react-i18next";
-import { getCookie } from "../utils/other";
+import { getCookie, getCurrencyAndRate } from "../utils/other";
+import { exchangeRates } from "../utils/constants";
+import { AllProductsPage } from "../components/all-product/all-product-page";
+import { FilterProvider } from "../context/filter-context";
+import { getFaceMakeupProductTypeIds } from "../api/attributes/makeups";
 
 export function SkinToneFinder() {
   const { i18n } = useTranslation();
@@ -84,9 +72,11 @@ export function SkinToneFinder() {
         <SkinColorProvider>
           <MakeupProvider>
             <FindTheLookProvider>
-              <div className="h-full min-h-dvh">
-                <Main />
-              </div>
+              <FilterProvider>
+                <div className="h-full min-h-dvh">
+                  <Main />
+                </div>
+              </FilterProvider>
             </FindTheLookProvider>
           </MakeupProvider>
         </SkinColorProvider>
@@ -133,6 +123,28 @@ function Main() {
     loadModels();
   }, []);
 
+  const { view, setView } = useFindTheLookContext();
+
+  const [groupedItemsData, setGroupedItemsData] = useState<{
+    makeup: FindTheLookItems[];
+    accessories: FindTheLookItems[];
+  }>({
+    makeup: [{ label: "Foundations", section: "makeup" }],
+    accessories: [],
+  });
+
+  const mapTypes: {
+    [key: string]: {
+      attributeName: string;
+      values: string[];
+    };
+  } = {
+    Foundations: {
+      attributeName: "face_makeup_product_type",
+      values: getFaceMakeupProductTypeIds(["Foundations"]),
+    },
+  };
+
   return (
     <>
       {modelLoading && <ModelLoadingScreen progress={progress} />}
@@ -150,10 +162,34 @@ function Main() {
           <ScreenshotPreview />
         </div>
       )}
+      {view === "all_categories" && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 10,
+          }}
+        >
+          <AllProductsPage
+            onClose={() => {
+              setView("face");
+            }}
+            groupedItemsData={groupedItemsData}
+            name={"Foundation"}
+            mapTypes={mapTypes}
+          />
+        </div>
+      )}
       <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
         <div className="absolute inset-0">
-          <VideoStream debugMode={false} />
-          <SkinToneFinderScene faceLandmarker={faceLandmarkerRef.current} />
+          {!criterias.isCaptured ? (
+            <VideoStream debugMode={false} />
+          ) : (
+            <SkinToneFinderScene faceLandmarker={faceLandmarkerRef.current} />
+          )}
         </div>
         <TopNavigation cart={isInferenceFinished} />
 
@@ -312,9 +348,9 @@ function MatchedShades() {
           </div>
         </div>
 
-        <div className="w-full text-left">
+        <div className="w-full text-right">
           <button
-            className="text-[0.625rem] text-white sm:py-2"
+            className="text-end text-[0.625rem] text-white sm:py-2"
             onClick={() => {
               setView("all_categories");
             }}
@@ -428,7 +464,7 @@ function OtherShades() {
           ></button>
         ))}
       </div>
-      <div className="w-full text-left">
+      <div className="w-full text-right">
         <button
           className="text-[0.625rem] text-white sm:py-2"
           onClick={() => {
@@ -454,6 +490,8 @@ function ProductList({ products }: { products: Array<Product> }) {
   const { scrollContainerRef, handleMouseDown } = useScrollContainer();
   const { data } = useBrandsQuerySuspense();
   const [selected, setSelected] = useState(null as Product | null);
+
+  const { currency, rate } = getCurrencyAndRate(exchangeRates);
 
   return (
     <div
@@ -501,7 +539,7 @@ function ProductList({ products }: { products: Array<Product> }) {
                 <p className="text-[0.5rem] text-white/60">{brand}</p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.625rem] font-bold text-white">
-                    ${product.price.toFixed(2)}
+                    {currency} {product.price * rate}
                   </span>
                 </div>
               </div>
@@ -527,35 +565,7 @@ function ProductList({ products }: { products: Array<Product> }) {
 }
 
 function BottomContent() {
-  const { criterias } = useCamera();
-  const { skinType } = useSkinColor();
-
-  const { view, setView } = useFindTheLookContext();
-
-  const [groupedItemsData, setGroupedItemsData] = useState<{
-    makeup: FindTheLookItems[];
-    accessories: FindTheLookItems[];
-  }>({
-    makeup: [{ label: "Foundation", section: "makeup" }],
-    accessories: [],
-  });
-
-  if (criterias.isCaptured && skinType != null && view === "face") {
-    return <ShadesSelector />;
-  }
-
-  if (view === "all_categories") {
-    return (
-      <AllProductsPage
-        onClose={() => {
-          setView("face");
-        }}
-        groupedItemsData={groupedItemsData}
-      />
-    );
-  }
-
-  return <div></div>;
+  return <ShadesSelector />;
 }
 
 interface SidebarProps {
@@ -585,251 +595,10 @@ function Sidebar({ setCollapsed }: SidebarProps) {
           <button className="" onClick={compareCapture}>
             <Icons.compare className="size-4 text-white sm:size-6" />
           </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const mapTypes: {
-  [key: string]: {
-    attributeName: string;
-    values: string[];
-  };
-} = {
-  Foundation: {
-    attributeName: "face_makeup_product_type",
-    values: getFaceMakeupProductTypeIds(["Foundations"]),
-  },
-};
-
-function AllProductsPage({
-  onClose,
-  groupedItemsData,
-}: {
-  onClose: () => void;
-  groupedItemsData: {
-    makeup: FindTheLookItems[];
-    accessories: FindTheLookItems[];
-  };
-}) {
-  const [tab, setTab] = useState<"makeup" | "accessories">("makeup");
-  const { selectedItems: cart, dispatch } = useFindTheLookContext();
-
-  return (
-    <div
-      className={clsx(
-        "fixed inset-0 flex h-dvh flex-col bg-black font-sans text-white",
-      )}
-    >
-      {/* Navigation */}
-      <div className="flex items-center justify-between px-4 py-2">
-        <button type="button" className="size-6" onClick={() => onClose()}>
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-        <div className="flex items-center justify-end space-x-2.5">
-          <Heart className="size-6" />
-          <Icons.bag className="size-6" />
-        </div>
-      </div>
-
-      {cart.items.length > 0 ? (
-        <div className="mx-auto my-4 flex w-fit space-x-2.5 rounded-lg bg-white/25 p-4">
-          {cart.items.map((product) => {
-            const imageUrl = mediaUrl(
-              product.media_gallery_entries[0].file,
-            ) as string;
-            return (
-              <div className="relative size-9">
-                <img src={imageUrl} className="h-full w-full object-cover" />
-
-                <div className="absolute right-0 top-0">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      dispatch({ type: "remove", payload: product });
-                    }}
-                  >
-                    <X className="size-5 text-black" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
-
-      <div className="mx-auto flex w-full max-w-[480px] px-4 py-3">
-        {["makeup", "accessories"].map((item) => (
-          <button
-            key={item}
-            type="button"
-            className={clsx(
-              "flex h-8 w-full items-center justify-center border text-xs uppercase",
-              item === tab
-                ? "border-white bg-white text-black"
-                : "border-white text-white",
-            )}
-            onClick={() => {
-              dispatch({ type: "reset" });
-              setTab(item as "makeup" | "accessories");
-            }}
-          >
-            Similar {item}
+          <button className="" onClick={() => window.location.reload()}>
+            <Icons.reset className="size-4 text-white sm:size-6" />
           </button>
-        ))}
-      </div>
-
-      {tab === "makeup" ? (
-        <MakeupAllView makeups={groupedItemsData.makeup} />
-      ) : (
-        <AccessoriesAllView accessories={groupedItemsData.accessories} />
-      )}
-    </div>
-  );
-}
-
-function MakeupAllView({ makeups }: { makeups: FindTheLookItems[] }) {
-  const validMakeups = makeups.filter((category) => mapTypes[category.label]);
-
-  return (
-    <div className="h-full flex-1 overflow-y-auto px-5">
-      <div className="space-y-14">
-        {validMakeups.map((category) => (
-          <ProductHorizontalList
-            category={category.label}
-            key={category.section}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function AccessoriesAllView({
-  accessories,
-}: {
-  accessories: FindTheLookItems[];
-}) {
-  const validAccessories = accessories.filter(
-    (category) => mapTypes[category.label],
-  );
-
-  return (
-    <div className="h-full flex-1 overflow-y-auto px-5">
-      <div className="space-y-14">
-        {validAccessories.map((category) => (
-          <ProductHorizontalList
-            category={category.label}
-            key={category.section}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ProductHorizontalList({ category }: { category: string }) {
-  const { selectedItems: cart, dispatch } = useFindTheLookContext(); // Assuming dispatch is here
-
-  if (!mapTypes[category]) {
-    console.warn(`Category "${category}" is not defined in mapTypes.`);
-    return null;
-  }
-
-  const { attributeName, values } = mapTypes[category];
-  const { data } = useProducts({
-    product_type_key: attributeName,
-    type_ids: values,
-  });
-
-  const { addItemToCart } = useCartContext();
-
-  const handleAddToCart = async (id: string, url: string) => {
-    try {
-      await addItemToCart(id, url);
-      console.log(`Product ${id} added to cart!`);
-    } catch (error) {
-      console.error("Failed to add product to cart:", error);
-    }
-  };
-
-  return (
-    <div key={category}>
-      <div className="py-4">
-        <h2 className="text-base text-[#E6E5E3]">{category}</h2>
-      </div>
-      <div className="flex w-full gap-4 overflow-x-auto no-scrollbar active:cursor-grabbing">
-        {data ? (
-          data.items.map((product, index) => {
-            const imageUrl =
-              mediaUrl(product.media_gallery_entries[0].file) ??
-              "https://picsum.photos/id/237/200/300";
-
-            return (
-              <div
-                key={product.id}
-                className="w-[calc(50%-0.5rem)] shrink-0 rounded shadow lg:w-[calc(16.667%-0.5rem)]"
-                onClick={() => {
-                  window.open(
-                    `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                    "_blank",
-                  );
-                }}
-              >
-                <div className="relative aspect-square w-full overflow-hidden">
-                  <img
-                    src={imageUrl}
-                    alt="Product"
-                    className="h-full w-full rounded object-cover"
-                  />
-                </div>
-
-                <h3 className="line-clamp-2 h-10 pt-2.5 text-xs font-semibold text-white">
-                  {product.name}
-                </h3>
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-white/60">
-                    <BrandName
-                      brandId={getProductAttributes(product, "brand")}
-                    />
-                  </p>
-                  <div className="flex flex-wrap items-center justify-end gap-x-1">
-                    <span className="text-sm font-bold text-white">
-                      ${product.price.toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-                <Rating rating={4} />
-                <div className="flex space-x-1 pt-1">
-                  <button
-                    type="button"
-                    className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
-                    onClick={() => {
-                      handleAddToCart(
-                        product.id.toString(),
-                        `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                      );
-                    }}
-                  >
-                    ADD TO CART
-                  </button>
-                  <button
-                    type="button"
-                    className="flex h-10 w-full items-center justify-center border border-white bg-white text-xs font-semibold text-black"
-                    onClick={() => {
-                      dispatch({ type: "add", payload: product });
-                    }}
-                  >
-                    SELECT
-                  </button>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <LoadingProducts />
-        )}
+        </div>
       </div>
     </div>
   );
