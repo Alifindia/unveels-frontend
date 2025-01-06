@@ -24,6 +24,7 @@ import { LoadingProducts } from "../../../../components/loading";
 import { useBronzerQuery } from "./bronzer-query";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useEffect, useState } from "react";
+import { useSelecProductNumberContext } from "../../select-product-context";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 
 export function BronzerSelector() {
@@ -183,6 +184,7 @@ function TextureSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -208,7 +210,35 @@ function ProductList() {
     setShowBronzer(selectedColor != null);
   }, [selectedColor]);
 
+  useEffect(() => {
+    if (data?.items && selectedProductNumber) {
+      const adjustedIndex = selectedProductNumber - 1;
+      const matchedProduct = data.items[adjustedIndex];
+      console.log(selectedProductNumber)
+      if (matchedProduct) {
+        setSelectedProduct(matchedProduct);
+        setSelectedColor(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "hexacode",
+          )?.value || null
+        );
+        setSelectedTexture(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "texture",
+          )?.value,
+        );
+      }
+    }
+  }, [data, selectedProductNumber]);
+
   const handleProductClick = (product: Product) => {
+    if (selectedProduct?.id === product.id) {
+      setSelectedProduct(null);
+      setSelectedProductNumber(null);
+      setSelectedTexture(null);
+      setSelectedColor(null);
+      return
+    }
     console.log(product);
     setSelectedProduct(product);
     setSelectedColor(
@@ -254,6 +284,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
+                productNumber={index+1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

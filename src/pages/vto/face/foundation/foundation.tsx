@@ -12,6 +12,7 @@ import { useFoundationContext } from "./foundation-context";
 import { useFoundationQuery } from "./foundation-query";
 import { Product } from "../../../../api/shared";
 import { useEffect, useState } from "react";
+import { useSelecProductNumberContext } from "../../select-product-context";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 import { getFaceMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 
@@ -166,6 +167,7 @@ function TextureSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -192,6 +194,32 @@ function ProductList() {
     texture: selectedTexture,
   });
 
+  useEffect(() => {
+    if (data?.items && selectedProductNumber) {
+      const adjustedIndex = selectedProductNumber - 1;
+      const matchedProduct = data.items[adjustedIndex];
+      console.log(selectedProductNumber)
+      if (matchedProduct) {
+        setSelectedProduct(matchedProduct);
+        setColorFamily(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "skin_tone",
+          )?.value,
+        );
+        setSelectedColor(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "hexacode",
+          )?.value,
+        );
+        setSelectedTexture(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "texture",
+          )?.value,
+        );
+      }
+    }
+  }, [data, selectedProductNumber]);
+
   if (colorFamilyToInclude == null && data?.items != null) {
     setColorFamilyToInclude(
       data.items.map(
@@ -203,7 +231,15 @@ function ProductList() {
   }
 
   const handleProductClick = (product: Product) => {
-    console.log(product);
+    if (selectedProduct?.id === product.id) {
+      setSelectedProduct(null);
+      setSelectedProductNumber(null);
+      setColorFamily(null);
+      setSelectedColor(null);
+      setSelectedTexture(null)
+      return
+    }
+    console.log(product);    
     setSelectedProduct(product);
     setColorFamily(
       product.custom_attributes.find(
@@ -253,6 +289,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
+                productNumber={index+1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

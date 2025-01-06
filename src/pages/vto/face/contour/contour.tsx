@@ -24,6 +24,7 @@ import { filterTextures } from "../../../../api/attributes/texture";
 import Textures from "three/src/renderers/common/Textures.js";
 import { useContourQuery } from "./contour-query";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
+import { useSelecProductNumberContext } from "../../select-product-context";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 
 export function ContourSelector() {
@@ -255,6 +256,7 @@ function TextureSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -278,7 +280,35 @@ function ProductList() {
     setShowContour(selectedColors.length > 0);
   }, [selectedColors, selectedMode, selectedColors]);
 
+  useEffect(() => {
+    if (data?.items && selectedProductNumber) {
+      const adjustedIndex = selectedProductNumber - 1;
+      const matchedProduct = data.items[adjustedIndex];
+      console.log(selectedProductNumber)
+      if (matchedProduct) {
+        setSelectedProduct(matchedProduct);
+        setSelectedColors([
+          matchedProduct.custom_attributes
+            .find((item) => item.attribute_code === "hexacode")
+            ?.value.split(",")[0],
+        ]);
+        setSelectedTexture(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "texture",
+          )?.value,
+        );
+      }
+    }
+  }, [data, selectedProductNumber]);
+
   const handleProductClick = (product: Product) => {
+    if (selectedProduct?.id === product.id) {
+      setSelectedProduct(null);
+      setSelectedProductNumber(null);
+      setSelectedColors([])
+      setSelectedTexture(null)
+      return
+    }
     console.log(product);
     setSelectedProduct(product);
     setSelectedColors([
@@ -324,6 +354,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
+                productNumber={index+1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

@@ -35,6 +35,78 @@ export const thickNessLabels = ["Dense", "Medium", "Sparse"];
 export const noseWidthLabels = ["Broad", "Medium", "Narrow"];
 export const noseLengthLabels = ["Average", "Long", "Short"];
 
+export const shadesLipColor = ["One", "Dual", "Ombre"];
+export const lipLinerSizes = [
+  { label: "One", value: "Small" },
+  { label: "Two", value: "Upper Lip" },
+  { label: "Three", value: "Large Lower" },
+  { label: "Four", value: "Large Narrower" },
+  { label: "Five", value: "Large & Full" },
+  { label: "Six", value: "Wider" },
+];
+
+export const stringNumbers = [
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten",
+  "eleven",
+  "twelve",
+  "thirteen",
+  "fourteen",
+  "fifteen",
+  "sixteen",
+  "seventeen",
+  "eighteen",
+  "nineteen",
+  "twenty",
+];
+
+export  const subSection = [
+    {
+      name: "Lip Color",
+      path: "lip-color",
+    },
+    {
+      name: "Lip Liner",
+      path: "lip-liner",
+    },
+    {
+      name: "Lip Plumper",
+      path: "lip-plumper",
+    },
+    { name: "Eyebrows", path: "eyebrows" },
+    { name: "Eye Shadow", path: "eye-shadow" },
+    { name: "Eye Liner", path: "eye-liner" },
+    { name: "Lashes", path: "lashes" },
+    { name: "Mascara", path: "mascara" },
+    { name: "Lenses", path: "lenses" },
+    { name: "Foundation", path: "foundation" },
+    { name: "Concealer", path: "concealer" },
+    { name: "Contour", path: "contour" },
+    { name: "Blush", path: "blush" },
+    { name: "Bronzer", path: "bronzer" },
+    { name: "Highlighter", path: "highlighter" },
+    {
+      name: "Nail Polish",
+      path: "nail-polish",
+    },
+    {
+      name: "Press on Nails",
+      path: "press-on-nails",
+    },
+    {
+      name: "Hair Color",
+      path: "hair-color",
+    },
+  ];
+
 export const lipLabels = [
   "Full-lips",
   "Heart-lips",

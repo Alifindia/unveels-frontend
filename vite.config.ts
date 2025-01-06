@@ -14,6 +14,7 @@ const baseRoutes = [
   "/virtual-try-on-product",
   "/virtual-try-on",
   "/see-improvement",
+  "/smart-beauty",
   "/virtual-try-on-accesories",
   "/virtual-try-on-makeup",
   "/virtual-try-on-product",

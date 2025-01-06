@@ -11,10 +11,11 @@ import { useLipColorQuery } from "./lip-color-query";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
-import { useFindTheLookContext } from "../../../../context/find-the-look-context";
-import { getLipsMakeupProductTypeIds } from "../../../../api/attributes/makeups";
+import { useSelecProductNumberContext } from "../../select-product-context";
 
 export function LipColorSelector() {
+  console.log("render LipColorSelector");
+  
   return (
     <div className="mx-auto w-full divide-y px-2">
       <div>
@@ -33,38 +34,35 @@ export function LipColorSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily, colorFamilyToInclude } =
-    useLipColorContext();
+  const { colorFamily, setColorFamily } = useLipColorContext();
 
   return (
     <div
       className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
       data-mode="lip-color"
     >
-      {colors
-        .filter((c) => colorFamilyToInclude?.includes(c.value))
-        .map((item, index) => (
-          <button
-            type="button"
-            className={clsx(
-              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
-              {
-                "border-white/80": colorFamily === item.value,
-              },
-            )}
-            onClick={() =>
-              setColorFamily(colorFamily === item.value ? null : item.value)
-            }
-          >
-            <div
-              className="size-2.5 shrink-0 rounded-full"
-              style={{
-                background: item.hex,
-              }}
-            />
-            <span className="text-[0.625rem]">{item.label}</span>
-          </button>
-        ))}
+      {colors.map((item, index) => (
+        <button
+          type="button"
+          className={clsx(
+            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
+            {
+              "border-white/80": colorFamily === item.value,
+            },
+          )}
+          onClick={() =>
+            setColorFamily(colorFamily === item.value ? null : item.value)
+          }
+        >
+          <div
+            className="size-2.5 shrink-0 rounded-full"
+            style={{
+              background: item.hex,
+            }}
+          />
+          <span className="text-[0.625rem]">{item.label}</span>
+        </button>
+      ))}
     </div>
   );
 }
@@ -77,20 +75,34 @@ function ColorSelector() {
     showLipColor,
     lipColors,
   } = useMakeup();
-  const {
-    selectedColors,
-    setSelectedColors,
-    selectedMode,
-    colorFamily,
-    selectedTexture,
-  } = useLipColorContext();
+  const { selectedColors, setSelectedColors, selectedMode, colorFamily } =
+    useLipColorContext();
+
+     const { data } = useLipColorQuery({
+       color: colorFamily,
+       sub_color: null,
+       texture: null,
+     });
+
+     if (!colorFamily) {
+       return null;
+     }
+
+     const extracted_sub_colors = extractUniqueCustomAttributes(
+       data?.items ?? [],
+       "hexacode",
+     ).flatMap((item) => item.split(","));
 
   const handleColorClick = (color: string) => {
+    console.log("handleColorClick");
+    console.log(data, "data");
+    
     if (!showLipColor) setShowLipColor(true);
 
     // Handle color deselection
     if (selectedColors.includes(color)) {
       const newColors = selectedColors.filter((c) => c !== color);
+    console.log(newColors, "newColors");
       setSelectedColors(newColors);
       setLipColors(newColors);
       return;
@@ -107,7 +119,8 @@ function ColorSelector() {
       selectedColors.length < maxColors
         ? [...selectedColors, color]
         : [...selectedColors.slice(1), color]; // Remove oldest, add new
-
+    console.log(newColors, "newColors");
+    
     setSelectedColors(newColors);
     setLipColors(newColors);
   };
@@ -118,21 +131,7 @@ function ColorSelector() {
     setShowLipColor(false);
   };
 
-  const { data } = useLipColorQuery({
-    color: colorFamily,
-    sub_color: null,
-    texture: selectedTexture,
-  });
-
-  if (!colorFamily) {
-    return null;
-  }
-
-  const extracted_sub_colors = extractUniqueCustomAttributes(
-    data?.items ?? [],
-    "hexacode",
-  ).flatMap((item) => item.split(","));
-
+ 
   return (
     <div className="mx-auto w-full py-1 sm:py-2">
       <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
@@ -247,8 +246,7 @@ function ShadesSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
-    useFindTheLookContext();
+  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
 
   const {
     colorFamily,
@@ -277,24 +275,50 @@ function ProductList() {
     texture: selectedTexture,
   });
 
-  console.log({
-    colorFamily,
-    selectedTexture,
-    selectedColors,
-    isLoading,
-  });
-
+  useEffect(() => {
+    if (data?.items && selectedProductNumber) {
+      const adjustedIndex = selectedProductNumber - 1;
+      const matchedProduct = data.items[adjustedIndex];
+      console.log(matchedProduct);
+      if (matchedProduct) {
+        setSelectedProduct(matchedProduct);
+        setSelectedColors(
+          matchedProduct.custom_attributes
+            .find((item) => item.attribute_code === "hexacode")
+            ?.value.split(","),
+        );
+        setColorFamily(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "color"
+          )?.value || null
+        );
+        setSelectedTexture(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "texture",
+          )?.value,
+        );
+      }
+    }
+  }, [data, selectedProductNumber]);
+  
   if (colorFamilyToInclude == null && data?.items != null) {
     setColorFamilyToInclude(
       data.items.map(
         (d) =>
-          d.custom_attributes.find((c) => c.attribute_code === "color")?.value,
+          d.custom_attributes.find((c) => c.attribute_code === "color")?.value
       ),
     );
   }
-
+  
   const handleProductClick = (product: Product) => {
-    console.log(product);
+    if (selectedProduct?.id === product.id) {
+      setSelectedProduct(null);
+      setSelectedProductNumber(null);
+      setColorFamily(null);
+      setSelectedColors([]);
+      setSelectedTexture(null)
+      return
+    }
     setSelectedProduct(product);
     setColorFamily(
       product.custom_attributes.find((item) => item.attribute_code === "color")
@@ -313,50 +337,23 @@ function ProductList() {
   };
 
   return (
-    <>
-      <div className="w-full text-right">
-        <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
-          onClick={() => {
-            setMapTypes({
-              Lipstick: {
-                attributeName: "lips_makeup_product_type",
-                values: getLipsMakeupProductTypeIds([
-                  "Lipsticks",
-                  "Lip Stains",
-                  "Lip Tints",
-                  "Lip Glosses",
-                ]),
-              },
-            });
-            setGroupedItemsData({
-              makeup: [{ label: "Lipstick", section: "makeup" }],
-              accessories: [],
-            });
-            setSectionName("Lipstick");
-            setView("all_categories");
-          }}
-        >
-          View all
-        </button>
-      </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
-        {isLoading ? (
-          <LoadingProducts />
-        ) : (
-          data?.items.map((product, index) => {
-            return (
-              <VTOProductCard
-                product={product}
-                key={product.id}
-                selectedProduct={selectedProduct}
-                setSelectedProduct={setSelectedProduct}
-                onClick={() => handleProductClick(product)}
-              />
-            );
-          })
-        )}
-      </div>
-    </>
+    <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
+      {isLoading ? (
+        <LoadingProducts />
+      ) : (
+        data?.items.map((product, index) => {
+          return (
+            <VTOProductCard
+              product={product}
+              productNumber={index+1}
+              key={product.id}
+              selectedProduct={selectedProduct}
+              setSelectedProduct={setSelectedProduct}
+              onClick={() => handleProductClick(product)}
+            />
+          );
+        })
+      )}
+    </div>
   );
 }

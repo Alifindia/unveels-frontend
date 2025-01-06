@@ -23,15 +23,20 @@ import { Link, Outlet, useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 
 import { Footer } from "../components/footer";
+import { VideoScene } from "../components/recorder/recorder";
 import { CameraProvider, useCamera } from "../context/recorder-context";
 import { ShareModal } from "../components/share-modal";
 import { SkinColorProvider } from "../components/skin-tone-finder-scene/skin-color-context";
+import { usePage } from "../hooks/usePage";
 import { useRecordingControls } from "../hooks/useRecorder";
-import { EyesMode } from "./vto/vto-makeups/eyes/eyes-makeup";
-import { FaceMode } from "./vto/vto-makeups/face/face-makeup";
-import { HairMode } from "./vto/vto-makeups/hair/hair-makeup";
-import { LipsMode } from "./vto/vto-makeups/lips/lips-makeup";
-import { NailsMode } from "./vto/vto-makeups/nails/nails-makeup";
+import { EyesMode } from "./vto/smart-beauty/eyes/eyes-makeup";
+import { FaceMode } from "./vto/smart-beauty/face/face-makeup";
+import { HairMode } from "./vto/smart-beauty/hair/hair-makeup";
+import { HandAccessoriesMode } from "./vto/hand-accessories/hand-accessories";
+import { HeadAccessoriesMode } from "./vto/head-accesories/head-accessories";
+import { LipsMode } from "./vto/smart-beauty/lips/lips-makeup";
+import { NailsMode } from "./vto/smart-beauty/nails/nails-makeup";
+import { NeckAccessoriesMode } from "./vto/neck-accessories/neck-accessories";
 import { VirtualTryOnScene } from "../components/vto/virtual-try-on-scene";
 import { MakeupProvider } from "../context/makeup-context";
 import { AccesoriesProvider } from "../context/accesories-context";
@@ -62,16 +67,17 @@ import { TiaraProvider } from "./vto/head-accesories/tiaras/tiaras-context";
 import { HeadbandProvider } from "./vto/head-accesories/headband/headband-context";
 import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-context";
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
-import {
-  FindTheLookProvider,
-  useFindTheLookContext,
-} from "../context/find-the-look-context";
-import { CartProvider } from "../context/cart-context";
-import { FilterProvider } from "../context/filter-context";
-import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
+import VoiceCommand from "../components/voice-command/voice-command";
+import { useVirtualTryOnMakeupsVoice, VirtualTryOnMakeupsVoiceProvider } from "../context/virtual-try-on-makeups-voice-context";
+import { SelecProductNumberProvider, useSelecProductNumberContext } from "./vto/select-product-context";
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
-import { SelecProductNumberProvider } from "./vto/select-product-context";
+import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
+import { FindTheLookProvider, useFindTheLookContext } from "../context/find-the-look-context";
+import { CartProvider } from "../context/cart-context";
+import { FilterProvider } from "../context/filter-context";
+import { getCookie } from "../utils/other";
+import { useTranslation } from "react-i18next";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -139,23 +145,35 @@ export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
   );
 }
 
-export function VirtualTryOnMakeups() {
+export function VirtualTryOnMakeupsVoice() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+
   return (
     <CameraProvider>
       <SkinColorProvider>
         <MakeupProvider>
           <AccesoriesProvider>
-            <VirtualTryOnProvider>
-              <FindTheLookProvider>
-                <CartProvider>
-                  <FilterProvider>
-                    <div className="h-full min-h-dvh">
-                      <Main />
-                    </div>
-                  </FilterProvider>
-                </CartProvider>
-              </FindTheLookProvider>
-            </VirtualTryOnProvider>
+            <VirtualTryOnMakeupsVoiceProvider>
+              <VirtualTryOnProvider>
+                <FindTheLookProvider>
+                  <CartProvider>
+                    <FilterProvider>
+                      <div className="h-full min-h-dvh">
+                        <Main />
+                      </div>
+                    </FilterProvider>
+                  </CartProvider>
+                </FindTheLookProvider>
+              </VirtualTryOnProvider>
+            </VirtualTryOnMakeupsVoiceProvider>
           </AccesoriesProvider>
         </MakeupProvider>
       </SkinColorProvider>
@@ -191,40 +209,40 @@ function Main() {
     }
     return (
       <>
-        {criterias.screenshotImage && (
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 10,
-            }}
-          >
-            <ScreenshotPreview />
-          </div>
-        )}
-        <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
-          <div className="absolute inset-0">
-            <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
-            <div className="pointer-events-none absolute inset-0"></div>
-          </div>
-          <TopNavigation cart={false} />
-
-          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-            <Sidebar
-              onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
-              setMediaFile={setMediaFile}
-              setMode={setMode}
-              setShowChangeModel={setShowChangeModel}
-            />
-            <div className="bg-black/10 pt-1 shadow-lg backdrop-blur-sm">
-              {isMainContentVisible && <MainContent />}
-              <Footer />
-            </div>
-          </div>
+      {criterias.screenshotImage && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 10,
+          }}
+        >
+          <ScreenshotPreview />
         </div>
+      )}
+      <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+        <div className="absolute inset-0">
+          <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+          <div className="pointer-events-none absolute inset-0"></div>
+        </div>
+        <TopNavigation />
+
+      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
+        <Sidebar
+          onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
+          setMediaFile={setMediaFile}
+          setMode={setMode}
+          setShowChangeModel={setShowChangeModel}
+        />
+        <div className="bg-black/10 pt-1 shadow-lg backdrop-blur-sm">
+          {isMainContentVisible && <MainContent />}
+          <Footer />
+        </div>
+      </div>
+    </div>
       </>
     );
   }
@@ -234,35 +252,9 @@ function Main() {
 
 function MainContent() {
   const [collapsed, setCollapsed] = useState(false);
+  const {setSelectedProductNumber} = useSelecProductNumberContext()
   const { criterias } = useCamera();
-  const [shareOpen, setShareOpen] = useState(false);
   const navigate = useNavigate();
-
-  if (criterias.isFinished) {
-    return shareOpen ? (
-      <ShareModal
-        onClose={() => {
-          setShareOpen(false);
-        }}
-      />
-    ) : (
-      <div className="flex space-x-5 px-5 pb-10 font-serif">
-        <button
-          type="button"
-          className="h-10 w-full rounded border border-[#CA9C43] text-white"
-        >
-          Exit
-        </button>
-        <button
-          type="button"
-          className="h-10 w-full rounded bg-gradient-to-r from-[#CA9C43] to-[#92702D] text-white"
-          onClick={() => setShareOpen(true)}
-        >
-          Share <Icons.share className="ml-4 inline-block size-6" />
-        </button>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -270,7 +262,7 @@ function MainContent() {
         <button
           type="button"
           onClick={() => {
-            navigate("/virtual-try-on-makeups/makeups");
+            navigate("/smart-beauty/makeups");
           }}
           className="flex h-3 w-full items-center justify-center bg-transparent"
         >
@@ -282,15 +274,71 @@ function MainContent() {
   );
 }
 
-export function TryOnSelectorMakeups() {
+export function TryOnSelectorMakeupsVoice() {
+  const { t } = useTranslation();
+
+  const [tab, setTab] = useState("makeup" as "makeup" | "accessories" | null);
+
+  const activeClassNames =
+    "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text text-transparent";
+
   return (
     <div className="mx-auto w-full max-w-lg space-y-2 px-4">
+      <div className="flex h-10 w-full items-center justify-between border-b border-gray-600 text-center">
+        {["makeup", "accessories"].map((shadeTab) => {
+          const isActive = tab === shadeTab;
+          return (
+            <Fragment key={shadeTab}>
+              <button
+                key={shadeTab}
+                className={`relative h-10 grow border-b font-luxury text-[10px] sm:text-[12px] lg:text-[14px] ${
+                  isActive
+                    ? activeClassNames
+                    : "border-transparent text-gray-500"
+                }`}
+                onClick={() => setTab(shadeTab as "makeup" | "accessories")}
+              >
+                <span
+                  className={clsx(
+                    "capitalize",
+                    isActive ? "text-white/70 blur-sm" : "",
+                  )}
+                >
+                  {t("vto." + shadeTab)}
+                </span>
+                {isActive ? (
+                  <>
+                    <div
+                      className={clsx(
+                        "absolute inset-0 flex items-center justify-center text-[10px] blur-sm sm:text-[12px] lg:text-[14px]",
+                        activeClassNames,
+                      )}
+                    >
+                      <span className="text-center text-[10px] capitalize sm:text-[12px] lg:text-[14px]">
+                        {t("vto." + shadeTab)}
+                      </span>
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-center text-[10px] capitalize text-white/70 sm:text-[12px] lg:text-[14px]">
+                        {t("vto." + shadeTab)}
+                      </span>
+                    </div>
+                  </>
+                ) : null}
+              </button>
+            </Fragment>
+          );
+        })}
+      </div>
       <Makeups />
+      <Outlet />
     </div>
   );
 }
 
 export function Makeups() {
+  const { t } = useTranslation();
+
   const shadeOptions = [
     {
       name: "Lips",
@@ -300,19 +348,37 @@ export function Makeups() {
     {
       name: "Eyes",
       icon: <Icons.makeupEyes />,
+      items: [
+        "Eyebrows",
+        "Eye Shadow",
+        "Eye Liner",
+        "Lashes",
+        "Mascara",
+        "Lenses",
+      ],
     },
     {
       name: "Face",
       icon: <Icons.makeupFace />,
+      items: [
+        "Foundation",
+        "Concealer",
+        "Contour",
+        "Blush",
+        "Bronzer",
+        "Highlighter",
+      ],
     },
     {
       name: "Hair",
       icon: <Icons.makeupHair />,
+      items: ["Hair Color"],
     },
   ];
 
   const [selectedMakeup, setSelectedMakeup] = useState<string | null>(null);
-
+  const { setSelectedProductNumber } = useSelecProductNumberContext()
+console.log(selectedMakeup)
   return (
     <>
       <div className="flex flex-col items-start">
@@ -322,7 +388,10 @@ export function Makeups() {
               key={index}
               className="flex flex-col items-center space-y-2"
               data-selected={selectedMakeup === option.name}
-              onClick={() => setSelectedMakeup(option.name)}
+              onClick={() => {
+                setSelectedMakeup(option.name)
+                setSelectedProductNumber(null)
+              }}
             >
               <div
                 className={clsx(
@@ -334,7 +403,7 @@ export function Makeups() {
                 )}
               >
                 {cloneElement(option.icon, {
-                  className: "text-white size-5",
+                  className: "text-white size-5", // Reduce icon size here
                 })}
 
                 <div
@@ -351,7 +420,7 @@ export function Makeups() {
                 />
               </div>
               <div className="text-center text-[10px] !leading-4 text-white lg:text-sm">
-                {option.name}
+                {t("vto." + option.name)} {/* Reduce text size here */}
               </div>
             </button>
           ))}
@@ -377,63 +446,51 @@ function BottomContent() {
   return <Outlet />;
 }
 
-export function TopNavigation({ cart = false }: { cart?: boolean }) {
-  const { flipCamera } = useCamera();
-  const [backClickCount, setBackClickCount] = useState(0);
-
-  const handleBackClick = () => {
-    if (process.env.NODE_ENV === "production") {
-      if (backClickCount === 0) {
-        setBackClickCount(1);
-        window.location.href = "/virtual-try-on/makeups";
-      } else {
-        window.location.href = "https://unveels.com/technologies";
-      }
-    }
-  };
-
-  const handleCloseClick = () => {
-    if (process.env.NODE_ENV === "production") {
-      window.location.href = "https://unveels.com/technologies";
-    }
-  };
+export function TopNavigation({}: {}) {
+  const isDevelopment = process.env.NODE_ENV === "development";
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
-      <div className="flex flex-col gap-3">
-        {process.env.NODE_ENV === "development" ? (
-          <Link
-            to="/virtual-try-on/accesories"
-            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          >
-            <ChevronLeft className="size-4 text-white" />
-          </Link>
-        ) : (
-          <button
-            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            onClick={handleBackClick}
-          >
-            <ChevronLeft className="size-4 text-white" />
-          </button>
-        )}
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <div className="flex flex-col gap-4">
+        <a
+          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          href="https://unveels.com/technologies"
+        >
+          <ChevronLeft className="size-6 text-white" />
+        </a>
       </div>
 
-      <div className="flex flex-col gap-3">
-        {process.env.NODE_ENV === "development" ? (
+      <div className="flex flex-col gap-4">
+        {isDevelopment ? (
           <Link
+            type="button"
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
             to="/"
-            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           >
-            <X className="size-4 text-white" />
+            <X className="size-6 text-white" />
           </Link>
         ) : (
-          <button
-            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            onClick={handleCloseClick}
+          <a
+            type="button"
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+            href="https://unveels.com/technologies"
           >
-            <X className="size-4 text-white" />
-          </button>
+            <X className="size-6 text-white" />
+          </a>
         )}
+
+        <div className="relative -m-0.5 p-0.5">
+          <div
+            className="absolute inset-0 rounded-full border-2 border-transparent"
+            style={{
+              background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
+              WebkitMask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+              mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+              WebkitMaskComposite: "destination-out",
+              maskComposite: "exclude",
+            }}
+          />
+        </div>
       </div>
     </div>
   );
@@ -460,6 +517,7 @@ function Sidebar({
         <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 
         <div className="flex flex-col gap-4 rounded-full bg-black/25 px-1.5 py-2 backdrop-blur-md">
+          <VoiceCommand />
           <button className="" onClick={screenShoot}>
             <Icons.camera className="size-4 text-white sm:size-6" />
           </button>

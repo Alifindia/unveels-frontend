@@ -6,11 +6,13 @@ import { BrandName } from "../product/brand";
 
 export function VTOProductCard({
   product,
+  productNumber,
   selectedProduct,
   setSelectedProduct,
   onClick,
 }: {
   product: Product;
+  productNumber?: number;
   selectedProduct: Product | null;
   setSelectedProduct: React.Dispatch<React.SetStateAction<Product | null>>;
   onClick: () => void;
