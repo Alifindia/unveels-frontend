@@ -197,7 +197,7 @@ const routes = [
         ],
       },
       {
-        path: "/virtual-try-on-makeups-voice",
+        path: "/smart-beauty",
         element: <VirtualTryOnMakeupsVoice />,
         children: [
           { path: "makeups", element: <TryOnSelectorMakeupsVoice /> },
@@ -283,8 +283,8 @@ function Home() {
       <LinkButton to="/virtual-try-on-makeups/makeups">
         Virtual Try On Makeup
       </LinkButton>
-      <LinkButton to="/virtual-try-on-makeups-voice/makeups">
-        Virtual Try On Makeup Voice
+      <LinkButton to="/smart-beauty/makeups">
+        Smart Beauty
       </LinkButton>
       <LinkButton to="/virtual-try-on-accesories/accesories">
         Virtual Try On Accesories
