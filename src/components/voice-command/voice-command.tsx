@@ -1,4 +1,4 @@
-import VoiceButton from "../assistant/voice-button";
+import VoiceButton from "../voice-command/voice-button";
 import { useFunctionCommand } from "./useFunctionCommand";
 
 const VoiceCommand = () => {
