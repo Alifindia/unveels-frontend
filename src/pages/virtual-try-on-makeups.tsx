@@ -71,6 +71,7 @@ import { FilterProvider } from "../context/filter-context";
 import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
+import { SelecProductNumberProvider } from "./vto/select-product-context";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -78,6 +79,7 @@ interface VirtualTryOnProvider {
 
 export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
   return (
+  <SelecProductNumberProvider>
     <WatchesProvider>
       <HandwearProvider>
         <ScarvesProvider>
@@ -133,6 +135,7 @@ export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
         </ScarvesProvider>
       </HandwearProvider>
     </WatchesProvider>
+  </SelecProductNumberProvider>
   );
 }
 
