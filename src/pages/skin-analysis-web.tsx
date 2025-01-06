@@ -62,7 +62,7 @@ function Main() {
   const steps = [
     async () => {
       const model = await loadTFLiteModel(
-        "/media/unveels/models/skin-analysis/best_skin_float16.tflite",
+        "/media/unveels/models/skin-analysis/best_float16.tflite",
       );
       modelSkinAnalysisRef.current = model;
     },
