@@ -68,7 +68,7 @@ const NeckOccluderInner: React.FC<NeckOccluderProps> = React.memo(
       if (!landmarks.current || !occluderRef.current) return;
       if (landmarks.current.length > 0) {
         occluderRef.current.visible = true;
-        const neckLandmark = landmarks.current[0];
+        const neckLandmark = landmarks.current[152];
 
         const neckDistance =
           calculateDistance(landmarks.current[197], landmarks.current[152]) *
@@ -87,12 +87,20 @@ const NeckOccluderInner: React.FC<NeckOccluderProps> = React.memo(
 
         if (neckLandmark) {
           occluderRef.current.position.set(
-            (neckLandmarkX / 6) * 2,
-            neckLandmarkY - neckDistance + neckDistance - neckDistanceY,
-            0,
+            neckLandmarkX,
+            neckLandmarkY - (neckDistance / 3),
+            neckLandmarkZ,
           );
 
+          const quaternion = calculateFaceOrientation(landmarks.current);
+
+          if (quaternion) {
+            occluderRef.current.setRotationFromQuaternion(quaternion);
+          }
+
           occluderRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+          occluderRef.current.translateZ(-(scaleFactor * 12));
+          occluderRef.current.rotation.z = 0;
         }
       } else {
         occluderRef.current.visible = false;

@@ -6,6 +6,7 @@ import { NECKLACE } from "../../../utils/constants";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../utils/calculateDistance";
 import { useAccesories } from "../../../context/accesories-context";
+import { calculateFaceOrientation } from "../../../utils/calculateFaceOrientation";
 
 interface NecklaceProps extends MeshProps {
   landmarks: React.RefObject<Landmark[]>;
@@ -63,7 +64,7 @@ const NecklaceInner: React.FC<NecklaceProps> = React.memo(
       if (!landmarks.current || !necklaceRef.current) return;
       if (landmarks.current.length > 0) {
         necklaceRef.current.visible = true;
-        const neckLandmark = landmarks.current[0];
+        const neckLandmark = landmarks.current[152];
 
         const neckDistance =
           calculateDistance(landmarks.current[197], landmarks.current[152]) *
@@ -83,12 +84,20 @@ const NecklaceInner: React.FC<NecklaceProps> = React.memo(
 
         if (neckLandmark) {
           necklaceRef.current.position.set(
-            (neckLandmarkX / 6) * 2,
-            neckLandmarkY - neckDistance,
-            0,
+            neckLandmarkX,
+            neckLandmarkY - (neckDistance * 0.9),
+            neckLandmarkZ,
           );
 
+          const quaternion = calculateFaceOrientation(landmarks.current);
+
+          if (quaternion) {
+            necklaceRef.current.setRotationFromQuaternion(quaternion);
+          }
+
           necklaceRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+          necklaceRef.current.translateZ(-(scaleFactor * 12));
+          necklaceRef.current.rotation.z = 0;
         }
       } else {
         necklaceRef.current.visible = false;
