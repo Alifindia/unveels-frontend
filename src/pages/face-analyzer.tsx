@@ -258,7 +258,7 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
           <div className="flex items-center justify-center rounded-full bg-gradient-to-b from-[#CA9C43] to-[#644D21] p-1">
             {criterias.capturedImage ? (
               <img
-                className="size-24 rounded-full object-fill"
+                className="size-24 rounded-full object-fill transform scale-x-[-1]"
                 src={criterias.capturedImage}
                 alt="Captured Profile"
               />
