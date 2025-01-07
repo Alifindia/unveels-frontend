@@ -71,13 +71,12 @@ const NailPinkyInner: React.FC<NailPinkyProps> = React.memo(
         const nailsFingerDIP = handLandmarks.current[20];
 
         const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
-
         // Scale coordinates proportionally with the viewport
         const nailsFingerX = (1 - nailsFingerDIP.x - 0.495) * outputWidth;
         const nailsFingerY = -(nailsFingerDIP.y - 0.496) * outputHeight;
         const nailsFingerZ = 240;
 
-        const scaleFactor = (fingerSize * outputWidth) / 1.8;
+        const scaleFactor = (fingerSize * outputWidth) / 2.5;
 
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
         nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
