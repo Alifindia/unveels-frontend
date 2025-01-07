@@ -51,32 +51,27 @@ export const getCurrencyAndRate = (
     (rate) => rate.currency_to === currencyCode,
   );
 
+  const currencyMapping: { [key: string]: string } = {
+    BHD: "BHD ",
+    AUD: "A$",
+    GBP: "£",
+    CAD: "CA$",
+    CNY: "CN¥",
+    EUR: "€",
+    USD: "$",
+    KWD: "KWD ",
+    IQD: "IQD ",
+    JPY: "¥",
+    OMR: "OMR ",
+    QAR: "QAR ",
+    RUB: "RUB ",
+    SAR: "SAR ",
+    AED: "AED ",
+  };
+
   return {
     currency: currencyCode,
     rate: exchangeRate ? exchangeRate.rate : 1, // Default rate is 1 for KWD
-    currencySymbol: getCurrencySymbol(currencyCode),
+    currencySymbol: currencyMapping[currencyCode] || "KWD",
   };
 };
-
-function getCurrencySymbol(currencyCode: string): string | undefined {
-  const currencyMapping: { [key: string]: string } = {
-    BHD: "BHD",
-    A$: "AUD",
-    "£": "GBP",
-    CA$: "CAD",
-    "CN¥": "CNY",
-    "€": "EUR",
-    $: "USD",
-    KWD: "KWD",
-    IQD: "IQD",
-    "¥": "JPY",
-    OMR: "OMR",
-    QAR: "QAR",
-    RUB: "RUB",
-    SAR: "SAR",
-    AED: "AED",
-  };
-  return Object.keys(currencyMapping).find(
-    (symbol) => currencyMapping[symbol] === currencyCode
-  );
-}

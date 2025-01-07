@@ -254,7 +254,7 @@ function ProductHorizontalList({
                   </p>
                   <div className="flex flex-wrap items-center justify-end gap-x-1">
                     <span className="text-sm font-bold text-white">
-                      {currencySymbol} {(product.price * rate).toFixed(3)}
+                      {currencySymbol}{(product.price * rate).toFixed(3)}
                     </span>
                   </div>
                 </div>
@@ -1364,10 +1364,10 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
           </div>
           <div className="my-4 flex justify-between text-sm">
             <span>
-              {currencySymbol} {minPrice}
+              {currencySymbol}{minPrice}
             </span>
             <span>
-              {currencySymbol} {maxPrice}
+              {currencySymbol}{maxPrice}
             </span>
           </div>
           <div className="relative h-6 w-full">

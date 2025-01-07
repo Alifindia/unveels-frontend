@@ -539,7 +539,7 @@ function ProductList({ products }: { products: Array<Product> }) {
                 <p className="text-[0.5rem] text-white/60">{brand}</p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.625rem] font-bold text-white">
-                    {currencySymbol} {(product.price * rate).toFixed(3)}
+                    {currencySymbol}{(product.price * rate).toFixed(3)}
                   </span>
                 </div>
               </div>

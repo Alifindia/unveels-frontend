@@ -95,7 +95,7 @@ export function RecommendationsTab({
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="truncate text-[0.625rem] font-bold text-white">
-                        {currencySymbol} {(product.price * rate).toFixed(3)}
+                        {currencySymbol}{(product.price * rate).toFixed(3)}
                       </span>
                     </div>
                   </div>
@@ -235,7 +235,7 @@ export function RecommendationsTab({
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="truncate text-[0.625rem] font-bold text-white">
-                        {currencySymbol} {(product.price * rate).toFixed(3)}
+                        {currencySymbol}{(product.price * rate).toFixed(3)}
                       </span>
                     </div>
                   </div>

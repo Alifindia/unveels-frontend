@@ -963,7 +963,7 @@ function ProductHorizontalList({ category }: { category: string }) {
                   </p>
                   <div className="flex flex-wrap items-center justify-end gap-x-1">
                     <span className="text-[0.5rem] font-bold text-white md:text-[10px]">
-                      {currencySymbol} {(product.price * rate).toFixed(3)}
+                      {currencySymbol}{(product.price * rate).toFixed(3)}
                     </span>
                   </div>
                 </div>

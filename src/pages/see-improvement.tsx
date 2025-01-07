@@ -261,7 +261,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                 </p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.625rem] font-bold text-white">
-                    {currencySymbol} {(product.price * rate).toFixed(3)}
+                    {currencySymbol}{(product.price * rate).toFixed(3)}
                   </span>
                   {/* <span className="text-[0.5rem] text-white/50 line-through">
                 ${product.originalPrice.toFixed(2)}

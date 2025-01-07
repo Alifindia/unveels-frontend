@@ -41,7 +41,7 @@ const SuggestedGifts = ({ product }: SuggestedGiftsProps) => {
                 <p className="text-[0.5rem] text-white/60">Brand Name</p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.625rem] font-bold text-white">
-                    {currencySymbol} {(item.price * rate).toFixed(3)}
+                    {currencySymbol}{(item.price * rate).toFixed(3)}
                   </span>
                 </div>
               </div>

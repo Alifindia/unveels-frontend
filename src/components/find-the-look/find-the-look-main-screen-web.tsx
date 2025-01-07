@@ -96,7 +96,7 @@ export function FindTheLookMainScreenWeb({
   };
 
   return (
-    <div className="relative mx-auto flex h-full min-h-dvh w-full flex-col bg-black pt-30">
+    <div className="relative mx-auto flex h-full min-h-dvh w-full flex-col bg-black pt-40">
       <input
         ref={photoVideoUploadRef}
         type="file"

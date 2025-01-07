@@ -95,10 +95,10 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
                 <p className="text-[0.5rem] text-white/60">{message.brand}</p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.625rem] font-bold text-white">
-                    {currencySymbol} {+message.price * rate}
+                    {currencySymbol}{+message.price * rate}
                   </span>
                   <span className="text-[0.5rem] text-white/50 line-through">
-                    {currencySymbol} {+message.originalPrice * rate}
+                    {currencySymbol}{+message.originalPrice * rate}
                   </span>
                 </div>
               </div>
