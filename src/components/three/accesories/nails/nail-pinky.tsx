@@ -73,11 +73,11 @@ const NailPinkyInner: React.FC<NailPinkyProps> = React.memo(
         const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
 
         // Scale coordinates proportionally with the viewport
-        const nailsFingerX = (1 - nailsFingerDIP.x - 0.5) * outputWidth;
-        const nailsFingerY = -(nailsFingerDIP.y - 0.5) * outputHeight;
-        const nailsFingerZ = 200;
+        const nailsFingerX = (1 - nailsFingerDIP.x - 0.495) * outputWidth;
+        const nailsFingerY = -(nailsFingerDIP.y - 0.496) * outputHeight;
+        const nailsFingerZ = 240;
 
-        const scaleFactor = (fingerSize * outputWidth) / 2.4;
+        const scaleFactor = (fingerSize * outputWidth) / 1.8;
 
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
         nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -87,6 +87,8 @@ const NailPinkyInner: React.FC<NailPinkyProps> = React.memo(
         if (quaternion) {
           nailsRef.current.setRotationFromQuaternion(quaternion);
         }
+
+        nailsRef.current.rotation.y -= 0.01; // Sesuaikan nilai 0.02 untuk kecepatan rotasi
 
         // Update nail color dynamically during the frame
         if (nailsRef.current) {

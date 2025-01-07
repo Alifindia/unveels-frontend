@@ -66,43 +66,52 @@ const NailThumbInner: React.FC<NailThumbProps> = React.memo(
       if (!handLandmarks.current || !nailsRef.current) return;
       if (handLandmarks.current.length > 0) {
         nailsRef.current.visible = true;
+        // Check if the hand is the right hand
+        const isRightHand = handLandmarks.current[0]?.x > 0.5; // Example logic, adjust as needed
+    
         const middleFingerMCP = handLandmarks.current[9];
         const nailsFingerMCP = handLandmarks.current[13];
         const nailsFingerDIP = handLandmarks.current[4];
-
+    
         const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
-
-        const nailsFingerX = (1 - nailsFingerDIP.x - 0.5) * outputWidth;
-        const nailsFingerY = -(nailsFingerDIP.y - 0.5) * outputHeight;
+    
+        const nailsFingerX = (1 - nailsFingerDIP.x - 0.509) * outputWidth;
+        const nailsFingerY = -(nailsFingerDIP.y - 0.519) * outputHeight;
         const nailsFingerZ = 200;
-
+    
         const scaleFactor = (fingerSize * outputWidth) / 2.4;
-
+    
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
         nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
+    
         const quaternion = handQuaternion(handLandmarks.current, 1, 5);
-
+    
         if (quaternion) {
           nailsRef.current.setRotationFromQuaternion(quaternion);
         }
-
-        // Update nail color dynamically during the frame
-        if (nailsRef.current) {
-          nailsRef.current.traverse((child) => {
-            if ((child as Mesh).isMesh) {
-              const mesh = child as Mesh;
-              if (mesh.material instanceof MeshStandardMaterial) {
-                mesh.material.color.set(nailsColor); // Dynamically update color
-                mesh.material.needsUpdate = true;
-              }
-            }
-          });
+    
+        // Adjust rotation based on hand type
+        if (isRightHand) {
+          nailsRef.current.rotation.y += 0.02; // Right hand
+        } else {
+          nailsRef.current.rotation.y -= 1.4; // Left hand
         }
+    
+        // Update nail color dynamically during the frame
+        nailsRef.current.traverse((child) => {
+          if ((child as Mesh).isMesh) {
+            const mesh = child as Mesh;
+            if (mesh.material instanceof MeshStandardMaterial) {
+              mesh.material.color.set(nailsColor); // Dynamically update color
+              mesh.material.needsUpdate = true;
+            }
+          }
+        });
       } else {
         nailsRef.current.visible = false;
       }
     });
+    
 
     return null;
   },

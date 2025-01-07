@@ -77,11 +77,11 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
         const scaleX = viewport.width / outputWidth;
         const scaleY = viewport.height / outputHeight;
 
-        const nailsFingerX = (1 - nailsFingerDIP.x - 0.5) * outputWidth;
-        const nailsFingerY = -(nailsFingerDIP.y - 0.5) * outputHeight;
-        const nailsFingerZ = 200;
+        const nailsFingerX = (1 - nailsFingerDIP.x - 0.492) * outputWidth;
+        const nailsFingerY = -(nailsFingerDIP.y - 0.515) * outputHeight;
+        const nailsFingerZ = 250;
 
-        const scaleFactor = (fingerSize * outputWidth) / 2.4;
+        const scaleFactor = (fingerSize * outputWidth) / 2.2;
 
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
         nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -91,6 +91,8 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
         if (quaternion) {
           nailsRef.current.setRotationFromQuaternion(quaternion);
         }
+
+        nailsRef.current.rotation.y += 0.3; // Sesuaikan nilai 0.02 untuk kecepatan rotasi
 
         // Update nail color dynamically during the frame
         if (nailsRef.current) {
