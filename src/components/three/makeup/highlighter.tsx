@@ -42,7 +42,7 @@ const HighlighterInner: React.FC<HighlighterProps> = ({
     const materialOptions: Partial<MeshBasicMaterialParameters> = {
       color: new Color(highlighterColor),
       transparent: !!alphaMap,
-      opacity: 0.36,
+      opacity: 0.4,
     };
 
     if (alphaMap) {

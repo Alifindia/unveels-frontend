@@ -44,7 +44,7 @@ export const getCurrencyAndRate = (
   };
 
   // Get data from localStorage
-  const localStorageData = JSON.parse(localStorage.getItem("cart") || "null");
+  const localStorageData = JSON.parse(localStorage.getItem("mage-cache-storage") || "null");
 
   if (!localStorageData || !localStorageData.subtotal) {
     // If no data found, default to KWD with rate 1

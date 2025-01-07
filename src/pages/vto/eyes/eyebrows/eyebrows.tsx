@@ -217,7 +217,7 @@ function ProductList() {
     setEyebrowsColor(selectedColor || "#ffffff");
     setEyebrowsPattern(parseInt(selectedPattern || "0"));
     setShowEyebrows(selectedColor != null && selectedPattern != null);
-  }, [selectedColor, selectedPattern]);
+  }, [selectedColor, selectedPattern, selectedProduct]);
 
   useEffect(() => {
     if (data?.items && selectedProductNumber) {

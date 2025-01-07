@@ -143,6 +143,12 @@ const EarringInner: React.FC<EarringProps> = React.memo(
         if (quaternion) {
           leftEarringRef.current.setRotationFromQuaternion(quaternion);
           rightEarringRef.current.setRotationFromQuaternion(quaternion);
+          if (quaternion?.z < -0.011) {
+            leftEarringRef.current.visible = false;
+          }
+          if (quaternion?.z > 0.011) {
+            rightEarringRef.current.visible = false;
+          }
         }
 
         rightEarringRef.current.translateX(-(rightScaleFactor * 0.8));
@@ -151,13 +157,6 @@ const EarringInner: React.FC<EarringProps> = React.memo(
         leftEarringRef.current.translateX(leftScaleFactor * 0.8);
         leftEarringRef.current.translateY(-(leftScaleFactor * 1.8));
         leftEarringRef.current.translateZ(-(leftScaleFactor * 2));
-        if (leftBottomEar.z > 0.19) {
-          leftEarringRef.current.visible = false;
-        }
-        console.log(rightBottomEar.z);
-        if (rightBottomEar.z > 0.19) {
-          rightEarringRef.current.visible = false;
-        }
       } else {
         leftEarringRef.current.visible = false;
         rightEarringRef.current.visible = false;
