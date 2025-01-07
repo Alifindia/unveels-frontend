@@ -66,52 +66,52 @@ const WatchInner: React.FC<WatchProps> = React.memo(
     useFrame(() => {
       if (!handLandmarks.current || !watchRef.current) return;
       if (handLandmarks.current.length > 0) {
-        watchRef.current.visible = true;
+        const wrist = handLandmarks.current[0]; // Pergelangan tangan
+        const thumbBase = handLandmarks.current[1]; // Pangkal ibu jari
+        const indexBase = handLandmarks.current[5]; // Pangkal jari telunjuk
+        const pinkyBase = handLandmarks.current[17]; // Pangkal jari kelingking
     
-        const wrist = handLandmarks.current[0]; // Landmark untuk pergelangan tangan
-        const thumbBase = handLandmarks.current[1]; // Landmark untuk pangkal ibu jari
-        const indexBase = handLandmarks.current[5]; // Landmark untuk pangkal jari telunjuk
+        const isPalmFacingBack = thumbBase.z > pinkyBase.z;
+    
+        console.log(`Telapak tangan menghadap ${isPalmFacingBack ? "belakang" : "depan"}`);
     
         const wristSize = calculateDistance(wrist, thumbBase);
         const wristX = (1 - wrist.x - 0.5) * outputWidth;
-        const wristY = -(wrist.y - 0.5) * outputHeight;
-        const wristZ = 200;
+        const adjustmentOffset = 5; // Sesuaikan nilai ini untuk mengontrol offset ke atas/bawah
+        const wristY = -(wrist.y - 0.5) * outputHeight - adjustmentOffset; // Tambahkan offset
+        const wristZ = 190;
     
         const scaleFactor = (wristSize * outputWidth) / 3;
     
         watchRef.current.position.set(wristX, wristY, wristZ);
         watchRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
     
-        // Deteksi apakah tangan kiri atau tangan kanan
         const isRightHand = thumbBase.x < indexBase.x;
     
         const quaternion = handQuaternion(handLandmarks.current);
     
         if (quaternion) {
-          // Set quaternion berdasarkan sisi tangan
-          if (isRightHand) {
-            const adjustment = new Quaternion().setFromAxisAngle(
-              new Vector3(0, 0, 1), // Rotasi di sekitar sumbu Z
-              Math.PI, // Rotasi 180 derajat
-            );
-            watchRef.current.quaternion.copy(quaternion).multiply(adjustment);
+          const adjustment = new Quaternion();
+    
+          if (isPalmFacingBack) {
+            adjustment.setFromAxisAngle(new Vector3(1, 0, 0), Math.PI);
           } else {
-            watchRef.current.setRotationFromQuaternion(quaternion);
+            adjustment.setFromAxisAngle(new Vector3(1, 0, 0), 0);
           }
+    
+          if (!isRightHand) {
+            adjustment.multiply(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), Math.PI));
+          }
+    
+          watchRef.current.quaternion.copy(quaternion).multiply(adjustment);
         }
-
-        // Memeriksa apakah pergelangan tangan menekuk
-        const isWristBent = wristSize < 0.1; // Jika pergelangan tangan menekuk lebih tajam dari threshold ini
-        if (isWristBent) {
-          watchRef.current.visible = false; // Sembunyikan jam tangan jika pergelangan tangan menekuk
-        } else {
-          watchRef.current.visible = true; // Tampilkan jam tangan jika pergelangan tangan tidak menekuk
-        }
-
+    
+        const isWristBent = wristSize < 0.1;
+        watchRef.current.visible = !isWristBent;
       } else {
         watchRef.current.visible = false;
       }
-    });
+    });    
 
     return null;
   },
