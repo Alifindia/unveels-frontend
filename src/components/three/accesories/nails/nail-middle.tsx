@@ -79,7 +79,7 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
         const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
     
         // Scale coordinates proportionally with the viewport
-        const nailsFingerX = (1 - nailsFingerDIP.x - 0.495) * outputWidth;
+        const nailsFingerX = (1 - nailsFingerDIP.x - 0.496) * outputWidth;
         const nailsFingerY = -(nailsFingerDIP.y - 0.515) * outputHeight;
         const nailsFingerZ = 200;
     

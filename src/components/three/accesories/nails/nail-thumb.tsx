@@ -75,8 +75,8 @@ const NailThumbInner: React.FC<NailThumbProps> = React.memo(
     
         const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
     
-        const nailsFingerX = (1 - nailsFingerDIP.x - 0.509) * outputWidth;
-        const nailsFingerY = -(nailsFingerDIP.y - 0.519) * outputHeight;
+        const nailsFingerX = (1 - nailsFingerDIP.x - 0.5) * outputWidth;
+        const nailsFingerY = -(nailsFingerDIP.y - 0.515) * outputHeight;
         const nailsFingerZ = 200;
     
         const scaleFactor = (fingerSize * outputWidth) / 2.4;

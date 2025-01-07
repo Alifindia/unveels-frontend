@@ -79,11 +79,11 @@ const NailIndexInner: React.FC<NailIndexProps> = React.memo(
         const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
     
         // Scale and position adjustments for right hand
-        let nailsFingerX = (1 - nailsFingerDIP.x - 0.492) * outputWidth;
-        let nailsFingerY = -(nailsFingerDIP.y - 0.51) * outputHeight;    
+        let nailsFingerX = (1 - nailsFingerDIP.x - 0.501) * outputWidth;
+        let nailsFingerY = -(nailsFingerDIP.y - 0.515) * outputHeight;    
         const nailsFingerZ = 200;
     
-        const scaleFactor = (fingerSize * outputWidth) / 2.2;
+        const scaleFactor = (fingerSize * outputWidth) / 2;
     
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
         nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
