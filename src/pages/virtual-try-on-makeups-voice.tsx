@@ -275,63 +275,9 @@ function MainContent() {
 }
 
 export function TryOnSelectorMakeupsVoice() {
-  const { t } = useTranslation();
-
-  const [tab, setTab] = useState("makeup" as "makeup" | "accessories" | null);
-
-  const activeClassNames =
-    "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text text-transparent";
-
   return (
     <div className="mx-auto w-full max-w-lg space-y-2 px-4">
-      <div className="flex h-10 w-full items-center justify-between border-b border-gray-600 text-center">
-        {["makeup", "accessories"].map((shadeTab) => {
-          const isActive = tab === shadeTab;
-          return (
-            <Fragment key={shadeTab}>
-              <button
-                key={shadeTab}
-                className={`relative h-10 grow border-b font-luxury text-[10px] sm:text-[12px] lg:text-[14px] ${
-                  isActive
-                    ? activeClassNames
-                    : "border-transparent text-gray-500"
-                }`}
-                onClick={() => setTab(shadeTab as "makeup" | "accessories")}
-              >
-                <span
-                  className={clsx(
-                    "capitalize",
-                    isActive ? "text-white/70 blur-sm" : "",
-                  )}
-                >
-                  {t("vto." + shadeTab)}
-                </span>
-                {isActive ? (
-                  <>
-                    <div
-                      className={clsx(
-                        "absolute inset-0 flex items-center justify-center text-[10px] blur-sm sm:text-[12px] lg:text-[14px]",
-                        activeClassNames,
-                      )}
-                    >
-                      <span className="text-center text-[10px] capitalize sm:text-[12px] lg:text-[14px]">
-                        {t("vto." + shadeTab)}
-                      </span>
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-center text-[10px] capitalize text-white/70 sm:text-[12px] lg:text-[14px]">
-                        {t("vto." + shadeTab)}
-                      </span>
-                    </div>
-                  </>
-                ) : null}
-              </button>
-            </Fragment>
-          );
-        })}
-      </div>
       <Makeups />
-      <Outlet />
     </div>
   );
 }
@@ -378,7 +324,6 @@ export function Makeups() {
 
   const [selectedMakeup, setSelectedMakeup] = useState<string | null>(null);
   const { setSelectedProductNumber } = useSelecProductNumberContext()
-console.log(selectedMakeup)
   return (
     <>
       <div className="flex flex-col items-start">
