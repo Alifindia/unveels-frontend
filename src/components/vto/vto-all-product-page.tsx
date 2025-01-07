@@ -172,7 +172,7 @@ function ProductHorizontalList({
 
   const { attributeName, values } = mapTypes[category];
 
-  const { currency, rate } = getCurrencyAndRate(exchangeRates);
+  const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
   // Using useProductsVTOAll hook with dependencies that trigger data refetch
   const { data, refetch, isLoading, isFetching } = useProductsVTOAll({
@@ -255,7 +255,7 @@ function ProductHorizontalList({
                   </p>
                   <div className="flex flex-wrap items-center justify-end gap-x-1">
                     <span className="text-sm font-bold text-white">
-                      {currency} (product.price * rate)
+                      {currencySymbol} ({(product.price * rate).toFixed(3)})
                     </span>
                   </div>
                 </div>
@@ -1253,7 +1253,7 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
     console.log("Selected Size Two:", value);
   };
 
-  const { currency, rate } = getCurrencyAndRate(exchangeRates);
+  const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 rounded-t-lg bg-[#09090b] p-4">
@@ -1365,10 +1365,10 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
           </div>
           <div className="my-4 flex justify-between text-sm">
             <span>
-              {currency} {minPrice}
+              {currencySymbol} {minPrice}
             </span>
             <span>
-              {currency} {maxPrice}
+              {currencySymbol} {maxPrice}
             </span>
           </div>
           <div className="relative h-6 w-full">

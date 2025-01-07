@@ -25,6 +25,40 @@ export const getCurrencyAndRate = (
   exchangeRates: { currency_to: string; rate: number }[],
 ) => {
   // Currency mapping
+  // Get data from localStorage
+  const localStorageData = localStorage.getItem("current_currency");
+
+  if (!localStorageData) {
+    // If no data found, default to KWD with rate 1
+    return {
+      currency: "KWD",
+      rate: 1,
+    };
+  }
+
+  // Extract currency symbol from the "subtotal" field
+  // const subtotal: string = localStorageData.subtotal;
+  // const currencySymbolMatch = subtotal.match(/>([^\d\s]+)\s/); // Match currency symbol before the amount
+  // const currencySymbol: string | null = currencySymbolMatch
+  //   ? currencySymbolMatch[1]
+  //   : null;
+
+  // If currency symbol is null, fallback to default "KWD"
+  const currencyCode = localStorageData;
+
+  // Find the corresponding exchange rate
+  const exchangeRate = exchangeRates.find(
+    (rate) => rate.currency_to === currencyCode,
+  );
+
+  return {
+    currency: currencyCode,
+    rate: exchangeRate ? exchangeRate.rate : 1, // Default rate is 1 for KWD
+    currencySymbol: getCurrencySymbol(currencyCode),
+  };
+};
+
+function getCurrencySymbol(currencyCode: string): string | undefined {
   const currencyMapping: { [key: string]: string } = {
     BHD: "BHD",
     A$: "AUD",
@@ -42,35 +76,7 @@ export const getCurrencyAndRate = (
     SAR: "SAR",
     AED: "AED",
   };
-
-  // Get data from localStorage
-  const localStorageData = JSON.parse(localStorage.getItem("mage-cache-storage") || "null");
-
-  if (!localStorageData || !localStorageData.subtotal) {
-    // If no data found, default to KWD with rate 1
-    return {
-      currency: "KWD",
-      rate: 1,
-    };
-  }
-
-  // Extract currency symbol from the "subtotal" field
-  const subtotal: string = localStorageData.subtotal;
-  const currencySymbolMatch = subtotal.match(/>([^\d\s]+)\s/); // Match currency symbol before the amount
-  const currencySymbol: string | null = currencySymbolMatch
-    ? currencySymbolMatch[1]
-    : null;
-
-  // If currency symbol is null, fallback to default "KWD"
-  const currencyCode = currencySymbol ? currencyMapping[currencySymbol] : "KWD";
-
-  // Find the corresponding exchange rate
-  const exchangeRate = exchangeRates.find(
-    (rate) => rate.currency_to === currencyCode,
+  return Object.keys(currencyMapping).find(
+    (symbol) => currencyMapping[symbol] === currencyCode
   );
-
-  return {
-    currency: currencyCode,
-    rate: exchangeRate ? exchangeRate.rate : 1, // Default rate is 1 for KWD
-  };
-};
+}

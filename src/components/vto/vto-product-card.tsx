@@ -19,7 +19,7 @@ export function VTOProductCard({
 }) {
   const imageUrl = mediaUrl(product.media_gallery_entries?.[0]?.file);
 
-  const { currency, rate } = getCurrencyAndRate(exchangeRates);
+  const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
   const isSelected = selectedProduct?.id === product.id;
 
@@ -56,7 +56,7 @@ export function VTOProductCard({
 
       <div className="flex items-end justify-between space-x-1 pt-1">
         <div className="bg-gradient-to-r bg-clip-text text-[0.6rem] text-transparent text-white sm:text-[0.85rem]">
-          {currency} {product.price * rate}
+          {currencySymbol} {(product.price * rate).toFixed(3)}
         </div>
         <button
           type="button"

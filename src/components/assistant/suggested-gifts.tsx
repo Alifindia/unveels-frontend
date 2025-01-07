@@ -8,7 +8,7 @@ interface SuggestedGiftsProps {
 }
 
 const SuggestedGifts = ({ product }: SuggestedGiftsProps) => {
-  const { currency, rate } = getCurrencyAndRate(exchangeRates);
+  const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
   return (
     <div className="w-full space-y-4 bg-gradient-to-b from-[#1B1404] to-[#2C1F06] py-4">
@@ -41,7 +41,7 @@ const SuggestedGifts = ({ product }: SuggestedGiftsProps) => {
                 <p className="text-[0.5rem] text-white/60">Brand Name</p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.625rem] font-bold text-white">
-                    {currency} {item.price * rate}
+                    {currencySymbol} {(item.price * rate).toFixed(3)}
                   </span>
                 </div>
               </div>

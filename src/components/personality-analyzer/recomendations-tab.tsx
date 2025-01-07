@@ -37,7 +37,7 @@ export function RecommendationsTab({
 
   const { addItemToCart } = useCartContext();
 
-  const { currency, rate } = getCurrencyAndRate(exchangeRates);
+  const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
   const handleAddToCart = async (id: string, url: string) => {
     try {
@@ -95,7 +95,7 @@ export function RecommendationsTab({
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="truncate text-[0.625rem] font-bold text-white">
-                        {currency} {product.price * rate}
+                        {currencySymbol} {(product.price * rate).toFixed(3)}
                       </span>
                     </div>
                   </div>
@@ -152,7 +152,7 @@ export function RecommendationsTab({
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="truncate text-[0.625rem] font-bold text-white">
-                        {currency}
+                        {currencySymbol}
                         {profile.products.reduce(
                           (acc, product) => acc + product.price,
                           0,
@@ -235,7 +235,7 @@ export function RecommendationsTab({
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="truncate text-[0.625rem] font-bold text-white">
-                        {currency} {product.price * rate}
+                        {currencySymbol} {(product.price * rate).toFixed(3)}
                       </span>
                     </div>
                   </div>

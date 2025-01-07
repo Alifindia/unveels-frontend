@@ -902,7 +902,7 @@ function AccessoriesAllView({
 
 function ProductHorizontalList({ category }: { category: string }) {
   const { selectedItems: cart, dispatch } = useFindTheLookContext();
-  const { currency, rate } = getCurrencyAndRate(exchangeRates);
+  const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
   if (!mapTypes[category]) {
     console.warn(`Category "${category}" is not defined in mapTypes.`);
@@ -963,7 +963,7 @@ function ProductHorizontalList({ category }: { category: string }) {
                   </p>
                   <div className="flex flex-wrap items-center justify-end gap-x-1">
                     <span className="text-[0.5rem] font-bold text-white md:text-[10px]">
-                      {currency} {product.price * rate}
+                      {currencySymbol} {(product.price * rate).toFixed(3)}
                     </span>
                   </div>
                 </div>

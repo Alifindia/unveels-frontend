@@ -46,6 +46,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
 
         const data = await response.json();
+        localStorage.setItem("current_currency", data.currency.quote_currency_code);
         const itemCount = data.items.reduce(
           (acc: number, item: CartItem) => acc + item.qty,
           0,
