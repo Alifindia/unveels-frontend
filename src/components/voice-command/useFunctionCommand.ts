@@ -202,6 +202,23 @@ export function useFunctionCommand() {
   } = useHairColorContext();
   const [recording, setRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const [sectionName, setSectionName] = useState("");
+  const getLastPathSegment = (path: string): string => {
+    if (!path) return "";
+    const lastSlashIndex = path.lastIndexOf("/");
+    return path.substring(lastSlashIndex + 1);
+  };
+
+  useEffect(() => {
+    const lastSegment = getLastPathSegment(pathname);
+    setSectionName(lastSegment);
+  }, [pathname]);
+  
+  const sectionNameRef = useRef(sectionName);
+
+  useEffect(() => {
+    sectionNameRef.current = sectionName;
+  }, [sectionName]);
 
   // Inisialisasi Speech Recognition
   const initializeRecognition = () => {
@@ -403,7 +420,7 @@ export function useFunctionCommand() {
 
   function handleSetColorMode(mode: string) {
     if (
-      getLastPathSegment(pathname) == "lip-color" &&
+      sectionNameRef.current == "lip-color" &&
       shadesLipColor.includes(mode)
     ) {
       setSelectedMode(mode);
@@ -421,11 +438,11 @@ export function useFunctionCommand() {
         setReplaceIndex(0);
       }
     }
-    if (getLastPathSegment(pathname) == "eye-shadow") {
+    if (sectionNameRef.current == "eye-shadow") {
       setModeEyeShadow(mode);
     }
     if (
-      getLastPathSegment(pathname) == "contour" &&
+      sectionNameRef.current == "contour" &&
       ["One", "Dual"].includes(mode)
     ) {
       setSelectedModeContour(mode);
@@ -439,7 +456,7 @@ export function useFunctionCommand() {
       }
     }
     if (
-      getLastPathSegment(pathname) == "blush" &&
+      sectionNameRef.current == "blush" &&
       ["One", "Dual", "Tri"].includes(mode)
     ) {
       setSelectedModeBlush(mode as "One" | "Dual" | "Tri");
@@ -460,14 +477,14 @@ export function useFunctionCommand() {
   }
 
   const handleSetColor = async (colorCode: string, color: string) => {
-    if (getLastPathSegment(pathname) == "lip-color" && colorCode !== "") {
+    if (sectionNameRef.current == "lip-color" && colorCode !== "") {
       console.log(colorCode, "colorCode");
       setColorFamily(colorCode);
       await queryClient.invalidateQueries({
         queryKey: ["products", "lipcolor", colorCode, null, null],
       });
     }
-    if (getLastPathSegment(pathname) == "lip-plumper") {
+    if (sectionNameRef.current == "lip-plumper") {
       const dataUseLipPlumperQuery: any = queryClient.getQueryData([
         "products",
         "lip-plumper",
@@ -481,22 +498,22 @@ export function useFunctionCommand() {
       const isColor = ["Purple", "Orange", "Pink"].findIndex((e) => e == color);
       if (isColor !== -1) setSelectedColorPlumper(colorData[isColor]);
     }
-    if (getLastPathSegment(pathname) == "lip-liner" && colorCode !== "") {
+    if (sectionNameRef.current == "lip-liner" && colorCode !== "") {
       setColorFamilyLinier(colorCode);
     }
-    if (getLastPathSegment(pathname) == "eyebrows" && colorCode !== "") {
+    if (sectionNameRef.current == "eyebrows" && colorCode !== "") {
       setColorFamilyEyebrows(colorCode);
     }
-    if (getLastPathSegment(pathname) == "eye-liner" && colorCode !== "") {
+    if (sectionNameRef.current == "eye-liner" && colorCode !== "") {
       setColorFamilyEyeLiner(colorCode);
     }
-    if (getLastPathSegment(pathname) == "lashes" && colorCode !== "") {
+    if (sectionNameRef.current == "lashes" && colorCode !== "") {
       setColorFamilyLashes(colorCode);
     }
-    if (getLastPathSegment(pathname) == "mascara" && colorCode !== "") {
+    if (sectionNameRef.current == "mascara" && colorCode !== "") {
       setColorFamilyMascara(colorCode);
     }
-    if (getLastPathSegment(pathname) == "foundation") {
+    if (sectionNameRef.current == "foundation") {
       const colorId =
         skin_tones.find(
           (e) => e.name == color || e.name.toLowerCase() == color.toLowerCase(),
@@ -506,7 +523,7 @@ export function useFunctionCommand() {
         setColorFamilyFoundation(colorId);
       }
     }
-    if (getLastPathSegment(pathname) == "concealer") {
+    if (sectionNameRef.current == "concealer") {
       const colorId =
         skin_tones.find(
           (e) => e.name == color || e.name.toLowerCase() == color.toLowerCase(),
@@ -516,13 +533,13 @@ export function useFunctionCommand() {
         setColorFamilyConcealer(colorId);
       }
     }
-    if (getLastPathSegment(pathname) == "hair-color" && colorCode !== "") {
+    if (sectionNameRef.current == "hair-color" && colorCode !== "") {
       setColorFamilyHairColor(colorCode);
     }
   };
 
   const handleSetColorChildern = (index: string) => {
-    if (getLastPathSegment(pathname) == "lip-color") {
+    if (sectionNameRef.current == "lip-color") {
       console.log(colorFamily, "colorFamily");
       const data: any = queryClient.getQueryData([
         "products",
@@ -567,7 +584,7 @@ export function useFunctionCommand() {
         setLipColors(newColors);
       }
     }
-    if (getLastPathSegment(pathname) == "lip-liner") {
+    if (sectionNameRef.current == "lip-liner") {
       const datauseLipLinerQuery: any = queryClient.getQueryData([
         "products",
         "lipliner",
@@ -590,7 +607,7 @@ export function useFunctionCommand() {
         setLiplinerColor(color);
       }
     }
-    if (getLastPathSegment(pathname) == "eyebrows") {
+    if (sectionNameRef.current == "eyebrows") {
       const datauseEyebrowsQuery: any = queryClient.getQueryData([
         "products",
         "eyebrows",
@@ -614,7 +631,7 @@ export function useFunctionCommand() {
         setEyebrowsColor(color);
       }
     }
-    if (getLastPathSegment(pathname) == "eye-shadow") {
+    if (sectionNameRef.current == "eye-shadow") {
       // Handle color deselection
       const maxColorsMap: {
         [key: string]: number;
@@ -665,7 +682,7 @@ export function useFunctionCommand() {
         setSelectedColorsEyeShadow(newColors);
       }
     }
-    if (getLastPathSegment(pathname) == "eye-liner") {
+    if (sectionNameRef.current == "eye-liner") {
       const datauseEyelinerQuery: any = queryClient.getQueryData([
         "products",
         "eyeliners",
@@ -682,7 +699,7 @@ export function useFunctionCommand() {
         setSelectedColorEyeLiner(color);
       }
     }
-    if (getLastPathSegment(pathname) == "mascara") {
+    if (sectionNameRef.current == "mascara") {
       const datauseMascaraQuery: any = queryClient.getQueryData([
         "products",
         "mascara",
@@ -699,7 +716,7 @@ export function useFunctionCommand() {
         setSelectedColorMascara(color);
       }
     }
-    if (getLastPathSegment(pathname) == "foundation") {
+    if (sectionNameRef.current == "foundation") {
       const datauseFoundationQuery: any = queryClient.getQueryData([
         "products",
         "foundations",
@@ -721,7 +738,7 @@ export function useFunctionCommand() {
         setFoundationColor(color);
       }
     }
-    if (getLastPathSegment(pathname) == "concealer") {
+    if (sectionNameRef.current == "concealer") {
       const datauseConcealerQuery: any = queryClient.getQueryData([
         "products",
         "concealers",
@@ -741,7 +758,7 @@ export function useFunctionCommand() {
         setConcealerColor(color);
       }
     }
-    if (getLastPathSegment(pathname) == "contour") {
+    if (sectionNameRef.current == "contour") {
       const datauseContourQuery: any = queryClient.getQueryData([
         "products",
         "contours",
@@ -780,7 +797,7 @@ export function useFunctionCommand() {
         setContourColors(newColors);
       }
     }
-    if (getLastPathSegment(pathname) == "blush") {
+    if (sectionNameRef.current == "blush") {
       const datauseBlushQuery: any = queryClient.getQueryData([
         "products",
         "faceblush",
@@ -839,7 +856,7 @@ export function useFunctionCommand() {
         }
       }
     }
-    if (getLastPathSegment(pathname) == "bronzer") {
+    if (sectionNameRef.current == "bronzer") {
       const datauseBronzerQuery: any = queryClient.getQueryData([
         "products",
         "bronzers",
@@ -861,7 +878,7 @@ export function useFunctionCommand() {
         setBronzerColor(color);
       }
     }
-    if (getLastPathSegment(pathname) == "highlighter") {
+    if (sectionNameRef.current == "highlighter") {
       const datauseFaceHighlighterQuery: any = queryClient.getQueryData([
         "products",
         "facehighlighter",
@@ -879,7 +896,7 @@ export function useFunctionCommand() {
         setSelectedColorHighlighter(color);
       }
     }
-    if (getLastPathSegment(pathname) == "hair-color") {
+    if (sectionNameRef.current == "hair-color") {
       const colorData = [
         "#d9be95",
         "#784405",
@@ -903,7 +920,7 @@ export function useFunctionCommand() {
   };
 
   const handleSelectPattern = (pattern: string) => {
-    if (getLastPathSegment(pathname) == "lip-liner") {
+    if (sectionNameRef.current == "lip-liner") {
       const patternValue =
         lipLinerSizes.find(
           (e, idx) => e.label == pattern || idx + 1 == parseInt(pattern),
@@ -911,7 +928,7 @@ export function useFunctionCommand() {
       console.log(patternValue, "patternValue");
       if (patternValue) setSelectedSizeLinier(patternValue);
     }
-    if (getLastPathSegment(pathname) == "eyebrows") {
+    if (sectionNameRef.current == "eyebrows") {
       const indexPattern = parseInt(pattern) - 1;
       console.log(indexPattern, "indexPattern");
       if (indexPattern >= 0) {
@@ -919,14 +936,14 @@ export function useFunctionCommand() {
         setEyebrowsPattern(indexPattern);
       }
     }
-    if (getLastPathSegment(pathname) == "eye-shadow") {
+    if (sectionNameRef.current == "eye-shadow") {
       const indexPattern = parseInt(pattern) - 1;
       console.log(indexPattern, "indexPattern");
       if (indexPattern >= 0) {
         setSelectModeIndexEyeShadow(indexPattern);
       }
     }
-    if (getLastPathSegment(pathname) == "eye-liner") {
+    if (sectionNameRef.current == "eye-liner") {
       const indexPattern = parseInt(pattern) - 1;
       console.log(parseInt(pattern), indexPattern, "indexPattern");
       if (indexPattern >= 0) {
@@ -934,7 +951,7 @@ export function useFunctionCommand() {
         setSelectedShape(value);
       }
     }
-    if (getLastPathSegment(pathname) == "lashes") {
+    if (sectionNameRef.current == "lashes") {
       const indexPattern = parseInt(pattern) - 1;
       console.log(parseInt(pattern), indexPattern, "indexPattern");
       if (indexPattern >= 0) {
@@ -942,7 +959,7 @@ export function useFunctionCommand() {
         setSelectedPattern(value);
       }
     }
-    if (getLastPathSegment(pathname) == "contour") {
+    if (sectionNameRef.current == "contour") {
       const indexPattern = parseInt(pattern) - 1;
       console.log(indexPattern, "indexPattern");
       if (indexPattern >= 0) {
@@ -950,7 +967,7 @@ export function useFunctionCommand() {
         setSelectedShapeContour(indexPattern.toString());
       }
     }
-    if (getLastPathSegment(pathname) == "blush") {
+    if (sectionNameRef.current == "blush") {
       const indexPattern = parseInt(pattern) - 1;
       console.log(indexPattern, "indexPattern");
       if (indexPattern >= 0) {
@@ -958,7 +975,7 @@ export function useFunctionCommand() {
         setSelectedShapeBlush(indexPattern.toString());
       }
     }
-    if (getLastPathSegment(pathname) == "bronzer") {
+    if (sectionNameRef.current == "bronzer") {
       const indexPattern = parseInt(pattern) - 1;
       console.log(indexPattern, "indexPattern");
       if (indexPattern >= 0) {
@@ -966,7 +983,7 @@ export function useFunctionCommand() {
         setSelectedShapeBronzer(indexPattern.toString());
       }
     }
-    if (getLastPathSegment(pathname) == "highlighter") {
+    if (sectionNameRef.current == "highlighter") {
       const indexPattern = parseInt(pattern) - 1;
       console.log(indexPattern, "indexPattern");
       if (indexPattern >= 0) {
@@ -985,23 +1002,23 @@ export function useFunctionCommand() {
       )?.value || null;
     console.log(textureValue, "textureValue");
 
-    if (getLastPathSegment(pathname) == "lip-color" && textureValue) {
+    if (sectionNameRef.current == "lip-color" && textureValue) {
       setSelectedTexture(textureValue);
     }
-    if (getLastPathSegment(pathname) == "lip-plumper" && textureValue) {
+    if (sectionNameRef.current == "lip-plumper" && textureValue) {
       setSelectedTexturePlumper(textureMode);
     }
-    if (getLastPathSegment(pathname) == "eye-shadow" && textureValue) {
+    if (sectionNameRef.current == "eye-shadow" && textureValue) {
       setSelectedTextureEyeShadow(textureValue);
     }
-    if (getLastPathSegment(pathname) == "foundation" && textureValue) {
+    if (sectionNameRef.current == "foundation" && textureValue) {
       if (selectedTextureFoundation === textureValue) {
         setSelectedTextureFoundation(null);
       } else {
         setSelectedTextureFoundation(textureValue);
       }
     }
-    if (getLastPathSegment(pathname) == "contour" && textureValue) {
+    if (sectionNameRef.current == "contour" && textureValue) {
       const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
       if (selectedTextureContour === textureValue) {
         setSelectedTextureContour(null);
@@ -1011,7 +1028,7 @@ export function useFunctionCommand() {
       const indexMaterial = textures.findIndex((e) => e.label == textureMode);
       setHighlighterMaterial(indexMaterial);
     }
-    if (getLastPathSegment(pathname) == "blush" && textureValue) {
+    if (sectionNameRef.current == "blush" && textureValue) {
       const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
       if (selectedTextureContour === textureValue) {
         setSelectedTextureBlush(null);
@@ -1021,7 +1038,7 @@ export function useFunctionCommand() {
       const indexMaterial = textures.findIndex((e) => e.label == textureMode);
       setBlushMaterial(indexMaterial);
     }
-    if (getLastPathSegment(pathname) == "bronzer" && textureValue) {
+    if (sectionNameRef.current == "bronzer" && textureValue) {
       const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
       if (selectedTextureBronzer === textureValue) {
         setSelectedTextureBronzer(null);
@@ -1031,7 +1048,7 @@ export function useFunctionCommand() {
       const indexMaterial = textures.findIndex((e) => e.label == textureMode);
       setHighlighterMaterial(indexMaterial);
     }
-    if (getLastPathSegment(pathname) == "highlighter" && textureValue) {
+    if (sectionNameRef.current == "highlighter" && textureValue) {
       const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
       if (selectedTextureHighlighter === textureValue) {
         setSelectedTextureHighlighter(null);
@@ -1058,5 +1075,5 @@ export function useFunctionCommand() {
     };
   }, []);
 
-  return { recording, setRecording, startListening, stopListening };
+  return { pathname, recording, setRecording, startListening, stopListening };
 }
