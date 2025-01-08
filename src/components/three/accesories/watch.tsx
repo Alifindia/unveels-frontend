@@ -77,11 +77,10 @@ const WatchInner: React.FC<WatchProps> = React.memo(
     
         const wristSize = calculateDistance(wrist, thumbBase);
         const wristX = (1 - wrist.x - 0.5) * outputWidth;
-        const adjustmentOffset = 5; // Sesuaikan nilai ini untuk mengontrol offset ke atas/bawah
-        const wristY = -(wrist.y - 0.5) * outputHeight - adjustmentOffset; // Tambahkan offset
-        const wristZ = 190;
+        const wristY = -(wrist.y - 0.5) * outputHeight;
+        const wristZ = 230;
     
-        const scaleFactor = (wristSize * outputWidth) / 3;
+        const scaleFactor = (wristSize * outputWidth) / 3.8;
     
         watchRef.current.position.set(wristX, wristY, wristZ);
         watchRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
