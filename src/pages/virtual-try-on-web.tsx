@@ -113,7 +113,7 @@ function Main() {
           }
 
           if (data.lipTexture) {
-            setLipTexture(data.setLipTexture);
+            setLipTexture(data.lipTexture);
           }
 
           // lipliner
@@ -145,7 +145,7 @@ function Main() {
           }
 
           if (data.eyebrowsColor !== undefined) {
-            setEyebrowsColor(data.setEyebrowsColor);
+            setEyebrowsColor(data.eyebrowsColor);
           }
 
           if (data.eyebrowsPattern !== undefined) {
@@ -232,7 +232,7 @@ function Main() {
           }
 
           if (data.contourPattern !== undefined) {
-            setContourShape(data.contourShape);
+            setContourShape(data.contourPattern);
           }
 
           // blush
@@ -249,7 +249,7 @@ function Main() {
           }
 
           if (data.blushPattern !== undefined) {
-            setBlushPattern(data.setBlushPattern);
+            setBlushPattern(data.blushPattern);
           }
 
           // bronzer
