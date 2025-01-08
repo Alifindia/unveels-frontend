@@ -7,6 +7,7 @@ import { ColorPalette } from "../components/color-palette";
 import { Icons } from "../components/icons";
 import { LoadingProducts } from "../components/loading";
 import { getCurrencyAndRate } from "../utils/other";
+import { exchangeRates } from "../utils/constants";
 
 export function SingleVirtualTryOnDetail() {
   const {} = useParams();
@@ -229,8 +230,8 @@ function ProductList() {
               </p>
               <div className="flex items-end justify-between space-x-1 pt-1">
                 <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.625rem] text-transparent">
-
-                  </div>
+                  {currencySymbol}{(product.price * rate).toFixed(3)}
+                </div>
                 <button
                   type="button"
                   className="flex h-7 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-2.5 text-[0.5rem] font-semibold text-white"
