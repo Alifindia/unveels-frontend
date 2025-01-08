@@ -69,6 +69,8 @@ import {
 } from "../context/find-the-look-context";
 
 import { useTranslation } from "react-i18next";
+import { getCurrencyAndRate } from "../utils/other";
+import { exchangeRates } from "../utils/constants";
 
 export const productTypeCheckers = {
   isLipColorProduct: (data: Product) => {
@@ -308,6 +310,7 @@ function Main({
   const [showChangeModel, setShowChangeModel] = useState(false);
   const { view, setView, sectionName, mapTypes, groupedItemsData } =
     useFindTheLookContext();
+  const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
   return (
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
@@ -343,7 +346,7 @@ function Main({
           </button>
           <div className="w-full pl-3 sm:pl-4">
             <div className="text-[0.75rem] font-medium text-white sm:text-xs md:text-sm">
-              ${product.price}
+              {currencySymbol}{(product.price * rate).toFixed(3)}
             </div>
           </div>
         </div>

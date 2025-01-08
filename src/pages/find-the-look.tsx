@@ -443,6 +443,8 @@ function ProductList({ product_type }: { product_type: string }) {
     }
   };
 
+  const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
+
   return (
     <div className="flex w-full gap-4 overflow-x-auto no-scrollbar active:cursor-grabbing">
       {data ? (
@@ -480,7 +482,7 @@ function ProductList({ product_type }: { product_type: string }) {
 
               <div className="flex items-end justify-between space-x-1 pt-1">
                 <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.625rem] text-transparent">
-                  ${product.price.toFixed(2)}
+                  {currencySymbol}{(product.price * rate).toFixed(3)}
                 </div>
                 <button
                   type="button"
@@ -1023,6 +1025,8 @@ function SingleCategoryView({
     }
   };
 
+  const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
+
   return (
     <div
       className={clsx(
@@ -1071,7 +1075,7 @@ function SingleCategoryView({
                       </p>
                       <div className="flex flex-wrap items-center justify-end gap-x-1">
                         <span className="text-sm font-bold text-white">
-                          ${product.price.toFixed(2)}
+                        {currencySymbol}{(product.price * rate).toFixed(3)}
                         </span>
                       </div>
                     </div>

@@ -173,47 +173,30 @@ export function VirtualTryOnScene({
     showHairRef.current = showHair;
   }, [showHair]);
 
-  useEffect(() => {
-    let isMounted = true;
-    const initializeFaceLandmarker = async () => {
-      try {
-        const filesetResolver = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.17/wasm",
-        );
+  const initializeHairSegmenter = async () => {
+    try {
+      const filesetResolver = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.17/wasm",
+      );
 
-        const hairSegmenter = await ImageSegmenter.createFromOptions(
-          filesetResolver,
-          {
-            baseOptions: {
-              modelAssetPath:
-                "/media/unveels/models/hair/hair_segmenter.tflite",
-              delegate: "CPU",
-            },
-            runningMode: "VIDEO",
-            outputCategoryMask: true,
-            outputConfidenceMasks: false,
+      const hairSegmenter = await ImageSegmenter.createFromOptions(
+        filesetResolver,
+        {
+          baseOptions: {
+            modelAssetPath: "/media/unveels/models/hair/hair_segmenter.tflite",
+            delegate: "CPU",
           },
-        );
+          runningMode: "VIDEO",
+          outputCategoryMask: true,
+          outputConfidenceMasks: false,
+        },
+      );
 
-        if (isMounted) {
-          hairSegmenterRef.current = hairSegmenter;
-        }
-      } catch (error) {
-        console.error("Gagal menginisialisasi FaceLandmarker:", error);
-        if (isMounted) setError(error as Error);
-      }
-    };
-
-    initializeFaceLandmarker();
-
-    // Cleanup pada unmount
-    return () => {
-      isMounted = false;
-      if (hairSegmenterRef.current) {
-        hairSegmenterRef.current.close();
-      }
-    };
-  }, []);
+      hairSegmenterRef.current = hairSegmenter;
+    } catch (error) {
+      console.error("Gagal menginisialisasi HairSegmenter:", error);
+    }
+  };
 
   const normalizeLandmarks = (
     landmarks: { x: number; y: number; z: number }[],
@@ -532,6 +515,8 @@ export function VirtualTryOnScene({
     media: HTMLVideoElement | HTMLImageElement,
     mode: "LIVE" | "VIDEO" | "IMAGE",
   ) => {
+    await initializeHairSegmenter();
+
     // Initialize face detector
     const faceModel = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
     const faceDetector = await faceLandmarksDetection.createDetector(
