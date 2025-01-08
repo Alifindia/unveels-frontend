@@ -1,18 +1,24 @@
 import clsx from "clsx";
 import { Icons } from "../../../../components/icons";
 import { colors } from "../../../../api/attributes/color";
-import { filterFabrics } from "../../../../api/attributes/fabric";
+import {
+  filterFabrics,
+  filterFabricsByValue,
+} from "../../../../api/attributes/fabric";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useHeadbandContext } from "./headband-context";
 import { Product } from "../../../../api/shared";
 import { ColorPalette } from "../../../../components/color-palette";
+import { useHeadbandQuery } from "./headband-query";
+import { getHexCodeSubColor } from "../../../../api/attributes/sub_color";
+import { useEffect, useState } from "react";
+import { useAccesories } from "../../../../context/accesories-context";
 
 export function SingleHeadbandSelector({ product }: { product: Product }) {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <div>
-        <FamilyColorSelector />
         <ColorSelector product={product} />
       </div>
       <FabricSelector product={product} />
@@ -21,61 +27,35 @@ export function SingleHeadbandSelector({ product }: { product: Product }) {
   );
 }
 
-function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useHeadbandContext();
-
-  return (
-    <div className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar">
-      {colors.map((item) => (
-        <button
-          key={item.value}
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() => setColorFamily(item.value)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{ background: item.hex }}
-          />
-          <span className="text-[0.625rem]">{item.label}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function ColorSelector({ product }: { product: Product }) {
   const { selectedColor, setSelectedColor } = useHeadbandContext();
+  const { data } = useHeadbandQuery({
+    color: product.custom_attributes.find(
+      (item) => item.attribute_code === "color",
+    )?.value,
+    fabric: null,
+  });
 
-  const handleClearSelection = () => {
-    setSelectedColor(null);
-  };
-
-  const handleColorSelection = (color: string) => {
-    if (selectedColor === color) {
-      setSelectedColor(null);
-    } else {
-      setSelectedColor(color);
-    }
-  };
-
-  const extracted_sub_colors = extractUniqueCustomAttributes(
-    [product],
+  const extractHexa = extractUniqueCustomAttributes(
+    data?.items ?? [],
     "hexacode",
   ).flatMap((item) => item.split(","));
 
+  const extractSubColor = extractUniqueCustomAttributes(
+    data?.items ?? [],
+    "sub_color",
+  ).flatMap((item) => getHexCodeSubColor(item) ?? "");
+
+  const extracted_sub_colors =
+    extractHexa.length > 0 ? extractHexa : extractSubColor;
+
   return (
     <div className="mx-auto w-full py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
-          onClick={handleClearSelection}
+          onClick={() => setSelectedColor(null)}
         >
           <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
@@ -84,8 +64,8 @@ function ColorSelector({ product }: { product: Product }) {
             key={color}
             size="large"
             palette={{ color }}
-            selected={selectedColor === color}
-            onClick={() => handleColorSelection(color)}
+            selected={color == selectedColor}
+            onClick={() => setSelectedColor(color)}
           />
         ))}
       </div>
@@ -97,7 +77,7 @@ function FabricSelector({ product }: { product: Product }) {
   const { selectedFabric, setSelectedFabric } = useHeadbandContext();
 
   const productFabrics = extractUniqueCustomAttributes([product], "fabric");
-  const fabrics = filterFabrics(productFabrics);
+  const fabrics = filterFabricsByValue(productFabrics);
 
   return (
     <div className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar">
@@ -122,10 +102,61 @@ function FabricSelector({ product }: { product: Product }) {
 }
 
 function ProductList({ product }: { product: Product }) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const {
+    colorFamily,
+    setColorFamily,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+    selectedFabric,
+    setSelectedFabric,
+  } = useHeadbandContext();
+
+  const { setShowHeadband } = useAccesories();
+
+  useEffect(() => {
+    if (selectedProduct != null) {
+      setShowHeadband(true);
+    }
+  }, [selectedProduct]);
+
+  if (colorFamilyToInclude == null && product != null) {
+    setColorFamilyToInclude(
+      product.custom_attributes.find((c) => c.attribute_code === "color")
+        ?.value,
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      getHexCodeSubColor(
+        product.custom_attributes.find(
+          (item) => item.attribute_code === "sub_color",
+        )?.value,
+      ) ?? null,
+    );
+    setSelectedFabric(
+      product.custom_attributes.find((item) => item.attribute_code === "fabric")
+        ?.value,
+    );
+  };
+
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
       {[product].map((item) => (
-        <VTOProductCard key={item.id} product={item} />
+        <VTOProductCard
+          key={item.id}
+          product={item}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
+          onClick={() => handleProductClick(product)}
+        />
       ))}
     </div>
   );

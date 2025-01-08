@@ -10,7 +10,7 @@ import { ColorPalette } from "../../../../components/color-palette";
 
 export function SinglePressOnNailsSelector({ product }: { product: Product }) {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <div>
         <FamilyColorSelector />
         <ColorSelector product={product} />

@@ -3,15 +3,21 @@ import { colors } from "../../../../api/attributes/color";
 import { Product } from "../../../../api/shared";
 import { Icons } from "../../../../components/icons";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
-import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import {
+  extractUniqueCustomAttributes,
+  getProductAttributes,
+} from "../../../../utils/apiUtils";
 import { useNeckwearContext } from "./neckwear-context";
 import { ColorPalette } from "../../../../components/color-palette";
+import { useNeckwearQuery } from "./neckwear-query";
+import { getHexCodeSubColor } from "../../../../api/attributes/sub_color";
+import { useEffect, useState } from "react";
+import { useAccesories } from "../../../../context/accesories-context";
 
 export function SingleNeckwearSelector({ product }: { product: Product }) {
   return (
-    <div className="mx-auto w-full divide-y px-4">
+    <div className="mx-auto w-full divide-y px-2">
       <div>
-        <FamilyColorSelector />
         <ColorSelector product={product} />
       </div>
 
@@ -20,61 +26,62 @@ export function SingleNeckwearSelector({ product }: { product: Product }) {
   );
 }
 
-function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useNeckwearContext();
-
-  return (
-    <div className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar">
-      {colors.map((item) => (
-        <button
-          key={item.value}
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() => setColorFamily(item.value)}
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{ background: item.hex }}
-          />
-          <span className="text-[0.625rem]">{item.label}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
+export const neck_accessories_product_type = [
+  {
+    label: "Necklaces",
+    value: "6509",
+  },
+  {
+    label: "Pendants",
+    value: "6510",
+  },
+  {
+    label: "Chokers",
+    value: "6511",
+  },
+  {
+    label: "Scarves",
+    value: "6512",
+  },
+];
 
 function ColorSelector({ product }: { product: Product }) {
   const { selectedColor, setSelectedColor } = useNeckwearContext();
 
-  const handleClearSelection = () => {
-    setSelectedColor(null);
-  };
+  const productType = getProductAttributes(
+    product,
+    "neck_accessories_product_type",
+  );
+  const productTypeLabel = (neck_accessories_product_type.find(
+    (item) => item.value === productType,
+  )?.label ?? "Chokers") as "Chokers" | "Necklaces" | "Pendants"; // Type assertion
 
-  const handleColorSelection = (color: string) => {
-    if (selectedColor === color) {
-      setSelectedColor(null);
-    } else {
-      setSelectedColor(color);
-    }
-  };
+  const { data } = useNeckwearQuery(productTypeLabel, {
+    color: product.custom_attributes.find(
+      (item) => item.attribute_code === "color",
+    )?.value,
+  });
 
-  const extracted_sub_colors = extractUniqueCustomAttributes(
-    [product],
+  const extractHexa = extractUniqueCustomAttributes(
+    data?.items ?? [],
     "hexacode",
   ).flatMap((item) => item.split(","));
 
+  const extractSubColor = extractUniqueCustomAttributes(
+    data?.items ?? [],
+    "sub_color",
+  ).flatMap((item) => getHexCodeSubColor(item) ?? "");
+
+  const extracted_sub_colors =
+    extractHexa.length > 0 ? extractHexa : extractSubColor;
+
   return (
     <div className="mx-auto w-full py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
-          onClick={handleClearSelection}
+          onClick={() => setSelectedColor(null)}
         >
           <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
@@ -83,8 +90,8 @@ function ColorSelector({ product }: { product: Product }) {
             key={color}
             size="large"
             palette={{ color }}
-            selected={selectedColor === color}
-            onClick={() => handleColorSelection(color)}
+            selected={color == selectedColor}
+            onClick={() => setSelectedColor(color)}
           />
         ))}
       </div>
@@ -93,10 +100,76 @@ function ColorSelector({ product }: { product: Product }) {
 }
 
 function ProductList({ product }: { product: Product }) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [activeNeckwear, setActiveNeckwear] = useState<
+    "Chokers" | "Necklaces" | "Pendants" | null
+  >(null);
+
+  const {
+    colorFamily,
+    setColorFamily,
+    setSelectedColor,
+    colorFamilyToInclude,
+    setColorFamilyToInclude,
+  } = useNeckwearContext();
+
+  const { setShowNecklace } = useAccesories();
+
+  useEffect(() => {
+    if (selectedProduct != null) {
+      setShowNecklace(true);
+    }
+  }, [selectedProduct]);
+
+  const productType = getProductAttributes(
+    product,
+    "neck_accessories_product_type",
+  );
+  const neckwearType = (neck_accessories_product_type.find(
+    (item) => item.value === productType,
+  )?.label ?? "Chokers") as "Chokers" | "Necklaces" | "Pendants"; // Type assertion
+
+  useEffect(() => {
+    if (activeNeckwear === neckwearType) return;
+    setActiveNeckwear(neckwearType);
+    setSelectedProduct(null);
+    setSelectedColor(null);
+    setColorFamily(null);
+    console.log("HandwearProductList");
+  }, [neckwearType]);
+
+  if (colorFamilyToInclude == null && product != null) {
+    setColorFamilyToInclude(
+      product.custom_attributes.find((c) => c.attribute_code === "color")
+        ?.value,
+    );
+  }
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      getHexCodeSubColor(
+        product.custom_attributes.find(
+          (item) => item.attribute_code === "sub_color",
+        )?.value,
+      ) ?? null,
+    );
+  };
+
   return (
     <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
       {[product].map((item) => (
-        <VTOProductCard key={item.id} product={item} />
+        <VTOProductCard
+          key={item.id}
+          product={item}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
+          onClick={() => handleProductClick(product)}
+        />
       ))}
     </div>
   );
