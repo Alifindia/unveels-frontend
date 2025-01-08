@@ -67,6 +67,13 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
       if (!handLandmarks.current || !nailsRef.current) return;
       if (handLandmarks.current.length > 0) {
         nailsRef.current.visible = true;
+        
+        const thumbBase = handLandmarks.current[1]; // Pangkal ibu jari
+        const pinkyBase = handLandmarks.current[17]; // Pangkal jari kelingking
+
+        const isPalmFacingBack = thumbBase.z > pinkyBase.z;
+        console.log(`Telapak tangan menghadap ${isPalmFacingBack ? "belakang" : "depan"}`);
+
         const middleFingerMCP = handLandmarks.current[9];
         const nailsFingerMCP = handLandmarks.current[13];
         const nailsFingerDIP = handLandmarks.current[16];
@@ -78,13 +85,12 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
         const scaleY = viewport.height / outputHeight;
 
         const nailsFingerX = (1 - nailsFingerDIP.x - 0.492) * outputWidth;
-        const nailsFingerY = -(nailsFingerDIP.y - 0.515) * outputHeight;
+        const nailsFingerY = -(nailsFingerDIP.y - 0.525) * outputHeight;
         const nailsFingerZ = 250;
 
-        const scaleFactor = (fingerSize * outputWidth) / 2.2;
+        const scaleFactor = (fingerSize * outputWidth) / 1.7;
 
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
-        nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
         const quaternion = handQuaternion(handLandmarks.current, 16, 12);
 
@@ -92,8 +98,15 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
           nailsRef.current.setRotationFromQuaternion(quaternion);
         }
 
-        nailsRef.current.rotation.y += 0.3; // Sesuaikan nilai 0.02 untuk kecepatan rotasi
-
+        // Adjust rotation based on hand type
+        if (isPalmFacingBack) {
+          nailsRef.current.rotation.y += 9.6;
+          nailsRef.current.scale.set(scaleFactor * 0.7, scaleFactor * 0.2, scaleFactor * 0.9); // Updated scale for longer length
+        } else {
+          nailsRef.current.rotation.y += 0.3;
+          nailsRef.current.scale.set(scaleFactor * 0.77, scaleFactor * 0.2, scaleFactor * 0.98); // Updated scale for longer length
+        }
+        
         // Update nail color dynamically during the frame
         if (nailsRef.current) {
           nailsRef.current.traverse((child) => {
