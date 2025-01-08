@@ -6,6 +6,7 @@ import data from "../assets/message.json";
 import { ColorPalette } from "../components/color-palette";
 import { Icons } from "../components/icons";
 import { LoadingProducts } from "../components/loading";
+import { getCurrencyAndRate } from "../utils/other";
 
 export function SingleVirtualTryOnDetail() {
   const {} = useParams();
@@ -197,6 +198,8 @@ function ProductList() {
     ),
   );
 
+  const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
+
   return (
     <div className="flex w-full gap-4 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing">
       {isLoading ? (
@@ -222,12 +225,12 @@ function ProductList() {
               </h3>
               <p className="text-[0.625rem] text-white/60">
                 {/* <BrandName brandId={getProductAttributes(product, "brand")} />{" "} */}
-                Brand
+                {/* Brand */}
               </p>
               <div className="flex items-end justify-between space-x-1 pt-1">
                 <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.625rem] text-transparent">
-                  {product.price}
-                </div>
+
+                  </div>
                 <button
                   type="button"
                   className="flex h-7 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-2.5 text-[0.5rem] font-semibold text-white"
