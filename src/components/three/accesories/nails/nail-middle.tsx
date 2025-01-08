@@ -72,6 +72,13 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
       if (!handLandmarks.current || !nailsRef.current) return;
       if (handLandmarks.current.length > 0) {
         nailsRef.current.visible = true;
+
+        const thumbBase = handLandmarks.current[1]; // Pangkal ibu jari
+        const pinkyBase = handLandmarks.current[17]; // Pangkal jari kelingking
+
+        const isPalmFacingBack = thumbBase.z > pinkyBase.z;
+        console.log(`Telapak tangan menghadap ${isPalmFacingBack ? "belakang" : "depan"}`);
+
         const middleFingerMCP = handLandmarks.current[9];
         const nailsFingerMCP = handLandmarks.current[13];
         const nailsFingerDIP = handLandmarks.current[12];
@@ -79,14 +86,13 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
         const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
     
         // Scale coordinates proportionally with the viewport
-        const nailsFingerX = (1 - nailsFingerDIP.x - 0.496) * outputWidth;
-        const nailsFingerY = -(nailsFingerDIP.y - 0.515) * outputHeight;
+        const nailsFingerX = (1 - nailsFingerDIP.x - 0.49) * outputWidth;
+        const nailsFingerY = -(nailsFingerDIP.y - 0.522) * outputHeight;
         const nailsFingerZ = 200;
     
-        const scaleFactor = (fingerSize * outputWidth) /2;
+        const scaleFactor = (fingerSize * outputWidth) / 1.5;
     
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
-        nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
     
         const quaternion = handQuaternion(handLandmarks.current, 15, 12);
     
@@ -94,9 +100,14 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
           nailsRef.current.setRotationFromQuaternion(quaternion);
         }
     
-        // Tambahkan sedikit rotasi pada sumbu Y
-        nailsRef.current.rotation.y += 0.25; // Sesuaikan nilai 0.02 untuk kecepatan rotasi
-    
+        // Adjust rotation based on hand type
+        if (isPalmFacingBack) {
+          nailsRef.current.rotation.y += 9.4;
+          nailsRef.current.scale.set(scaleFactor * 0.7, scaleFactor * 0.2, scaleFactor * 0.7); // Updated scale for longer length
+        } else {
+          nailsRef.current.rotation.y += 0.23;
+          nailsRef.current.scale.set(scaleFactor * 0.7, scaleFactor * 0.2, scaleFactor * 0.9); // Updated scale for longer length
+        }
         // Update nail color dynamically during the frame
         nailsRef.current.traverse((child) => {
           if ((child as Mesh).isMesh) {
