@@ -20,7 +20,7 @@ const SuggestedGifts = ({ product }: SuggestedGiftsProps) => {
             "https://picsum.photos/id/237/200/300";
           return (
             <div
-              className="flex h-[150px] w-[115px] shrink-0 flex-col overflow-hidden rounded-lg bg-[#2C1F06]"
+              className="flex h-[150px] w-[115px] shrink-0 flex-col overflow-hidden rounded-lg bg-[#2C1F06] cursor-pointer"
               key={index}
               onClick={() => {
                 window.open(
