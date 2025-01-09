@@ -70,7 +70,7 @@ function Main() {
         {
           baseOptions: {
             modelAssetPath:
-              "/media/unveels/face-landmarker/face_landmarker.task",
+              "/media/unveels/models/face-landmarker/face_landmarker.task",
             delegate: "CPU",
           },
           outputFaceBlendshapes: true,

@@ -26,7 +26,7 @@ export function Scanner() {
       const faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
         baseOptions: {
           modelAssetPath:
-            "/media/unveels/face-landmarker/face_landmarker.task",
+            "/media/unveels/models/face-landmarker/face_landmarker.task",
         },
         runningMode: "IMAGE",
         numFaces: 1,

@@ -80,7 +80,7 @@ export function VideoStream({
         const faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
           baseOptions: {
             modelAssetPath:
-              "/media/unveels/face-landmarker/face_landmarker.task",
+              "/media/unveels/models/face-landmarker/face_landmarker.task",
             delegate: "CPU",
           },
           runningMode:
