@@ -333,7 +333,11 @@ const VocalConnectionScreen = ({ onBack }: { onBack: () => void }) => {
       <div className="pointer-events-none absolute inset-0 flex justify-center overflow-hidden">
         <ModelScene speak={speak} playing={playing} blendshape={blendshape} />
       </div>
-      <div className="absolute inset-x-0 bottom-0 flex h-1/3 flex-col bg-gradient-to-b from-[#1B1404] to-[#2C1F06]">
+      <div
+        className={`absolute inset-x-0 bottom-0 flex ${
+          productData.length > 0 ? "h-[55%] lg:h-1/2" : "h-1/3"
+        } flex-col bg-gradient-to-b from-[#1B1404] to-[#2C1F06]`}
+      >
         <div className="flex-1 p-4 text-xl text-white">
           {productData.length > 0 && <SuggestedGifts product={productData} />}
           {loading ? <LoadingChat showAvatar={false} /> : msg}
