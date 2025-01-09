@@ -21,12 +21,12 @@ export function Scanner() {
 
     async function loadLandmarker() {
       const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+        "/media/unveels/wasm",
       );
       const faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
         baseOptions: {
           modelAssetPath:
-            "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+            "/media/unveels/face-landmarker/face_landmarker.task",
         },
         runningMode: "IMAGE",
         numFaces: 1,

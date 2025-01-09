@@ -176,7 +176,7 @@ export function VirtualTryOnScene({
   const initializeHairSegmenter = async () => {
     try {
       const filesetResolver = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.17/wasm",
+        "/media/unveels/wasm",
       );
 
       const hairSegmenter = await ImageSegmenter.createFromOptions(

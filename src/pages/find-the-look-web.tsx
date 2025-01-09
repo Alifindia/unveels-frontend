@@ -47,14 +47,14 @@ function Main() {
   const steps = [
     async () => {
       const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+        "/media/unveels/wasm",
       );
 
       const faceLandmarkerInstance = await FaceLandmarker.createFromOptions(
         vision,
         {
           baseOptions: {
-            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+            modelAssetPath: `/media/unveels/face-landmarker/face_landmarker.task`,
             delegate: "CPU",
           },
           runningMode: "IMAGE",
@@ -69,7 +69,7 @@ function Main() {
     async () => {
       const accesoriesDetectorInstance = await ObjectDetector.createFromOptions(
         await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+          "/media/unveels/wasm",
         ),
         {
           baseOptions: {
@@ -87,7 +87,7 @@ function Main() {
     async () => {
       const makeupDetectorInstance = await ObjectDetector.createFromOptions(
         await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+          "/media/unveels/wasm",
         ),
         {
           baseOptions: {

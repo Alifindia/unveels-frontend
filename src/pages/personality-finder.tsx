@@ -91,13 +91,13 @@ function MainContent() {
   const steps = [
     async () => {
       const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+        "/media/unveels/wasm",
       );
       const faceLandmarkerInstance = await FaceLandmarker.createFromOptions(
         vision,
         {
           baseOptions: {
-            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+            modelAssetPath: `/media/unveels/face-landmarker/face_landmarker.task`,
             delegate: "CPU",
           },
           outputFaceBlendshapes: true,
@@ -267,7 +267,7 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
           <div className="flex items-center justify-center rounded-full bg-gradient-to-b from-[#CA9C43] to-[#644D21] p-1">
             {criterias.capturedImage ? (
               <img
-                className="size-16 rounded-full object-fill sm:size-20"
+                className="size-16 rounded-full object-fill sm:size-20 transform scale-x-[-1]"
                 src={criterias.capturedImage}
                 alt="Captured Profile"
               />

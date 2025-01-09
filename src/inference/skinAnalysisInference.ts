@@ -2,7 +2,7 @@ import { labels, skinAnalysisDataItem } from "../utils/constants";
 import { base64ToImage, preprocess } from "../utils/imageProcessing";
 import { FaceResults } from "../types/faceResults";
 import * as tf from "@tensorflow/tfjs-core";
-import "@tensorflow/tfjs-backend-cpu";
+import "@tensorflow/tfjs-backend-webgl";
 import * as tflite from "@tensorflow/tfjs-tflite";
 import { SkinAnalysisResult } from "../types/skinAnalysisResult";
 
@@ -72,7 +72,7 @@ export const skinAnalysisInference = async (
     const image = await base64ToImage(imageData);
     const colors = new Colors();
 
-    tf.setBackend("cpu");
+    tf.setBackend("webgl");
     await tf.ready();
 
     if (model.inputs[0].shape) {

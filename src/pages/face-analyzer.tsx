@@ -84,13 +84,13 @@ function MainContent() {
   const steps = [
     async () => {
       const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+        "/media/unveels/wasm",
       );
       const faceLandmarkerInstance = await FaceLandmarker.createFromOptions(
         vision,
         {
           baseOptions: {
-            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+            modelAssetPath: `/media/unveels/face-landmarker/face_landmarker.task`,
             delegate: "CPU",
           },
           outputFaceBlendshapes: true,
