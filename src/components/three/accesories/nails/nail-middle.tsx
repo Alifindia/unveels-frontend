@@ -70,27 +70,50 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
 
     useFrame(() => {
       if (!handLandmarks.current || !nailsRef.current) return;
+    
       if (handLandmarks.current.length > 0) {
-        nailsRef.current.visible = true;
-
         const thumbBase = handLandmarks.current[1]; // Pangkal ibu jari
         const pinkyBase = handLandmarks.current[17]; // Pangkal jari kelingking
-
-        const isPalmFacingBack = thumbBase.z > pinkyBase.z;
-        console.log(`Telapak tangan menghadap ${isPalmFacingBack ? "belakang" : "depan"}`);
-
-        const middleFingerMCP = handLandmarks.current[9];
+        const middleFingerPIP = handLandmarks.current[10]; // Middle finger PIP joint
+        const middleFingerMCP = handLandmarks.current[9];  // Middle finger MCP joint
+        const middleFingerDIP = handLandmarks.current[12]; // Middle finger DIP joint
         const nailsFingerMCP = handLandmarks.current[13];
-        const nailsFingerDIP = handLandmarks.current[12];
+    
+        // Calculate distances to detect bending
+        const pipToDipDistance = calculateDistance(middleFingerPIP, middleFingerDIP);
+        const mcpToPipDistance = calculateDistance(middleFingerMCP, middleFingerPIP);
+        const isFingerBent = pipToDipDistance < mcpToPipDistance * 0.8; // Example threshold for bending
+    
+        const isPalmFacingBack = thumbBase.z > pinkyBase.z; // Determine palm direction
+        const isLeftHand = thumbBase.x > pinkyBase.x; // Check if it’s the left hand
+    
+        console.log(`Middle finger bent: ${isFingerBent}`);
+        console.log(`Telapak tangan menghadap ${isPalmFacingBack ? "belakang" : "depan"}`);
+        console.log(`Tangan kiri: ${isLeftHand}`);
+    
+        // Determine whether to show or hide the nail effect
+        if (isLeftHand && !isPalmFacingBack && !isFingerBent) {
+          nailsRef.current.visible = false; // Hide nails if left hand is facing the camera and finger is not bent
+          return; // Skip further calculations for this frame
+        } else {
+          nailsRef.current.visible = true; // Show nails otherwise
+        }
     
         const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
-    
-        // Scale coordinates proportionally with the viewport
-        const nailsFingerX = (1 - nailsFingerDIP.x - 0.49) * outputWidth;
-        const nailsFingerY = -(nailsFingerDIP.y - 0.522) * outputHeight;
         const nailsFingerZ = 200;
     
         const scaleFactor = (fingerSize * outputWidth) / 1.5;
+    
+        let nailsFingerX: number;
+        let nailsFingerY: number;
+    
+        if (isPalmFacingBack) {
+          nailsFingerX = (1 - middleFingerDIP.x - 0.5) * outputWidth;
+          nailsFingerY = -(middleFingerDIP.y - 0.505) * outputHeight;
+        } else {
+          nailsFingerX = (1 - middleFingerDIP.x - 0.49) * outputWidth;
+          nailsFingerY = -(middleFingerDIP.y - 0.522) * outputHeight;
+        }
     
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
     
@@ -102,8 +125,8 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
     
         // Adjust rotation based on hand type
         if (isPalmFacingBack) {
-          nailsRef.current.rotation.y += 9.4;
-          nailsRef.current.scale.set(scaleFactor * 0.7, scaleFactor * 0.2, scaleFactor * 0.7); // Updated scale for longer length
+          nailsRef.current.rotation.y += 9.5;
+          nailsRef.current.scale.set(scaleFactor * 0.55, scaleFactor * 0.2, scaleFactor * 0.58); // Updated scale for longer length
         } else {
           nailsRef.current.rotation.y += 0.23;
           nailsRef.current.scale.set(scaleFactor * 0.7, scaleFactor * 0.2, scaleFactor * 0.9); // Updated scale for longer length
@@ -121,8 +144,8 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
       } else {
         nailsRef.current.visible = false;
       }
-    });    
-
+    });
+    
     return null;
   },
 );

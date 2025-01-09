@@ -66,27 +66,47 @@ const NailIndexInner: React.FC<NailIndexProps> = React.memo(
       if (!handLandmarks.current || !nailsRef.current) return;
     
       if (handLandmarks.current.length > 0) {
-        nailsRef.current.visible = true;
-    
         const thumbBase = handLandmarks.current[1]; // Pangkal ibu jari
         const pinkyBase = handLandmarks.current[17]; // Pangkal jari kelingking
-
-        const isPalmFacingBack = thumbBase.z > pinkyBase.z;
-        console.log(`Telapak tangan menghadap ${isPalmFacingBack ? "belakang" : "depan"}`);
-
-        // Select landmarks for the finger
         const middleFingerMCP = handLandmarks.current[9];
         const nailsFingerMCP = handLandmarks.current[13];
         const nailsFingerDIP = handLandmarks.current[8];
+        const middleFingerPIP = handLandmarks.current[10];
+        
+        const isPalmFacingBack = thumbBase.z > pinkyBase.z;
+        const isLeftHand = thumbBase.x > pinkyBase.x; // Check if it’s the left hand
+        
+        // Calculate distances to detect bending
+        const pipToDipDistance = calculateDistance(middleFingerPIP, nailsFingerDIP);
+        const mcpToPipDistance = calculateDistance(middleFingerMCP, middleFingerPIP);
+        const isFingerBent = pipToDipDistance < mcpToPipDistance * 0.8; // Example threshold for bending
+    
+        console.log(`Telapak tangan menghadap ${isPalmFacingBack ? "belakang" : "depan"}`);
+    
+        // Apply condition for visibility
+        if (isLeftHand && !isPalmFacingBack && !isFingerBent) {
+          nailsRef.current.visible = false; // Hide nails for left-hand facing the camera and finger not bent
+          return;
+        }
+    
+        nailsRef.current.visible = true; // Show nails otherwise
     
         const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
     
         // Scale and position adjustments for right hand
-        let nailsFingerX = (1 - nailsFingerDIP.x - 0.495) * outputWidth;
-        let nailsFingerY = -(nailsFingerDIP.y - 0.519) * outputHeight;    
         const nailsFingerZ = 200;
-    
         const scaleFactor = (fingerSize * outputWidth) / 1.7;
+    
+        let nailsFingerX: number;
+        let nailsFingerY: number;
+    
+        if (isPalmFacingBack) {
+          nailsFingerX = (1 - nailsFingerDIP.x - 0.498) * outputWidth;
+          nailsFingerY = -(nailsFingerDIP.y - 0.5) * outputHeight;
+        } else {
+          nailsFingerX = (1 - nailsFingerDIP.x - 0.495) * outputWidth;
+          nailsFingerY = -(nailsFingerDIP.y - 0.519) * outputHeight;
+        }
     
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
     
@@ -98,11 +118,11 @@ const NailIndexInner: React.FC<NailIndexProps> = React.memo(
     
         // Adjust rotation based on hand type
         if (isPalmFacingBack) {
-          nailsRef.current.rotation.y += 9.1;
-          nailsRef.current.scale.set(scaleFactor * 0.7, scaleFactor * 0.2, scaleFactor * 0.7); // Updated scale for longer length
+          nailsRef.current.rotation.y += 9.3;
+          nailsRef.current.scale.set(scaleFactor * 0.52, scaleFactor * 0.2, scaleFactor * 0.6);
         } else {
           nailsRef.current.rotation.y += 0.01;
-          nailsRef.current.scale.set(scaleFactor * 0.8, scaleFactor * 0.2, scaleFactor * 0.82); // Updated scale for longer length
+          nailsRef.current.scale.set(scaleFactor * 0.8, scaleFactor * 0.2, scaleFactor * 0.82);
         }
     
         // Update nail color dynamically during the frame
@@ -110,7 +130,7 @@ const NailIndexInner: React.FC<NailIndexProps> = React.memo(
           if ((child as Mesh).isMesh) {
             const mesh = child as Mesh;
             if (mesh.material instanceof MeshStandardMaterial) {
-              mesh.material.color.set(nailsColor); // Dynamically update color
+              mesh.material.color.set(nailsColor);
               mesh.material.needsUpdate = true;
             }
           }
@@ -118,8 +138,8 @@ const NailIndexInner: React.FC<NailIndexProps> = React.memo(
       } else {
         nailsRef.current.visible = false;
       }
-    });    
-
+    });
+    
     return null;
   },
 );

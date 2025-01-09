@@ -65,62 +65,78 @@ const NailPinkyInner: React.FC<NailPinkyProps> = React.memo(
     useFrame(() => {
       if (!handLandmarks.current || !nailsRef.current) return;
       if (handLandmarks.current.length > 0) {
-        nailsRef.current.visible = true;
-
         const thumbBase = handLandmarks.current[1]; // Pangkal ibu jari
         const pinkyBase = handLandmarks.current[17]; // Pangkal jari kelingking
-
-        const isPalmFacingBack = thumbBase.z > pinkyBase.z;
-        console.log(`Telapak tangan menghadap ${isPalmFacingBack ? "belakang" : "depan"}`);
-
-        const middleFingerMCP = handLandmarks.current[9];
+    
+        const middleFingerPIP = handLandmarks.current[10]; // Middle finger PIP joint
+        const middleFingerMCP = handLandmarks.current[9]; // Middle finger MCP joint
+        const middleFingerDIP = handLandmarks.current[12]; // Middle finger DIP joint
         const nailsFingerMCP = handLandmarks.current[13];
         const nailsFingerDIP = handLandmarks.current[20];
     
-        const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
+        // Calculate distances to detect bending
+        const pipToDipDistance = calculateDistance(middleFingerPIP, middleFingerDIP);
+        const mcpToPipDistance = calculateDistance(middleFingerMCP, middleFingerPIP);
+        const isFingerBent = pipToDipDistance < mcpToPipDistance * 0.8; // Example threshold for bending
     
-        // Adjust the coordinates for nail positioning
-        const nailsFingerX = (1 - nailsFingerDIP.x - 0.494) * outputWidth;
-        const nailsFingerY = -(nailsFingerDIP.y - 0.508) * outputHeight;
-        const nailsFingerZ = 260;
+        const isPalmFacingBack = thumbBase.z > pinkyBase.z; // Determine palm direction
+        const isLeftHand = thumbBase.x > pinkyBase.x; // Check if it’s the left hand
     
-        // Increase scale factor to lengthen the nail effect
-        const scaleFactor = (fingerSize * outputWidth) / 2; // Adjusted for longer nails
-    
-        nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
-    
-        // Stretch the nail in the Y-axis (length direction)
-    
-        const quaternion = handQuaternion(handLandmarks.current, 15, 20);
-    
-        if (quaternion) {
-          nailsRef.current.setRotationFromQuaternion(quaternion);
-        }
-    
-        // Adjust rotation based on hand type
-        if (isPalmFacingBack) {
-          nailsRef.current.rotation.y += 9.6;
-          nailsRef.current.scale.set(scaleFactor * 0.7, scaleFactor * 0.2, scaleFactor * 0.9); // Updated scale for longer length
+        // Determine whether to show or hide the nail effect
+        if (isLeftHand && !isPalmFacingBack && !isFingerBent) {
+          nailsRef.current.visible = false; // Hide nails if left hand is facing the camera and finger is not bent
         } else {
-          nailsRef.current.rotation.y += 0.01;
-          nailsRef.current.scale.set(scaleFactor * 0.7, scaleFactor * 0.2, scaleFactor * 0.95); // Updated scale for longer length
-        }
+          nailsRef.current.visible = true; // Show nails otherwise
     
-        // Update nail color dynamically during the frame
-        nailsRef.current.traverse((child) => {
-          if ((child as Mesh).isMesh) {
-            const mesh = child as Mesh;
-            if (mesh.material instanceof MeshStandardMaterial) {
-              mesh.material.color.set(nailsColor); // Dynamically update color
-              mesh.material.needsUpdate = true;
-            }
+          // Rest of your code for nails positioning and rotation
+          const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
+          const nailsFingerZ = 260;
+          const scaleFactor = (fingerSize * outputWidth) / 2; // Adjusted for longer nails
+    
+          let nailsFingerX;
+          let nailsFingerY;
+    
+          if (isPalmFacingBack) {
+            nailsFingerX = (1 - nailsFingerDIP.x - 0.5) * outputWidth;
+            nailsFingerY = -(nailsFingerDIP.y - 0.494) * outputHeight;
+          } else {
+            nailsFingerX = (1 - nailsFingerDIP.x - 0.494) * outputWidth;
+            nailsFingerY = -(nailsFingerDIP.y - 0.508) * outputHeight;
           }
-        });
+    
+          nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
+    
+          const quaternion = handQuaternion(handLandmarks.current, 15, 20);
+    
+          if (quaternion) {
+            nailsRef.current.setRotationFromQuaternion(quaternion);
+          }
+    
+          // Adjust rotation based on hand type
+          if (isPalmFacingBack) {
+            nailsRef.current.rotation.y += 9.5;
+            nailsRef.current.scale.set(scaleFactor * 0.58, scaleFactor * 0.2, scaleFactor * 0.68); // Updated scale for longer length
+          } else {
+            nailsRef.current.rotation.y += 0.01;
+            nailsRef.current.scale.set(scaleFactor * 0.7, scaleFactor * 0.2, scaleFactor * 0.95); // Updated scale for longer length
+          }
+    
+          // Update nail color dynamically during the frame
+          nailsRef.current.traverse((child) => {
+            if ((child as Mesh).isMesh) {
+              const mesh = child as Mesh;
+              if (mesh.material instanceof MeshStandardMaterial) {
+                mesh.material.color.set(nailsColor); // Dynamically update color
+                mesh.material.needsUpdate = true;
+              }
+            }
+          });
+        }
       } else {
         nailsRef.current.visible = false;
       }
-    });    
-
+    });
+    
     return null;
   },
 );
