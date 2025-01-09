@@ -229,33 +229,45 @@ export const extractSkinColor = (
 export const preprocess = (
   source: HTMLImageElement,
   modelWidth: number,
-  modelHeight: number,
+  modelHeight: number
 ): [tf.Tensor, number, number] => {
-  let xRatio: number = 0;
-  let yRatio: number = 0;
+  let xRatio = 0;
+  let yRatio = 0;
 
-  const input: tf.Tensor = tf.tidy(() => {
-    let input;
-    const img = tf.browser.fromPixels(source);
+  // Step 1: Use a canvas for resizing and preprocessing
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Unable to get canvas context");
 
-    // padding image to square => [n, m] to [n, n], n > m
-    const [h, w] = img.shape.slice(0, 2); // get source width and height
-    const maxSize = Math.max(w, h); // get max size
-    input = tf.pad(img, [
-      [0, maxSize - h], // padding y [bottom only]
-      [0, maxSize - w], // padding x [right only]
-      [0, 0],
-    ]);
+  const [h, w] = [source.height, source.width];
+  const maxSize = Math.max(w, h);
+  xRatio = maxSize / w;
+  yRatio = maxSize / h;
 
-    xRatio = maxSize / w; // update xRatio
-    yRatio = maxSize / h; // update yRatio
+  // Make the canvas square by using maxSize
+  canvas.width = maxSize;
+  canvas.height = maxSize;
 
-    input = tf.image.resizeBilinear(input, [modelWidth, modelHeight]);
-    input = tf.cast(input, "float32");
-    input = tf.div(input, 255.0);
-    input = tf.expandDims(input);
+  // Center the image in the square canvas
+  const offsetX = (maxSize - w) / 2;
+  const offsetY = (maxSize - h) / 2;
+  ctx.fillStyle = "black"; // Fill the padding area with black
+  ctx.fillRect(0, 0, maxSize, maxSize);
+  ctx.drawImage(source, offsetX, offsetY, w, h);
 
-    return input;
+  // Resize the square canvas to model dimensions
+  const resizedCanvas = document.createElement("canvas");
+  resizedCanvas.width = modelWidth;
+  resizedCanvas.height = modelHeight;
+  const resizedCtx = resizedCanvas.getContext("2d");
+  if (!resizedCtx) throw new Error("Unable to get resized canvas context");
+  resizedCtx.drawImage(canvas, 0, 0, modelWidth, modelHeight);
+
+  // Step 2: Use TensorFlow.js for final preprocessing
+  const input = tf.tidy(() => {
+    const imgTensor = tf.browser.fromPixels(resizedCanvas); // Convert canvas to tensor
+    const normalized = tf.div(imgTensor, 255.0); // Normalize to [0, 1]
+    return tf.expandDims(normalized); // Add batch dimension
   });
 
   return [input, xRatio, yRatio];
