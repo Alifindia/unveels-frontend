@@ -16,13 +16,13 @@ const TopNavigation = ({ onBack }: { onBack?: () => void }) => {
         </button>
       </div>
       <div className="flex flex-col gap-4">
-        <Link
-          type="button"
-          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          to="/"
-        >
-          <X className="size-6 text-white" />
-        </Link>
+        <button type="button">
+          <Link
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+            to="/"
+          >
+            <X className="size-6 text-white" />
+        </Link></button>
       </div>
     </div>
   );
