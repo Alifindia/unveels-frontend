@@ -3,13 +3,25 @@ import { useEffect, useRef, useState } from "react";
 import { RecorderStatus, TopNavigation } from "../assistant";
 import { Icons } from "../icons";
 import { useCamera } from "../../context/recorder-context";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../../utils/other";
 
 export function FindTheLookMainScreenWeb({
   onSelection,
 }: {
   onSelection: () => void;
 }) {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   // Refs for the file inputs
   const imageUploadRef = useRef<HTMLInputElement>(null);
@@ -20,7 +32,6 @@ export function FindTheLookMainScreenWeb({
   const uploadedImageRef = useRef<HTMLImageElement>(null);
   const uploadedVideoRef = useRef<HTMLVideoElement>(null);
   const { imageRef, videoRef, setRunningMode } = useCamera();
-
   // Function to toggle active sections
   const handleSectionClick = (
     section: "liveCamera" | "takeSnapshot" | "uploadPhotoOrVideo",
@@ -126,12 +137,11 @@ export function FindTheLookMainScreenWeb({
               <div className="flex items-center space-x-2">
                 <Icons.liveCamera className="size-8 shrink-0" />
                 <h3 className="truncate text-lg font-bold lg:text-2xl">
-                  Live Camera
+                  {t("camera_select.live.title")}
                 </h3>
               </div>
               <p className="overflow-hidden text-ellipsis text-sm leading-relaxed lg:text-base">
-                Capture the essence of elegance in real-time with our live
-                camera feature.
+                {t("camera_select.live.desc.text")}
               </p>
               {activeSection === "liveCamera" && (
                 <div className="space-y-3">
@@ -139,26 +149,26 @@ export function FindTheLookMainScreenWeb({
                     <span className="bg-gradient-to-b from-[#473209] to-[#CA9C43] bg-clip-text text-transparent">
                       ▼
                     </span>
-                    <h4 className="font-semibold">Steps to Follow</h4>
+                    <h4 className="font-semibold">{t("camera_select.live.desc.h4")}</h4>
                   </div>
                   <ul className="list-disc space-y-1 pl-5 text-xs text-white lg:text-sm">
                     <li className="whitespace-normal">
-                      Hold the camera parallel to the face.
+                      {t("camera_select.live.desc.li1")}
                     </li>
                     <li className="whitespace-normal">
-                      Ensure the entire face is centered in the frame.
+                      {t("camera_select.live.desc.li2")}
                     </li>
                     <li className="whitespace-normal">
-                      Position the camera at eye level with the face.
+                      {t("camera_select.live.desc.li3")}
                     </li>
                     <li className="whitespace-normal">
-                      Keep the camera steady and avoid tilting.
+                      {t("camera_select.live.desc.li4")}
                     </li>
                     <li className="whitespace-normal">
-                      Ensure the area is well-lit for clear detection.
+                      {t("camera_select.live.desc.li5")}.
                     </li>
                     <li className="whitespace-normal">
-                      Avoid shadows on the face by using soft, even lighting.
+                      {t("camera_select.live.desc.li6")}
                     </li>
                   </ul>
                 </div>
@@ -185,12 +195,11 @@ export function FindTheLookMainScreenWeb({
               <div className="flex items-center space-x-2">
                 <Icons.takeSnapshot className="size-8 shrink-0" />
                 <h3 className="truncate text-lg font-bold lg:text-2xl">
-                  Take a Snapshot
+                  {t("camera_select.snap.title")}
                 </h3>
               </div>
               <p className="overflow-hidden text-ellipsis text-sm leading-relaxed lg:text-base">
-                Unveil the potential of your favorite images with our photo
-                upload feature.
+                {t("camera_select.snap.desc.text")}
               </p>
               {activeSection === "takeSnapshot" && (
                 <div className="space-y-3">
@@ -198,21 +207,20 @@ export function FindTheLookMainScreenWeb({
                     <span className="bg-gradient-to-b from-[#473209] to-[#CA9C43] bg-clip-text text-transparent">
                       ▼
                     </span>
-                    <h4 className="font-semibold">Steps to Follow</h4>
+                    <h4 className="font-semibold">{t("camera_select.snap.desc.h4")}</h4>
                   </div>
                   <ul className="list-disc space-y-1 pl-5 text-xs text-white lg:text-sm">
                     <li className="whitespace-normal">
-                      Take a clear, high-resolution photo for the best results.
+                      {t("camera_select.snap.desc.li1")}
                     </li>
                     <li className="whitespace-normal">
-                      Make sure the entire upper body is visible in the photo.
+                      {t("camera_select.snap.desc.li2")}
                     </li>
                     <li className="whitespace-normal">
-                      Take a photo with even lighting and minimal shadows.
+                      {t("camera_select.snap.desc.li3")}
                     </li>
                     <li className="whitespace-normal">
-                      Ensure the photo contains only one individual for accurate
-                      analysis.
+                      {t("camera_select.snap.desc.li4")}
                     </li>
                   </ul>
                 </div>
@@ -223,7 +231,7 @@ export function FindTheLookMainScreenWeb({
                 onClick={() => snapshotUploadRef.current?.click()}
                 className="mt-6 w-full bg-gradient-to-r from-[#473209] to-[#CA9C43] px-10 py-3 font-semibold text-white shadow-lg lg:w-auto"
               >
-                UPLOAD PHOTO
+                {t("camera_select.snap.desc.btn")}
               </button>
             )}
           </div>
@@ -239,12 +247,11 @@ export function FindTheLookMainScreenWeb({
               <div className="flex items-center space-x-2">
                 <Icons.uploadPhotoOrVideo className="size-8 shrink-0" />
                 <h3 className="truncate text-lg font-bold lg:text-2xl">
-                  Upload Photo Or Video
+                  {t("camera_select.upload.title")}
                 </h3>
               </div>
               <p className="overflow-hidden text-ellipsis text-sm leading-relaxed lg:text-base">
-                Immerse yourself in the luxury of transformation with our video
-                upload feature.
+                {t("camera_select.upload.desc.text")}
               </p>
               {activeSection === "uploadPhotoOrVideo" && (
                 <div className="space-y-3">
@@ -252,25 +259,23 @@ export function FindTheLookMainScreenWeb({
                     <span className="bg-gradient-to-b from-[#473209] to-[#CA9C43] bg-clip-text text-transparent">
                       ▼
                     </span>
-                    <h4 className="font-semibold">Steps to Follow</h4>
+                    <h4 className="font-semibold">{t("camera_select.upload.desc.h4")}</h4>
                   </div>
                   <ul className="list-disc space-y-1 pl-5 text-xs text-white lg:text-sm">
                     <li className="whitespace-normal">
-                      Choose a high-quality photo or video for upper body only.
+                      {t("camera_select.upload.desc.li1")}
                     </li>
                     <li className="whitespace-normal">
-                      Ensure the photo or video is stable and not shaky.
+                      {t("camera_select.upload.desc.li2")}.
                     </li>
                     <li className="whitespace-normal">
-                      Make sure the entire look is visible.
+                      {t("camera_select.upload.desc.li3")}.
                     </li>
                     <li className="whitespace-normal">
-                      Opt for a photo or video with bright, even lighting and
-                      minimal shadows.
+                      {t("camera_select.upload.desc.li4")}
                     </li>
                     <li className="whitespace-normal">
-                      Ensure the photo or video contains only one individual for
-                      precise detection.
+                      {t("camera_select.upload.desc.li5")}
                     </li>
                   </ul>
                 </div>
@@ -281,7 +286,7 @@ export function FindTheLookMainScreenWeb({
                 onClick={() => photoVideoUploadRef.current?.click()}
                 className="mt-6 w-full bg-gradient-to-r from-[#473209] to-[#CA9C43] px-10 py-3 font-semibold text-white shadow-lg lg:w-auto"
               >
-                UPLOAD PHOTO/VIDEO
+                {t("camera_select.upload.desc.btn")}
               </button>
             )}
           </div>
