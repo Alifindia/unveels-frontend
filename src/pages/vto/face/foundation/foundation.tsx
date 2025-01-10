@@ -15,8 +15,20 @@ import { useEffect, useState } from "react";
 import { useSelecProductNumberContext } from "../../select-product-context";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 import { getFaceMakeupProductTypeIds } from "../../../../api/attributes/makeups";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../../../../utils/other";
 
 export function FoundationSelector() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+
   return (
     <div className="mx-auto w-full divide-y px-2">
       <div>
@@ -166,6 +178,7 @@ function TextureSelector() {
 }
 
 function ProductList() {
+  const { t } = useTranslation();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
@@ -278,7 +291,7 @@ function ProductList() {
             setView("all_categories");
           }}
         >
-          View all
+          {t("view_all")}
         </button>
       </div>
       <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">

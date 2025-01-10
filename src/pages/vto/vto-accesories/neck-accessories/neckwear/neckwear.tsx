@@ -19,6 +19,8 @@ import {
   headAccessoriesProductTypeFilter,
   neckAccessoriesProductTypeFilter,
 } from "../../../../api/attributes/accessories";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../../../../../utils/other";
 
 function useActiveNeckwear(): "Chokers" | "Necklaces" | "Pendants" {
   const location = useLocation();
@@ -44,6 +46,16 @@ function useActiveNeckwear(): "Chokers" | "Necklaces" | "Pendants" {
 }
 
 export function NeckwearSelector() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+  
   return (
     <div className="mx-auto w-full divide-y px-2">
       <FamilyColorSelector />
@@ -145,6 +157,7 @@ function ColorSelector() {
 }
 
 function NeckwearProductList() {
+  const { t } = useTranslation();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [activeNeckwear, setActiveNeckwear] = useState<
     "Chokers" | "Necklaces" | "Pendants" | null
@@ -235,7 +248,7 @@ function NeckwearProductList() {
             setView("all_categories");
           }}
         >
-          View all
+          {t("view_all")}
         </button>
       </div>
       <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">

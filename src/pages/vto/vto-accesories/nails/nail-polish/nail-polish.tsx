@@ -18,8 +18,20 @@ import { useFindTheLookContext } from "../../../../context/find-the-look-context
 import { getNailPolishProductTypeIds } from "../../../../api/attributes/makeups";
 import { useMakeup } from "../../../../context/makeup-context";
 import { useAccesories } from "../../../../context/accesories-context";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../../../../../utils/other";
 
 export function NailPolishSelector() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+  
   return (
     <div className="mx-auto w-full divide-y px-2">
       <div>
@@ -157,6 +169,7 @@ function TextureSelector() {
 }
 
 function ProductList() {
+  const { t } = useTranslation();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
@@ -238,7 +251,7 @@ function ProductList() {
             setView("all_categories");
           }}
         >
-          View all
+          {t("view_all")}
         </button>
       </div>
       <div className="flex w-full gap-4 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing">

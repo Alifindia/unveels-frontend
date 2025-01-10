@@ -9,14 +9,26 @@ import { TiaraProvider, useTiaraContext } from "./tiaras-context";
 import { useTiarasQuery } from "./tiaras-query";
 import { colors } from "../../../../api/attributes/color";
 import { Product } from "../../../../api/shared";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getHexCodeSubColor } from "../../../../api/attributes/sub_color";
 import { ColorPalette } from "../../../../components/color-palette";
 import { useAccesories } from "../../../../context/accesories-context";
 import { useFindTheLookContext } from "../../../../context/find-the-look-context";
 import { headAccessoriesProductTypeFilter } from "../../../../api/attributes/accessories";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../../../../utils/other";
 
 export function TiaraSelector() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+  
   return (
     <div className="mx-auto w-full divide-y px-4">
       <FamilyColorSelector />
@@ -223,6 +235,7 @@ function FabricSelector() {
 }
 
 function TiaraProductList() {
+  const { t } = useTranslation();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
@@ -299,7 +312,7 @@ function TiaraProductList() {
             setView("all_categories");
           }}
         >
-          View all
+          {t("view_all")}
         </button>
       </div>
 
