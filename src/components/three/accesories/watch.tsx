@@ -73,15 +73,16 @@ const WatchInner: React.FC<WatchProps> = React.memo(
     
         const isPalmFacingBack = thumbBase.z > pinkyBase.z;
     
-        console.log(`Telapak tangan menghadap ${isPalmFacingBack ? "belakang" : "depan"}`);
-    
         const wristSize = calculateDistance(wrist, thumbBase);
         const wristX = (1 - wrist.x - 0.5) * outputWidth;
         const wristY = -(wrist.y - 0.5) * outputHeight;
         const wristZ = 230;
-    
-        const scaleFactor = (wristSize * outputWidth) / 3.8;
-    
+        let scaleFactor: number
+        if (isPalmFacingBack) {
+          scaleFactor = (wristSize * outputWidth) / 3.7;        
+        } else {
+          scaleFactor = (wristSize * outputWidth) / 3.48;
+        }
         watchRef.current.position.set(wristX, wristY, wristZ);
         watchRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
     
