@@ -28,19 +28,19 @@ export function VirtualAvatar() {
 
     const audioSrc = await makeSpeech(incomingText, incomingLanguage);
 
+    if ((window as any).flutter_inappwebview) {
+      (window as any).flutter_inappwebview
+        .callHandler("isSpeak", "true")
+        .then((result: any) => {
+          console.log("Flutter responded with:", result);
+        })
+        .catch((error: any) => {
+          console.error("Error calling Flutter handler:", error);
+        });
+    }
+
     setTimeout(() => {
       setBlendshape(audioSrc.data.blendData);
-      if ((window as any).flutter_inappwebview) {
-        (window as any).flutter_inappwebview
-          .callHandler("isSpeak", "true")
-          .then((result: any) => {
-            console.log("Flutter responded with:", result);
-          })
-          .catch((error: any) => {
-            console.error("Error calling Flutter handler:", error);
-          });
-      }
-
       setFinishTalking(false);
       setSpeak(true);
       setPlaying(true);
@@ -58,20 +58,13 @@ export function VirtualAvatar() {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(firstTime);
-
-    if (finishTalking) {
-      if (firstTime == 0) {
-        setFinishTalking(false);
-        setFirstTime(1);
-      }
+  const onFinishTalking = (condition: boolean) => {
+    setTimeout(() => {
       setSpeak(false);
       setPlaying(false);
-      setFinishTalking(false);
-      console.log(finishTalking);
-    }
-  }, [finishTalking]);
+    }, 500);
+    console.log("FINISH TALKING", condition);
+  }
 
   return (
     <div className="relative mx-auto flex h-full min-h-dvh w-full flex-col bg-[linear-gradient(180deg,#000000_0%,#0F0B02_41.61%,#47330A_100%)]">
@@ -80,7 +73,7 @@ export function VirtualAvatar() {
           blendshape={blendshape}
           speak={speak}
           playing={playing}
-          setFinishTalking={setFinishTalking}
+          setFinishTalking={(condition) => onFinishTalking(condition)}
         />
       </div>
     </div>
