@@ -233,11 +233,9 @@ export const preprocess = (
 ): [tf.Tensor, number, number] => {
   let xRatio: number = 0;
   let yRatio: number = 0;
-
   const input: tf.Tensor = tf.tidy(() => {
     let input;
     const img = tf.browser.fromPixels(source);
-
     // padding image to square => [n, m] to [n, n], n > m
     const [h, w] = img.shape.slice(0, 2); // get source width and height
     const maxSize = Math.max(w, h); // get max size
@@ -246,15 +244,12 @@ export const preprocess = (
       [0, maxSize - w], // padding x [right only]
       [0, 0],
     ]);
-
     xRatio = maxSize / w; // update xRatio
     yRatio = maxSize / h; // update yRatio
-
     input = tf.image.resizeBilinear(input, [modelWidth, modelHeight]);
     input = tf.cast(input, "float32");
     input = tf.div(input, 255.0);
     input = tf.expandDims(input);
-
     return input;
   });
 
