@@ -88,12 +88,40 @@ export const cropImage = (
  */
 export const base64ToImage = async (
   base64Str: string,
+  isFlipped: boolean = false
 ): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = `${base64Str}`;
     img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
+    img.onload = () => {
+      if (isFlipped) {
+        // Create a canvas to manipulate the image
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (ctx) {
+          // Set canvas dimensions to match the image
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          // Flip the image horizontally
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(img, 0, 0);
+
+          // Create a new image element with the flipped image
+          const flippedImg = new Image();
+          flippedImg.src = canvas.toDataURL();
+          flippedImg.onload = () => resolve(flippedImg);
+          flippedImg.onerror = (err) => reject(new Error("Gagal memuat gambar terbalik."));
+        } else {
+          reject(new Error("Konteks canvas tidak tersedia."));
+        }
+      } else {
+        resolve(img);
+      }
+    };
     img.onerror = (err) => reject(new Error("Gagal memuat gambar."));
   });
 };
