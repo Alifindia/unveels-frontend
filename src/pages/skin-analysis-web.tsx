@@ -233,11 +233,9 @@ function Main({ isArabic }: { isArabic?: boolean }) {
     skinAnalysisInference();
   }, [criterias.isCaptured, criterias.capturedImage]);
 
-  if (loading.loading) {
-    return <ModelLoadingScreen progress={loading.progress} />;
-  }
   return (
     <>
+      {loading.loading && <ModelLoadingScreen progress={loading.progress} />}
       <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
         {isInferenceCompleted &&
           criterias.capturedImage != null &&

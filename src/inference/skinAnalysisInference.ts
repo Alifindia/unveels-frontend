@@ -1,6 +1,21 @@
 import * as tf from "@tensorflow/tfjs";
 import { SkinAnalysisResult } from "../types/skinAnalysisResult";
-import { labels } from "../utils/constants";
+const labels = [
+  "acne",
+  "blackhead",
+  "dark circles",
+  "droopy lower eyelid",
+  "droopy upper eyelid",
+  "dry",
+  "eyebags",
+  "moisture",
+  "oily",
+  "pores",
+  "redness",
+  "spots",
+  "whitehead",
+  "wrinkles",
+]
 
 interface DetectionBox {
   box: number[];
