@@ -20,7 +20,7 @@ import { VideoStream } from "../components/recorder/video-stream";
 import { ShareModal } from "../components/share-modal";
 import { SkinAnalysisScene } from "../components/skin-analysis/skin-analysis-scene";
 import { useRecordingControls } from "../hooks/useRecorder";
-import { skinAnalysisInference } from "../inference/skinAnalysisInference";
+// import { skinAnalysisInference } from "../inference/skinAnalysisInference";
 import { FaceResults } from "../types/faceResults";
 import {
   SkinAnalysisProvider,
@@ -34,7 +34,7 @@ import {
   InferenceProvider,
   useInferenceContext,
 } from "../context/inference-context";
-import * as tf from "@tensorflow/tfjs-core";
+import * as tf from "@tensorflow/tfjs";
 import * as tflite from "@tensorflow/tfjs-tflite";
 import { loadTFLiteModel } from "../utils/tfliteInference";
 import { useModelLoader } from "../hooks/useModelLoader";
@@ -43,6 +43,15 @@ import { Scanner } from "../components/scanner";
 import { useCartContext } from "../context/cart-context";
 import { useTranslation } from "react-i18next";
 import { getCookie, getCurrencyAndRate } from "../utils/other";
+import { GraphModel } from "@tensorflow/tfjs-converter";
+import { base64ToImage } from "../utils/imageProcessing";
+import { detectFrame } from "../inference/skinAnalysisInference";
+
+interface Model {
+  net: tf.GraphModel;
+  inputShape: number[];
+  outputShape: tf.Shape[];
+}
 
 export function SkinAnalysis() {
   const { i18n } = useTranslation();
@@ -105,18 +114,66 @@ function Main({isArabic}: {isArabic: boolean}) {
     },
   ];
 
-  const {
-    progress,
-    isLoading: modelLoading,
-    loadModels,
-  } = useModelLoader(steps);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [loading, setLoading] = useState({ loading: true, progress: 0 });
+  const [model, setModel] = useState<Model | null>(null);
 
   useEffect(() => {
-    loadModels();
+    const loadModel = async () => {
+      try {
+        await tf.ready();
+
+        const yolov8: GraphModel = await tf.loadGraphModel(
+          `/media/unveels/models/skin-analysis/best_web_model/model.json`,
+          {
+            onProgress: (fractions: number) => {
+              setLoading({ loading: true, progress: fractions });
+            },
+          },
+        );
+
+        if (!yolov8.inputs[0]?.shape) {
+          throw new Error("Invalid model input shape");
+        }
+
+        const dummyInput: tf.Tensor = tf.randomUniform(
+          yolov8.inputs[0].shape,
+          0,
+          1,
+          "float32",
+        );
+
+        const warmupResult = yolov8.execute(dummyInput);
+        const warmupResults: tf.Tensor[] = Array.isArray(warmupResult)
+          ? warmupResult
+          : [warmupResult as tf.Tensor];
+
+        setLoading({ loading: false, progress: 1 });
+        setModel({
+          net: yolov8,
+          inputShape: yolov8.inputs[0].shape,
+          outputShape: warmupResults.map((e) => e.shape),
+        });
+
+        tf.dispose([...warmupResults, dummyInput]);
+      } catch (error) {
+        setLoading({ loading: false, progress: 0 });
+        console.error("Error loading model:", error);
+      }
+    };
+
+    loadModel();
+
+    return () => {
+      if (model?.net) {
+        model.net.dispose();
+      }
+    };
   }, []);
 
   useEffect(() => {
-    const faceAnalyzerInference = async () => {
+    const skinAnalisisInference = async () => {
       if (
         criterias.isCaptured &&
         criterias.capturedImage &&
@@ -131,22 +188,44 @@ function Main({isArabic}: {isArabic: boolean}) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         try {
-          if (modelSkinAnalysisRef.current) {
-            const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] =
-              await skinAnalysisInference(
-                criterias.capturedImage,
-                modelSkinAnalysisRef.current,
-              );
+          if (model != null) {
+            const image = await base64ToImage(criterias.capturedImage, true);
+            console.log("converting success");
 
-            setInferenceResult(skinAnalysisResult[0]);
-            setSkinAnalysisResult(skinAnalysisResult[1]);
-            setIsInferenceCompleted(true);
+            if (canvasRef.current == null) {
+              throw new Error("Canvas ref is null");
+            }
+            const skinAnalysisResult: SkinAnalysisResult[] = await detectFrame(
+              image,
+              model,
+              canvasRef.current,
+            );
 
-            console.log(skinAnalysisResult[1]);
+            // const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] =
+            // await skinAnalysisInference(
+            //   criterias.capturedImage,
+            //   modelSkinAnalysisRef.current,
+            // );
 
-            setTimeout(() => {
-              setShowScannerAfterInference(false); // Hentikan scanner setelah 2 detik
-            }, 2000);
+            if (skinAnalysisResult) {
+              // setInferenceResult(skinAnalysisResult[0]);
+              setSkinAnalysisResult([
+                ...skinAnalysisResult,
+                {
+                  class: 1000,
+                  score: 0,
+                  data: criterias.capturedImage,
+                  label: "",
+                },
+              ]);
+              setIsInferenceCompleted(true);
+
+              // console.log(skinAnalysisResult[1]);
+
+              setTimeout(() => {
+                setShowScannerAfterInference(false); // Hentikan scanner setelah 2 detik
+              }, 2000);
+            }
           }
         } catch (error: any) {
           console.error("Inference error:", error);
@@ -160,28 +239,49 @@ function Main({isArabic}: {isArabic: boolean}) {
       }
     };
 
-    faceAnalyzerInference();
+    skinAnalisisInference();
   }, [criterias.isCaptured, criterias.capturedImage]);
 
-  if (modelLoading) {
-    <ModelLoadingScreen progress={progress} />;
+  if (loading.loading) {
+    return <ModelLoadingScreen progress={loading.progress} />;
   }
+
   return (
     <>
-      <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+      <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
+        {isInferenceCompleted &&
+          criterias.capturedImage != null &&
+          model != null && (
+            <div className="absolute inset-0">
+              <img
+                src={criterias.capturedImage}
+                width={model.inputShape[2]}
+                height={model.inputShape[1]}
+                className="h-full w-full scale-x-[-1] transform object-cover"
+              />
+            </div>
+          )}
         <div className="absolute inset-0">
           <>
-            {!isLoading && inferenceResult != null ? (
-              <SkinAnalysisScene data={inferenceResult} />
+            {model != null && (
+              <canvas
+                width={model.inputShape[2]}
+                height={model.inputShape[1]}
+                ref={canvasRef}
+                className="h-full w-full object-cover"
+              />
+            )}
+            {!isLoading && isInferenceCompleted == true ? (
+              <></>
             ) : (
               <>
-                {criterias.isCaptured ? (
+                {isInferenceCompleted ? (
                   <>
-                    {showScannerAfterInference || !isInferenceCompleted ? (
+                    {/* {showScannerAfterInference || !isInferenceCompleted ? (
                       <Scanner />
                     ) : (
                       <></>
-                    )}
+                    )} */}
                   </>
                 ) : (
                   <>
@@ -400,7 +500,8 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                 </p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.48125rem] font-bold text-white sm:text-[0.625rem]">
-                    {currencySymbol}{(product.price * rate).toFixed(3)}
+                    {currencySymbol}
+                    {(product.price * rate).toFixed(3)}
                   </span>
                 </div>
               </div>
@@ -549,7 +650,7 @@ function AnalysisResults({ onClose, isArabic }: { onClose: () => void, isArabic?
           <div className="flex items-center justify-center rounded-full bg-gradient-to-b from-[#CA9C43] to-[#644D21] p-1">
             {criterias.capturedImage ? (
               <img
-                className="size-24 rounded-full object-fill transform scale-x-[-1]"
+                className="size-24 scale-x-[-1] transform rounded-full object-fill"
                 src={criterias.capturedImage}
                 alt="Captured Profile"
               />

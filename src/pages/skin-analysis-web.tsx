@@ -12,17 +12,24 @@ import {
 } from "../context/skin-analysis-context";
 import { FaceResults } from "../types/faceResults";
 import { SkinAnalysisResult } from "../types/skinAnalysisResult";
-import { skinAnalysisInference } from "../inference/skinAnalysisInference";
+// import { skinAnalysisInference } from "../inference/skinAnalysisInference";
 import { VideoScene } from "../components/recorder/recorder";
-import * as tf from "@tensorflow/tfjs-core";
+import * as tf from "@tensorflow/tfjs";
 import * as tflite from "@tensorflow/tfjs-tflite";
-import { loadTFLiteModel } from "../utils/tfliteInference";
-import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
-import { Scanner } from "../components/scanner";
-import SkinAnalysisScene from "../components/skin-analysis/skin-analysis-scene";
+// import { Scanner } from "../components/scanner";
+import { GraphModel } from "@tensorflow/tfjs";
+import { detectFrame } from "../inference/skinAnalysisInference";
+import { base64ToImage } from "../utils/imageProcessing";
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../utils/other";
+import { label } from "three/webgpu";
+
+interface Model {
+  net: tf.GraphModel;
+  inputShape: number[];
+  outputShape: tf.Shape[];
+}
 
 export function SkinAnalysisWeb() {
   const { i18n } = useTranslation();
@@ -35,7 +42,7 @@ export function SkinAnalysisWeb() {
     i18n.changeLanguage(lang);
   }, [i18n]);
   const isArabic = i18n.language === "ar";
-  
+
   return (
     <CameraProvider>
       <InferenceProvider>
@@ -53,6 +60,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
   const { criterias } = useCamera();
 
   const modelSkinAnalysisRef = useRef<tflite.TFLiteModel | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const {
     isLoading,
@@ -72,27 +80,65 @@ function Main({ isArabic }: { isArabic?: boolean }) {
   const [showScannerAfterInference, setShowScannerAfterInference] =
     useState(true);
 
-  const steps = [
-    async () => {
-      const model = await loadTFLiteModel(
-        "/media/unveels/models/skin-analysis/best_float16.tflite",
-      );
-      modelSkinAnalysisRef.current = model;
-    },
-  ];
+  const [loading, setLoading] = useState({ loading: true, progress: 0 });
 
-  const {
-    progress,
-    isLoading: modelLoading,
-    loadModels,
-  } = useModelLoader(steps);
+  const [model, setModel] = useState<Model | null>(null);
 
   useEffect(() => {
-    loadModels();
+    const loadModel = async () => {
+      try {
+        await tf.ready();
+
+        const yolov8: GraphModel = await tf.loadGraphModel(
+          `/media/unveels/models/skin-analysis/best_web_model/model.json`,
+          {
+            onProgress: (fractions: number) => {
+              setLoading({ loading: true, progress: fractions });
+            },
+          },
+        );
+
+        if (!yolov8.inputs[0]?.shape) {
+          throw new Error("Invalid model input shape");
+        }
+
+        const dummyInput: tf.Tensor = tf.randomUniform(
+          yolov8.inputs[0].shape,
+          0,
+          1,
+          "float32",
+        );
+
+        const warmupResult = yolov8.execute(dummyInput);
+        const warmupResults: tf.Tensor[] = Array.isArray(warmupResult)
+          ? warmupResult
+          : [warmupResult as tf.Tensor];
+
+        setLoading({ loading: false, progress: 1 });
+        setModel({
+          net: yolov8,
+          inputShape: yolov8.inputs[0].shape,
+          outputShape: warmupResults.map((e) => e.shape),
+        });
+
+        tf.dispose([...warmupResults, dummyInput]);
+      } catch (error) {
+        setLoading({ loading: false, progress: 0 });
+        console.error("Error loading model:", error);
+      }
+    };
+
+    loadModel();
+
+    return () => {
+      if (model?.net) {
+        model.net.dispose();
+      }
+    };
   }, []);
 
   useEffect(() => {
-    const faceAnalyzerInference = async () => {
+    const skinAnalysisInference = async () => {
       if (
         criterias.isCaptured &&
         criterias.capturedImage &&
@@ -118,20 +164,32 @@ function Main({ isArabic }: { isArabic?: boolean }) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         try {
-          if (modelSkinAnalysisRef.current) {
-            const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] =
-              await skinAnalysisInference(
-                criterias.capturedImage,
-                modelSkinAnalysisRef.current,
-              );
+          if (model != null) {
+            const image = await base64ToImage(criterias.capturedImage, true);
+            console.log("converting success");
+
+            if (canvasRef.current == null) {
+              throw new Error("Canvas ref is null");
+            }
+            const skinAnalysisResult: SkinAnalysisResult[] = await detectFrame(
+              image,
+              model,
+              canvasRef.current,
+            );
 
             if (skinAnalysisResult) {
-              console.log("Skin Analysis Result:", skinAnalysisResult[1]);
-              const resultString = JSON.stringify(skinAnalysisResult[1]);
+              console.log("Skin Analysis Result:", skinAnalysisResult);
+              const resultString = JSON.stringify([
+                ...skinAnalysisResult,
+                {
+                  label: "imageData",
+                  class: 1000,
+                  score: 0,
+                  data: criterias.capturedImage,
+                },
+              ]);
               console.log("Skin Analysis Result as JSON:", resultString);
 
-              setInferenceResult(skinAnalysisResult[0]);
-              setSkinAnalysisResult(skinAnalysisResult[1]);
               setIsInferenceCompleted(true);
 
               if ((window as any).flutter_inappwebview) {
@@ -172,28 +230,48 @@ function Main({ isArabic }: { isArabic?: boolean }) {
       }
     };
 
-    faceAnalyzerInference();
+    skinAnalysisInference();
   }, [criterias.isCaptured, criterias.capturedImage]);
 
-  if (modelLoading) {
-    return <ModelLoadingScreen progress={progress} />;
+  if (loading.loading) {
+    return <ModelLoadingScreen progress={loading.progress} />;
   }
   return (
     <>
-      <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+      <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
+        {isInferenceCompleted &&
+          criterias.capturedImage != null &&
+          model != null && (
+            <div className="absolute inset-0">
+              <img
+                src={criterias.capturedImage}
+                width={model.inputShape[2]}
+                height={model.inputShape[1]}
+                className="h-full w-full scale-x-[-1] transform object-cover"
+              />
+            </div>
+          )}
         <div className="absolute inset-0">
           <>
-            {!isLoading && inferenceResult != null ? (
-              <SkinAnalysisScene data={inferenceResult} />
+            {model != null && (
+              <canvas
+                width={model.inputShape[2]}
+                height={model.inputShape[1]}
+                ref={canvasRef}
+                className="h-full w-full object-cover"
+              />
+            )}
+            {!isLoading && isInferenceCompleted == true ? (
+              <></>
             ) : (
               <>
-                {criterias.isCaptured ? (
+                {isInferenceCompleted ? (
                   <>
-                    {showScannerAfterInference || !isInferenceCompleted ? (
+                    {/* {showScannerAfterInference || !isInferenceCompleted ? (
                       <Scanner />
                     ) : (
                       <></>
-                    )}
+                    )} */}
                   </>
                 ) : (
                   <>
