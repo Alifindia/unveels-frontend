@@ -64,7 +64,7 @@ export function FindTheLook() {
 
     const lang = storeLang === "ar" ? "ar" : "en";
 
-    i18n.changeLanguage("ar");
+    i18n.changeLanguage(lang);
   }, [i18n]);
   const isArabic = i18n.language === "ar";
 
