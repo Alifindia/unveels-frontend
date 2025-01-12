@@ -64,15 +64,16 @@ export function FindTheLook() {
 
     const lang = storeLang === "ar" ? "ar" : "en";
 
-    i18n.changeLanguage(lang);
+    i18n.changeLanguage("ar");
   }, [i18n]);
+  const isArabic = i18n.language === "ar";
 
   return (
     <CameraProvider>
       <SkinAnalysisProvider>
         <FindTheLookProvider>
           <div className="h-full min-h-dvh">
-            <Main />
+            <Main isArabic={isArabic}/>
           </div>
         </FindTheLookProvider>
       </SkinAnalysisProvider>
@@ -80,7 +81,7 @@ export function FindTheLook() {
   );
 }
 
-function Main() {
+function Main({ isArabic }: { isArabic?: boolean }) {
   const { criterias } = useCamera();
   const [selectionMade, setSelectionMade] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
@@ -194,7 +195,7 @@ function Main() {
           <TopNavigation cart={true} />
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-            <MainContent />
+            <MainContent isArabic={isArabic}/>
             {view == "face" && tab === null && <Footer />}
           </div>
         </div>
@@ -203,8 +204,8 @@ function Main() {
   );
 }
 
-function MainContent() {
-  return <BottomContent />;
+function MainContent({ isArabic }: { isArabic?: boolean }) {
+  return <BottomContent isArabic={isArabic} />;
 }
 
 function MakeupCategories({
@@ -518,7 +519,7 @@ const groupedItems = (findTheLookItems: FindTheLookItems[]) => {
   };
 };
 
-function BottomContent() {
+function BottomContent({ isArabic }: { isArabic?: boolean }) {
   const { criterias, setCriterias } = useCamera();
   const { view, setView, findTheLookItems, tab, section, setTab, setSection } =
     useFindTheLookContext();
@@ -611,7 +612,7 @@ function BottomContent() {
     );
   }
 
-  return <VideoScene />;
+  return <VideoScene isArabic={isArabic}/>;
 }
 
 function InferenceResults({

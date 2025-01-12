@@ -65,6 +65,7 @@ export function SkinToneFinder() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
+  const isArabic = i18n.language === "ar";
 
   return (
     <CameraProvider>
@@ -74,7 +75,7 @@ export function SkinToneFinder() {
             <FindTheLookProvider>
               <FilterProvider>
                 <div className="h-full min-h-dvh">
-                  <Main />
+                  <Main isArabic={isArabic}/>
                 </div>
               </FilterProvider>
             </FindTheLookProvider>
@@ -85,7 +86,7 @@ export function SkinToneFinder() {
   );
 }
 
-function Main() {
+function Main({isArabic}: {isArabic: boolean}) {
   const { criterias, status, setRunningMode } = useCamera();
   const [collapsed, setCollapsed] = useState(false);
   const { isInferenceFinished } = useInferenceContext();
@@ -194,7 +195,7 @@ function Main() {
         <TopNavigation cart={isInferenceFinished} />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          {criterias.isCaptured ? "" : <VideoScene />}
+          {criterias.isCaptured ? "" : <VideoScene isArabic={isArabic} />}
           {isInferenceFinished && <Sidebar setCollapsed={setCollapsed} />}
           {isInferenceFinished && (
             <div className="bg-black/10 p-2 shadow-lg backdrop-blur-sm">

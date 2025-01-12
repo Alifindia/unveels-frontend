@@ -41,13 +41,14 @@ export function SeeImprovement() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
+  const isArabic = i18n.language === "ar";
 
   return (
     <CameraProvider>
       <SkinAnalysisProvider>
         <SkinImprovementProvider>
           <div className="h-full min-h-dvh">
-            <Main />
+            <Main isArabic={isArabic}/>
           </div>
         </SkinImprovementProvider>
       </SkinAnalysisProvider>
@@ -55,7 +56,7 @@ export function SeeImprovement() {
   );
 }
 
-function Main() {
+function Main({ isArabic }: { isArabic?: boolean }) {
   const { criterias } = useCamera();
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
   const [collapsed, setCollapsed] = useState(false);
@@ -106,7 +107,7 @@ function Main() {
         <TopNavigation />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          <MainContent collapsed={collapsed} setCollapsed={setCollapsed} />
+          <MainContent collapsed={collapsed} setCollapsed={setCollapsed} isArabic={isArabic} />
           <Footer />
         </div>
       </div>
@@ -117,11 +118,12 @@ function Main() {
 interface MainContentProps {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
+  isArabic?: boolean 
 }
 
-function MainContent({ collapsed, setCollapsed }: MainContentProps) {
+function MainContent({ collapsed, setCollapsed, isArabic }: MainContentProps) {
   return (
-    <>{collapsed ? null : <BottomContent setCollapsed={setCollapsed} />}</>
+    <>{collapsed ? null : <BottomContent setCollapsed={setCollapsed} isArabic={isArabic} />}</>
   );
 }
 
@@ -304,9 +306,10 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
 
 interface BottomContentProps {
   setCollapsed: (collapsed: boolean) => void;
+  isArabic?: boolean
 }
 
-function BottomContent({ setCollapsed }: BottomContentProps) {
+function BottomContent({ setCollapsed, isArabic }: BottomContentProps) {
   const { criterias, setCriterias } = useCamera();
   const { view, setView } = useSkinAnalysis();
 
@@ -321,7 +324,7 @@ function BottomContent({ setCollapsed }: BottomContentProps) {
     );
   }
 
-  return <VideoScene />;
+  return <VideoScene isArabic={isArabic} />;
 }
 
 function Slider({ valueSlider }: { valueSlider: number }) {

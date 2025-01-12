@@ -9,14 +9,27 @@ import SkinImprovementScene from "../components/skin-improvement/skin-improvemen
 import { VideoStream } from "../components/recorder/video-stream";
 import { Footer } from "../components/footer";
 import { VideoScene } from "../components/recorder/recorder";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
 
 export function SeeImprovementWeb() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+  const isArabic = i18n.language === "ar";
+
   return (
     <CameraProvider>
       <SkinAnalysisProvider>
         <SkinImprovementProvider>
           <div className="h-full min-h-dvh">
-            <Main />
+            <Main isArabic={isArabic} />
           </div>
         </SkinImprovementProvider>
       </SkinAnalysisProvider>
@@ -24,7 +37,7 @@ export function SeeImprovementWeb() {
   );
 }
 
-function Main() {
+function Main({ isArabic }: { isArabic?: boolean }) {
   const { criterias } = useCamera();
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
   const [collapsed, setCollapsed] = useState(false);
@@ -74,7 +87,7 @@ function Main() {
         </div>
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          {!criterias.isCaptured && <VideoScene />}
+          {!criterias.isCaptured && <VideoScene isArabic={isArabic}/>}
           <Footer />
         </div>
       </div>

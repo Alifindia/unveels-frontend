@@ -15,14 +15,27 @@ import {
 } from "@mediapipe/tasks-vision";
 import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
 
 export function FindTheLookWeb() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+  const isArabic = i18n.language === "ar";
+  
   return (
     <CameraProvider>
       <SkinAnalysisProvider>
         <FindTheLookProvider>
           <div className="h-full min-h-dvh">
-            <Main />
+            <Main isArabic={isArabic}/>
           </div>
         </FindTheLookProvider>
       </SkinAnalysisProvider>
@@ -30,7 +43,7 @@ export function FindTheLookWeb() {
   );
 }
 
-function Main() {
+function Main({ isArabic }: { isArabic?: boolean }) {
   const { criterias } = useCamera();
   const [selectionMade, setSelectionMade] = useState(false);
 
@@ -140,7 +153,7 @@ function Main() {
           </div>
 
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-            {!criterias.isCaptured && <VideoScene />}
+            {!criterias.isCaptured && <VideoScene isArabic={isArabic}/>}
             <Footer />
           </div>
         </div>

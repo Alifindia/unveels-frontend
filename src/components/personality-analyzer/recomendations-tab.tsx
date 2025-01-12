@@ -18,10 +18,12 @@ import { LinkButton } from "../../App";
 type RecommendationsTabProps = {
   personality?: string;
   faceShape?: string;
+  isArabic?: boolean;
 };
 export function RecommendationsTab({
   personality,
   faceShape,
+  isArabic
 }: RecommendationsTabProps) {
   const { t } = useTranslation();
 
@@ -50,7 +52,7 @@ export function RecommendationsTab({
 
   return (
     <div className="w-full overflow-auto px-4 py-8">
-      <div className="pb-14">
+      <div className="pb-14" dir={isArabic ? "rtl" : "ltr"}>
         <h2 className="pb-4 text-xl font-bold lg:text-2xl">
           {t("viewpersonality.perfumerec")}
         </h2>
@@ -125,7 +127,7 @@ export function RecommendationsTab({
           <LoadingProducts />
         )}
       </div>
-      <div className="pb-14">
+      <div className="pb-14" dir={isArabic ? "rtl" : "ltr"}>
         <h2 className="text-xl font-bold">{t("viewpersonality.lookrec")}</h2>
         <p className="pb-4 text-sm font-bold">{t("viewpersonality.lookdec")}</p>
         {items ? (
@@ -187,7 +189,7 @@ export function RecommendationsTab({
           <LoadingProducts />
         )}
       </div>
-      <div className="pb-14">
+      <div className="pb-14" dir={isArabic ? "rtl" : "ltr"}>
         <h2 className="text-xl font-bold">
           {t("viewpersonality.lipcolorrec")}
         </h2>

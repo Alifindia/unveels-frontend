@@ -10,15 +10,28 @@ import { useEffect, useRef } from "react";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
 
 export function SkinToneFinderWeb() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+  const isArabic = i18n.language === "ar";
+
   return (
     <CameraProvider>
       <InferenceProvider>
         <SkinColorProvider>
           <MakeupProvider>
             <div className="h-full min-h-dvh">
-              <Main />
+              <Main isArabic={isArabic}/>
             </div>
           </MakeupProvider>
         </SkinColorProvider>
@@ -27,7 +40,7 @@ export function SkinToneFinderWeb() {
   );
 }
 
-function Main() {
+function Main({isArabic}: {isArabic: boolean}) {
   const { criterias } = useCamera();
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
 
@@ -75,7 +88,7 @@ function Main() {
         </div>
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          {criterias.isCaptured ? "" : <VideoScene />}
+          {criterias.isCaptured ? "" : <VideoScene isArabic={isArabic} />}
           <Footer />
         </div>
       </div>

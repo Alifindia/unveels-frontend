@@ -17,20 +17,33 @@ import {
 import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { Scanner } from "../components/scanner";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
 
 export function PersonalityFinderWeb() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+  const isArabic = i18n.language === "ar";
+  
   return (
     <CameraProvider>
       <InferenceProvider>
         <div className="h-full min-h-dvh">
-          <MainContent />
+          <MainContent isArabic={isArabic}/>
         </div>
       </InferenceProvider>
     </CameraProvider>
   );
 }
 
-function MainContent() {
+function MainContent({ isArabic }: { isArabic?: boolean }) {
   const modelFaceShapeRef = useRef<tflite.TFLiteModel | null>(null);
   const modelPersonalityFinderRef = useRef<tflite.TFLiteModel | null>(null);
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
@@ -232,7 +245,7 @@ function MainContent() {
         </div>
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          {!criterias.isCaptured && <VideoScene />}
+          {!criterias.isCaptured && <VideoScene isArabic={isArabic}/>}
           <Footer />
         </div>
       </div>

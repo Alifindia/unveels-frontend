@@ -54,13 +54,14 @@ export function SkinAnalysis() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
+  const isArabic = i18n.language === "ar";
 
   return (
     <CameraProvider>
       <InferenceProvider>
         <SkinAnalysisProvider>
           <div className="h-full min-h-dvh">
-            <Main />
+            <Main isArabic={isArabic} />
           </div>
         </SkinAnalysisProvider>
       </InferenceProvider>
@@ -68,7 +69,7 @@ export function SkinAnalysis() {
   );
 }
 
-function Main() {
+function Main({isArabic}: {isArabic: boolean}) {
   const { criterias } = useCamera();
 
   const modelSkinAnalysisRef = useRef<tflite.TFLiteModel | null>(null);
@@ -194,8 +195,8 @@ function Main() {
         <TopNavigation cart={isInferenceCompleted} />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          {!criterias.isCaptured && <VideoScene />}
-          <MainContent isInferenceCompleted={isInferenceCompleted} />
+          {!criterias.isCaptured && <VideoScene isArabic={isArabic} />}
+          <MainContent isInferenceCompleted={isInferenceCompleted} isArabic={isArabic} />
           {!criterias.isCaptured && <Footer />}
         </div>
       </div>
@@ -205,10 +206,12 @@ function Main() {
 
 function MainContent({
   isInferenceCompleted = false,
+  isArabic
 }: {
   isInferenceCompleted: boolean;
+  isArabic?: boolean;
 }) {
-  return <BottomContent isInferenceCompleted={isInferenceCompleted} />;
+  return <BottomContent isInferenceCompleted={isInferenceCompleted} isArabic={isArabic} />;
 }
 
 const tabs = [
@@ -437,8 +440,10 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
 
 function BottomContent({
   isInferenceCompleted = false,
+  isArabic
 }: {
   isInferenceCompleted: boolean;
+  isArabic?: boolean;
 }) {
   const { criterias, setCriterias } = useCamera();
   const { view, setView } = useSkinAnalysis();
@@ -463,6 +468,7 @@ function BottomContent({
         onClose={() => {
           setView("face");
         }}
+        isArabic={isArabic}
       />
     );
   }
@@ -499,7 +505,7 @@ function ProblemResults({
   );
 }
 
-function AnalysisResults({ onClose }: { onClose: () => void }) {
+function AnalysisResults({ onClose, isArabic }: { onClose: () => void, isArabic?: boolean }) {
   const {
     calculateSkinHealthScore,
     calculateAverageSkinConditionScore,
@@ -968,84 +974,98 @@ function AnalysisResults({ onClose }: { onClose: () => void }) {
 
         <div className="divide-y divide-white/50 px-2 py-10 text-white">
           <ProblemSection
+            isArabic={isArabic}
             title="Wrinkles"
             detected="Forehead: Mild spots observed, likely due to sun exposure.Cheeks: A few dark spots noted on both cheeks, possibly post-inflammatory hyperpigmentation"
             description="Wrinkles are a natural part of aging, but they can also develop as a result of sun exposure, dehydration, and smoking. They can be treated with topical creams, botox, and fillers."
             score={getTotalScoreByLabel("wrinkles")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Spots"
             detected="Forehead: Mild spots observed, likely due to sun exposure.Cheeks: A few dark spots noted on both cheeks, possibly post-inflammatory hyperpigmentation"
             description="Spots can be caused by sun exposure, hormonal changes, and skin inflammation. They can be treated with topical creams, laser therapy, and chemical peels."
             score={getTotalScoreByLabel("spots")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Texture"
             detected="Detected"
             description="Uneven skin texture can be caused by acne, sun damage, and aging. It can be treated with exfoliation, laser therapy, and microneedling."
             score={getTotalScoreByLabel("texture")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Dark Circles"
             detected="Detected"
             description="Dark circles can be caused by lack of sleep, dehydration, and genetics. They can be treated with eye creams, fillers, and laser therapy."
             score={getTotalScoreByLabel("dark circle")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Redness"
             detected="Detected"
             description="Redness can be caused by rosacea, sunburn, and skin sensitivity. It can be treated with topical creams, laser therapy, and lifestyle changes."
             score={getTotalScoreByLabel("redness")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="oily"
             detected="Detected"
             description="Oiliness can be caused by hormonal changes, stress, and genetics. It can be treated with oil-free skincare products, medication, and lifestyle changes."
             score={getTotalScoreByLabel("oily")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Moisture"
             detected="Detected"
             description="Dry skin can be caused by cold weather, harsh soaps, and aging. It can be treated with moisturizers, humidifiers, and lifestyle changes."
             score={getTotalScoreByLabel("moisture")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Pores"
             detected="Detected"
             description="Large pores can be caused by genetics, oily skin, and aging. They can be treated with topical creams, laser therapy, and microneedling."
             score={getTotalScoreByLabel("pores")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Eyebags"
             detected="Detected"
             description="Eye bags can be caused by lack of sleep, allergies, and aging. They can be treated with eye creams, fillers, and surgery."
             score={getTotalScoreByLabel("eyebags")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Radiance"
             detected="Detected"
             description="Dull skin can be caused by dehydration, poor diet, and lack of sleep. It can be treated with exfoliation, hydration, and lifestyle changes."
             score={getTotalScoreByLabel("radiance")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Firmness"
             detected="Detected"
             description="Loss of firmness can be caused by aging, sun exposure, and smoking. It can be treated with topical creams, botox, and fillers."
             score={getTotalScoreByLabel("firmness")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Droopy Upper Eyelid"
             detected="Detected"
             description="Droopy  can  eyelidbe caused by aging, genetics, and sun exposure. They can be treated with eyelid surgery, botox, and fillers."
             score={getTotalScoreByLabel("droopy upper eyelid")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Droopy Lower Eyelid"
             detected="Detected"
             description="Droopy  can  eyelidbe caused by aging, genetics, and sun exposure. They can be treated with eyelid surgery, botox, and fillers."
             score={getTotalScoreByLabel("droopy lower eyelid")}
           />
           <ProblemSection
+            isArabic={isArabic}
             title="Acne"
             detected="Detected"
             description="Acne can be caused by hormonal changes, stress, and genetics. It can be treated with topical creams, medication, and lifestyle changes."
@@ -1062,11 +1082,13 @@ function ProblemSection({
   detected,
   description,
   score,
+  isArabic
 }: {
   title: string;
   detected: string;
   description: string;
   score: number;
+  isArabic?: boolean;
 }) {
   const { t } = useTranslation();
   // High -> 70% - 100%
@@ -1074,8 +1096,8 @@ function ProblemSection({
   // low -> 0% - 39%
   const scoreType = score < 40 ? "Low" : score < 70 ? "Moderate" : "High";
   return (
-    <div className="py-5">
-      <div className="flex items-center space-x-2 pb-6">
+    <div className="py-5" dir={isArabic ? "rtl" : "ltr"}>
+      <div className="flex items-center gap-x-3 pb-6">
         <Icons.personalityTriangle className="size-8 shrink-0" />
 
         <h2 className="text-3xl font-bold capitalize text-white">

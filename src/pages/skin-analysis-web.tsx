@@ -21,14 +21,27 @@ import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { Scanner } from "../components/scanner";
 import SkinAnalysisScene from "../components/skin-analysis/skin-analysis-scene";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
 
 export function SkinAnalysisWeb() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+  const isArabic = i18n.language === "ar";
+  
   return (
     <CameraProvider>
       <InferenceProvider>
         <SkinAnalysisProvider>
           <div className="h-full min-h-dvh">
-            <Main />
+            <Main isArabic={isArabic}/>
           </div>
         </SkinAnalysisProvider>
       </InferenceProvider>
@@ -36,7 +49,7 @@ export function SkinAnalysisWeb() {
   );
 }
 
-function Main() {
+function Main({ isArabic }: { isArabic?: boolean }) {
   const { criterias } = useCamera();
 
   const modelSkinAnalysisRef = useRef<tflite.TFLiteModel | null>(null);
@@ -193,7 +206,7 @@ function Main() {
         </div>
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          {!criterias.capturedImage && <VideoScene />}
+          {!criterias.capturedImage && <VideoScene isArabic={isArabic} />}
           <Footer />
         </div>
       </div>

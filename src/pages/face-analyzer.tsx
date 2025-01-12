@@ -47,19 +47,20 @@ export function FaceAnalyzer() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
+  const isArabic = i18n.language === "ar";
 
   return (
     <CameraProvider>
       <InferenceProvider>
         <div className="h-full min-h-dvh">
-          <MainContent />
+          <MainContent isArabic={isArabic} />
         </div>
       </InferenceProvider>
     </CameraProvider>
   );
 }
 
-function MainContent() {
+function MainContent({ isArabic }: { isArabic?: boolean }) {
   const modelFaceShapeRef = useRef<tflite.TFLiteModel | null>(null);
   const modelPersonalityFinderRef = useRef<tflite.TFLiteModel | null>(null);
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
@@ -193,7 +194,7 @@ function MainContent() {
   }, [criterias.isCaptured]);
 
   if (inferenceResult) {
-    return <Result inferenceResult={inferenceResult} />;
+    return <Result inferenceResult={inferenceResult} isArabic={isArabic} />;
   }
 
   return (
@@ -220,7 +221,7 @@ function MainContent() {
         <TopNavigation />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          {!criterias.isCaptured && <VideoScene />}
+          {!criterias.isCaptured && <VideoScene isArabic={isArabic}/>}
           <Footer />
         </div>
       </div>
@@ -228,7 +229,8 @@ function MainContent() {
   );
 }
 
-function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
+function Result({ inferenceResult, isArabic }: { inferenceResult: Classifier[], isArabic?: boolean }) {
+  const { t } = useTranslation();
   const tabs = [
     {
       title: "Attributes",
@@ -274,7 +276,7 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
         <div>
           <div className="flex items-center gap-x-1">
             <Icons.hashtagCircle className="size-4" />
-            <div className="text-sm sm:text-base">AI Face Analyzer :</div>{" "}
+            <div className="text-sm sm:text-base">{t("viewpersonality.aiFaceAnalyzer")} :</div>{" "}
             {/* Adjusted text size */}
           </div>
         </div>
@@ -294,7 +296,9 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
               )}
               onClick={() => setTab(tab.title)}
             >
-              {tab.title}
+              {t(
+                `tabsmenupf.${tab.title.toLocaleLowerCase().replace(" ", "_")}`,
+              )}
             </button>
           ))}
         </div>
@@ -302,18 +306,19 @@ function Result({ inferenceResult }: { inferenceResult: Classifier[] }) {
 
       {/* Main Content */}
       {selectedTab === "Attributes" ? (
-        <AttributesTab data={inferenceResult} />
+        <AttributesTab data={inferenceResult} isArabic={isArabic} />
       ) : null}
       {selectedTab === "Recommendations" ? (
         <RecommendationsTab
           faceShape={inferenceResult ? inferenceResult[14].outputLabel : ""}
+          isArabic={isArabic}
         />
       ) : null}
     </div>
   );
 }
 
-function AttributesTab({ data }: { data: Classifier[] | null }) {
+function AttributesTab({ data, isArabic }: { data: Classifier[] | null, isArabic?: boolean }) {
   const { t } = useTranslation();
   if (!data) {
     return <div></div>;
@@ -322,6 +327,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
   return (
     <div className="grid flex-1 grid-cols-1 gap-2 space-y-4 overflow-auto px-10 py-3 text-xs md:grid-cols-2 md:gap-4 md:space-y-0 md:px-40 md:py-6 md:text-base">
       <FeatureSection
+        isArabic={isArabic}
         icon={<Icons.face className="size-6 md:size-12" />}
         title={t("attributepf.face.title")}
         features={[
@@ -340,6 +346,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
+        isArabic={isArabic}
         icon={<Icons.eye className="size-6 md:size-12" />}
         title={t("attributepf.eyes.title")}
         features={[
@@ -376,6 +383,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
+        isArabic={isArabic}
         icon={<Icons.brows className="size-6 md:size-12" />}
         title={t("attributepf.brows.title")}
         features={[
@@ -404,6 +412,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
+        isArabic={isArabic}
         icon={<Icons.lips className="size-6 md:size-12" />}
         title={t("attributepf.lips.title")}
         features={[
@@ -422,6 +431,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
+        isArabic={isArabic}
         icon={<Icons.cheekbones className="size-6 md:size-12" />}
         title={t("attributepf.cheekbones.title")}
         features={[
@@ -434,6 +444,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
+        isArabic={isArabic}
         icon={<Icons.nose className="size-6 md:size-12" />}
         title={t("attributepf.nose.title")}
         features={[
@@ -446,6 +457,7 @@ function AttributesTab({ data }: { data: Classifier[] | null }) {
         ]}
       />
       <FeatureSection
+        isArabic={isArabic}
         icon={<Icons.hair className="size-6 md:size-12" />}
         title={t("attributepf.hair.title")}
         features={[
@@ -465,6 +477,7 @@ function FeatureSection({
   icon,
   title,
   features,
+  isArabic
 }: {
   icon: ReactNode;
   title: string;
@@ -474,12 +487,13 @@ function FeatureSection({
     color?: boolean;
     hex?: string;
   }[];
+  isArabic?: boolean
 }) {
   return (
     <div className="flex h-full flex-col border-white/50 md:py-4 md:even:border-l md:even:pl-4">
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-2" dir={isArabic ? "rtl" : "ltr"}>
         {/* Section Title */}
-        <div className="flex items-center space-x-3 pb-4">
+        <div className={`flex items-center space-x-3 pb-4 ${isArabic ? "flex-row-reverse justify-end" : "flex-row"}`}>
           <span className="text-xl md:text-2xl">{icon}</span> {/* Icon size */}
           <h2 className="text-xl font-semibold md:text-2xl">{title}</h2>{" "}
           {/* Title size */}

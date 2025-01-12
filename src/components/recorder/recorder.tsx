@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useCamera } from "../../context/recorder-context";
 import { useTranslation } from "react-i18next";
 
-function RecorderGuide() {
+function RecorderGuide({ isArabic }: { isArabic?: boolean }) {
   const { t } = useTranslation();
   const {
     criterias: { facePosition, lighting, orientation },
@@ -73,7 +73,7 @@ function RecorderGuide() {
               facePosition
                 ? "border-white text-white [background:linear-gradient(90deg,_#CA9C43_0%,_#916E2B_27.4%,_#6A4F1B_59.4%,_#473209_100%);]"
                 : "border-dashed border-white/50",
-            )}
+            )} dir={isArabic ? "rtl" : "ltr"}
           >
             <span className="truncate md:whitespace-normal">
               {t("criteria.facePosition")}
@@ -88,7 +88,7 @@ function RecorderGuide() {
               lighting
                 ? "border-white text-white [background:linear-gradient(90deg,_#CA9C43_0%,_#916E2B_27.4%,_#6A4F1B_59.4%,_#473209_100%);]"
                 : "border-dashed border-white/50",
-            )}
+            )} dir={isArabic ? "rtl" : "ltr"}
           >
             <span className="truncate md:whitespace-normal">
               {t("criteria.lighting")}
@@ -103,7 +103,7 @@ function RecorderGuide() {
               orientation
                 ? "border-white text-white [background:linear-gradient(90deg,_#CA9C43_0%,_#916E2B_27.4%,_#6A4F1B_59.4%,_#473209_100%);]"
                 : "border-dashed border-white/50",
-            )}
+            )} dir={isArabic ? "rtl" : "ltr"}
           >
             <span className="truncate md:whitespace-normal">
               {t("criteria.orientation")}
@@ -116,6 +116,6 @@ function RecorderGuide() {
   );
 }
 
-export function VideoScene() {
-  return <RecorderGuide />;
+export function VideoScene({ isArabic }: { isArabic?: boolean }) {
+  return <RecorderGuide isArabic={isArabic}/>;
 }

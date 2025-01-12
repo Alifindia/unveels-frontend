@@ -22,7 +22,7 @@ export function FindTheLookMainScreenWeb({
   }, [i18n]);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const { t } = useTranslation();
-
+  const isArabic = i18n.language === "ar";
   // Refs for the file inputs
   const imageUploadRef = useRef<HTMLInputElement>(null);
   const snapshotUploadRef = useRef<HTMLInputElement>(null);
@@ -123,10 +123,10 @@ export function FindTheLookMainScreenWeb({
         onChange={handleUploadImage}
       />
       <div className="px-4 text-center font-extrabold text-white xl:text-start xl:text-2xl">
-        How do you want to find the look
+        {t("viewftl.page")}
       </div>
 
-      <div className="space-y-4 p-3.5">
+      <div className="space-y-4 p-3.5" dir={isArabic ? "rtl" : "ltr"}>
         {/* Section Live Camera */}
         <div
           className="cursor-pointer rounded-3xl bg-[#252525] p-5 text-white shadow-[inset_5.2px_5.2px_19.5px_rgba(255,255,255,0.1)] lg:p-16"
@@ -134,7 +134,7 @@ export function FindTheLookMainScreenWeb({
         >
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-5 lg:w-2/3">
-              <div className="flex items-center space-x-2">
+              <div className={`flex items-center gap-x-4 ${isArabic ? "flex-row-reverse justify-end" : "flex-row"}`}>
                 <Icons.liveCamera className="size-8 shrink-0" />
                 <h3 className="truncate text-lg font-bold lg:text-2xl">
                   {t("camera_select.live.title")}
@@ -145,7 +145,7 @@ export function FindTheLookMainScreenWeb({
               </p>
               {activeSection === "liveCamera" && (
                 <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
+                  <div className={`flex items-center gap-x-4 ${isArabic ? "flex-row-reverse justify-end" : "flex-row"}`}>
                     <span className="bg-gradient-to-b from-[#473209] to-[#CA9C43] bg-clip-text text-transparent">
                       ▼
                     </span>
@@ -179,7 +179,7 @@ export function FindTheLookMainScreenWeb({
                 onClick={() => handleLiveCamera()}
                 className="mt-6 w-full bg-gradient-to-r from-[#473209] to-[#CA9C43] px-10 py-3 font-semibold text-white shadow-lg lg:w-auto"
               >
-                USE LIVE CAMERA
+                {t("camera_select.live.desc.btn")}
               </button>
             )}
           </div>
@@ -192,7 +192,7 @@ export function FindTheLookMainScreenWeb({
         >
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-5 lg:w-2/3">
-              <div className="flex items-center space-x-2">
+              <div className={`flex items-center gap-x-4 ${isArabic ? "flex-row-reverse justify-end" : "flex-row"}`}>
                 <Icons.takeSnapshot className="size-8 shrink-0" />
                 <h3 className="truncate text-lg font-bold lg:text-2xl">
                   {t("camera_select.snap.title")}
@@ -203,7 +203,7 @@ export function FindTheLookMainScreenWeb({
               </p>
               {activeSection === "takeSnapshot" && (
                 <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
+                  <div className={`flex items-center gap-x-4 ${isArabic ? "flex-row-reverse justify-end" : "flex-row"}`}>
                     <span className="bg-gradient-to-b from-[#473209] to-[#CA9C43] bg-clip-text text-transparent">
                       ▼
                     </span>
@@ -244,7 +244,7 @@ export function FindTheLookMainScreenWeb({
         >
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-5 lg:w-2/3">
-              <div className="flex items-center space-x-2">
+              <div className={`flex items-center gap-x-4 ${isArabic ? "flex-row-reverse justify-end" : "flex-row"}`}>
                 <Icons.uploadPhotoOrVideo className="size-8 shrink-0" />
                 <h3 className="truncate text-lg font-bold lg:text-2xl">
                   {t("camera_select.upload.title")}
@@ -255,7 +255,7 @@ export function FindTheLookMainScreenWeb({
               </p>
               {activeSection === "uploadPhotoOrVideo" && (
                 <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
+                  <div className={`flex items-center gap-x-4 ${isArabic ? "flex-row-reverse justify-end" : "flex-row"}`}>
                     <span className="bg-gradient-to-b from-[#473209] to-[#CA9C43] bg-clip-text text-transparent">
                       ▼
                     </span>
