@@ -451,7 +451,7 @@ function ProductList({ product_type }: { product_type: string }) {
       {data ? (
         data.items.map((product, index) => {
           const imageUrl =
-            mediaUrl(product.media_gallery_entries[0]?.file) ??
+            mediaUrl(product.media_gallery_entries[0].file) ??
             "https://picsum.photos/id/237/200/300";
 
           return (
@@ -777,7 +777,7 @@ function AllProductsPage({
         <div className="mx-auto my-4 flex w-fit space-x-2.5 rounded-lg bg-white/25 p-4">
           {cart.items.map((product) => {
             const imageUrl = mediaUrl(
-              product.media_gallery_entries[0]?.file,
+              product.media_gallery_entries[0].file,
             ) as string;
             return (
               <div className="relative size-9" key={product.id}>
@@ -939,7 +939,7 @@ function ProductHorizontalList({ category }: { category: string }) {
         {data ? (
           data.items.map((product, index) => {
             const imageUrl =
-              mediaUrl(product.media_gallery_entries[0]?.file) ??
+              mediaUrl(product.media_gallery_entries[0].file) ??
               "https://picsum.photos/id/237/200/300";
 
             return (
@@ -1053,7 +1053,7 @@ function SingleCategoryView({
           {data
             ? data.items.map((product, index) => {
                 const imageUrl = mediaUrl(
-                  product.media_gallery_entries[0]?.file,
+                  product.media_gallery_entries[0].file,
                 ) as string;
                 return (
                   <div key={product.id} className="w-full rounded shadow">
