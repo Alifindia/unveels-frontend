@@ -99,6 +99,7 @@ function Main({isArabic}: {isArabic: boolean}) {
   );
 
   const { setSkinAnalysisResult } = useSkinAnalysis();
+  const [isVideoDetectorReady, setIsVideoDetectorReady] = useState(false);
 
   const [isInferenceCompleted, setIsInferenceCompleted] = useState(false);
   const [showScannerAfterInference, setShowScannerAfterInference] =
@@ -244,7 +245,7 @@ function Main({isArabic}: {isArabic: boolean}) {
 
   return (
     <>
-      {loading.loading && <ModelLoadingScreen progress={loading.progress} />}
+      {loading.loading && !isVideoDetectorReady && <ModelLoadingScreen progress={loading.progress} />}
       <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
         {isInferenceCompleted &&
           criterias.capturedImage != null &&
@@ -282,7 +283,7 @@ function Main({isArabic}: {isArabic: boolean}) {
                   </>
                 ) : (
                   <>
-                    <VideoStream />
+                    <VideoStream onCanvasReady={setIsVideoDetectorReady}/>
                   </>
                 )}
               </>
