@@ -711,7 +711,7 @@ export function VideoStream({
               ref={imageRef}
               src={imageRef.current?.src}
               alt="Uploaded"
-              className="h-full w-full object-cover"
+              className="h-auto max-w-full object-cover"
             />
           )}
 
