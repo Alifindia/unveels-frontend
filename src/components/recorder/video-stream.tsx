@@ -377,6 +377,8 @@ export function VideoStream({
       if (canvas) {
         const ctx = canvas.getContext("2d");
         if (ctx) {
+          const { innerWidth: width, innerHeight: height } = window;
+
           const dpr = window.devicePixelRatio || 1;
 
           // Get the dimensions of the canvas and image
@@ -415,7 +417,17 @@ export function VideoStream({
             }
 
             // Draw the image on the canvas with calculated offsets
-            ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+            ctx.clearRect(0, 0, width, height);
+            ctx.save(); // Simpan kondisi canvas saat ini
+            ctx.scale(-1, 1); // Membalikkan gambar secara horizontal
+            ctx.drawImage(
+              img,
+              -offsetX - drawWidth,
+              offsetY,
+              drawWidth,
+              drawHeight,
+            );
+            ctx.restore(); // Kembalikan kondisi canvas ke semula
 
             if (results.faceLandmarks && results.faceLandmarks.length > 0) {
               const landmarks = results.faceLandmarks[0];
@@ -730,7 +742,7 @@ export function VideoStream({
             criterias.runningMode === "IMAGE") && (
             <canvas
               ref={canvasRef}
-              className={`pointer-events-none absolute left-0 top-0 h-full w-screen`}
+              className={`pointer-events-none absolute left-0 top-0 h-full w-screen transform ${runningMode !== "LIVE_CAMERA" ? "scale-x-[-1]" : ""}`}
             />
           )}
 

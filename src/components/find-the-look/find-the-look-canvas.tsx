@@ -19,6 +19,7 @@ interface FindTheLookCanvasProps {
     faceLandmarker: FaceLandmarker | null;
     accesoriesDetector: ObjectDetector | null;
     makeupDetector: ObjectDetector | null;
+    earringDetector: ObjectDetector | null;
   };
 }
 
@@ -49,7 +50,7 @@ export function FindTheLookCanvas({
     useState(true);
 
   // Gunakan models dari props
-  const { faceLandmarker, accesoriesDetector, makeupDetector } = models;
+  const { faceLandmarker, accesoriesDetector, makeupDetector, earringDetector } = models;
 
   const [handResult, setHandResult] = useState<ObjectDetectorResult | null>(
     null,
@@ -164,7 +165,8 @@ export function FindTheLookCanvas({
         !isInferenceRunning && // Periksa apakah inferensi sudah berjalan
         accesoriesDetector &&
         makeupDetector &&
-        faceLandmarker
+        faceLandmarker &&
+        earringDetector
       ) {
         isInferenceRunning = true; // Set flag saat inferensi dimulai
         try {
@@ -172,12 +174,6 @@ export function FindTheLookCanvas({
           await new Promise((resolve) => setTimeout(resolve, 2000));
 
           const resultsAccesories = await accesoriesDetector.detect(image);
-          const resultsMakeup = await makeupDetector.detect(image);
-          const resultsFaceLandmark = await faceLandmarker.detect(image);
-
-          console.log(resultsAccesories);
-
-          // Mengkategorikan hasil deteksi
           const categorizedResults = categorizeResults(resultsAccesories);
           console.log(categorizedResults);
 
@@ -185,9 +181,29 @@ export function FindTheLookCanvas({
           setHandResult(categorizedResults.handResult);
           setRingResult(categorizedResults.ringResult);
           setNeckResult(categorizedResults.neckResult);
-          setEarringResult(categorizedResults.earringResult);
           setGlassResult(categorizedResults.glassResult);
           setHeadResult(categorizedResults.headResult);
+          accesoriesDetector.close();
+
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
+          const resultsMakeup = await makeupDetector.detect(image);
+          setMakeupResult(resultsMakeup);
+          makeupDetector.close();
+
+          try {
+            const resultsEarring = await earringDetector.detect(image);
+            console.log(resultsEarring.detections);
+            setEarringResult(resultsEarring.detections.at(0));
+            earringDetector.close();
+          } catch (error) {
+            console.log(error);
+          }
+          const resultsFaceLandmark = await faceLandmarker.detect(image);
+          setFaceLandmark(resultsFaceLandmark.faceLandmarks[0] || null);
+          faceLandmarker.close();
+
+          console.log(resultsAccesories);
 
           console.log(handResult);
           console.log(ringResult);
@@ -196,8 +212,6 @@ export function FindTheLookCanvas({
           console.log(glassResult);
           console.log(headResult);
 
-          setMakeupResult(resultsMakeup);
-          setFaceLandmark(resultsFaceLandmark.faceLandmarks[0] || null);
 
           setIsInferenceCompleted(true);
 
@@ -319,7 +333,7 @@ export function FindTheLookCanvas({
 
       // Function to calculate labelX based on isFlip
       const calculateLabelX = (centerX: number) => {
-        return isFlip ? centerX - 50 : centerX + 50;
+        return centerX + 50;
       };
 
       const drawDetections = (

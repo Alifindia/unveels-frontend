@@ -9,7 +9,7 @@ export function useModelLoader(steps: Array<() => Promise<void>>) {
       await steps[i]();
 
       // Tambahkan jeda untuk transisi yang lebih halus
-      await new Promise((resolve) => setTimeout(resolve, 300)); // Jeda 300ms
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Jeda 300ms
 
       setProgress(Math.round(((i + 1) / steps.length) * 100));
     }

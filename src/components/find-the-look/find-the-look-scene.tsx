@@ -10,11 +10,12 @@ interface FindTheLookSceneProps {
     faceLandmarker: FaceLandmarker | null;
     accesoriesDetector: ObjectDetector | null;
     makeupDetector: ObjectDetector | null;
+    earringDetector: ObjectDetector | null;
   };
 }
 
 export function FindTheLookScene({ models }: FindTheLookSceneProps) {
-  const { criterias } = useCamera();
+  const { criterias, runningMode } = useCamera();
   const findTheLookCanvasRef = useRef<HTMLCanvasElement>(null);
   const [imageLoaded, setImageLoaded] = useState<HTMLImageElement | null>(null);
   const { setTab, setSection } = useFindTheLookContext();
@@ -74,7 +75,15 @@ export function FindTheLookScene({ models }: FindTheLookSceneProps) {
   return (
     <>
       {/* Always render the Scanner */}
-      {!isInferenceCompleted && <Scanner />}
+      {!isInferenceCompleted && (
+        <div
+          className={
+            runningMode !== "LIVE_CAMERA" ? "scale-x-[-1] transform" : ""
+          }
+        >
+          <Scanner />
+        </div>
+      )}
 
       {/* Always render FindTheLookCanvas but hide it during scanning */}
       {imageLoaded && (
@@ -96,6 +105,7 @@ export function FindTheLookScene({ models }: FindTheLookSceneProps) {
               onLabelClick={handleLabelClick}
               onDetectDone={handleDetectDone} // Pass the callback
               models={models}
+              isFlip={runningMode !== "LIVE_CAMERA"}
             />
           </canvas>
         </div>

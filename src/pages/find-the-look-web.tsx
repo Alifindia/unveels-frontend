@@ -51,10 +51,12 @@ function Main({ isArabic }: { isArabic?: boolean }) {
     faceLandmarker: FaceLandmarker | null;
     accesoriesDetector: ObjectDetector | null;
     makeupDetector: ObjectDetector | null;
+    earringDetector: ObjectDetector | null;
   }>({
     faceLandmarker: null,
     accesoriesDetector: null,
     makeupDetector: null,
+    earringDetector: null,
   });
 
   const steps = [
@@ -113,6 +115,24 @@ function Main({ isArabic }: { isArabic?: boolean }) {
         },
       );
       modelsRef.current.makeupDetector = makeupDetectorInstance;
+    },
+    async () => {
+      const earringDetectorInstance = await ObjectDetector.createFromOptions(
+        await FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+        ),
+        {
+          baseOptions: {
+            modelAssetPath:
+              "/media/unveels/models/find-the-look/earrings.tflite",
+            delegate: "CPU",
+          },
+          runningMode: "IMAGE",
+          maxResults: 1,
+          scoreThreshold: 0.8,
+        },
+      );
+      modelsRef.current.earringDetector = earringDetectorInstance;
     },
   ];
 

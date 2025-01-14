@@ -21,7 +21,7 @@ export function Scanner() {
 
     async function loadLandmarker() {
       const vision = await FilesetResolver.forVisionTasks(
-        "/media/unveels/wasm",
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
       );
       const faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
         baseOptions: {
