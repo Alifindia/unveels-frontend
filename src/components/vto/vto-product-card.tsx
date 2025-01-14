@@ -53,7 +53,7 @@ export function VTOProductCard({
         <BrandName brandId={getProductAttributes(product, "brand")} />
       </p>
       <div className="flex items-end justify-between space-x-1 pt-1">
-        <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.4375rem] text-white sm:text-[0.625rem]">
+        <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.4375rem] text-white sm:text-[0.625rem] max-w-px">
           {currencySymbol}{(product.price * rate).toFixed(3)}
         </div>
         <button
