@@ -49,7 +49,7 @@ export function VTOProductCard({
       <h3 className="line-clamp-2 h-6 py-1 text-[0.425rem] font-semibold text-white sm:h-10 sm:py-2 sm:text-[0.625rem]">
         {product.name}
       </h3>
-      <p className="h-3 text-[0.425rem] text-white/60 sm:h-4 sm:text-[0.625rem]">
+      <p className="line-clamp-1 h-3 text-[0.425rem] text-white/60 sm:h-4 sm:text-[0.625rem]">
         <BrandName brandId={getProductAttributes(product, "brand")} />
       </p>
       <div className="flex items-end justify-between space-x-1 pt-1">
