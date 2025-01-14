@@ -610,6 +610,36 @@ export function VirtualTryOnScene({
     }
   };
 
+  const isDesktop = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) == false;
+  const [videoDimensions, setVideoDimensions] = useState({
+    width: 480,
+    height: 480,
+  });
+
+  const updateVideoDimensions = () => {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+
+    const aspectRatio = screenWidth / screenHeight;
+
+    let width = Math.min(screenWidth, 480);
+    let height = width / aspectRatio;
+
+    if (height > 480) {
+      height = 480;
+      width = height * aspectRatio;
+    }
+
+    setVideoDimensions({ width: Math.round(width), height: Math.round(height) });
+  };
+
+  useEffect(() => {
+    updateVideoDimensions();
+
+    window.addEventListener("resize", updateVideoDimensions);
+    return () => window.removeEventListener("resize", updateVideoDimensions);
+  }, []);
+
   return (
     <div className="fixed inset-0 flex items-center justify-center">
       {webcamRef.current &&
@@ -776,8 +806,8 @@ export function VirtualTryOnScene({
           screenshotFormat="image/jpeg"
           mirrored={false}
           videoConstraints={{
-            width: VIDEO_WIDTH,
-            height: VIDEO_HEIGHT,
+            width: isDesktop ? VIDEO_WIDTH : videoDimensions.height,
+            height: isDesktop ? VIDEO_HEIGHT : videoDimensions.width,
             facingMode: criterias.flipped ? "environment" : "user",
             frameRate: { ideal: 30 },
           }}
