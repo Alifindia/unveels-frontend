@@ -46,6 +46,8 @@ import { useFaceHighlighterQuery } from "../../pages/vto/face/highlighter/highli
 import { useHairColorContext } from "../../pages/vto/hair/hair-color/hair-color-context";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSelecProductNumberContext } from "../../pages/vto/select-product-context";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { arabicToEnglishMap } from "./translate-ar-to-en";
 
 export function useFunctionCommand() {
   const navigate = useNavigate();
@@ -203,6 +205,9 @@ export function useFunctionCommand() {
   const [recording, setRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
   const [sectionName, setSectionName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [text, setText] = useState("");
+  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_BARD_API_KEY);
   const getLastPathSegment = (path: string): string => {
     if (!path) return "";
     const lastSlashIndex = path.lastIndexOf("/");
@@ -221,8 +226,21 @@ export function useFunctionCommand() {
     setSelectedProductNumber(null);
   }, [sectionName]);
 
+  const translateArabicToEnglish = (text: string) => {
+    const trimmedText = text.trim();
+    let result = arabicToEnglishMap[trimmedText] || null;
+    console.log(result)
+    if (result) {
+      console.log(`Translation found for: ${trimmedText}, resetting value.`);
+      result = null;
+      return arabicToEnglishMap[trimmedText];
+    } else {
+      return trimmedText;
+    }
+  };
+
   // Inisialisasi Speech Recognition
-  const initializeRecognition = () => {
+  const initializeRecognition = (language = "en-GB") => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -233,7 +251,7 @@ export function useFunctionCommand() {
 
     const recognition = new SpeechRecognition();
     recognition.continuous = true; // Mendengarkan terus-menerus
-    recognition.lang = "en-GB"; // Bahasa Inggris UK
+    recognition.lang = language; // Bahasa yang digunakan
     recognition.interimResults = false;
 
     // Event handler untuk hasil pengenalan suara
@@ -244,7 +262,14 @@ export function useFunctionCommand() {
           : 0; // Index hasil terakhir
       const speechResult = event.results[lastIndex][0].transcript.toLowerCase();
       console.log("Transcript:", speechResult);
-      handleCommand(speechResult);
+
+      if (language === "en-GB") {
+        handleCommand(speechResult);
+      } else {
+        const translatedText = translateArabicToEnglish(speechResult);
+        console.log("Translated Text:", translatedText);
+        handleCommand(translatedText);
+      }
     };
 
     recognition.onerror = (event) => {
@@ -262,11 +287,15 @@ export function useFunctionCommand() {
 
   // Start listening
   const startListening = () => {
+    const browserLanguage = navigator.language || "en-GB";
+    console.log("Detected browser language:", browserLanguage);
+  
     if (!recognitionRef.current) {
-      recognitionRef.current = initializeRecognition();
+      recognitionRef.current = initializeRecognition(browserLanguage);
     }
 
     if (recognitionRef.current && !recording) {
+      recognitionRef.current.lang = browserLanguage; // Pastikan bahasa diperbarui
       recognitionRef.current.start();
       setRecording(true);
     }
@@ -358,8 +387,11 @@ export function useFunctionCommand() {
       const colorMode = capitalizeWords(
         transcript.match(colorModeRegex)[1].toLowerCase().trim(),
       );
-      handleSetColorMode(colorMode);
-    }
+      const disallowedPatterns = [/pattern 1/i, /pattern 2/i, /pattern 3/i, /pattern 4/i, /pattern 5/i]
+      const isInvalid = disallowedPatterns.some((pattern) => pattern.test(colorMode));
+    
+      if (!isInvalid) handleSetColorMode(colorMode);
+    }    
     // Check for color texture
     if (textureModeRegex.test(transcript)) {
       const textureMode = capitalizeWords(
