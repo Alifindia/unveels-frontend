@@ -218,6 +218,7 @@ export function useFunctionCommand() {
 
   useEffect(() => {
     sectionNameRef.current = sectionName;
+    setSelectedProductNumber(null);
   }, [sectionName]);
 
   // Inisialisasi Speech Recognition
@@ -339,6 +340,7 @@ export function useFunctionCommand() {
     }
     // Check for sub section
     if (subSectionRegex.test(transcript)) {
+      if(selectedProductNumber) setSelectedProductNumber(null);
       const subSection = capitalizeWords(
         transcript.match(subSectionRegex)[1].toLowerCase().trim(),
       );
@@ -1006,7 +1008,7 @@ export function useFunctionCommand() {
       setSelectedTexture(textureValue);
     }
     if (sectionNameRef.current == "lip-plumper" && textureValue) {
-      setSelectedTexturePlumper(textureMode);
+      setSelectedTexturePlumper(textureValue);
     }
     if (sectionNameRef.current == "eye-shadow" && textureValue) {
       setSelectedTextureEyeShadow(textureValue);
