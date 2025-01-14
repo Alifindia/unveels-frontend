@@ -20,7 +20,7 @@ const FoundationSTFInner: React.FC<FoundationSTFProps> = React.memo(
       return new MeshBasicMaterial({
         color: new Color(foundationColor),
         transparent: true,
-        opacity: 0.05,
+        opacity: 0.08,
         visible: showFoundation,
       });
     }, [foundationColor]);

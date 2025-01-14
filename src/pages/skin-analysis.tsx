@@ -78,7 +78,7 @@ export function SkinAnalysis() {
   );
 }
 
-function Main({isArabic}: {isArabic: boolean}) {
+function Main({ isArabic }: { isArabic: boolean }) {
   const { criterias } = useCamera();
 
   const modelSkinAnalysisRef = useRef<tflite.TFLiteModel | null>(null);
@@ -100,6 +100,7 @@ function Main({isArabic}: {isArabic: boolean}) {
 
   const { setSkinAnalysisResult } = useSkinAnalysis();
 
+  const isVideoDetectorReady = useRef(false);
   const [isInferenceCompleted, setIsInferenceCompleted] = useState(false);
   const [showScannerAfterInference, setShowScannerAfterInference] =
     useState(true);
@@ -242,9 +243,16 @@ function Main({isArabic}: {isArabic: boolean}) {
     skinAnalisisInference();
   }, [criterias.isCaptured, criterias.capturedImage]);
 
+  const setIsVideoDetectorReady = (ready: boolean) => {
+    console.log("Video detector is ready: ", ready);
+    isVideoDetectorReady.current = ready;
+  }
+
   return (
     <>
-      {loading.loading && <ModelLoadingScreen progress={loading.progress} />}
+      {isVideoDetectorReady.current == false && model == null && (
+        <ModelLoadingScreen progress={loading.progress} />
+      )}
       <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
         {isInferenceCompleted &&
           criterias.capturedImage != null &&
@@ -282,7 +290,7 @@ function Main({isArabic}: {isArabic: boolean}) {
                   </>
                 ) : (
                   <>
-                    <VideoStream />
+                    <VideoStream onVideoReady={setIsVideoDetectorReady}/>
                   </>
                 )}
               </>
@@ -293,7 +301,10 @@ function Main({isArabic}: {isArabic: boolean}) {
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
           {!criterias.isCaptured && <VideoScene isArabic={isArabic} />}
-          <MainContent isInferenceCompleted={isInferenceCompleted} isArabic={isArabic} />
+          <MainContent
+            isInferenceCompleted={isInferenceCompleted}
+            isArabic={isArabic}
+          />
           {!criterias.isCaptured && <Footer />}
         </div>
       </div>
@@ -303,12 +314,17 @@ function Main({isArabic}: {isArabic: boolean}) {
 
 function MainContent({
   isInferenceCompleted = false,
-  isArabic
+  isArabic,
 }: {
   isInferenceCompleted: boolean;
   isArabic?: boolean;
 }) {
-  return <BottomContent isInferenceCompleted={isInferenceCompleted} isArabic={isArabic} />;
+  return (
+    <BottomContent
+      isInferenceCompleted={isInferenceCompleted}
+      isArabic={isArabic}
+    />
+  );
 }
 
 const tabs = [
@@ -538,7 +554,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
 
 function BottomContent({
   isInferenceCompleted = false,
-  isArabic
+  isArabic,
 }: {
   isInferenceCompleted: boolean;
   isArabic?: boolean;
@@ -603,7 +619,13 @@ function ProblemResults({
   );
 }
 
-function AnalysisResults({ onClose, isArabic }: { onClose: () => void, isArabic?: boolean }) {
+function AnalysisResults({
+  onClose,
+  isArabic,
+}: {
+  onClose: () => void;
+  isArabic?: boolean;
+}) {
   const {
     calculateSkinHealthScore,
     calculateAverageSkinConditionScore,
@@ -729,7 +751,7 @@ function AnalysisResults({ onClose, isArabic }: { onClose: () => void, isArabic?
 
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#6B13B1] text-sm font-bold text-white">
-                  {getTotalScoreByLabel("dark circle")}%
+                  {getTotalScoreByLabel("dark circles")}%
                 </div>
                 <span>{t("skinlabel.dark circles")}</span>
               </div>
@@ -1180,7 +1202,7 @@ function ProblemSection({
   detected,
   description,
   score,
-  isArabic
+  isArabic,
 }: {
   title: string;
   detected: string;

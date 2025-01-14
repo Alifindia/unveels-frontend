@@ -207,6 +207,9 @@ export function FindTheLookCanvas({
               onDetectDone(true);
               console.log("Inference Finished");
             }
+            accesoriesDetector.close();
+            makeupDetector.close();
+            faceLandmarker.close();
           }, 1000);
         } catch (error) {
           console.error("Error during detection: ", error);

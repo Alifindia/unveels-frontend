@@ -99,7 +99,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
   const steps = [
     async () => {
       const vision = await FilesetResolver.forVisionTasks(
-        "/media/unveels/wasm",
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
       );
 
       const faceLandmarkerInstance = await FaceLandmarker.createFromOptions(
@@ -121,7 +121,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
     async () => {
       const accesoriesDetectorInstance = await ObjectDetector.createFromOptions(
         await FilesetResolver.forVisionTasks(
-          "/media/unveels/wasm",
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
         ),
         {
           baseOptions: {
@@ -130,8 +130,8 @@ function Main({ isArabic }: { isArabic?: boolean }) {
             delegate: "CPU",
           },
           runningMode: "IMAGE",
-          maxResults: 5,
-          scoreThreshold: 0.4,
+          maxResults: 20,
+          scoreThreshold: 0.2,
         },
       );
       modelsRef.current.accesoriesDetector = accesoriesDetectorInstance;
@@ -139,7 +139,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
     async () => {
       const makeupDetectorInstance = await ObjectDetector.createFromOptions(
         await FilesetResolver.forVisionTasks(
-          "/media/unveels/wasm",
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
         ),
         {
           baseOptions: {
@@ -147,8 +147,8 @@ function Main({ isArabic }: { isArabic?: boolean }) {
             delegate: "CPU",
           },
           runningMode: "IMAGE",
-          maxResults: 4,
-          scoreThreshold: 0.1,
+          maxResults: 20,
+          scoreThreshold: 0.05,
         },
       );
       modelsRef.current.makeupDetector = makeupDetectorInstance;
@@ -188,7 +188,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
               <FindTheLookScene models={modelsRef.current} />
             ) : (
               <>
-                <VideoStream />
+                <VideoStream isNeedDetectOrientation={false}/>
               </>
             )}
           </div>

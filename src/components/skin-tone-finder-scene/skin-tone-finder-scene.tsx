@@ -157,6 +157,7 @@ function SkinToneFinderInnerScene({
 
           //before after
           if (data.beforeAfter !== undefined) {
+            console.log("COMPARING CAPTURE");
             compareCapture();
           }
 
@@ -185,6 +186,36 @@ function SkinToneFinderInnerScene({
       window.removeEventListener("message", handleMessage);
     };
   }, []);
+
+  useEffect(() => {
+    if (criterias.screenshotImage) {
+      // Jika screenshotImage adalah URL objek Blob, ambil Blob-nya menggunakan fetch
+      fetch(criterias.screenshotImage)
+        .then((response) => response.blob())
+        .then((blob) => {
+          const fileReader = new FileReader();
+
+          fileReader.onloadend = () => {
+            const resultString = JSON.stringify(fileReader.result);
+            if ((window as any).flutter_inappwebview) {
+              (window as any).flutter_inappwebview
+                .callHandler("screenshootResult", resultString)
+                .then((result: any) => {
+                  console.log("Flutter responded with:", result);
+                })
+                .catch((error: any) => {
+                  console.error("Error calling Flutter handler:", error);
+                });
+            }
+          };
+
+          fileReader.readAsDataURL(blob);
+        })
+        .catch((error) => {
+          console.error("Error fetching Blob:", error);
+        });
+    }
+  }, [criterias.screenshotImage]);
 
   // Memproses gambar dan mendeteksi landmark
   useEffect(() => {

@@ -52,8 +52,8 @@ export const SkinAnalysisProvider: React.FC<SkinAnalysisProviderProps> = ({
   const calculateAverageSkinProblemsScore = (): number => {
     const skinProblemsLabels = [
       "texture",
-      "dark circle",
-      "eyebag",
+      "dark circles",
+      "eyebags",
       "wrinkles",
       "pores",
       "spots",
@@ -81,7 +81,7 @@ export const SkinAnalysisProvider: React.FC<SkinAnalysisProviderProps> = ({
       "firmness",
       "droopy eyelid upper",
       "droopy eyelid lower",
-      "moistures",
+      "moisture",
       "oily",
       "redness",
       "radiance",

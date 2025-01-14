@@ -30,11 +30,15 @@ import {
 interface VideoStreamProps {
   debugMode?: boolean;
   onCanvasReady?: (ready: boolean | false) => void;
+  isNeedDetectOrientation?: boolean;
+  onVideoReady?: (ready: boolean | false) => void;
 }
 
 export function VideoStream({
   debugMode = false,
   onCanvasReady,
+  isNeedDetectOrientation = true,
+  onVideoReady,
 }: VideoStreamProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -75,7 +79,7 @@ export function VideoStream({
     const initializeFaceLandmarker = async () => {
       try {
         const vision = await FilesetResolver.forVisionTasks(
-          "/media/unveels/wasm",
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
         );
         const faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
           baseOptions: {
@@ -91,6 +95,9 @@ export function VideoStream({
 
         faceLandmarRef.current = faceLandmarker;
         startDetection();
+        if (onVideoReady) {
+          onVideoReady(true);
+        }
       } catch (err) {
         console.error("Failed to initialize FaceDetector:", err);
         setError(err as Error);
@@ -551,15 +558,17 @@ export function VideoStream({
 
     setCriterias({
       lighting: isBrightnessGood,
-      facePosition: isPositionGood,
-      orientation: isOrientationGood,
+      facePosition: isNeedDetectOrientation ? isPositionGood : true,
+      orientation: isNeedDetectOrientation ? isOrientationGood : true,
     });
 
     return {
       brightness: isBrightnessGood,
-      position: isPositionGood,
-      orientation: isOrientationGood,
-      allGood: isBrightnessGood && isPositionGood && isOrientationGood,
+      position: isNeedDetectOrientation ? isPositionGood : true,
+      orientation: isNeedDetectOrientation ? isOrientationGood : true,
+      allGood: isNeedDetectOrientation
+        ? isBrightnessGood && isPositionGood && isOrientationGood
+        : isBrightnessGood,
     };
   }, [
     lighting,
