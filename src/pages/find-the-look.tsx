@@ -188,7 +188,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
               <FindTheLookScene models={modelsRef.current} />
             ) : (
               <>
-                <VideoStream />
+                <VideoStream isNeedDetectOrientation={false}/>
               </>
             )}
           </div>

@@ -47,7 +47,7 @@ export function useSkincareProductQuery({
             {
               field: "skin_concern",
               value: skinConcernId,
-              condition_type: "eq",
+              condition_type: "finset",
             },
           ],
         });

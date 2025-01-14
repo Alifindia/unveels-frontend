@@ -278,7 +278,7 @@ export const detectFrame = async (
       ];
     });
 
-    const nms = await tf.image.nonMaxSuppressionAsync(boxes, scores, 500, 0.4, 0.003);
+    const nms = await tf.image.nonMaxSuppressionAsync(boxes, scores, 500, 0.4, 0.001);
     if (!nms) {
       throw new Error("Non-max suppression failed");
     }
