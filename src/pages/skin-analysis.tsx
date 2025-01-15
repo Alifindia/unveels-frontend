@@ -52,7 +52,7 @@ import { FilterProvider, useFilterContext } from "../context/filter-context";
 import { FindTheLookProvider, useFindTheLookContext } from "../context/find-the-look-context";
 import { getSkinConcernProductTypeIds } from "../api/attributes/skin_concern";
 import { Rating } from "../components/rating";
-import { useProductsVTOAll } from "../api/get-product";
+import { useProducts, useProductsVTOAll } from "../api/get-product";
 import { LinkButton } from "../App";
 
 interface Model {
@@ -147,7 +147,49 @@ function Main({ isArabic }: { isArabic: boolean }) {
       values: string[];
     };
   } = {
-    [capitalizeFirstLetter(tab)]: {
+    Wrinkles: {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds([
+        "Oily Skin",
+        "Dark Circles",
+        "Anti Aging",
+        "Wrinkles",
+        "Damaged Skin",
+        "Fine Lines",
+        "Sensitive Skin",
+        "Redness",
+        "Acne",
+        "Spots",
+        "Uneven Skintone",
+        "Dry Skin",
+        "Pores",
+        "Black Heads",
+        "Blemishes",
+        "Lip Lines"
+      ]),
+    },
+    Redness: {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds([
+        "Oily Skin",
+        "Dark Circles",
+        "Anti Aging",
+        "Wrinkles",
+        "Damaged Skin",
+        "Fine Lines",
+        "Sensitive Skin",
+        "Redness",
+        "Acne",
+        "Spots",
+        "Uneven Skintone",
+        "Dry Skin",
+        "Pores",
+        "Black Heads",
+        "Blemishes",
+        "Lip Lines"
+      ]),
+    },
+    Spots: {
       attributeName: "skin_concern",
       values: getSkinConcernProductTypeIds([
         "Oily Skin",
@@ -1484,17 +1526,9 @@ function ProductHorizontalList({
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
   // Using useProductsVTOAll hook with dependencies that trigger data refetch
-  const { data, refetch, isLoading, isFetching } = useProductsVTOAll({
+  const { data, refetch, isLoading, isFetching } = useProducts({
     product_type_key: attributeName,
     type_ids: values,
-    order: sort,
-    selectedFormation: selectedFormation,
-    selectedBrand: selectedBrand,
-    selectedCountry: selectedCountry,
-    selectedSizeOne: selectedSizeOne,
-    selectedSizeTwo: selectedSizeTwo,
-    maxPrice: maxPrice,
-    minPrice: minPrice,
   });
 
   // Whenever a filter context value changes, trigger refetch
