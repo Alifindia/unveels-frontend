@@ -39,8 +39,8 @@ interface MakeupContextProps {
   showEyeShadow: boolean;
   setShowEyeShadow: (show: boolean) => void;
 
-  eyeshadowMode: "One" | "Dual" | "Tri" | "Quad" | "Penta";
-  setEyeShadowMode: (mode: "One" | "Dual" | "Tri" | "Quad" | "Penta") => void;
+  eyeshadowMode: "One" | "Dual" | "Tri" | "Quad" | "Penta" | string;
+  setEyeShadowMode: (mode: "One" | "Dual" | "Tri" | "Quad" | "Penta" | string) => void;
 
   //Eyeliner
   showEyeliner: boolean;
@@ -296,7 +296,7 @@ export const MakeupProvider: React.FC<MakeupProviderProps> = ({
   );
 
   const [eyeshadowMode, setEyeShadowMode] = useState<
-    "One" | "Dual" | "Tri" | "Quad" | "Penta"
+    "One" | "Dual" | "Tri" | "Quad" | "Penta" | string
   >(
     (initialValues?.eyeshadowMode as
       | "One"

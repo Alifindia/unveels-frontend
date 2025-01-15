@@ -39,7 +39,7 @@ export const arabicToEnglishSection: { [key: string]: any } = {
   "انتقل الى قسم التمييز حدد التمييز" : "go to highlighter section select highlighter",
   "انتقل إلى قسم لون الشعر واختر لون الشعر" : "go to hair color section select hair color",
   "انتقل الى قسمي لون الشعر واختر لون الشعر" : "go to hair color section select hair color",
-}; 
+};
 
 export const arabicToEnglishNumbers: { [key: string]: string } = {
   "واحد": "one",
@@ -169,10 +169,10 @@ export const arabicToEnglishSetMode: { [key: string]: string } = {
   "مجموعه امبيرا" : "set ombre",
   "مجموعه ثلاثيه" : "set tri",
   "مجموعة ثلاثية" : "set tri",
-  "مجموعه رباعيه" : "set quadra",
-  "مجموعة رباعية" : "set quadra",
-  "مجموعة خماسية" : "set tetra",
-  "مجموعه خماسيه" : "set tetra",
+  "مجموعه رباعيه" : "set quad",
+  "مجموعة رباعية" : "set quad",
+  "مجموعة خماسية" : "set penta",
+  "مجموعه خماسيه" : "set penta",
 };
 
 export const arabicToEnglishSelectColor: { [key: string]: string } = {

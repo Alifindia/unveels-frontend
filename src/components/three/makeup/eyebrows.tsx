@@ -20,6 +20,10 @@ import {
   EYEBROW_TEXTURE_SIX,
   EYEBROW_TEXTURE_THREE,
   EYEBROW_TEXTURE_TWO,
+  EYEBROW_TEXTURE_ELEVEN,
+  EYEBROW_TEXTURE_TWELVE,
+  EYEBROW_TEXTURE_THIRTEEN,
+  EYEBROW_TEXTURE_FOURTEEN,
 } from "../../../utils/constants";
 
 interface EyebrowsProps extends MeshProps {
@@ -47,6 +51,10 @@ const EyebrowsInner: React.FC<EyebrowsProps> = ({
     EYEBROW_TEXTURE_EIGHT,
     EYEBROW_TEXTURE_NINE,
     EYEBROW_TEXTURE_TEN,
+    EYEBROW_TEXTURE_ELEVEN,
+    EYEBROW_TEXTURE_TWELVE,
+    EYEBROW_TEXTURE_THIRTEEN,
+    EYEBROW_TEXTURE_FOURTEEN,
   ]);
 
   // Memilih tekstur yang sesuai berdasarkan blushPattern

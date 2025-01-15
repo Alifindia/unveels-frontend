@@ -32,8 +32,8 @@ const maxColorsMap: {
   One: 1,
   Dual: 2,
   Tri: 3,
-  Quadra: 4,
-  Tetra: 5,
+  Quad: 4,
+  Penta: 5,
 };
 
 function ColorSelector() {
@@ -144,8 +144,8 @@ const modes = [
   { name: "One", count: 4 },
   { name: "Dual", count: 4 },
   { name: "Tri", count: 4 },
-  { name: "Quadra", count: 4 },
-  { name: "Tetra", count: 3 },
+  { name: "Quad", count: 4 },
+  { name: "Penta", count: 3 },
 ];
 
 function ModeSelector() {

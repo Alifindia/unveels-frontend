@@ -17,7 +17,7 @@ import { getEyeMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../../../../utils/other";
 
-export function EyeShadowSelector() {  
+export function EyeShadowSelector() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
@@ -48,8 +48,8 @@ const maxColorsMap: {
   One: 1,
   Dual: 2,
   Tri: 3,
-  Quadra: 4,
-  Tetra: 5,
+  Quad: 4,
+  Penta: 5,
 };
 
 function ColorSelector() {
@@ -80,7 +80,7 @@ function ColorSelector() {
   });
 
   const extracted_sub_colors =
-    selectedMode == "One" || selectedMode == "Tetra"
+    selectedMode == "One" || selectedMode == "Penta"
       ? extractUniqueCustomAttributes(data?.items ?? [], "hexacode").flatMap(
           (item) => item.split(","),
         )
@@ -151,7 +151,7 @@ function ColorSelector() {
         >
           <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
-        {(selectedMode == "One" || selectedMode == "Tetra") &&
+        {(selectedMode == "One" || selectedMode == "Penta") &&
         extracted_sub_colors
           ? extracted_sub_colors.map((color, index) => (
               <ColorPalette
@@ -216,8 +216,8 @@ const modes = [
   { name: "One", count: 4 },
   { name: "Dual", count: 4 },
   { name: "Tri", count: 4 },
-  { name: "Quadra", count: 4 },
-  { name: "Tetra", count: 3 },
+  { name: "Quad", count: 4 },
+  { name: "Penta", count: 3 },
 ];
 
 function ModeSelector() {
