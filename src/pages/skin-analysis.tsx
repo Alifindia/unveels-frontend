@@ -47,11 +47,13 @@ import { GraphModel } from "@tensorflow/tfjs-converter";
 import { base64ToImage } from "../utils/imageProcessing";
 import { detectFrame } from "../inference/skinAnalysisInference";
 import { Link } from "react-router-dom";
-import { AllProductsPage } from "../components/all-product/all-product-page";
 import { FindTheLookItems } from "../types/findTheLookItems";
-import { FilterProvider } from "../context/filter-context";
-import { FindTheLookProvider } from "../context/find-the-look-context";
+import { FilterProvider, useFilterContext } from "../context/filter-context";
+import { FindTheLookProvider, useFindTheLookContext } from "../context/find-the-look-context";
 import { getSkinConcernProductTypeIds } from "../api/attributes/skin_concern";
+import { Rating } from "../components/rating";
+import { useProductsVTOAll } from "../api/get-product";
+import { LinkButton } from "../App";
 
 interface Model {
   net: tf.GraphModel;
@@ -147,7 +149,24 @@ function Main({ isArabic }: { isArabic: boolean }) {
   } = {
     [capitalizeFirstLetter(tab)]: {
       attributeName: "skin_concern",
-      values: getSkinConcernProductTypeIds([capitalizeFirstLetter(tab)]),
+      values: getSkinConcernProductTypeIds([
+        "Oily Skin",
+        "Dark Circles",
+        "Anti Aging",
+        "Wrinkles",
+        "Damaged Skin",
+        "Fine Lines",
+        "Sensitive Skin",
+        "Redness",
+        "Acne",
+        "Spots",
+        "Uneven Skintone",
+        "Dry Skin",
+        "Pores",
+        "Black Heads",
+        "Blemishes",
+        "Lip Lines"
+      ]),
     },
   };
 
@@ -353,7 +372,6 @@ function Main({ isArabic }: { isArabic: boolean }) {
                 setView("face");
               }}
               groupedItemsData={groupedItemsData}
-              name={tab}
               mapTypes={mapTypes}
             />
           </div>
@@ -1312,6 +1330,275 @@ function ProblemSection({
         </h2>
 
         <ProductList skinConcern={title} />
+      </div>
+    </div>
+  );
+}
+
+export function AllProductsPage({
+  onClose,
+  groupedItemsData,
+  mapTypes,
+}: {
+  onClose: () => void;
+  groupedItemsData: {
+    makeup: FindTheLookItems[];
+    accessories: FindTheLookItems[];
+  };
+  mapTypes: {
+    [key: string]: {
+      attributeName: string;
+      values: string[];
+    };
+  };
+}) {
+  const [tab] = useState<"makeup" | "accessories">("makeup");
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [sorting, setSorting] = useState(false);
+  const { sort, setSort } = useFilterContext();
+  const { selectedItems: cart, dispatch } = useFindTheLookContext();
+  const { t } = useTranslation();
+  const addItemToCart = () => {};
+
+  return (
+    <div className="fixed inset-0 flex flex-col bg-black px-2 font-sans text-white">
+      {isFilterVisible && (
+        <div
+          className="fixed inset-0 z-40 bg-black opacity-50"
+          onClick={() => setIsFilterVisible(false)}
+        ></div>
+      )}
+      {/* Navigation */}
+      <div className="flex items-center justify-between px-4 py-2">
+        <button type="button" className="size-6" onClick={() => onClose()}>
+          <ChevronLeft className="h-6 w-6" />
+        </button>
+        <div className="flex items-center justify-end space-x-2.5">
+          <Heart className="size-6" />
+          <Icons.bag className="size-6" />
+        </div>
+      </div>
+
+      {/* Makeup Tab */}
+      {tab === "makeup" ? (
+        <MakeupAllView makeups={groupedItemsData.makeup} mapTypes={mapTypes} />
+      ) : (
+        <></>
+      )}
+      <div className="h-20">
+        <div className="mx-auto flex max-w-sm space-x-2.5 pb-6 pt-4 lg:space-x-6">
+          {cart.items.length > 0 ? (
+            <>
+              <LinkButton
+                to={`/virtual-try-on-product?sku=${cart.items
+                  .map((product) => product.sku)
+                  .join(",")}`}
+                className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
+              >
+                {t("viewftl.try_now")}
+              </LinkButton>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
+              >
+                {t("viewftl.try_now")}
+              </button>
+            </>
+          )}
+
+          <button
+            type="button"
+            className="flex h-10 w-full items-center justify-center border border-white bg-white text-xs font-semibold text-black"
+            onClick={addItemToCart}
+          >
+            {t("viewftl.add_all_to_cart")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MakeupAllView({
+  makeups,
+  mapTypes,
+}: {
+  makeups: FindTheLookItems[];
+  mapTypes: {
+    [key: string]: {
+      attributeName: string;
+      values: string[];
+    };
+  };
+}) {
+  const validMakeups = makeups.filter((category) => mapTypes[category.label]);
+
+  return (
+    <div className="h-full flex-1 overflow-y-auto px-5">
+      <div className="space-y-14">
+        {validMakeups.map((category) => (
+          <ProductHorizontalList
+            category={category.label}
+            key={category.section}
+            mapTypes={mapTypes}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProductHorizontalList({
+  category,
+  mapTypes,
+}: {
+  category: string;
+  mapTypes: {
+    [key: string]: {
+      attributeName: string;
+      values: string[];
+    };
+  };
+}) {
+  const { selectedItems: cart, dispatch } = useFindTheLookContext();
+  const {
+    selectedBrand,
+    selectedCountry,
+    selectedSizeOne,
+    selectedSizeTwo,
+    minPrice,
+    maxPrice,
+    selectedFormation,
+    sort,
+  } = useFilterContext();
+
+  if (!mapTypes[category]) {
+    console.warn(`Category "${category}" is not defined in mapTypes.`);
+    return null;
+  }
+  const { t } = useTranslation();
+  const { attributeName, values } = mapTypes[category];
+  const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
+
+  // Using useProductsVTOAll hook with dependencies that trigger data refetch
+  const { data, refetch, isLoading, isFetching } = useProductsVTOAll({
+    product_type_key: attributeName,
+    type_ids: values,
+    order: sort,
+    selectedFormation: selectedFormation,
+    selectedBrand: selectedBrand,
+    selectedCountry: selectedCountry,
+    selectedSizeOne: selectedSizeOne,
+    selectedSizeTwo: selectedSizeTwo,
+    maxPrice: maxPrice,
+    minPrice: minPrice,
+  });
+
+  // Whenever a filter context value changes, trigger refetch
+  useEffect(() => {
+    refetch();
+  }, [
+    selectedBrand,
+    selectedCountry,
+    selectedSizeOne,
+    selectedSizeTwo,
+    minPrice,
+    maxPrice,
+    selectedFormation,
+    sort,
+    refetch, // Ensure refetch is included to avoid stale closures
+  ]);
+
+  const { addItemToCart } = useCartContext();
+
+  const handleAddToCart = async (id: string, url: string) => {
+    try {
+      await addItemToCart(id, url);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
+
+  return (
+    <div key={category}>
+      <div className="py-4">
+        <h2 className="text-base text-[#E6E5E3]">Skin Concern</h2>
+      </div>
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-6">
+        {isLoading || isFetching ? (
+          <LoadingProducts /> // Show loading spinner when data is being fetched
+        ) : (
+          data?.items.map((product) => {
+            const imageUrl =
+              mediaUrl(product.media_gallery_entries[0].file) ??
+              "https://picsum.photos/id/237/200/300";
+
+            return (
+              <div
+                key={product.id}
+                className="rounded-xl shadow"
+                onClick={() => {
+                  window.open(
+                    `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                    "_blank",
+                  );
+                }}
+              >
+                <div className="relative aspect-square w-full overflow-hidden">
+                  <img
+                    src={imageUrl}
+                    alt="Product"
+                    className="h-full w-full rounded object-cover"
+                  />
+                </div>
+
+                <h3 className="line-clamp-2 h-10 pt-2.5 text-xs font-semibold text-white">
+                  {product.name}
+                </h3>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-white/60">
+                    <BrandName
+                      brandId={getProductAttributes(product, "brand")}
+                    />
+                  </p>
+                  <div className="flex flex-wrap items-center justify-end gap-x-1">
+                    <span className="text-sm font-bold text-white">
+                      {currencySymbol}{(product.price * rate).toFixed(3)}
+                    </span>
+                  </div>
+                </div>
+                <Rating rating={4} />
+                <div className="flex space-x-1 pt-1">
+                  <button
+                    type="button"
+                    className="flex h-10 w-full items-center justify-center border border-white text-xs font-semibold text-white"
+                    onClick={() => {
+                      handleAddToCart(
+                        product.id.toString(),
+                        `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      );
+                    }}
+                  >
+                    {t("viewftl.addcart")}
+                  </button>
+                  <button
+                    type="button"
+                    className="flex h-10 w-full items-center justify-center border border-white bg-white text-xs font-semibold text-black"
+                    onClick={() => {
+                      dispatch({ type: "add", payload: product });
+                    }}
+                  >
+                    {t("viewftl.select")}
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );
