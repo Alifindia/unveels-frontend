@@ -309,7 +309,7 @@ function MatchedShades() {
   const [selectedTne, setSelectedTone] = useState(tone_types[0]);
   const { skinType, hexSkin } = useSkinColor();
   const { setView } = useFindTheLookContext();
-
+  const { setShowFoundation, setFoundationColor }= useMakeup()
   const skinToneId = skin_tones.find((tone) => tone.name === skinType)?.id;
 
   const { data } = useSkinToneProductQuery({
@@ -339,7 +339,11 @@ function MatchedShades() {
                 style={{
                   background: option.color,
                 }}
-                onClick={() => setSelectedTone(option)}
+                onClick={() => {
+                  setShowFoundation(true);
+                  setFoundationColor(option.color);
+                  setSelectedTone(option)
+                }}
               >
                 {t(
                   `tone_types.${option.name.toLocaleLowerCase().replace(" ", "_")}`,
@@ -428,7 +432,11 @@ function OtherShades() {
                 ? "border-white"
                 : "border-transparent",
             )}
-            onClick={() => setSelectedTone(tone)}
+            onClick={() => {
+              setShowFoundation(true);
+              setFoundationColor(tone.color);
+              setSelectedTone(tone)
+            }}
           >
             <div
               className="size-3 rounded-full"

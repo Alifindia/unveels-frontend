@@ -28,23 +28,8 @@ export function VirtualAvatar() {
 
     const audioSrc = await makeSpeech(incomingText, incomingLanguage);
 
-    if ((window as any).flutter_inappwebview) {
-      (window as any).flutter_inappwebview
-        .callHandler("isSpeak", "true")
-        .then((result: any) => {
-          console.log("Flutter responded with:", result);
-        })
-        .catch((error: any) => {
-          console.error("Error calling Flutter handler:", error);
-        });
-    }
-
-    setTimeout(() => {
-      setBlendshape(audioSrc.data.blendData);
-      setFinishTalking(false);
-      setSpeak(true);
-      setPlaying(true);
-    }, 500);
+    setBlendshape(audioSrc.data.blendData);
+    setAudioSource(`${talkingAvatarHost}${audioSrc.data.filename}`);
   };
 
   useEffect(() => {
@@ -64,7 +49,7 @@ export function VirtualAvatar() {
       setPlaying(false);
     }, 500);
     console.log("FINISH TALKING", condition);
-  }
+  };
 
   return (
     <div className="relative mx-auto flex h-full min-h-dvh w-full flex-col bg-[linear-gradient(180deg,#000000_0%,#0F0B02_41.61%,#47330A_100%)]">
@@ -76,6 +61,18 @@ export function VirtualAvatar() {
           setFinishTalking={(condition) => onFinishTalking(condition)}
         />
       </div>
+      <ReactAudioPlayer
+        src={audioSource ?? undefined}
+        ref={audioPlayer}
+        onEnded={() => onFinishTalking(false)}
+        onCanPlayThrough={() => console.log("READY")}
+        onCanPlay={() => {
+          setFinishTalking(false);
+          setSpeak(true);
+          setPlaying(true);
+        }}
+        autoPlay
+      />
     </div>
   );
 }
