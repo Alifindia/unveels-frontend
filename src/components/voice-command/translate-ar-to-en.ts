@@ -47,9 +47,9 @@ export const arabicToEnglishMap: { [key: string]: any } = {
   "مجموعه امبيرا" : "set ombre",
   "مجموعه ثلاثيه" : "set tri",
   "مجموعة ثلاثية" : "set tri",
-  "مجموعه رباعيه" : "set quadra",
-  "مجموعة رباعية" : "set quadra",
-  "مجموعة خماسية" : "set tetra",
-  "مجموعه خماسيه" : "set tetra",
+  "مجموعه رباعيه" : "set quad",
+  "مجموعة رباعية" : "set quad",
+  "مجموعة خماسية" : "set penta",
+  "مجموعه خماسيه" : "set penta",
   "اختر لون واحدا" : "select color one",
 };

@@ -1771,8 +1771,15 @@ export const EYEBROW_TEXTURE_NINE =
   "/media/unveels/vto-assets/texture/eyebrow/eyebrow-9.png";
 export const EYEBROW_TEXTURE_TEN =
   "/media/unveels/vto-assets/texture/eyebrow/eyebrow-10.png";
-
-// head occluder
+export const EYEBROW_TEXTURE_ELEVEN =
+  "/media/unveels/vto-assets/texture/eyebrow/eyebrow-11.png";
+export const EYEBROW_TEXTURE_TWELVE =
+  "/media/unveels/vto-assets/texture/eyebrow/eyebrow-12.png";
+export const EYEBROW_TEXTURE_THIRTEEN =
+  "/media/unveels/vto-assets/texture/eyebrow/eyebrow-13.png";
+export const EYEBROW_TEXTURE_FOURTEEN =
+  "/media/unveels/vto-assets/texture/eyebrow/eyebrow-14.png";
+  // head occluder
 export const HEAD_OCCLUDER =
   "/media/unveels/vto-assets/occluder/headOccluder.glb";
 

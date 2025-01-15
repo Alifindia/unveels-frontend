@@ -218,7 +218,7 @@ export function useFunctionCommand() {
     const lastSegment = getLastPathSegment(pathname);
     setSectionName(lastSegment);
   }, [pathname]);
-  
+
   const sectionNameRef = useRef(sectionName);
 
   useEffect(() => {
@@ -289,7 +289,7 @@ export function useFunctionCommand() {
   const startListening = () => {
     const browserLanguage = navigator.language || "en-GB";
     console.log("Detected browser language:", browserLanguage);
-  
+
     if (!recognitionRef.current) {
       recognitionRef.current = initializeRecognition(browserLanguage);
     }
@@ -341,24 +341,24 @@ export function useFunctionCommand() {
         nine: 9,
         ten: 10,
       };
-      
+
     if (selectProduct.test(transcript)) {
       let productNumber = transcript.match(selectProduct)?.[1]; // Ambil angka atau kata dari grup pertama
-    
+
       // Jika nilai adalah kata, konversikan ke angka
       if (productNumber && isNaN(Number(productNumber))) {
         productNumber = numberWords[productNumber.toLowerCase()]?.toString();
       }
-    
+
       // Konversi ke number
       const numericProductNumber = Number(productNumber);
-    
+
       // Check if the product number is different before setting the state
       if (!isNaN(numericProductNumber) && numericProductNumber !== Number(selectedProductNumber)) {
         setSelectedProductNumber(numericProductNumber);
       }
     }
-      
+
     // Check for section
     if (sectionRegex.test(transcript)) {
       const section = capitalizeWords(
@@ -389,9 +389,9 @@ export function useFunctionCommand() {
       );
       const disallowedPatterns = [/pattern 1/i, /pattern 2/i, /pattern 3/i, /pattern 4/i, /pattern 5/i]
       const isInvalid = disallowedPatterns.some((pattern) => pattern.test(colorMode));
-    
+
       if (!isInvalid) handleSetColorMode(colorMode);
-    }    
+    }
     // Check for color texture
     if (textureModeRegex.test(transcript)) {
       const textureMode = capitalizeWords(
@@ -673,8 +673,8 @@ export function useFunctionCommand() {
         One: 1,
         Dual: 2,
         Tri: 3,
-        Quadra: 4,
-        Tetra: 5,
+        Quad: 4,
+        Penta: 5,
       };
       const maxColors = maxColorsMap[selectedModeEyeShadow] || 1;
       const datauseEyeshadowsQuery: any = queryClient.getQueryData([
