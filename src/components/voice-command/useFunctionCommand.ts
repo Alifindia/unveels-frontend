@@ -47,7 +47,7 @@ import { useHairColorContext } from "../../pages/vto/hair/hair-color/hair-color-
 import { useQueryClient } from "@tanstack/react-query";
 import { useSelecProductNumberContext } from "../../pages/vto/select-product-context";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { arabicToEnglishMap } from "./translate-ar-to-en";
+import { arabicToEnglishSection, translateSelectProduct } from "./translate-ar-to-en";
 
 export function useFunctionCommand() {
   const navigate = useNavigate();
@@ -228,12 +228,13 @@ export function useFunctionCommand() {
 
   const translateArabicToEnglish = (text: string) => {
     const trimmedText = text.trim();
-    let result = arabicToEnglishMap[trimmedText] || null;
-    console.log(result)
-    if (result) {
+    let selectResult = translateSelectProduct(trimmedText);
+    let result = arabicToEnglishSection[trimmedText] || null;
+    console.log(selectResult)
+    if (selectResult || result) {
       console.log(`Translation found for: ${trimmedText}, resetting value.`);
       result = null;
-      return arabicToEnglishMap[trimmedText];
+      return selectResult || result
     } else {
       return trimmedText;
     }
