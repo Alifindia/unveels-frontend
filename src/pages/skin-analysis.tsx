@@ -580,7 +580,7 @@ function BottomContent({
     return (
       <AnalysisResults
         onClose={() => {
-          setView("face");
+          setView("problems");
         }}
         isArabic={isArabic}
       />
