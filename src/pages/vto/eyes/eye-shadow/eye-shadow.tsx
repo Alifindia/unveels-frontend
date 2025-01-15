@@ -276,7 +276,7 @@ function ModeSelector() {
                 <img
                   src={`/media/unveels/vto/eyeshadows/eyeshadow-${currentMode.name.toLowerCase()}-${index + 1}.png`}
                   alt="Eye shadow"
-                  className="size-[35px] shrink-0 sm:size-[50px] lg:size-[65px]"
+                  className="size-[25px] shrink-0 sm:size-[40px] lg:size-[55px]"
                 />
               </button>
             ))}

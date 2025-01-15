@@ -64,3 +64,23 @@ export const skin_concerns = [
     value: "5840",
   },
 ];
+
+export const faceMakeupProductTypesFilter = (productTypes: String[]) => {
+  const filteredFaceProductTypes = skin_concerns
+    .filter((product) => productTypes.includes(product.label))
+    .map((product) => product.value)
+    .join(",");
+  return filteredFaceProductTypes;
+};
+
+export const faceSkinConcernProductTypesMap = skin_concerns.reduce(
+  (acc, { label, value }) => {
+    acc[label] = value;
+    return acc;
+  },
+  {} as Record<string, string>,
+);
+
+export function getSkinConcernProductTypeIds(labels: string[]): string[] {
+  return labels.map((label) => faceSkinConcernProductTypesMap[label]);
+}

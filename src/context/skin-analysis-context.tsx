@@ -8,8 +8,8 @@ interface SkinAnalysisContextProps {
   tab: string;
   setTab: (tab: string) => void;
 
-  view: "face" | "problems" | "results";
-  setView: (view: "face" | "problems" | "results") => void;
+  view: "face" | "problems" | "results" | "all_categories";
+  setView: (view: "face" | "problems" | "results" | "all_categories") => void;
 
   skinAnalysisData: SkinAnalysisItem[];
   setSkinAnalysisData: React.Dispatch<React.SetStateAction<SkinAnalysisItem[]>>;
@@ -41,7 +41,8 @@ export const SkinAnalysisProvider: React.FC<SkinAnalysisProviderProps> = ({
   children,
 }) => {
   const [tab, setTab] = useState<string>("acne");
-  const [view, setView] = useState<"face" | "problems" | "results">("face");
+  const [view, setView] = useState<"face" | "problems" | "results" | "all_categories">("face");
+  console.log(setView)
   const [skinAnalysisData, setSkinAnalysisData] =
     useState<SkinAnalysisItem[]>(skinAnalysisDataItem);
 

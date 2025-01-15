@@ -127,7 +127,7 @@ function ShapeSelector() {
             <img
               src={nailshapes[index]}
               alt="Nail shape"
-              className="size-[35px] rounded sm:size-[50px] lg:size-[65px]"
+              className="size-[25px] rounded sm:size-[40px] lg:size-[55px]"
             />
           </button>
         ))}

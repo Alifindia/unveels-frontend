@@ -30,6 +30,7 @@ import {
 import { useCartContext } from "../context/cart-context";
 import { useTranslation } from "react-i18next";
 import { getCookie, getCurrencyAndRate } from "../utils/other";
+import { useSearchParams } from "react-router-dom";
 
 export function SeeImprovement() {
   const { i18n } = useTranslation();
@@ -150,12 +151,16 @@ const tabs = [
 function SkinProblems({
   onClose,
   setCollapsed,
+  skinConcerns
 }: {
   onClose: () => void;
   setCollapsed: (collapsed: boolean) => void;
+  skinConcerns?: string | null
 }) {
   const { tab, setTab, getTotalScoreByLabel } = useSkinAnalysis();
-
+  useEffect(() => {
+    if(skinConcerns) setTab(skinConcerns)
+  }, [skinConcerns]);
   return (
     <>
       <div className="relative space-y-2 bg-black/10 p-2 px-4 pb-4 shadow-lg backdrop-blur-sm">
@@ -312,14 +317,16 @@ interface BottomContentProps {
 function BottomContent({ setCollapsed, isArabic }: BottomContentProps) {
   const { criterias, setCriterias } = useCamera();
   const { view, setView } = useSkinAnalysis();
-
-  if (criterias.isCaptured) {
+  const [searchParams] = useSearchParams();
+  const skinConcern = searchParams.get("skinConcern"); // Mengambil parameter "skinConcern"=
+  if (criterias.isCaptured || skinConcern) {
     return (
       <SkinProblems
         onClose={() => {
           setView("face");
         }}
         setCollapsed={setCollapsed}
+        skinConcerns={skinConcern}
       />
     );
   }

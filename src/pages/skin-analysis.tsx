@@ -46,6 +46,12 @@ import { getCookie, getCurrencyAndRate } from "../utils/other";
 import { GraphModel } from "@tensorflow/tfjs-converter";
 import { base64ToImage } from "../utils/imageProcessing";
 import { detectFrame } from "../inference/skinAnalysisInference";
+import { Link } from "react-router-dom";
+import { AllProductsPage } from "../components/all-product/all-product-page";
+import { FindTheLookItems } from "../types/findTheLookItems";
+import { FilterProvider } from "../context/filter-context";
+import { FindTheLookProvider } from "../context/find-the-look-context";
+import { getSkinConcernProductTypeIds } from "../api/attributes/skin_concern";
 
 interface Model {
   net: tf.GraphModel;
@@ -69,9 +75,13 @@ export function SkinAnalysis() {
     <CameraProvider>
       <InferenceProvider>
         <SkinAnalysisProvider>
-          <div className="h-full min-h-dvh">
-            <Main isArabic={isArabic} />
-          </div>
+          <FindTheLookProvider>
+            <FilterProvider>
+              <div className="h-full min-h-dvh">
+                <Main isArabic={isArabic} />
+              </div>
+            </FilterProvider>
+          </FindTheLookProvider>
         </SkinAnalysisProvider>
       </InferenceProvider>
     </CameraProvider>
@@ -92,7 +102,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
     setIsInferenceRunning,
   } = useInferenceContext();
 
-  const { view } = useSkinAnalysis();
+  const { view, setView, tab } = useSkinAnalysis();
 
   const [inferenceResult, setInferenceResult] = useState<FaceResults[] | null>(
     null,
@@ -119,6 +129,34 @@ function Main({ isArabic }: { isArabic: boolean }) {
 
   const [loading, setLoading] = useState({ loading: true, progress: 0 });
   const [model, setModel] = useState<Model | null>(null);
+  const capitalizeFirstLetter = (str: string) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+  const [groupedItemsData, setGroupedItemsData] = useState<{
+    makeup: FindTheLookItems[];
+    accessories: FindTheLookItems[];
+  }>({
+    makeup: [],
+    accessories: [],
+  });
+  const mapTypes: {
+    [key: string]: {
+      attributeName: string;
+      values: string[];
+    };
+  } = {
+    [capitalizeFirstLetter(tab)]: {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds([capitalizeFirstLetter(tab)]),
+    },
+  };
+
+  useEffect(() => {
+    setGroupedItemsData({
+      makeup: [{ label: capitalizeFirstLetter(tab), section: "makeup" }],
+      accessories: [],
+    });
+  }, [tab]);
 
   useEffect(() => {
     const loadModel = async () => {
@@ -299,7 +337,27 @@ function Main({ isArabic }: { isArabic: boolean }) {
           </>
         </div>
         <TopNavigation cart={isInferenceCompleted} />
-
+        {view === "all_categories" && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 10,
+            }}
+          >
+            <AllProductsPage
+              onClose={() => {
+                setView("face");
+              }}
+              groupedItemsData={groupedItemsData}
+              name={tab}
+              mapTypes={mapTypes}
+            />
+          </div>
+        )}
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
           {!criterias.isCaptured && <VideoScene isArabic={isArabic} />}
           <MainContent
@@ -349,7 +407,7 @@ const tabs = [
 ] as const;
 
 function SkinProblems({ onClose }: { onClose: () => void }) {
-  const { tab, setTab, getTotalScoreByLabel } = useSkinAnalysis();
+  const { tab, setTab, getTotalScoreByLabel, setView } = useSkinAnalysis();
   const { t } = useTranslation();
   const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
@@ -412,7 +470,9 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
         <div className="w-full text-right">
           <button
             className="text-[0.625rem] text-white sm:py-2"
-            onClick={() => {}}
+            onClick={() => {
+              setView("all_categories");
+            }}
           >
             {t("view_all")}
           </button>
@@ -460,7 +520,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
   const { data } = useSkincareProductQuery({
     skinConcern,
   });
-
+  console.log(data)
   const { addItemToCart } = useCartContext();
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
@@ -540,7 +600,9 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                     event.stopPropagation();
                   }}
                 >
-                  {t("viewskinan.seeimprovement")}
+                  <Link to={`/see-improvement?skinConcern=${skinConcern}`}>
+                    {t("viewskinan.seeimprovement")}
+                  </Link>
                 </button>
               </div>
             </div>
