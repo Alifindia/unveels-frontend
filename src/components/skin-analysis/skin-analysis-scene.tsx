@@ -150,7 +150,7 @@ export function SkinAnalysisScene({ data }: SkinAnalysisSceneProps) {
       style={{ zIndex: 0 }}
     >
       {/* Three.js Canvas */}
-      <Canvas
+      {/* <Canvas
         className="absolute left-0 top-0 h-full w-full"
         style={{ zIndex: 99 }}
         orthographic
@@ -162,7 +162,7 @@ export function SkinAnalysisScene({ data }: SkinAnalysisSceneProps) {
           landmarks={landmarks}
           landmarksRef={landmarkRef}
         />
-      </Canvas>
+      </Canvas> */}
 
       {/* Overlay Canvas untuk Labels */}
       <canvas

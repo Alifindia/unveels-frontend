@@ -4,7 +4,6 @@ import { BboxLandmark } from "../../types/bboxLandmark";
 import { adjustBoundingBoxes } from "../../utils/boundingBoxUtils";
 import { skinAnalysisDataItem } from "../../utils/constants";
 import { FaceResults } from "../../types/faceResults";
-import { useTranslation } from "react-i18next";
 
 interface OverlayCanvasProps {
   image: HTMLImageElement;
@@ -29,12 +28,11 @@ function OverlayCanvas({
   landmarks,
   onLabelClick,
 }: OverlayCanvasProps) {
-  const { t } = useTranslation();
   const featureColors: { [key: string]: string } = {
     spots: "255, 0, 0", // Merah
     acne: "9, 183, 26", // Hijau
     blackhead: "0, 0, 0", // Hitam
-    pores: "0, 0, 255", // Biru
+    pore: "0, 0, 255", // Biru
   };
 
   const innerRadius = 0;
@@ -109,7 +107,7 @@ function OverlayCanvas({
         ];
 
         adjustedResults.forEach((bbox) => {
-          if (!validLabels.includes(bbox.label)) return;
+          // if (!validLabels.includes(bbox.label)) return;
 
           const [leftIndex, topIndex, rightIndex, bottomIndex] = bbox.box;
           if (
@@ -164,7 +162,7 @@ function OverlayCanvas({
 
           ctx.font = "12px Arial";
           ctx.fillStyle = "white";
-          ctx.fillText(bbox.label, labelX, labelY - 5);
+          ctx.fillText(`${bbox.label} ${bbox.score.toFixed(2)}%`, labelX, labelY - 5);
 
           const textWidth = ctx.measureText(bbox.label).width;
           const underlineEndX = labelX + textWidth;
@@ -185,77 +183,77 @@ function OverlayCanvas({
           });
         });
 
-        skinAnalysisDataItem.forEach((dataItem) => {
-          const rgbColor = featureColors[dataItem.label] || "255, 255, 255";
+        // skinAnalysisDataItem.forEach((dataItem) => {
+        //   const rgbColor = featureColors[dataItem.label] || "255, 255, 255";
 
-          // Calculate center position for each landmark point
-          const centerX = landmarks[dataItem.point].x * drawWidth + offsetX;
-          const centerY = landmarks[dataItem.point].y * drawHeight + offsetY;
+        //   // Calculate center position for each landmark point
+        //   const centerX = landmarks[dataItem.point].x * drawWidth + offsetX;
+        //   const centerY = landmarks[dataItem.point].y * drawHeight + offsetY;
 
-          // Create a gradient for each data point
-          const gradient = ctx.createRadialGradient(
-            centerX,
-            centerY,
-            innerRadius,
-            centerX,
-            centerY,
-            outerRadius,
-          );
+        //   // Create a gradient for each data point
+        //   const gradient = ctx.createRadialGradient(
+        //     centerX,
+        //     centerY,
+        //     innerRadius,
+        //     centerX,
+        //     centerY,
+        //     outerRadius,
+        //   );
 
-          gradient.addColorStop(0, `rgba(${rgbColor}, 0.8)`);
-          gradient.addColorStop(1, `rgba(${rgbColor}, 0)`);
+        //   gradient.addColorStop(0, `rgba(${rgbColor}, 0.8)`);
+        //   gradient.addColorStop(1, `rgba(${rgbColor}, 0)`);
 
-          ctx.fillStyle = gradient;
+        //   ctx.fillStyle = gradient;
 
-          // Draw outer circle
-          ctx.beginPath();
-          ctx.arc(centerX, centerY, outerRadius, 0, 2 * Math.PI);
-          ctx.fill();
-          ctx.closePath();
+        //   // Draw outer circle
+        //   ctx.beginPath();
+        //   ctx.arc(centerX, centerY, outerRadius, 0, 2 * Math.PI);
+        //   ctx.fill();
+        //   ctx.closePath();
 
-          // Draw small white center dot
-          ctx.beginPath();
-          ctx.arc(centerX, centerY, 2, 0, 2 * Math.PI);
-          ctx.fillStyle = "white";
-          ctx.fill();
-          ctx.closePath();
+        //   // Draw small white center dot
+        //   ctx.beginPath();
+        //   ctx.arc(centerX, centerY, 2, 0, 2 * Math.PI);
+        //   ctx.fillStyle = "white";
+        //   ctx.fill();
+        //   ctx.closePath();
 
-          // Position label text slightly offset from center position
-          const labelX = centerX + 50;
-          const labelY = centerY + 50;
+        //   // Position label text slightly offset from center position
+        //   const labelX = centerX + 50;
+        //   const labelY = centerY + 50;
 
-          // Draw line from center to label
-          ctx.beginPath();
-          ctx.moveTo(centerX, centerY);
-          ctx.lineTo(labelX, labelY);
-          ctx.strokeStyle = "white";
-          ctx.stroke();
+        //   // Draw line from center to label
+        //   ctx.beginPath();
+        //   ctx.moveTo(centerX, centerY);
+        //   ctx.lineTo(labelX, labelY);
+        //   ctx.strokeStyle = "white";
+        //   ctx.stroke();
 
-          // Draw label text
-          ctx.font = "12px Arial";
-          ctx.fillStyle = "white";
-          ctx.fillText(t(`skinlabel.${dataItem.label}`), labelX, labelY - 5);
+        //   // Draw label text
+        //   ctx.font = "12px Arial";
+        //   ctx.fillStyle = "white";
+        //   ctx.fillText(dataItem.label, labelX, labelY - 5);
 
-          // Draw underline for label text
-          const textWidth = ctx.measureText(dataItem.label).width;
-          const underlineEndX = labelX + textWidth;
-          const underlineY = labelY + 5;
+        //   // Draw underline for label text
+        //   const textWidth = ctx.measureText(dataItem.label).width;
+        //   const underlineEndX = labelX + textWidth;
+        //   const underlineY = labelY + 5;
 
-          ctx.beginPath();
-          ctx.moveTo(labelX, labelY);
-          ctx.lineTo(underlineEndX, underlineY);
-          ctx.strokeStyle = "white";
-          ctx.stroke();
+        //   ctx.beginPath();
+        //   ctx.moveTo(labelX, labelY);
+        //   ctx.lineTo(underlineEndX, underlineY);
+        //   ctx.strokeStyle = "white";
+        //   ctx.stroke();
 
-          // Store label bounding box for click detection
-          labelBoundingBoxesRef.current.push({
-            label: dataItem.label,
-            x: labelX,
-            y: labelY - 20,
-            width: textWidth,
-            height: 20,
-          });
-        });
+        //   // Store label bounding box for click detection
+        //   labelBoundingBoxesRef.current.push({
+        //     label: dataItem.label,
+        //     x: labelX,
+        //     y: labelY - 20,
+        //     width: textWidth,
+        //     height: 20,
+        //   });
+        // });
 
         console.log("Adjusted Results:", adjustedResults);
         console.log("Label Bounding Boxes:", labelBoundingBoxesRef.current);

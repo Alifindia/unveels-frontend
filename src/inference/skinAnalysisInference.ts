@@ -1,5 +1,6 @@
 import * as tf from "@tensorflow/tfjs";
 import { SkinAnalysisResult } from "../types/skinAnalysisResult";
+import { FaceResults } from "../types/faceResults";
 const labels = [
   "acne",
   "blackhead",
@@ -17,24 +18,16 @@ const labels = [
   "wrinkles",
 ]
 
-interface DetectionBox {
-  box: number[];
-  score: number;
-  klass: number;
-  label: string;
-  color: string;
-}
-
 export const renderBoxes = (
   ctx: CanvasRenderingContext2D,
-  boxesToDraw: DetectionBox[]
+  boxesToDraw: FaceResults[]
 ): void => {
   // font configs
   const font = `10px Roboto, sans-serif`;
   ctx.font = font;
   ctx.textBaseline = "top";
 
-  boxesToDraw.forEach((detection: DetectionBox) => {
+  boxesToDraw.forEach((detection: FaceResults) => {
     // filter based on class threshold
     const score = (detection.score * 100).toFixed(1);
 
@@ -86,20 +79,20 @@ export class Colors {
    */
   constructor() {
     this.palette = [
-      "#FF7F7F", // acne
+      "#F72585", // acne
       "#4A4A4A", // blackhead
-      "#8B4513", // dark circle
-      "#FFD700", // droopy lower eyelid
-      "#FF6347", // droopy upper eyelid
+      "#6B13B1", // dark circle
+      "#14A086", // droopy lower eyelid
+      "#F72585", // droopy upper eyelid
       "#FFE4B5", // dry
-      "#D2B48C", // eyebag
-      "#00CED1", // moistures
-      "#FFA07A", // oily
-      "#8A2BE2", // pore
-      "#FF4500", // skinredness
-      "#DA70D6", // spots
+      "#00E0FF", // eyebag
+      "#5DD400", // moistures
+      "#B5179E", // oily
+      "#F4EB24", // pore
+      "#BD8EFF", // skinredness
+      "#0F38CC", // spots
       "#FFFFFF", // whitehead
-      "#708090", // wrinkles
+      "#00FF38", // wrinkles
     ];
     this.n = this.palette.length;
   }
@@ -215,7 +208,7 @@ export const detectFrame = async (
   model: Model,
   canvasRef: HTMLCanvasElement,
   callback: () => void = () => { }
-): Promise<SkinAnalysisResult[]> => {
+): Promise<[FaceResults[], SkinAnalysisResult[]]> => {
   if (!model?.net || !model.inputShape || !model.outputShape) {
     throw new Error("Invalid model structure");
   }
@@ -278,7 +271,7 @@ export const detectFrame = async (
       ];
     });
 
-    const nms = await tf.image.nonMaxSuppressionAsync(boxes, scores, 500, 0.4, 0.001);
+    const nms = await tf.image.nonMaxSuppressionAsync(boxes, scores, 500, 0.4, 0.003);
     if (!nms) {
       throw new Error("Non-max suppression failed");
     }
@@ -309,7 +302,7 @@ export const detectFrame = async (
         .reshape([nms.shape[0], modelSegHeight, modelSegWidth]) as tf.Tensor3D;
     });
 
-    const toDraw: DetectionBox[] = [];
+    const toDraw: FaceResults[] = [];
     let overlay: tf.Tensor3D | null = tf.zeros([modelHeight, modelWidth, 4]) as tf.Tensor3D;
 
     const skinAnalysisResult: SkinAnalysisResult[] = []
@@ -387,8 +380,8 @@ export const detectFrame = async (
 
         toDraw.push({
           box: upSampleBox,
-          score,
-          klass: label,
+          score: score * 100,
+          class: label,
           label: labels[label] ?? 'Unknown',
           color,
         });
@@ -424,10 +417,10 @@ export const detectFrame = async (
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     ctx.putImageData(maskImg, 0, 0);
-    renderBoxes(ctx, toDraw);
+    // renderBoxes(ctx, toDraw);
 
     callback();
-    return skinAnalysisResult;
+    return [toDraw, skinAnalysisResult];
   } catch (error) {
     console.error("Detection error:", error);
     throw error;

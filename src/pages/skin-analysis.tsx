@@ -196,7 +196,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
             if (canvasRef.current == null) {
               throw new Error("Canvas ref is null");
             }
-            const skinAnalysisResult: SkinAnalysisResult[] = await detectFrame(
+            const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] = await detectFrame(
               image,
               model,
               canvasRef.current,
@@ -209,9 +209,9 @@ function Main({ isArabic }: { isArabic: boolean }) {
             // );
 
             if (skinAnalysisResult) {
-              // setInferenceResult(skinAnalysisResult[0]);
+              setInferenceResult(skinAnalysisResult[0]);
               setSkinAnalysisResult([
-                ...skinAnalysisResult,
+                ...skinAnalysisResult[1],
                 {
                   class: 1000,
                   score: 0,
@@ -273,11 +273,12 @@ function Main({ isArabic }: { isArabic: boolean }) {
                 width={model.inputShape[2]}
                 height={model.inputShape[1]}
                 ref={canvasRef}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover blur-sm"
+                style={{ opacity: 0.5}}
               />
             )}
-            {!isLoading && isInferenceCompleted == true ? (
-              <></>
+            {!isLoading && inferenceResult != null ? (
+              <><SkinAnalysisScene data={inferenceResult} /></>
             ) : (
               <>
                 {isInferenceCompleted ? (
@@ -580,7 +581,7 @@ function BottomContent({
     return (
       <AnalysisResults
         onClose={() => {
-          setView("problems");
+          setView("face");
         }}
         isArabic={isArabic}
       />

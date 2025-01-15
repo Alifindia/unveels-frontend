@@ -588,7 +588,6 @@ export function VideoStream({
     position.y,
     orientation.pitch,
     orientation.yaw,
-    setCriterias,
   ]);
 
   /**
