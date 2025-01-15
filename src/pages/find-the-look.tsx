@@ -983,7 +983,7 @@ function ProductHorizontalList({ category }: { category: string }) {
                   <img
                     src={imageUrl}
                     alt="Product"
-                    className="h-full w-full rounded object-cover md:h-28 md:w-28"
+                    className="md:h-full md:w-full rounded object-cover h-28 w-28"
                   />
                 </div>
 
