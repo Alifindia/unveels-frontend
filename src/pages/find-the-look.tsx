@@ -550,6 +550,17 @@ function BottomContent({ isArabic }: { isArabic?: boolean }) {
     makeup: [],
     accessories: [],
   });
+  const removeDuplicateLabels = (items: any[]) => {
+    const seenLabels = new Set();
+    return items.filter((item) => {
+      if (seenLabels.has(item.label)) {
+        return false;
+      } else {
+        seenLabels.add(item.label);
+        return true;
+      }
+    });
+  };
 
   useEffect(() => {
     console.log(tab);
@@ -557,7 +568,8 @@ function BottomContent({ isArabic }: { isArabic?: boolean }) {
 
   useEffect(() => {
     if (findTheLookItems) {
-      const grouped = groupedItems(findTheLookItems);
+      const findTheLookItemsDup = removeDuplicateLabels(findTheLookItems);
+      const grouped = groupedItems(findTheLookItemsDup);
       setGroupedItemsData(grouped);
       console.log(groupedItemsData);
     }
