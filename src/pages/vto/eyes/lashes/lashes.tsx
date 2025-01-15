@@ -37,14 +37,14 @@ export function LashesSelector() {
 
       <div className="flex h-[35px] w-full items-center justify-between text-center sm:h-10">
         <Link
-          className={`relative grow text-[11.2px] sm:text-base lg:text-[20.8px]`}
+          className={`relative grow text-[10.4px] sm:text-base lg:text-[20px]`}
           to="/virtual-try-on/lashes"
         >
           <span className={"text-white"}>Lashes</span>
         </Link>
         <div className="h-5 border-r border-white"></div>
         <Link
-          className={`relative grow text-[11.2px] sm:text-base lg:text-[20.8px]`}
+          className={`relative grow text-[10.4px] sm:text-base lg:text-[20px]`}
           to="/virtual-try-on/mascara"
         >
           <span className={"text-white/60"}>Mascara</span>
@@ -153,7 +153,7 @@ function ShapeSelector() {
             <img
               src={eyelashes[index % eyelashes.length]}
               alt="Eyebrow"
-              className="size-[35px] rounded sm:size-[50px] lg:size-[65px]"
+              className="size-[25px] rounded sm:size-[40px] lg:size-[55px]"
             />
           </button>
         ))}

@@ -36,14 +36,14 @@ export function MascaraSelector() {
 
       <div className="flex h-[35px] w-full items-center justify-between text-center sm:h-10">
         <Link
-          className={`relative grow text-[11.2px] sm:text-base lg:text-[20.8px]`}
+          className={`relative grow text-[10.4px] sm:text-base lg:text-[20px]`}
           to="/virtual-try-on/lashes"
         >
           <span className={"text-white/60"}>Lashes</span>
         </Link>
         <div className="h-5 border-r border-white"></div>
         <Link
-          className={`relative grow text-[11.2px] sm:text-base lg:text-[20.8px]`}
+          className={`relative grow text-[10.4px] sm:text-base lg:text-[20px]`}
           to="/virtual-try-on/mascara"
         >
           <span className={"text-white"}>Mascara</span>

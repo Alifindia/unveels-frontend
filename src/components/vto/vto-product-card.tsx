@@ -35,10 +35,10 @@ export function VTOProductCard({
   return (
     <div
       style={cardStyle}
-      className="w-[70px] sm:w-[100px] cursor-pointer"
+      className="w-[65px] sm:w-[95px] cursor-pointer"
       onClick={onClick} // Memanggil onClick saat produk diklik
     >
-      <div className="relative h-[47.6px] w-[70px] overflow-hidden sm:h-[70px] sm:w-[100px]">
+      <div className="relative h-[42.6px] w-[65px] overflow-hidden sm:h-[65px] sm:w-[95px]">
         <img
           src={imageUrl}
           alt="Product"
@@ -53,12 +53,12 @@ export function VTOProductCard({
         <BrandName brandId={getProductAttributes(product, "brand")} />
       </p>
       <div className="flex items-end justify-between space-x-1 pt-1">
-        <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.4375rem] text-white sm:text-[0.625rem] max-w-px">
+        <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.4385rem] text-white sm:text-[0.635rem] max-w-px">
           {currencySymbol}{(product.price * rate).toFixed(3)}
         </div>
         <button
           type="button"
-          className="flex h-4 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-0.5 text-[0.4rem] font-semibold text-white sm:h-7 sm:px-1.5 sm:text-[0.5rem]"
+          className="flex h-4 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-0.5 text-[0.45rem] font-semibold text-white sm:h-7 sm:px-1.5 sm:text-[0.55rem]"
         >
           Add to cart
         </button>

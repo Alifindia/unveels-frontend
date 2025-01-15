@@ -171,7 +171,7 @@ function SizeSelector() {
             <img
               src={`/media/unveels/vto/lipliners/lipliner ${size.toLowerCase()}.png`}
               alt={size}
-              className="size-[35px] shrink-0 sm:size-[50px] lg:size-[65px]"
+              className="size-[25px] shrink-0 sm:size-[40px] lg:size-[55px]"
             />
           </button>
         ))}

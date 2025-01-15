@@ -129,7 +129,7 @@ function ModeSelector() {
       <div className="flex h-[35px] w-full items-center justify-between text-center sm:h-10">
         <button
           className={clsx(
-            "relative grow text-[11.2px] sm:text-base lg:text-[20.8px]",
+            "relative grow text-[10.4px] sm:text-base lg:text-[20px]",
             {
               "text-white": selectedMode === "occasions",
               "text-white/60": selectedMode !== "occasions",
@@ -142,7 +142,7 @@ function ModeSelector() {
         <div className="h-5 border-r border-white"></div>
         <button
           className={clsx(
-            "relative grow text-[11.2px] sm:text-base lg:text-[20.8px]",
+            "relative grow text-[10.4px] sm:text-base lg:text-[20px]",
             {
               "text-white": selectedMode === "materials",
               "text-white/60": selectedMode !== "materials",
