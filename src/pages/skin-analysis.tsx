@@ -104,7 +104,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
     setIsInferenceRunning,
   } = useInferenceContext();
 
-  const { view, setView, tab } = useSkinAnalysis();
+  const { view, setView, tab, skinAnalysisData } = useSkinAnalysis();
 
   const [inferenceResult, setInferenceResult] = useState<FaceResults[] | null>(
     null,
@@ -147,74 +147,92 @@ function Main({ isArabic }: { isArabic: boolean }) {
       values: string[];
     };
   } = {
+    "Oily Skin": {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Oily Skin"]),
+    },
+    "Dark Circles": {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Dark Circles"]),
+    },
+    "Anti Aging": {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Anti Aging"]),
+    },
     Wrinkles: {
       attributeName: "skin_concern",
-      values: getSkinConcernProductTypeIds([
-        "Oily Skin",
-        "Dark Circles",
-        "Anti Aging",
-        "Wrinkles",
-        "Damaged Skin",
-        "Fine Lines",
-        "Sensitive Skin",
-        "Redness",
-        "Acne",
-        "Spots",
-        "Uneven Skintone",
-        "Dry Skin",
-        "Pores",
-        "Black Heads",
-        "Blemishes",
-        "Lip Lines"
-      ]),
+      values: getSkinConcernProductTypeIds(["Wrinkles"]),
+    },
+    "Damaged Skin": {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Damaged Skin"]),
+    },
+    "Fine Lines": {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Fine Lines"]),
+    },
+    "Sensitive Skin": {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Sensitive Skin"]),
     },
     Redness: {
       attributeName: "skin_concern",
-      values: getSkinConcernProductTypeIds([
-        "Oily Skin",
-        "Dark Circles",
-        "Anti Aging",
-        "Wrinkles",
-        "Damaged Skin",
-        "Fine Lines",
-        "Sensitive Skin",
-        "Redness",
-        "Acne",
-        "Spots",
-        "Uneven Skintone",
-        "Dry Skin",
-        "Pores",
-        "Black Heads",
-        "Blemishes",
-        "Lip Lines"
-      ]),
+      values: getSkinConcernProductTypeIds(["Redness"]),
+    },
+    Acne: {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Acne"]),
     },
     Spots: {
       attributeName: "skin_concern",
-      values: getSkinConcernProductTypeIds([
-        "Oily Skin",
-        "Dark Circles",
-        "Anti Aging",
-        "Wrinkles",
-        "Damaged Skin",
-        "Fine Lines",
-        "Sensitive Skin",
-        "Redness",
-        "Acne",
-        "Spots",
-        "Uneven Skintone",
-        "Dry Skin",
-        "Pores",
-        "Black Heads",
-        "Blemishes",
-        "Lip Lines"
-      ]),
+      values: getSkinConcernProductTypeIds(["Spots"]),
+    },
+    "Uneven Skintone": {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Uneven Skintone"]),
+    },
+    "Dry Skin": {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Dry Skin"]),
+    },
+    Pores: {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Pores"]),
+    },
+    "Black Heads": {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Black Heads"]),
+    },
+    Blemishes: {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Blemishes"]),
+    },
+    "Lip Lines": {
+      attributeName: "skin_concern",
+      values: getSkinConcernProductTypeIds(["Lip Lines"]),
     },
   };
 
   useEffect(() => {
     setGroupedItemsData({
-      makeup: [{ label: capitalizeFirstLetter(tab), section: "makeup" }],
+      makeup: [
+        { label: "Oily Skin", section: "makeup" },
+        { label: "Dark Circles", section: "makeup" },
+        { label: "Anti Aging", section: "makeup" },
+        { label: "Wrinkles", section: "makeup" },
+        { label: "Damaged Skin", section: "makeup" },
+        { label: "Fine Lines", section: "makeup" },
+        { label: "Sensitive Skin", section: "makeup" },
+        { label: "Redness", section: "makeup" },
+        { label: "Acne", section: "makeup" },
+        { label: "Spots", section: "makeup" },
+        { label: "Uneven Skintone", section: "makeup" },
+        { label: "Dry Skin", section: "makeup" },
+        { label: "Pores", section: "makeup" },
+        { label: "Black Heads", section: "makeup" },
+        { label: "Blemishes", section: "makeup" },
+        { label: "Lip Lines", section: "makeup" },
+      ],
       accessories: [],
     });
   }, [tab]);
@@ -1560,7 +1578,7 @@ function ProductHorizontalList({
   return (
     <div key={category}>
       <div className="py-4">
-        <h2 className="text-base text-[#E6E5E3]">Skin Concern</h2>
+        <h2 className="text-base text-[#E6E5E3]">{category}</h2>
       </div>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-6">
         {isLoading || isFetching ? (
