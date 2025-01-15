@@ -24,6 +24,7 @@ import { base64ToImage } from "../utils/imageProcessing";
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../utils/other";
 import { label } from "three/webgpu";
+import SkinAnalysisScene from "../components/skin-analysis/skin-analysis-scene";
 
 interface Model {
   net: tf.GraphModel;
@@ -48,7 +49,7 @@ export function SkinAnalysisWeb() {
       <InferenceProvider>
         <SkinAnalysisProvider>
           <div className="h-full min-h-dvh">
-            <Main isArabic={isArabic}/>
+            <Main isArabic={isArabic} />
           </div>
         </SkinAnalysisProvider>
       </InferenceProvider>
@@ -172,16 +173,14 @@ function Main({ isArabic }: { isArabic?: boolean }) {
             if (canvasRef.current == null) {
               throw new Error("Canvas ref is null");
             }
-            const skinAnalysisResult: SkinAnalysisResult[] = await detectFrame(
-              image,
-              model,
-              canvasRef.current,
-            );
+            const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] =
+              await detectFrame(image, model, canvasRef.current);
 
             if (skinAnalysisResult) {
+              setInferenceResult(skinAnalysisResult[0]);
               console.log("Skin Analysis Result:", skinAnalysisResult);
               const resultString = JSON.stringify([
-                ...skinAnalysisResult,
+                ...skinAnalysisResult[1],
                 {
                   label: "imageData",
                   class: 1000,
@@ -236,7 +235,9 @@ function Main({ isArabic }: { isArabic?: boolean }) {
 
   return (
     <>
-      {loading.loading && !isVideoDetectorReady && <ModelLoadingScreen progress={loading.progress} />}
+      {loading.loading && !isVideoDetectorReady && (
+        <ModelLoadingScreen progress={loading.progress} />
+      )}
       <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
         {isInferenceCompleted &&
           criterias.capturedImage != null &&
@@ -257,11 +258,14 @@ function Main({ isArabic }: { isArabic?: boolean }) {
                 width={model.inputShape[2]}
                 height={model.inputShape[1]}
                 ref={canvasRef}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover blur-sm"
+                style={{ opacity: 0.5 }}
               />
             )}
-            {!isLoading && isInferenceCompleted == true ? (
-              <></>
+            {!isLoading && inferenceResult != null ? (
+              <>
+                <SkinAnalysisScene data={inferenceResult} />
+              </>
             ) : (
               <>
                 {isInferenceCompleted ? (
@@ -274,7 +278,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
                   </>
                 ) : (
                   <>
-                    <VideoStream onCanvasReady={setIsVideoDetectorReady}/>
+                    <VideoStream onCanvasReady={setIsVideoDetectorReady} />
                   </>
                 )}
               </>
