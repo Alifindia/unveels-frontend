@@ -516,6 +516,7 @@ export function VirtualTryOnScene({
     mode: "LIVE" | "VIDEO" | "IMAGE",
   ) => {
     await initializeHairSegmenter();
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Initialize face detector
     const faceModel = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
