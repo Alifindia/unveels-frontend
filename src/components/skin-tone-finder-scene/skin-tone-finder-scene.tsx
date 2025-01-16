@@ -124,6 +124,8 @@ function SkinToneFinderInnerScene({
   const [showScannerAfterInference, setShowScannerAfterInference] =
     useState(true);
 
+  const [data, setData] = useState<any>(null);
+
   useEffect(() => {
     if (criterias.capturedImage) {
       const image = new Image();
@@ -139,12 +141,28 @@ function SkinToneFinderInnerScene({
   }, [criterias.capturedImage]);
 
   useEffect(() => {
+    if (data?.beforeAfter !== undefined) {
+      compareCapture();
+    }
+
+    if (data?.flipCamera !== undefined) {
+      console.log("FLIPING CAMERA");
+      flipCamera();
+    }
+
+    if (data?.screenShoot !== undefined) {
+      screenShoot();
+    }
+  }, [data]);
+
+  useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       console.log("Message received:", event);
 
       if (event.data) {
         try {
           const data = JSON.parse(event.data);
+          setData(data);
           console.log("Parsed data:", data);
 
           if (data.showFoundation !== undefined) {
@@ -153,22 +171,6 @@ function SkinToneFinderInnerScene({
 
           if (data.foundationColor !== undefined) {
             setFoundationColor(data.foundationColor);
-          }
-
-          //before after
-          if (data.beforeAfter !== undefined) {
-            console.log("COMPARING CAPTURE");
-            compareCapture();
-          }
-
-          //flip camera
-          if (data.flipCamera !== undefined) {
-            flipCamera();
-          }
-
-          // screenshoot
-          if (data.screenShoot !== undefined) {
-            screenShoot();
           }
         } catch (error) {
           console.error("Error parsing message:", error);
