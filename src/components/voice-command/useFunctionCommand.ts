@@ -204,6 +204,7 @@ export function useFunctionCommand() {
   } = useHairColorContext();
   const [recording, setRecording] = useState(false);
   const recognitionRef = useRef<any>(null);
+  const colorfamilyRef = useRef<any>(null);
   const [sectionName, setSectionName] = useState("");
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState("");
@@ -220,6 +221,10 @@ export function useFunctionCommand() {
   }, [pathname]);
 
   const sectionNameRef = useRef(sectionName);
+
+  useEffect(() => {
+    colorfamilyRef.current = colorFamily;
+  }, [colorFamily]);
 
   useEffect(() => {
     sectionNameRef.current = sectionName;
@@ -604,11 +609,10 @@ export function useFunctionCommand() {
 
   const handleSetColorChildern = (index: string) => {
     if (sectionNameRef.current == "lip-color") {
-      console.log(colorFamily, "colorFamily");
       const data: any = queryClient.getQueryData([
         "products",
         "lipcolor",
-        colorFamily,
+        colorfamilyRef.current,
         null,
         null,
       ]);
