@@ -89,6 +89,22 @@ function Main() {
 
   const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
   const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [sidebarData, setSidebarData] = useState<any>(null);
+
+  useEffect(() => {
+    if (sidebarData?.beforeAfter !== undefined) {
+      compareCapture();
+    }
+
+    if (sidebarData?.flipCamera !== undefined) {
+      console.log("FLIPING CAMERA");
+      flipCamera();
+    }
+
+    if (sidebarData?.screenShoot !== undefined) {
+      screenShoot();
+    }
+  }, [sidebarData]);
 
   useEffect(() => {
     // Handler untuk menerima pesan
@@ -98,6 +114,7 @@ function Main() {
       if (event.data) {
         try {
           const data = JSON.parse(event.data);
+          setSidebarData(data);
           console.log("Parsed data:", data);
 
           if (data.lipColor !== undefined) {
@@ -351,21 +368,6 @@ function Main() {
 
           if (data.hairColor !== undefined) {
             setHairColor(data.hairColor);
-          }
-
-          //before after
-          if (data.beforeAfter !== undefined) {
-            compareCapture;
-          }
-
-          //flip camera
-          if (data.flipCamera !== undefined) {
-            flipCamera();
-          }
-
-          // screenshoot
-          if (data.screenShoot !== undefined) {
-            screenShoot();
           }
 
           // media

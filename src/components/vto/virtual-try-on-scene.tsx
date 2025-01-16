@@ -515,7 +515,11 @@ export function VirtualTryOnScene({
     media: HTMLVideoElement | HTMLImageElement,
     mode: "LIVE" | "VIDEO" | "IMAGE",
   ) => {
-    await initializeHairSegmenter();
+    try {
+      await initializeHairSegmenter();
+    } catch (error) {
+      console.log(error);
+    }
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Initialize face detector
