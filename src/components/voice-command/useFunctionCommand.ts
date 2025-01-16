@@ -241,7 +241,7 @@ export function useFunctionCommand() {
   };
 
   // Inisialisasi Speech Recognition
-  const initializeRecognition = (language = "en-GB") => {
+  const initializeRecognition = (language = "en") => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -264,7 +264,7 @@ export function useFunctionCommand() {
       const speechResult = event.results[lastIndex][0].transcript.toLowerCase();
       console.log("Transcript:", speechResult);
 
-      if (language === "en-GB") {
+      if (language === "en") {
         handleCommand(speechResult);
       } else {
         const translatedText = translateArabicToEnglish(speechResult);
@@ -288,7 +288,7 @@ export function useFunctionCommand() {
 
   // Start listening
   const startListening = () => {
-    const browserLanguage = navigator.language || "en-GB";
+    const browserLanguage = navigator.language || "en";
     console.log("Detected browser language:", browserLanguage);
 
     if (!recognitionRef.current) {
@@ -341,6 +341,26 @@ export function useFunctionCommand() {
         eight: 8,
         nine: 9,
         ten: 10,
+        eleven: 11,
+        twelve: 12,
+        thirteen: 13,
+        fourteen: 14,
+        fifteen: 15,
+        sixteen: 16,
+        seventeen: 17,
+        eighteen: 18,
+        nineteen: 19,
+        twenty: 20,
+        "twenty one": 21,
+        "twenty two": 22,
+        "twenty three": 23,
+        "twenty four": 24,
+        "twenty five": 25,
+        "twenty six": 26,
+        "twenty seven": 27,
+        "twenty eight": 28,
+        "twenty nine": 29,
+        "thirty": 30,
       };
 
     if (selectProduct.test(transcript)) {
@@ -388,7 +408,14 @@ export function useFunctionCommand() {
       const colorMode = capitalizeWords(
         transcript.match(colorModeRegex)[1].toLowerCase().trim(),
       );
-      const disallowedPatterns = [/pattern 1/i, /pattern 2/i, /pattern 3/i, /pattern 4/i, /pattern 5/i]
+      const disallowedPatterns = [
+        /pattern 1/i, /pattern 2/i, /pattern 3/i, /pattern 4/i, /pattern 5/i, /pattern 6/i, /pattern 7/i, /pattern 8/i, /pattern 9/i, /pattern 10/i,
+        /pattern 11/i, /pattern 12/i, /pattern 13/i, /pattern 14/i, /pattern 15/i, /pattern 16/i, /pattern 17/i, /pattern 18/i, /pattern 19/i, /pattern 20/i,
+        /pattern 21/i, /pattern 22/i, /pattern 23/i, /pattern 24/i, /pattern 25/i, /pattern 26/i, /pattern 27/i, /pattern 28/i, /pattern 29/i, /pattern 30/i,
+        /pattern one/i, /pattern two/i, /pattern three/i, /pattern four/i, /pattern five/i, /pattern six/i, /pattern seven/i, /pattern eight/i, /pattern nine/i, /pattern ten/i,
+        /pattern eleven/i, /pattern twelve/i, /pattern thirteen/i, /pattern fourteen/i, /pattern fifteen/i, /pattern sixteen/i, /pattern seventeen/i, /pattern eighteen/i, /pattern nineteen/i, /pattern twenty/i,
+        /pattern twenty one/i, /pattern twenty two/i, /pattern twenty three/i, /pattern twenty four/i, /pattern twenty five/i, /pattern twenty six/i, /pattern twenty seven/i, /pattern twenty eight/i, /pattern twenty nine/i, /pattern thirty/i
+      ];
       const isInvalid = disallowedPatterns.some((pattern) => pattern.test(colorMode));
 
       if (!isInvalid) handleSetColorMode(colorMode);
@@ -409,6 +436,7 @@ export function useFunctionCommand() {
         color = 'Grey';
       }
       const colorValue = colors.find((e) => e.label == color)?.value || "";
+      console.log(color)
       handleSetColor(colorValue, color);
     }
     // Check for color childern
@@ -423,9 +451,10 @@ export function useFunctionCommand() {
     }
     // Check pattern
     if (patternRegex.test(transcript)) {
-      const pattern = capitalizeWords(
+      let pattern = capitalizeWords(
         transcript.match(patternRegex)[1].toLowerCase().trim(),
       );
+      pattern = numberWords[pattern.toLowerCase()]?.toString() || pattern;
       handleSelectPattern(pattern);
     }
     // Check darknes

@@ -1,6 +1,7 @@
 export const arabicToEnglishSection: { [key: string]: any } = {
   "انتقل الى قسمي لون الشفاه اختر لون الشفاه": "go to lip color section select lip color",
   "انتقل الى قسمي لون الشفاه اختر لون الشفه" : "go to lip color section select lip color",
+  "انتقل الى قسمي لون الشفاه واختر لون الشفاه": "go to lip color section select lip color",
   "انتقل الى قسم تحديد الشفاه اختر تحديد الشفه" : "go to lip liner section select lip liner",
   "انتقل الى قسم تحديد الشفاه اختر تحديد الشفاه" : "go to lip liner section select lip liner",
   "انتقل الى قسم تحديد الشفاه اخترت تحديد الشفاه" : "go to lip liner section select lip liner",
@@ -13,6 +14,7 @@ export const arabicToEnglishSection: { [key: string]: any } = {
   "انتقل الى قسم الحواجب وحدد الحواجب" : "go to eyebrows section select eyebrows",
   "انتقل إلى قسم ظلال العيون واختر ظلال العيون" : "go to eye shadow section select eye shadow",
   "انتقل الى قسم ظلال العيون واختر ظلال العيون" : "go to eye shadow section select eye shadow",
+  "انتقل الى قسم ظلال العيون واختر دلال العيون" : "go to eye shadow section select eye shadow",
   "انتقل إلى قسم تحديد العيون واختر تحديد العيون" : "go to eye liner section select eye liner",
   "انتقل الى قسم تحديد العيون واختر تحديد العيون" : "go to eye liner section select eye liner",
   "انتقل إلى قسم الرموش حدد الرموش" : "go to lashes section select lashes",
@@ -21,6 +23,7 @@ export const arabicToEnglishSection: { [key: string]: any } = {
   "انتقل الى قسم المسطره واختري المسطره" : "go to mascara section select mascara",
   "انتقل الى قسم المسكره واختر المسكره" : "go to mascara section select mascara",
   "انتقل الى قسم المسطره واختار المسكره" : "go to mascara section select mascara",
+  "انتقل الى قسم المسطره واختر المستر": "go to mascara section select mascara",
   "انتقل إلى قسم العدسات واختر العدسات" : "go to lenses section select lenses",
   "انتقل الى قسم العدسات واختر العدسات" : "go to lenses section select lenses",
   "انتقل إلى قسم الأساس واختر الأساس" : "go to foundation section select foundation",
@@ -43,34 +46,29 @@ export const arabicToEnglishSection: { [key: string]: any } = {
 
 export const arabicToEnglishNumbers: { [key: string]: string } = {
   "واحد": "one",
-  "1": "one",
+  "واحده": "one",
+  "واحدا": "one",
   "اثنان": "two",
   "اثنين": "two",
   "الثاني": "two",
-  "2": "two",
   "ثلاثة": "three",
   "ثلاثه": "three",
   "الثالث": "three",
-  "3": "three",
   "أربعة": "four",
   "اربعه": "four",
   "الرابعه": "four",
-  "4": "four",
   "خمسة": "five",
   "خمسه": "five",
-  "5": "five",
   "ستة": "six",
-  "6": "six",
+  "سته": "six",
   "سبعة": "seven",
   "سبعه": "seven",
-  "7": "seven",
   "ثمانية": "eight",
   "ثمانيه": "eight",
-  "8": "eight",
   "تسعة": "nine",
   "تسعه": "nine",
-  "9": "nine",
   "عشرة": "ten",
+  "عشره": "ten",
   "10": "ten",
   "أحد عشر": "eleven",
   "11": "eleven",
@@ -97,6 +95,7 @@ export const arabicToEnglishNumbers: { [key: string]: string } = {
   "اثنان وعشرون": "twenty two",
   "22": "twenty two",
   "ثلاثة وعشرون": "twenty three",
+  "ثلاثه وعشرين": "twenty three",
   "23": "twenty three",
   "أربعة وعشرون": "twenty four",
   "24": "twenty four",
@@ -157,7 +156,8 @@ export const arabicToEnglishNumbers: { [key: string]: string } = {
 export const arabicToEnglishSelectProduct: { [key: string]: string } = {
   "حدد رقم المنتج": "select product number",
   "اختري المنتج رقم": "select product number",
-  "اختر المنتج رقم": "select product number"
+  "اختر المنتج رقم": "select product number",
+  "اختاري المنتج رق": "select product number"
 };
 
 export const arabicToEnglishSetMode: { [key: string]: string } = {
@@ -249,6 +249,9 @@ export const arabicToEnglishTexture: { [key: string]: string } = {
   "واضح" : "sheer",
 };
 
+export const arabicToEnglishSetPattern: { [key: string]: string } = {
+  "نمط محدد" : "set pattern",
+};
 
 export function translateSelectProduct(text: any) {
   let translatedText = text;
@@ -277,9 +280,21 @@ export function translateSelectProduct(text: any) {
   const containsSetMode = Object.keys(arabicToEnglishSetMode).some((keyword) =>
     text.includes(keyword)
   );
+  const containsSetPattern = Object.keys(arabicToEnglishSetPattern).some((keyword) =>
+    text.includes(keyword)
+  );
   const containsSection = Object.keys(arabicToEnglishSection).some((keyword) =>
     text.includes(keyword)
   );
+  const numbersMapping = {
+    ...arabicToEnglishNumbers,
+  };
+  const numberPhrases = Object.keys(numbersMapping).filter((key) => key.includes(" "));
+
+  numberPhrases.forEach((arabicPhrase) => {
+    const englishPhrase = numbersMapping[arabicPhrase];
+    translatedText = translatedText.replace(new RegExp(arabicPhrase, "g"), englishPhrase);
+  });
   if (containsTextureKeyword && containsTexture) {
     const textureMapping = {
       ...arabicToEnglishSelectTexture,
@@ -320,6 +335,16 @@ export function translateSelectProduct(text: any) {
       const englishWord = Mapping[arabicWord];
       translatedText = translatedText.replace(new RegExp(arabicWord, 'g'), englishWord);
     });
+  } else if (containsSetPattern && containsNumber) {
+    const Mapping = {
+      ...arabicToEnglishSetPattern,
+      ...arabicToEnglishNumbers,
+    };
+
+    Object.keys(Mapping).forEach((arabicWord) => {
+      const englishWord = Mapping[arabicWord];
+      translatedText = translatedText.replace(new RegExp(arabicWord, 'g'), englishWord);
+    });
   } else if (containsSetMode) {
     const Mapping = {
       ...arabicToEnglishSetMode,
@@ -329,16 +354,21 @@ export function translateSelectProduct(text: any) {
       const englishWord = Mapping[arabicWord];
       translatedText = translatedText.replace(new RegExp(arabicWord, 'g'), englishWord);
     });
-  }
-  const arabicWordsRemaining = Object.keys({
-    ...arabicToEnglishTexture,
-    ...arabicToEnglishColor,
-    ...arabicToEnglishSelectProduct,
-    ...arabicToEnglishSelectSubColor,
-    ...arabicToEnglishSetMode,
-    ...arabicToEnglishSection,
-  }).some((arabicWord) => translatedText.includes(arabicWord));
+  } else if (containsSection) {
+    const Mapping = {
+      ...arabicToEnglishSection,
+    };
 
+    Object.keys(Mapping).forEach((arabicWord) => {
+      const englishWord = Mapping[arabicWord];
+      translatedText = translatedText.replace(new RegExp(arabicWord, 'g'), englishWord);
+    });
+  }
+
+  Object.keys(numbersMapping).forEach((arabicWord) => {
+    const englishWord = numbersMapping[arabicWord];
+    translatedText = translatedText.replace(new RegExp(arabicWord, "g"), englishWord);
+  });
   // if (!isFullyTranslated || arabicWordsRemaining) {
   //   return null;
   // }
