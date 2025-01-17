@@ -36,14 +36,14 @@ export function MascaraSelector() {
 
       <div className="flex h-[35px] w-full items-center justify-between text-center sm:h-10">
         <Link
-          className={`relative grow text-[10.4px] sm:text-base lg:text-[20px]`}
+          className={`relative grow text-xs lg:text-[14px]`}
           to="/virtual-try-on/lashes"
         >
           <span className={"text-white/60"}>Lashes</span>
         </Link>
         <div className="h-5 border-r border-white"></div>
         <Link
-          className={`relative grow text-[10.4px] sm:text-base lg:text-[20px]`}
+          className={`relative grow text-xs lg:text-[14px]`}
           to="/virtual-try-on/mascara"
         >
           <span className={"text-white"}>Mascara</span>
@@ -206,7 +206,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
+          className="p-0 text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Mascara: {
@@ -225,7 +225,7 @@ function ProductList() {
           {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
         {isLoading ? (
           <LoadingProducts />
         ) : (

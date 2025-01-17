@@ -41,7 +41,7 @@ export function ColorPalette({
     return (
       <button
         className={clsx("shrink-0 rounded-full border border-transparent transform transition-all", {
-          "size-5 sm:size-[1.875rem]": size === "large",
+          "size-5 sm:size-[1.375rem]": size === "large",
           "size-2.5": size === "small",
             "scale-[1.3] border-white": selected,
           },

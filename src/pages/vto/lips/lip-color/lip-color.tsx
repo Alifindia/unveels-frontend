@@ -133,8 +133,8 @@ function ColorSelector() {
 
  
   return (
-    <div className="mx-auto w-full py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
+    <div className="mx-auto w-full py-1 lg:py-1.5">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 xl:py-1 2xl:py-2.5">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
@@ -160,7 +160,7 @@ function ColorSelector() {
 function TextureSelector() {
   const { selectedTexture, setSelectedTexture } = useLipColorContext();
   return (
-    <div className="mx-auto w-full py-1 sm:py-2">
+    <div className="mx-auto w-full py-1 lg:py-1.5">
       <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 no-scrollbar">
         {textures.map((texture, index) => (
           <button
@@ -181,7 +181,7 @@ function TextureSelector() {
               }
             }}
           >
-            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] lg:text-xs">{texture.label}</span>
           </button>
         ))}
       </div>
@@ -214,7 +214,7 @@ function ShadesSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-1 sm:py-2">
+    <div className="mx-auto w-full py-1 lg:py-1.5">
       <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
         {shades.map((shade, index) => (
           <button
@@ -234,7 +234,7 @@ function ShadesSelector() {
                 {shade}
               </div>
             ) : null}
-            <span className="relative text-[9.8px] sm:text-sm">{shade}</span>
+            <span className="relative text-[9.8px] sm:text-xs">{shade}</span>
           </button>
         ))}
 

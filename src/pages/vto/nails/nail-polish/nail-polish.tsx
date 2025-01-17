@@ -160,7 +160,7 @@ function TextureSelector() {
               }
             }}
           >
-            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] lg:text-xs">{texture.label}</span>
           </button>
         ))}
       </div>
@@ -231,7 +231,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
+          className="p-0 text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Nail: {

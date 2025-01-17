@@ -707,7 +707,15 @@ function ProductRecommendationsTabs({
 
   return (
     <>
-      <div className="fixed inset-0 h-full w-full" onClick={onClose}></div>
+      <div className="flex justify-center">
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex h-3 w-full items-center justify-center bg-transparent"
+        >
+          <div className="h-1 w-10 rounded-full bg-gray-400" />
+        </button>
+      </div>
       <div className="mx-auto w-full space-y-2 px-4 lg:max-w-xl">
         <div className="flex h-6 w-full items-center justify-between border-b border-gray-600 text-center sm:h-10">
           {["makeup", "accessories"].map((section) => {

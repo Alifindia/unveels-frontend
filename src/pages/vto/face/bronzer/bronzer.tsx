@@ -81,8 +81,8 @@ function ColorSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
+    <div className="mx-auto w-full py-1 lg:py-1.5">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
@@ -126,8 +126,8 @@ function ShapeSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
+    <div className="mx-auto w-full py-1 lg:py-1.5">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
         {bronzers.map((path, index) => (
           <button
             key={index}
@@ -143,7 +143,7 @@ function ShapeSelector() {
             <img
               src={path}
               alt="Eyebrow"
-              className="size-[35px] rounded sm:size-[50px]"
+              className="size-[25px] rounded sm:size-[30px] lg:size-[35px]"
             />
           </button>
         ))}
@@ -186,7 +186,7 @@ function TextureSelector() {
             )}
             onClick={() => setMaterial(index, texture)}
           >
-            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] lg:text-xs">{texture.label}</span>
           </button>
         ))}
       </div>
@@ -270,7 +270,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
+          className="p-0 text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Bronzers: {
@@ -289,7 +289,7 @@ function ProductList() {
           {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
         {isLoading ? (
           <LoadingProducts />
         ) : (

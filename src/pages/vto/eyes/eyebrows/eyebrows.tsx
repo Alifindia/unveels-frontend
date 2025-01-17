@@ -149,7 +149,7 @@ function PatternSelector() {
     setEyebrowsPattern(pattern);
   }
   return (
-    <div className="mx-auto w-full py-4">
+    <div className="mx-auto w-full py-2">
       <div className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar">
         {[...Array(14)].map((_, index) => (
           <button
@@ -166,7 +166,7 @@ function PatternSelector() {
             <img
               src={`/media/unveels/vto/eyebrows/${index % 8}.png`}
               alt="Eyebrow"
-              className="h-[14px] w-[38.5px] rounded sm:h-[20px] sm:w-[55px]"
+              className="h-[12px] w-[35px] rounded sm:h-[18px] sm:w-[45px]"
             />
           </button>
         ))}
@@ -277,7 +277,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
+          className="p-0 text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Eyebrows: {
@@ -300,7 +300,7 @@ function ProductList() {
         {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
         {isLoading ? (
           <LoadingProducts />
         ) : (

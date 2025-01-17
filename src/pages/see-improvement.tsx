@@ -108,8 +108,10 @@ function Main({ isArabic }: { isArabic?: boolean }) {
         <TopNavigation />
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-          <MainContent collapsed={collapsed} setCollapsed={setCollapsed} isArabic={isArabic} />
-          <Footer />
+          <div className="bg-black/10 p-2 shadow-lg backdrop-blur-sm">
+            <MainContent collapsed={collapsed} setCollapsed={setCollapsed} isArabic={isArabic} />
+            <Footer />
+          </div>
         </div>
       </div>
     </>
@@ -124,7 +126,20 @@ interface MainContentProps {
 
 function MainContent({ collapsed, setCollapsed, isArabic }: MainContentProps) {
   return (
-    <>{collapsed ? null : <BottomContent setCollapsed={setCollapsed} isArabic={isArabic} />}</>
+    <>
+      <div className="flex justify-center">
+        <button
+          type="button"
+          onClick={() => {
+            setCollapsed(!collapsed);
+          }}
+          className="flex h-3 w-full items-center justify-center bg-transparent"
+        >
+          <div className="h-1 w-10 rounded-full bg-gray-400" />
+        </button>
+      </div>
+      {collapsed ? null : <BottomContent setCollapsed={setCollapsed} isArabic={isArabic} />}
+    </>
   );
 }
 
@@ -163,7 +178,7 @@ function SkinProblems({
   }, [skinConcerns]);
   return (
     <>
-      <div className="relative space-y-2 bg-black/10 p-2 px-4 pb-4 shadow-lg backdrop-blur-sm">
+      <div className="relative space-y-2 px-4">
         <div className="flex justify-center">
           <button
             type="button"
@@ -175,7 +190,7 @@ function SkinProblems({
             <div className="h-1 w-10 rounded-full bg-gray-400" />
           </button>
         </div>
-        <div className="flex w-full items-center space-x-3.5 overflow-x-auto overflow-y-visible pt-7 no-scrollbar">
+        <div className="flex w-full items-center space-x-3.5 overflow-x-auto overflow-y-visible no-scrollbar">
           {tabs.map((problemTab) => {
             const isActive = tab === problemTab;
             return (

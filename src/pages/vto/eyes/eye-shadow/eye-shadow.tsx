@@ -140,8 +140,8 @@ function ColorSelector() {
   }, [selectedMode, selectedColors, setSelectedColors]);
 
   return (
-    <div className="mx-auto w-full py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
+    <div className="mx-auto w-full py-1 lg:py-1.5">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 xl:py-1 2xl:py-2.5">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
@@ -149,7 +149,7 @@ function ColorSelector() {
             setSelectedColors([]);
           }}
         >
-          <Icons.empty className="size-5 sm:size-[1.875rem]" />
+          <Icons.empty className="size-5 sm:size-[1.375rem]" />
         </button>
         {(selectedMode == "One" || selectedMode == "Penta") &&
         extracted_sub_colors
@@ -183,7 +183,7 @@ const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
 function TextureSelector() {
   const { selectedTexture, setSelectedTexture } = useEyeShadowContext();
   return (
-    <div className="mx-auto w-full py-1 sm:py-2">
+    <div className="mx-auto w-full py-1 lg:py-1.5">
       <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 no-scrollbar">
         {textures.map((texture, index) => (
           <button
@@ -204,7 +204,7 @@ function TextureSelector() {
               }
             }}
           >
-            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] lg:text-xs">{texture.label}</span>
           </button>
         ))}
       </div>
@@ -228,7 +228,7 @@ function ModeSelector() {
 
   return (
     <>
-      <div className="mx-auto w-full py-1 sm:py-2">
+      <div className="mx-auto w-full py-1 lg:py-1.5">
         <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
           {modes.map((mode, index) => (
             <button
@@ -248,7 +248,7 @@ function ModeSelector() {
                   {mode.name}
                 </div>
               ) : null}
-              <span className="relative text-[9.8px] sm:text-sm">
+              <span className="relative text-[9.8px] sm:text-xs">
                 {mode.name}
               </span>
             </button>
@@ -258,7 +258,7 @@ function ModeSelector() {
         </div>
       </div>
       {currentMode ? (
-        <div className="mx-auto w-full py-1 sm:py-2">
+        <div className="mx-auto w-full py-1 lg:py-1.5">
           <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
             {[...Array(currentMode.count)].map((_, index) => (
               <button
@@ -276,7 +276,7 @@ function ModeSelector() {
                 <img
                   src={`/media/unveels/vto/eyeshadows/eyeshadow-${currentMode.name.toLowerCase()}-${index + 1}.png`}
                   alt="Eye shadow"
-                  className="size-[25px] shrink-0 sm:size-[40px] lg:size-[55px]"
+                  className="size-[25px] shrink-0 md:size-[30px] lg:size-[30px] xl:size-[35px] 2xl:size-[50px]"
                 />
               </button>
             ))}
@@ -373,7 +373,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
+          className="p-0 text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Eyeshadows: {
@@ -392,7 +392,7 @@ function ProductList() {
           {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
         {isLoading ? (
           <LoadingProducts />
         ) : (
