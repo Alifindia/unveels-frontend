@@ -175,8 +175,11 @@ export function VirtualTryOnScene({
 
   const initializeHairSegmenter = async () => {
     try {
+      if (hairSegmenterRef.current !== null) {
+        throw new Error("HairSegmenter already initialized");
+      }
       const filesetResolver = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+        "/media/unveels/wasm",
       );
 
       const hairSegmenter = await ImageSegmenter.createFromOptions(
@@ -419,21 +422,30 @@ export function VirtualTryOnScene({
               drawHeight,
             );
 
-            const normalizedHandLandmarks = normalizeLandmarks(
-              hands[0].keypoints,
-              video.videoWidth,
-              video.videoHeight,
-              drawWidth,
-              drawHeight,
-            );
-            for (let i = 0; i < normalizedHandLandmarks.length; i++) {
-              normalizedHandLandmarks[i].z = hands[0].keypoints3D[i].z || 0;
-            }
             landmarksRef.current = normalizedFaceLandmarks;
-            handLandmarksRef.current = normalizedHandLandmarks;
+            // handLandmarksRef.current = normalizedHandLandmarks;
           } catch (err) {
             console.error("Detection error:", err);
             setError(err as Error);
+          }
+
+          try {
+            if (hands.length > 0) {
+              const normalizedHandLandmarks = normalizeLandmarks(
+                hands[0].keypoints,
+                img.width,
+                img.height,
+                drawWidth,
+                drawHeight,
+              );
+              for (let i = 0; i < normalizedHandLandmarks.length; i++) {
+                normalizedHandLandmarks[i].z = hands[0].keypoints3D[i].z || 0;
+              }
+              handLandmarksRef.current = normalizedHandLandmarks;
+            }
+          } catch (err) {
+            console.error("Detection error:", err);
+            // setError(err as Error);
           }
         } else {
           console.error("Canvas element is not properly initialized");
@@ -518,7 +530,7 @@ export function VirtualTryOnScene({
     try {
       await initializeHairSegmenter();
     } catch (error) {
-      console.log(error);
+      console.error("Gagal menginisialisasi HairSegmenter:", error);
     }
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -615,7 +627,8 @@ export function VirtualTryOnScene({
     }
   };
 
-  const isDesktop = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) == false;
+  const isDesktop =
+    /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) == false;
   const [videoDimensions, setVideoDimensions] = useState({
     width: 480,
     height: 480,
@@ -635,7 +648,10 @@ export function VirtualTryOnScene({
       width = height * aspectRatio;
     }
 
-    setVideoDimensions({ width: Math.round(width), height: Math.round(height) });
+    setVideoDimensions({
+      width: Math.round(width),
+      height: Math.round(height),
+    });
   };
 
   useEffect(() => {

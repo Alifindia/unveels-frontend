@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { VirtualTryOnScene } from "../components/vto/virtual-try-on-scene";
 import {
   AccesoriesProvider,
@@ -370,16 +370,6 @@ function Main() {
             setHairColor(data.hairColor);
           }
 
-          // media
-          if (data.mode !== undefined) {
-            setMode(data.mode);
-          }
-
-          // set media file
-          if (data.media !== undefined) {
-            setMediaFile(data.media);
-          }
-
           //handle add media
         } catch (error) {
           console.error("Error parsing message:", error); // Menampilkan error jika parsing gagal
@@ -435,9 +425,52 @@ function Main() {
     }
   }, [criterias.screenshotImage]);
 
+  const handleUploadPhoto = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      setMode("IMAGE");
+      setMediaFile(file);
+    }
+  };
+
+  const handleUploadVideo = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      setMode("VIDEO");
+      setMediaFile(file);
+    }
+  };
+
   return (
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
       <div className="absolute inset-0">
+        <div className="mt-96">
+          <button
+            id="hello"
+            style={{ color: "red" }}
+            onClick={() => {
+              const photoInput = document.getElementById("photoInput");
+              if (photoInput) {
+                photoInput.click();
+              }
+            }}
+          >
+            Hello
+          </button>
+          <button style={{ color: "red" }}>Heeee</button>
+          <input
+            id="photoInput"
+            type="file"
+            accept="image/*"
+            onChange={handleUploadPhoto}
+          />
+          <input
+            id="videoInput"
+            type="file"
+            accept="video/*"
+            onChange={handleUploadVideo}
+          />
+        </div>
         <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
         <div className="pointer-events-none absolute inset-0"></div>
       </div>
