@@ -107,7 +107,7 @@ function ColorSelector() {
 
   return (
     <div className="lg:max-w-full-xl mx-auto w-full !border-b-0">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
         <button
           type="button"
           className="inline-flex size-[1.875rem] shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80 sm:size-10"
