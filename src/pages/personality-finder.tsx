@@ -220,7 +220,7 @@ function MainContent({isArabic} : {isArabic?: boolean}) {
             </>
           ) : (
             <>
-              <VideoStream />
+              <VideoStream faceScannerColor="255, 178, 71" />
               <TopNavigation />
             </>
           )}

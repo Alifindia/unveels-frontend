@@ -444,20 +444,7 @@ function Main() {
   return (
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
       <div className="absolute inset-0">
-        <div className="mt-96">
-          <button
-            id="hello"
-            style={{ color: "red" }}
-            onClick={() => {
-              const photoInput = document.getElementById("photoInput");
-              if (photoInput) {
-                photoInput.click();
-              }
-            }}
-          >
-            Hello
-          </button>
-          <button style={{ color: "red" }}>Heeee</button>
+        <div className="mt-96 hidden">
           <input
             id="photoInput"
             type="file"

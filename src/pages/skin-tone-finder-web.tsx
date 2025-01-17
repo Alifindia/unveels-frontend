@@ -83,7 +83,7 @@ function Main({isArabic}: {isArabic: boolean}) {
     <>
       <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
         <div className="absolute inset-0">
-          <VideoStream debugMode={false} />
+          <VideoStream debugMode={false} faceScannerColor="43, 221, 217" />
           <SkinToneFinderScene faceLandmarker={faceLandmarkerRef.current} />
         </div>
 

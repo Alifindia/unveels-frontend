@@ -162,7 +162,22 @@ function OverlayCanvas({
 
           ctx.font = "12px Arial";
           ctx.fillStyle = "white";
-          ctx.fillText(`${bbox.label} ${bbox.score.toFixed(2)}%`, labelX, labelY - 5);
+
+          ctx.shadowColor = "black";
+          ctx.shadowBlur = 4;
+          ctx.shadowOffsetX = 1;
+          ctx.shadowOffsetY = 1;
+
+          ctx.fillText(
+            `${bbox.label} ${bbox.score.toFixed(2)}%`,
+            labelX,
+            labelY - 5,
+          );
+
+          ctx.shadowColor = "transparent";
+          ctx.shadowBlur = 0;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
 
           const textWidth = ctx.measureText(bbox.label).width;
           const underlineEndX = labelX + textWidth;

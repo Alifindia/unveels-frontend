@@ -25,6 +25,12 @@ import { useTranslation } from "react-i18next";
 import { getCookie } from "../utils/other";
 import { label } from "three/webgpu";
 import SkinAnalysisScene from "../components/skin-analysis/skin-analysis-scene";
+import {
+  loadTFLiteModel,
+  preprocessTFLiteImage,
+  runTFLiteInference,
+} from "../utils/tfliteInference";
+import { useModelLoader } from "../hooks/useModelLoader";
 
 interface Model {
   net: tf.GraphModel;
@@ -86,6 +92,22 @@ function Main({ isArabic }: { isArabic?: boolean }) {
 
   const [model, setModel] = useState<Model | null>(null);
 
+  const steps = [
+    async () => {
+      const model = await loadTFLiteModel(
+        "/media/unveels/models/age/model_age_q.tflite",
+      );
+
+      modelSkinAnalysisRef.current = model;
+    },
+  ];
+
+  const {
+    progress,
+    isLoading: modelLoading,
+    loadModels,
+  } = useModelLoader(steps);
+
   useEffect(() => {
     const loadModel = async () => {
       try {
@@ -132,6 +154,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
 
     loadModel();
 
+    loadModels();
     return () => {
       if (model?.net) {
         model.net.dispose();
@@ -173,6 +196,25 @@ function Main({ isArabic }: { isArabic?: boolean }) {
             if (canvasRef.current == null) {
               throw new Error("Canvas ref is null");
             }
+            let age = 30;
+            if (modelSkinAnalysisRef.current != null) {
+              const preprocessedImage = await preprocessTFLiteImage(
+                criterias.capturedImage,
+                200,
+                200,
+              );
+              const ageData = await runTFLiteInference(
+                modelSkinAnalysisRef.current,
+                preprocessedImage,
+                200,
+                200,
+              );
+              if (ageData instanceof tf.Tensor) {
+                const data = await ageData.data();
+                age = data[0] * 77;
+                ageData.dispose();
+              }
+            }
             const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] =
               await detectFrame(image, model, canvasRef.current);
 
@@ -186,6 +228,11 @@ function Main({ isArabic }: { isArabic?: boolean }) {
                   class: 1000,
                   score: 0,
                   data: criterias.capturedImage,
+                },
+                {
+                  label: "age",
+                  class: 1001,
+                  score: Math.round(age),
                 },
               ]);
               console.log("Skin Analysis Result as JSON:", resultString);
@@ -235,7 +282,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
 
   return (
     <>
-      {loading.loading && !isVideoDetectorReady && (
+      {(loading.loading || !isVideoDetectorReady || modelLoading) && (
         <ModelLoadingScreen progress={loading.progress} />
       )}
       <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">

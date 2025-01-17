@@ -31,7 +31,7 @@ export function PersonalityFinderWeb() {
     i18n.changeLanguage(lang);
   }, [i18n]);
   const isArabic = i18n.language === "ar";
-  
+
   return (
     <CameraProvider>
       <InferenceProvider>
@@ -239,7 +239,7 @@ function MainContent({ isArabic }: { isArabic?: boolean }) {
             </>
           ) : (
             <>
-              <VideoStream />
+              <VideoStream faceScannerColor="255, 178, 71" />
             </>
           )}
         </div>
