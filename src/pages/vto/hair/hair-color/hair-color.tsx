@@ -111,7 +111,7 @@ function ColorSelector() {
 
   return (
     <div className="mx-auto w-full">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 xl:py-1 2xl:py-2.5">
         {haircolors.map((path, index) => (
           <button
             key={index}
@@ -127,7 +127,7 @@ function ColorSelector() {
             <img
               src={path}
               alt="Hair Color"
-              className="h-[31.5px] w-[41.3px] rounded object-cover sm:h-[45px] sm:w-[59px] lg:h-[58.5px] lg:w-[76.7px]"
+              className="h-[31.5px] w-[41.3px] rounded object-cover xl:h-[45px] xl:w-[59px] 2xl:h-[58.5px] 2xl:w-[76.7px]"
             />
           </button>
         ))}
