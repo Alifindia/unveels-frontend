@@ -282,7 +282,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
 
   return (
     <>
-      {loading.loading && !isVideoDetectorReady && isLoading && (
+      {(loading.loading || !isVideoDetectorReady || modelLoading) && (
         <ModelLoadingScreen progress={loading.progress} />
       )}
       <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
