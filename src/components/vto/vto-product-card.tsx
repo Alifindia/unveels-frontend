@@ -35,10 +35,10 @@ export function VTOProductCard({
   return (
     <div
       style={cardStyle}
-      className="w-[50px] md:w-[60px] lg:w-[70px] xl:w-[70px] 2xl:w-[100px] cursor-pointer"
+      className="w-[60px] lg:w-[70px] xl:w-[70px] 2xl:w-[100px] cursor-pointer"
       onClick={onClick}
     >
-      <div className="relative h-[35px] w-[50px] md:h-[40px] md:w-[60px] lg:h-[45px] lg:w-[70px] xl:h-[45px] xl:w-[70px] 2xl:h-[70px] 2xl:w-[100px] overflow-hidden">
+      <div className="relative h-[40px] w-[60px] lg:h-[45px] lg:w-[70px] xl:h-[45px] xl:w-[70px] 2xl:h-[70px] 2xl:w-[100px] overflow-hidden">
         <img
           src={imageUrl}
           alt="Product"
@@ -58,7 +58,7 @@ export function VTOProductCard({
         </div>
         <button
           type="button"
-          className="flex h-3 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-0.5 text-[0.225rem] md:h-4 md:px-1 md:text-[0.325rem] lg:h-4 lg:px-1 lg:text-[0.325rem] xl:h-5 xl:px-1 xl:text-[0.425rem] 2xl:h-6 2xl:px-1 2xl:text-[0.625rem] text-white font-semibold"
+          className="flex h-4 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-1 text-[0.325rem] lg:h-4 lg:text-[0.325rem] xl:h-5 xl:text-[0.425rem] 2xl:h-6 2xl:text-[0.625rem] text-white font-semibold"
         >
           Add to cart
         </button>
