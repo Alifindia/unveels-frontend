@@ -35,10 +35,10 @@ export function VTOProductCard({
   return (
     <div
       style={cardStyle}
-      className="w-[60px] lg:w-[70px] xl:w-[70px] 2xl:w-[100px] cursor-pointer"
+      className="w-[70px] lg:w-[80px] xl:w-[100px] 2xl:w-[120px] cursor-pointer"
       onClick={onClick}
     >
-      <div className="relative h-[40px] w-[60px] lg:h-[45px] lg:w-[70px] xl:h-[45px] xl:w-[70px] 2xl:h-[70px] 2xl:w-[100px] overflow-hidden">
+      <div className="relative h-[40px] w-[70px] lg:h-[45px] lg:w-[80px] xl:h-[55px] xl:w-[100px] 2xl:h-[70px] 2xl:w-[120px] overflow-hidden">
         <img
           src={imageUrl}
           alt="Product"
@@ -52,13 +52,13 @@ export function VTOProductCard({
       <p className="line-clamp-1 h-2 text-[0.325rem] pt-0.5 pb-1 text-white/60 md:h-3 lg:h-3 2xl:h-4 lg:text-[0.35rem] xl:text-[0.45rem] 2xl:text-[0.625rem]">
         <BrandName brandId={getProductAttributes(product, "brand")} />
       </p>
-      <div className="flex items-end justify-between space-x-1 pt-1">
-        <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.425rem] lg:text-[0.35rem] xl:text-[0.45rem] 2xl:text-[0.625rem] font-semibold text-white">
+      <div className="flex items-end gap-1 justify-between space-x-1 pt-1">
+        <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] w-24 bg-clip-text text-[0.28rem] lg:text-[0.325rem] xl:text-[0.425rem] 2xl:text-[0.525rem] font-semibold text-white">
           {currencySymbol}{(product.price * rate).toFixed(3)}
         </div>
         <button
           type="button"
-          className="flex h-4 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-1 text-[0.325rem] lg:h-4 lg:text-[0.325rem] xl:h-5 xl:text-[0.425rem] 2xl:h-6 2xl:text-[0.625rem] text-white font-semibold"
+          className="flex w-[100px] h-3 items-center justify-center bg-gradient-to-r from-[#CA9C43] to-[#92702D] px-1 text-[0.28rem] lg:h-3 lg:text-[0.325rem] xl:h-4 xl:text-[0.425rem] 2xl:h-5 2xl:text-[0.525rem] text-white font-semibold"
         >
           Add to cart
         </button>
