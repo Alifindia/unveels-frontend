@@ -32,6 +32,7 @@ interface VideoStreamProps {
   onCanvasReady?: (ready: boolean | false) => void;
   isNeedDetectOrientation?: boolean;
   onVideoReady?: (ready: boolean | false) => void;
+  faceScannerColor?: string | null;
 }
 
 export function VideoStream({
@@ -39,6 +40,7 @@ export function VideoStream({
   onCanvasReady,
   isNeedDetectOrientation = true,
   onVideoReady,
+  faceScannerColor = "255, 220, 0",
 }: VideoStreamProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -196,12 +198,15 @@ export function VideoStream({
 
               gradient.addColorStop(
                 Math.max(0, glowOffset - 0.1),
-                "rgba(254, 238, 192, 0.1)",
+                `rgba(${faceScannerColor}, 0.1)`,
               );
-              gradient.addColorStop(glowOffset, "rgba(255, 220, 0, 0.5)");
+              gradient.addColorStop(
+                glowOffset,
+                `rgba(${faceScannerColor}, 0.5)`,
+              );
               gradient.addColorStop(
                 Math.min(1, glowOffset + 0.1),
-                "rgba(245, 209, 86, 0.1)",
+                `rgba(${faceScannerColor}, 0.1)`,
               );
 
               drawConnectorsFromFaces(
@@ -582,13 +587,7 @@ export function VideoStream({
         ? isBrightnessGood && isPositionGood && isOrientationGood
         : isBrightnessGood,
     };
-  }, [
-    lighting,
-    position.x,
-    position.y,
-    orientation.pitch,
-    orientation.yaw,
-  ]);
+  }, [lighting, position.x, position.y, orientation.pitch, orientation.yaw]);
 
   /**
    * Function to capture the current frame from the webcam and crop based on bounding box
