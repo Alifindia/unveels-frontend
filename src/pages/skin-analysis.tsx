@@ -36,8 +36,6 @@ import {
 } from "../context/inference-context";
 import * as tf from "@tensorflow/tfjs";
 import * as tflite from "@tensorflow/tfjs-tflite";
-import { loadTFLiteModel } from "../utils/tfliteInference";
-import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { Scanner } from "../components/scanner";
 import { useCartContext } from "../context/cart-context";
@@ -49,11 +47,20 @@ import { detectFrame } from "../inference/skinAnalysisInference";
 import { Link } from "react-router-dom";
 import { FindTheLookItems } from "../types/findTheLookItems";
 import { FilterProvider, useFilterContext } from "../context/filter-context";
-import { FindTheLookProvider, useFindTheLookContext } from "../context/find-the-look-context";
+import {
+  FindTheLookProvider,
+  useFindTheLookContext,
+} from "../context/find-the-look-context";
 import { getSkinConcernProductTypeIds } from "../api/attributes/skin_concern";
 import { Rating } from "../components/rating";
 import { useProducts, useProductsVTOAll } from "../api/get-product";
 import { LinkButton } from "../App";
+import {
+  loadTFLiteModel,
+  preprocessTFLiteImage,
+  runTFLiteInference,
+} from "../utils/tfliteInference";
+import { useModelLoader } from "../hooks/useModelLoader";
 
 interface Model {
   net: tf.GraphModel;
@@ -120,12 +127,18 @@ function Main({ isArabic }: { isArabic: boolean }) {
   const steps = [
     async () => {
       const model = await loadTFLiteModel(
-        "/media/unveels/models/skin-analysis/best_float16.tflite",
+        "/media/unveels/models/age/model_age_q.tflite",
       );
 
       modelSkinAnalysisRef.current = model;
     },
   ];
+
+  const {
+    progress,
+    isLoading: modelLoading,
+    loadModels,
+  } = useModelLoader(steps);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -282,6 +295,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
     };
 
     loadModel();
+    loadModels();
 
     return () => {
       if (model?.net) {
@@ -313,11 +327,27 @@ function Main({ isArabic }: { isArabic: boolean }) {
             if (canvasRef.current == null) {
               throw new Error("Canvas ref is null");
             }
-            const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] = await detectFrame(
-              image,
-              model,
-              canvasRef.current,
-            );
+            let age = 30;
+            if (modelSkinAnalysisRef.current != null) {
+              const preprocessedImage = await preprocessTFLiteImage(
+                criterias.capturedImage,
+                200,
+                200,
+              );
+              const ageData = await runTFLiteInference(
+                modelSkinAnalysisRef.current,
+                preprocessedImage,
+                200,
+                200,
+              );
+              if (ageData instanceof tf.Tensor) {
+                const data = await ageData.data();
+                age = data[0] * 77;
+                ageData.dispose();
+              }
+            }
+            const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] =
+              await detectFrame(image, model, canvasRef.current);
 
             // const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] =
             // await skinAnalysisInference(
@@ -334,6 +364,11 @@ function Main({ isArabic }: { isArabic: boolean }) {
                   score: 0,
                   data: criterias.capturedImage,
                   label: "",
+                },
+                {
+                  label: "age",
+                  class: 1001,
+                  score: Math.round(age),
                 },
               ]);
               setIsInferenceCompleted(true);
@@ -363,11 +398,11 @@ function Main({ isArabic }: { isArabic: boolean }) {
   const setIsVideoDetectorReady = (ready: boolean) => {
     console.log("Video detector is ready: ", ready);
     isVideoDetectorReady.current = ready;
-  }
+  };
 
   return (
     <>
-      {isVideoDetectorReady.current == false && model == null && (
+      {isVideoDetectorReady.current == false && model == null && isLoading && (
         <ModelLoadingScreen progress={loading.progress} />
       )}
       <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
@@ -391,11 +426,13 @@ function Main({ isArabic }: { isArabic: boolean }) {
                 height={model.inputShape[1]}
                 ref={canvasRef}
                 className="h-full w-full object-cover blur-sm"
-                style={{ opacity: 0.5}}
+                style={{ opacity: 0.5 }}
               />
             )}
             {!isLoading && inferenceResult != null ? (
-              <><SkinAnalysisScene data={inferenceResult} /></>
+              <>
+                <SkinAnalysisScene data={inferenceResult} />
+              </>
             ) : (
               <>
                 {isInferenceCompleted ? (
@@ -408,7 +445,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
                   </>
                 ) : (
                   <>
-                    <VideoStream onVideoReady={setIsVideoDetectorReady}/>
+                    <VideoStream onVideoReady={setIsVideoDetectorReady} />
                   </>
                 )}
               </>
@@ -598,7 +635,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
   const { data } = useSkincareProductQuery({
     skinConcern,
   });
-  console.log(data)
+  console.log(data);
   const { addItemToCart } = useCartContext();
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
@@ -834,7 +871,7 @@ function AnalysisResults({
             <Icons.hashtagCircle className="size-5" />
             <div className="text-lg">
               {t("viewskinan.skin_age")}:{" "}
-              {Math.floor(Math.random() * (64 - 20 + 1)) + 20}
+              {getTotalScoreByLabel("age")}
             </div>
           </div>
         </div>
