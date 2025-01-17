@@ -133,7 +133,7 @@ function ColorSelector() {
     extractHexa.length > 0 ? extractHexa : extractSubColor;
 
   return (
-    <div className="mx-auto w-full py-1 sm:py-2">
+    <div className="mx-auto w-full py-1 lg:py-1.5">
       <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
         <button
           type="button"
@@ -225,7 +225,7 @@ function NeckwearProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
+          className="p-0 text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Chokers: {

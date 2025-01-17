@@ -98,7 +98,7 @@ function ColorSelector() {
     extractHexa.length > 0 ? extractHexa : extractSubColor;
 
   return (
-    <div className="mx-auto w-full py-1 sm:py-2">
+    <div className="mx-auto w-full py-1 lg:py-1.5">
       <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 sm:py-2.5">
         <button
           type="button"
@@ -179,7 +179,7 @@ function OccasionSelector() {
           )}
           onClick={() => setSelectedOccasion(occasion.value)}
         >
-          <span className="text-[9.8px] sm:text-sm">{occasion.label}</span>
+          <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{occasion.label}</span>
         </button>
       ))}
     </div>
@@ -227,7 +227,7 @@ function FabricSelector() {
             alt={material.name}
             className="size-6 shrink-0"
           />
-          <span className="text-[9.8px] sm:text-sm">{material.name}</span>
+          <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{material.name}</span>
         </button>
       ))}
     </div>
@@ -296,7 +296,7 @@ function TiaraProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
+          className="p-0 text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Tiaras: {
@@ -316,7 +316,7 @@ function TiaraProductList() {
         </button>
       </div>
 
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
         {isLoading ? (
           <LoadingProducts />
         ) : (

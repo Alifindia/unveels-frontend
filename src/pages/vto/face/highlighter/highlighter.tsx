@@ -154,7 +154,7 @@ function TextureSelector() {
             )}
             onClick={() => setMaterial(index, texture)}
           >
-            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] lg:text-xs">{texture.label}</span>
           </button>
         ))}
       </div>
@@ -196,7 +196,7 @@ function ShapeSelector() {
             <img
               src={path}
               alt="Highlighter"
-              className="size-[25px] rounded sm:size-[40px] lg:size-[55px]"
+              className="size-[25px] rounded sm:size-[30px] lg:size-[35px]"
             />
           </button>
         ))}
@@ -292,7 +292,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
+          className="p-0 text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Highlighters: {
@@ -311,7 +311,7 @@ function ProductList() {
           {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
         {isLoading ? (
           <LoadingProducts />
         ) : (

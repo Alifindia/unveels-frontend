@@ -74,7 +74,7 @@ function FamilyColorSelector() {
                 background: item.color,
               }}
             />
-            <span className="text-[9.8px] sm:text-sm">{item.name}</span>
+            <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{item.name}</span>
           </button>
         ))}
     </div>
@@ -169,7 +169,7 @@ function TextureSelector() {
             )}
             onClick={() => setMaterial(index, texture)}
           >
-            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{texture.label}</span>
           </button>
         ))}
       </div>
@@ -275,7 +275,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
+          className="p-0 text-[0.625rem] text-white sm:py-1"
           onClick={() => {
             setMapTypes({
               Foundations: {

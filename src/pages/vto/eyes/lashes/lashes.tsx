@@ -83,7 +83,7 @@ function FamilyColorSelector() {
               background: item.value,
             }}
           />
-          <span className="text-[9.8px] sm:text-sm">{item.name}</span>
+          <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{item.name}</span>
         </button>
       ))}
     </div>
@@ -153,7 +153,7 @@ function ShapeSelector() {
             <img
               src={eyelashes[index % eyelashes.length]}
               alt="Eyebrow"
-              className="size-[25px] rounded sm:size-[40px] lg:size-[55px]"
+              className="size-[25px] rounded sm:size-[30px] lg:size-[35px]"
             />
           </button>
         ))}
@@ -202,7 +202,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
+          className="p-0 text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Lash: {
@@ -225,7 +225,7 @@ function ProductList() {
                     {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
         {isLoading ? (
           <LoadingProducts />
         ) : (

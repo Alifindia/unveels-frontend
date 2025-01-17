@@ -93,7 +93,7 @@ function ColorSelector() {
   ).flatMap((item) => item.split(","));
 
   return (
-    <div className="mx-auto w-full py-1 sm:py-2">
+    <div className="mx-auto w-full py-1 lg:py-1.5">
       <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
         <button
           type="button"
@@ -139,7 +139,7 @@ const eyeliners = [
 function ShapeSelector() {
   const { selectedShape, setSelectedShape } = useEyeLinerContext();
   return (
-    <div className="mx-auto w-full py-4">
+    <div className="mx-auto w-full py-2">
       <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
         {patterns.eyeliners.map((pattern, index) => (
           <button
@@ -162,7 +162,7 @@ function ShapeSelector() {
             <img
               src={eyeliners[index % eyeliners.length]}
               alt="Eyebrow"
-              className="size-[25px] rounded sm:size-[40px] lg:size-[55px]"
+              className="size-[25px] rounded sm:size-[30px] lg:size-[35px]"
             />
           </button>
         ))}
@@ -259,7 +259,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-2"
+          className="p-0 text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Eyeliners: {

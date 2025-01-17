@@ -240,7 +240,7 @@ function Main() {
               setMode={setMode}
               setShowChangeModel={setShowChangeModel}
             />
-            <div className="bg-black/10 pt-1 shadow-lg backdrop-blur-sm">
+            <div className="bg-black/10 shadow-lg backdrop-blur-sm">
               {isMainContentVisible && <MainContent />}
               <Footer />
             </div>
@@ -268,7 +268,7 @@ function MainContent() {
           }}
           className="flex h-3 w-full items-center justify-center bg-transparent"
         >
-          <div className="h-1 w-10 rounded-full bg-gray-400" />
+          <div className="h-1 w-8 xl:w-10 rounded-full bg-gray-400" />
         </button>
       </div>
       {collapsed ? null : <BottomContent />}
@@ -293,7 +293,7 @@ export function TryOnSelector() {
             <Fragment key={shadeTab}>
               <button
                 key={shadeTab}
-                className={`relative h-10 grow border-b font-luxury text-[10px] sm:text-[12px] lg:text-[14px] ${
+                className={`relative h-10 grow border-b font-luxury text-[8px] sm:text-[10px] lg:text-[12px] ${
                   isActive
                     ? activeClassNames
                     : "border-transparent text-gray-500"
@@ -426,7 +426,7 @@ export function Makeups() {
                   }
                 />
               </div>
-              <div className="text-center text-[10px] !leading-4 text-white lg:text-sm">
+              <div className="text-center text-[10px] !leading-4 text-white xl:text-xs 2xl:text-sm">
                 {t("vto." + option.name)} {/* Reduce text size here */}
               </div>
             </button>
@@ -666,16 +666,16 @@ function Sidebar({
         <div className="flex flex-col gap-4 rounded-full bg-black/25 px-1.5 py-2 backdrop-blur-md">
           {/* <VoiceCommand /> */}
           <button className="" onClick={screenShoot}>
-            <Icons.camera className="size-4 text-white sm:size-6" />
+            <Icons.camera className="size-4 text-white xl:size-5 2xl:size-6" />
           </button>
           <button className="" onClick={flipCamera}>
-            <Icons.flipCamera className="size-4 text-white sm:size-6" />
+            <Icons.flipCamera className="size-4 text-white xl:size-5 2xl:size-6" />
           </button>
           <button className="" onClick={onExpandClick}>
-            <Icons.expand className="size-4 text-white sm:size-6" />
+            <Icons.expand className="size-4 text-white xl:size-5 2xl:size-6" />
           </button>
           <button className="" onClick={compareCapture}>
-            <Icons.compare className="size-4 text-white sm:size-6" />
+            <Icons.compare className="size-4 text-white xl:size-5 2xl:size-6" />
           </button>
           <UploadMediaDialog
             setMediaFile={setMediaFile}
@@ -721,7 +721,7 @@ function UploadMediaDialog({
     <Dialog.Root>
       <Dialog.Trigger asChild>
         <button type="button" className="flex items-center justify-center">
-          <Icons.upload className="size-4 text-white sm:size-6" />
+          <Icons.upload className="size-4 text-white xl:size-5 2xl:size-6" />
         </button>
       </Dialog.Trigger>
       <Dialog.Portal>
