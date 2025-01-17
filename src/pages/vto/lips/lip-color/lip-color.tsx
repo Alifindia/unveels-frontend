@@ -34,14 +34,14 @@ export function LipColorSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily } = useLipColorContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } = useLipColorContext();
 
   return (
     <div
       className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
       data-mode="lip-color"
     >
-      {colors.map((item, index) => (
+      {colors.filter((c) => colorFamilyToInclude?.includes(c.value)).map((item, index) => (
         <button
           type="button"
           className={clsx(
