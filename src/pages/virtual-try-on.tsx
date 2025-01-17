@@ -524,7 +524,7 @@ export function Accessories() {
                   }
                 />
               </div>
-              <div className="text-center text-[10px] !leading-4 text-white sm:text-xs lg:text-sm">
+              <div className="text-center text-[10px] !leading-4 text-white xl:text-xs 2xl:text-sm">
                 {t("vto." + option.name)} {/* Reduce text size here */}
               </div>
             </button>
