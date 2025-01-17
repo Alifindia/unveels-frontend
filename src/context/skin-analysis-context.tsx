@@ -42,7 +42,7 @@ export const SkinAnalysisProvider: React.FC<SkinAnalysisProviderProps> = ({
 }) => {
   const [tab, setTab] = useState<string>("acne");
   const [view, setView] = useState<"face" | "problems" | "results" | "all_categories">("face");
-  console.log(setView)
+
   const [skinAnalysisData, setSkinAnalysisData] =
     useState<SkinAnalysisItem[]>(skinAnalysisDataItem);
 

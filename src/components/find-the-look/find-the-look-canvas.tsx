@@ -383,8 +383,17 @@ export function FindTheLookCanvas({
         // Gambar label
         ctx.font = "12px Arial";
         ctx.fillStyle = "white";
+        ctx.shadowColor = "black";
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+
         ctx.fillText(categoryName, labelX, labelY - 5);
 
+        ctx.shadowColor = "transparent";
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
         // Gambar garis bawah pada label
         const textWidth = ctx.measureText(categoryName).width;
         const underlineEndX = labelX + textWidth;
@@ -479,7 +488,17 @@ export function FindTheLookCanvas({
               // Display the label
               ctx.font = "12px Arial";
               ctx.fillStyle = "white";
+
+              ctx.shadowColor = "black";
+              ctx.shadowBlur = 4;
+              ctx.shadowOffsetX = 1;
+              ctx.shadowOffsetY = 1;
+
               ctx.fillText(label, labelX, labelY - 5);
+              ctx.shadowColor = "transparent";
+              ctx.shadowBlur = 0;
+              ctx.shadowOffsetX = 0;
+              ctx.shadowOffsetY = 0;
 
               // Draw underline for label text
               const textWidth = ctx.measureText(label).width;
@@ -549,7 +568,16 @@ export function FindTheLookCanvas({
               // Display the label
               ctx.font = "12px Arial";
               ctx.fillStyle = "white";
+              ctx.shadowColor = "black";
+              ctx.shadowBlur = 4;
+              ctx.shadowOffsetX = 1;
+              ctx.shadowOffsetY = 1;
+
               ctx.fillText(label, labelX, labelY - 5);
+              ctx.shadowColor = "transparent";
+              ctx.shadowBlur = 0;
+              ctx.shadowOffsetX = 0;
+              ctx.shadowOffsetY = 0;
 
               // Draw underline for label text
               const textWidth = ctx.measureText(label).width;
@@ -619,7 +647,16 @@ export function FindTheLookCanvas({
               // Display the label
               ctx.font = "12px Arial";
               ctx.fillStyle = "white";
+              ctx.shadowColor = "black";
+              ctx.shadowBlur = 4;
+              ctx.shadowOffsetX = 1;
+              ctx.shadowOffsetY = 1;
+
               ctx.fillText(label, labelX, labelY - 5);
+              ctx.shadowColor = "transparent";
+              ctx.shadowBlur = 0;
+              ctx.shadowOffsetX = 0;
+              ctx.shadowOffsetY = 0;
 
               // Draw underline for label text
               const textWidth = ctx.measureText(label).width;
@@ -689,7 +726,16 @@ export function FindTheLookCanvas({
               // Display the label
               ctx.font = "12px Arial";
               ctx.fillStyle = "white";
+              ctx.shadowColor = "black";
+              ctx.shadowBlur = 4;
+              ctx.shadowOffsetX = 1;
+              ctx.shadowOffsetY = 1;
+
               ctx.fillText(label, labelX, labelY - 5);
+              ctx.shadowColor = "transparent";
+              ctx.shadowBlur = 0;
+              ctx.shadowOffsetX = 0;
+              ctx.shadowOffsetY = 0;
 
               // Draw underline for label text
               const textWidth = ctx.measureText(label).width;
