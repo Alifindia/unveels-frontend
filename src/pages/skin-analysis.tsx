@@ -500,13 +500,16 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div
-        className="fixed inset-0 h-full w-full"
-        onClick={() => {
-          onClose();
-        }}
-      ></div>
       <div className="relative space-y-1 bg-black/10 p-2 px-4 pb-2 shadow-lg backdrop-blur-sm sm:space-y-2">
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-3 w-full items-center justify-center bg-transparent"
+          >
+            <div className="h-1 w-10 rounded-full bg-gray-400" />
+          </button>
+        </div>
         <div className="flex w-full items-center space-x-3.5 overflow-x-auto overflow-y-visible pt-7 no-scrollbar">
           {tabs.map((problemTab) => {
             const isActive = tab === problemTab;
