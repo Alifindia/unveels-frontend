@@ -253,6 +253,29 @@ export const arabicToEnglishSetPattern: { [key: string]: string } = {
   "نمط محدد" : "set pattern",
 };
 
+export const arabicToEnglishSetDark: { [key: string]: string } = {
+  "مجموعة مظلمة عشرة في المئة" : "set dark 10%",
+  "مجموعه مظلمه 10%" : "set dark 10%",
+  "مجموعة مظلمة عشرين بالمئة" : "set dark 20%",
+  "مجموعه مظلمه 20%": "set dark 20%",
+  "مجموعة مظلمة ثلاثون في المئة" : "set dark 30%",
+  "مجموعه مظلمه 30%": "set dark 30%",
+  "مجموعة مظلمة أربعين في المئة" : "set dark 40%",
+  "مجموعه مظلمه 40%": "set dark 40%",
+  "مجموعة مظلمة خمسين في المئة" : "set dark 50%",
+  "مجموعه مظلمه 50%": "set dark 50%",
+  "مجموعة مظلمة ستين في المئة" : "set dark 60%",
+  "مجموعه مظلمه 60%": "set dark 60%",
+  "مجموعة مظلمة سبعين في المئة" : "set dark 70%",
+  "مجموعه مظلمه 70%": "set dark 70%",
+  "مجموعة مظلمة ثمانين في المئة" : "set dark 80%",
+  "مجموعه مظلمه 80%": "set dark 80%",
+  "مجموعة مظلمة تسعين في المئة" : "set dark 90%",
+  "مجموعه مظلمه 90%": "set dark 90%",
+  "مجموعة مظلمة مائة بالمائة" : "set dark 100%",
+  "مجموعه مظلمه 100%": "set dark 100%",
+};
+
 export function translateSelectProduct(text: any) {
   let translatedText = text;
   let isFullyTranslated = false;
@@ -286,6 +309,10 @@ export function translateSelectProduct(text: any) {
   const containsSection = Object.keys(arabicToEnglishSection).some((keyword) =>
     text.includes(keyword)
   );
+  const containsSetDark = Object.keys(arabicToEnglishSetDark).some((keyword) =>
+    text.includes(keyword)
+  );
+  
   const numbersMapping = {
     ...arabicToEnglishNumbers,
   };
@@ -339,6 +366,15 @@ export function translateSelectProduct(text: any) {
     const Mapping = {
       ...arabicToEnglishSetPattern,
       ...arabicToEnglishNumbers,
+    };
+
+    Object.keys(Mapping).forEach((arabicWord) => {
+      const englishWord = Mapping[arabicWord];
+      translatedText = translatedText.replace(new RegExp(arabicWord, 'g'), englishWord);
+    });
+  } else if (containsSetDark) {
+    const Mapping = {
+      ...arabicToEnglishSetDark
     };
 
     Object.keys(Mapping).forEach((arabicWord) => {

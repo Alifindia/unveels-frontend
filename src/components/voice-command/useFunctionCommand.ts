@@ -368,6 +368,14 @@ export function useFunctionCommand() {
         "thirty": 30,
       };
 
+      const numberPercent: { [key: string]: number } = {
+        "ten%": 10,
+        "twenty%": 20,
+        "thirty%": 30,
+        "forty%": 40,
+        "fivety%": 50,
+      };
+
     if (selectProduct.test(transcript)) {
       let productNumber = transcript.match(selectProduct)?.[1]; // Ambil angka atau kata dari grup pertama
 
@@ -464,9 +472,12 @@ export function useFunctionCommand() {
     }
     // Check darknes
     if (darknesRegex.test(transcript)) {
-      const darknes = capitalizeWords(
+      let darknes = capitalizeWords(
         transcript.match(darknesRegex)[1].toLowerCase().trim(),
       );
+      if (darknes && isNaN(Number(darknes))) {
+        darknes = numberPercent[darknes.toLowerCase()]?.toString();
+      }
       handleSetDarknes(darknes);
     }
   };
