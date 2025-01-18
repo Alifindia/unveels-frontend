@@ -12,6 +12,8 @@ export default {
       },
       animation: {
         swirly: "swirly 10s ease-in-out infinite",
+        "fade-down": "fadeDown 0.5s ease-out",
+        "fade-top": "fadeTop 0.5s ease-in",
       },
       keyframes: {
         swirly: {
@@ -20,6 +22,14 @@ export default {
           "50%": { transform: "translateY(-20px)" },
           "75%": { transform: "translateY(-10px)" },
           "100%": { transform: "translateY(0)" },
+        },
+        fadeDown: {
+          "0%": { opacity: 0, transform: "translateY(-20px)" },
+          "100%": { opacity: 1, transform: "translateY(0)" },
+        },
+        fadeTop: {
+          "0%": { opacity: 1, transform: "translateY(0)" },
+          "100%": { opacity: 0, transform: "translateY(-20px)" },
         },
       },
     },
