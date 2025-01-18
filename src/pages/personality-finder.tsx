@@ -44,6 +44,8 @@ import { TopNavigation } from "../components/top-navigation";
 import { useTranslation } from "react-i18next";
 import { getCookie, getCurrencyAndRate } from "../utils/other";
 import { RecommendationsTab } from "../components/personality-analyzer/recomendations-tab";
+import SuccessPopup from "../components/popup-add-to-cart";
+import { useCartContext } from "../context/cart-context";
 
 export function PersonalityFinder() {
   const { i18n } = useTranslation();
@@ -252,9 +254,10 @@ function Result({ inferenceResult, isArabic }: { inferenceResult: Classifier[], 
   const [selectedTab, setTab] = useState(tabs[0].title);
 
   const { criterias } = useCamera();
-
+  const { dataItem } = useCartContext();
   return (
-    <div className="flex h-screen flex-col bg-black font-sans text-white">
+    <div className="relative flex h-screen flex-col bg-black font-sans text-white">
+      <SuccessPopup product={dataItem} />
       {/* Navigation */}
       <div className="mb-14">
         <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-3 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">

@@ -61,6 +61,7 @@ import {
   runTFLiteInference,
 } from "../utils/tfliteInference";
 import { useModelLoader } from "../hooks/useModelLoader";
+import SuccessPopup from "../components/popup-add-to-cart";
 
 interface Model {
   net: tf.GraphModel;
@@ -399,6 +400,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
     console.log("Video detector is ready: ", ready);
     isVideoDetectorReady.current = ready;
   };
+  const { dataItem } = useCartContext();
 
   return (
     <>
@@ -406,6 +408,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
         <ModelLoadingScreen progress={loading.progress} />
       )}
       <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
+        <SuccessPopup product={dataItem} />
         {isInferenceCompleted &&
           criterias.capturedImage != null &&
           model != null && (
@@ -639,13 +642,14 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
     skinConcern,
   });
   console.log(data);
-  const { addItemToCart } = useCartContext();
+  const { addItemToCart, setDataItem } = useCartContext();
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
-  const handleAddToCart = async (id: string, url: string) => {
+  const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -706,6 +710,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                     handleAddToCart(
                       product.id.toString(),
                       `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      product
                     );
                   }}
                 >
@@ -1459,9 +1464,11 @@ export function AllProductsPage({
   const { selectedItems: cart, dispatch } = useFindTheLookContext();
   const { t } = useTranslation();
   const addItemToCart = () => {};
+  const { dataItem } = useCartContext();
 
   return (
     <div className="fixed inset-0 flex flex-col bg-black px-2 font-sans text-white">
+      <SuccessPopup product={dataItem} />
       {isFilterVisible && (
         <div
           className="fixed inset-0 z-40 bg-black opacity-50"
@@ -1604,11 +1611,12 @@ function ProductHorizontalList({
     refetch, // Ensure refetch is included to avoid stale closures
   ]);
 
-  const { addItemToCart } = useCartContext();
+  const { addItemToCart, setDataItem } = useCartContext();
 
-  const handleAddToCart = async (id: string, url: string) => {
+  const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -1633,24 +1641,28 @@ function ProductHorizontalList({
               <div
                 key={product.id}
                 className="rounded-xl shadow"
-                onClick={() => {
-                  window.open(
-                    `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                    "_blank",
-                  );
-                }}
               >
-                <div className="relative aspect-square w-full overflow-hidden">
-                  <img
-                    src={imageUrl}
-                    alt="Product"
-                    className="h-full w-full rounded object-cover"
-                  />
-                </div>
+                <div
+                className="cursor-pointer"              
+                  onClick={() => {
+                    window.open(
+                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      "_blank",
+                    );
+                  }}
+                >
+                  <div className="relative aspect-square w-full overflow-hidden" >
+                    <img
+                      src={imageUrl}
+                      alt="Product"
+                      className="h-full w-full rounded object-cover"
+                    />
+                  </div>
 
-                <h3 className="line-clamp-2 h-10 pt-2.5 text-xs font-semibold text-white">
-                  {product.name}
-                </h3>
+                  <h3 className="line-clamp-2 h-10 pt-2.5 text-xs font-semibold text-white">
+                    {product.name}
+                  </h3>
+                </div>
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-white/60">
                     <BrandName
@@ -1672,6 +1684,7 @@ function ProductHorizontalList({
                       handleAddToCart(
                         product.id.toString(),
                         `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                        product
                       );
                     }}
                   >

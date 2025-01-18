@@ -55,6 +55,7 @@ import { useTranslation } from "react-i18next";
 import { getCookie, getCurrencyAndRate } from "../utils/other";
 import { exchangeRates } from "../utils/constants";
 import { LinkButton } from "../App";
+import SuccessPopup from "../components/popup-add-to-cart";
 
 export function FindTheLook() {
   const { i18n } = useTranslation();
@@ -195,7 +196,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
 
   const { view, setView, findTheLookItems, tab, section, setTab, setSection } =
     useFindTheLookContext();
-
+  const { dataItem } = useCartContext();
   return (
     <>
       {!selectionMade && (
@@ -203,6 +204,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
       )}
       {selectionMade && (
         <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+          <SuccessPopup product={dataItem} />
           <div className="absolute inset-0">
             {criterias.isCaptured && criterias.capturedImage ? (
               <FindTheLookScene models={modelsRef.current} />
@@ -453,11 +455,12 @@ function ProductList({ product_type }: { product_type: string }) {
 
   const { t } = useTranslation();
 
-  const { addItemToCart } = useCartContext();
+  const { addItemToCart, setDataItem } = useCartContext();
 
-  const handleAddToCart = async (id: string, url: string) => {
+  const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -513,6 +516,7 @@ function ProductList({ product_type }: { product_type: string }) {
                     handleAddToCart(
                       product.id.toString(),
                       `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      product
                     );
                   }}
                 >
@@ -795,6 +799,7 @@ function AllProductsPage({
   const { t } = useTranslation();
 
   const addItemToCart = () => {};
+  const { dataItem } = useCartContext();
 
   return (
     <div
@@ -802,6 +807,7 @@ function AllProductsPage({
         "fixed inset-0 flex h-dvh flex-col bg-black font-sans text-white",
       )}
     >
+      <SuccessPopup product={dataItem} />
       {/* Navigation */}
       <div className="flex items-center justify-between px-4 py-2">
         <button type="button" className="size-6" onClick={() => onClose()}>
@@ -958,12 +964,13 @@ function ProductHorizontalList({ category }: { category: string }) {
     type_ids: values,
   });
 
-  const { addItemToCart } = useCartContext();
+  const { addItemToCart, setDataItem } = useCartContext();
   const { t } = useTranslation();
 
-  const handleAddToCart = async (id: string, url: string) => {
+  const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -1019,6 +1026,7 @@ function ProductHorizontalList({ category }: { category: string }) {
                       handleAddToCart(
                         product.id.toString(),
                         `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                        product
                       );
                     }}
                   >
@@ -1054,12 +1062,13 @@ function SingleCategoryView({
 }) {
   const { data } = useLipsProductQuery({});
 
-  const { addItemToCart } = useCartContext();
+  const { addItemToCart, setDataItem } = useCartContext();
   const { t } = useTranslation();
 
-  const handleAddToCart = async (id: string, url: string) => {
+  const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -1067,6 +1076,7 @@ function SingleCategoryView({
   };
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
+  const { dataItem } = useCartContext();
 
   return (
     <div
@@ -1074,6 +1084,7 @@ function SingleCategoryView({
         "fixed inset-0 flex h-dvh flex-col bg-black font-sans text-white",
       )}
     >
+      <SuccessPopup product={dataItem} />
       {/* Navigation */}
       <div className="flex items-center justify-between px-4 py-2">
         <button type="button" className="size-6" onClick={() => onClose()}>
@@ -1129,6 +1140,7 @@ function SingleCategoryView({
                           handleAddToCart(
                             product.id.toString(),
                             `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                            product
                           );
                         }}
                       >
