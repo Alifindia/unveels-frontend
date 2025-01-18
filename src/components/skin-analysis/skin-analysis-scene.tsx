@@ -60,7 +60,7 @@ export function SkinAnalysisScene({ data }: SkinAnalysisSceneProps) {
             baseOptions: {
               modelAssetPath:
                 "/media/unveels/models/face-landmarker/face_landmarker.task",
-              delegate: "CPU",
+              delegate: "GPU",
             },
             runningMode: "IMAGE",
             numFaces: 1,

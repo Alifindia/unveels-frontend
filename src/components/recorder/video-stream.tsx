@@ -87,7 +87,7 @@ export function VideoStream({
           baseOptions: {
             modelAssetPath:
               "/media/unveels/models/face-landmarker/face_landmarker.task",
-            delegate: "CPU",
+            delegate: "GPU",
           },
           runningMode:
             runningMode == "LIVE_CAMERA" || runningMode == "VIDEO"

@@ -50,7 +50,7 @@ export function SkinImprovementScene() {
             baseOptions: {
               modelAssetPath:
                 "/media/unveels/models/face-landmarker/face_landmarker.task",
-              delegate: "CPU", // Opsional: gunakan "GPU" jika didukung
+              delegate: "GPU", // Opsional: gunakan "GPU" jika didukung
             },
             runningMode: "IMAGE",
             numFaces: 1,

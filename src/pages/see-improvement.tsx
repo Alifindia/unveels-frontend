@@ -73,7 +73,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
           baseOptions: {
             modelAssetPath:
               "/media/unveels/models/face-landmarker/face_landmarker.task",
-            delegate: "CPU",
+            delegate: "GPU",
           },
           outputFaceBlendshapes: true,
           runningMode: "IMAGE",
@@ -121,7 +121,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
 interface MainContentProps {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
-  isArabic?: boolean 
+  isArabic?: boolean
 }
 
 function MainContent({ collapsed, setCollapsed, isArabic }: MainContentProps) {
