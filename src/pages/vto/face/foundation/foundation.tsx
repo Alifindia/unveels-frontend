@@ -7,7 +7,7 @@ import { ColorPalette } from "../../../../components/color-palette";
 import { LoadingProducts } from "../../../../components/loading";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useMakeup } from "../../../../context/makeup-context";
-import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import { baseApiUrl, extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useFoundationContext } from "./foundation-context";
 import { useFoundationQuery } from "./foundation-query";
 import { Product } from "../../../../api/shared";
@@ -17,6 +17,7 @@ import { useFindTheLookContext } from "../../../../context/find-the-look-context
 import { getFaceMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../../../../utils/other";
+import { useCartContext } from "../../../../context/cart-context";
 
 export function FoundationSelector() {
   const { i18n } = useTranslation();
@@ -180,7 +181,8 @@ function TextureSelector() {
 function ProductList() {
   const { t } = useTranslation();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
+  const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber } = useSelecProductNumberContext()
+  const { addItemToCart, setDataItem } = useCartContext();
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -232,6 +234,31 @@ function ProductList() {
       }
     }
   }, [data, selectedProductNumber]);
+
+    useEffect(() => {
+    const handleAddToCart = async () => {
+      if (data?.items && addCartProductNumber) {
+        const adjustedIndex = addCartProductNumber - 1;
+        const matchedProduct = data.items[adjustedIndex];
+        console.log(matchedProduct);
+  
+        if (matchedProduct) {
+          const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
+          const id = matchedProduct.id.toString();
+          try {
+            await addItemToCart(id, url);
+            setDataItem(matchedProduct);
+            setAddCartProductNumber(null)
+            console.log(`Product ${id} added to cart!`);
+          } catch (error) {
+            console.error("Failed to add product to cart:", error);
+          }
+        }
+      }
+    };
+  
+    handleAddToCart();
+  }, [data, addCartProductNumber]);
 
   if (colorFamilyToInclude == null && data?.items != null) {
     setColorFamilyToInclude(

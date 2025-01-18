@@ -15,6 +15,8 @@ import { useFindTheLookContext } from "../../../../context/find-the-look-context
 import { getLashMakeupProductTypeIds } from "../../../../api/attributes/makeups";
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../../../../utils/other";
+import { useCartContext } from "../../../../context/cart-context";
+import { baseApiUrl } from "../../../../utils/apiUtils";
 
 const colorFamilies = [{ name: "Black", value: "#000000" }];
 
@@ -165,7 +167,8 @@ function ShapeSelector() {
 function ProductList() {
   const { t } = useTranslation();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
+  const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber } = useSelecProductNumberContext()
+  const { addItemToCart, setDataItem } = useCartContext();
   
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
@@ -187,6 +190,31 @@ function ProductList() {
       }
     }
   }, [data, selectedProductNumber]);
+
+  useEffect(() => {
+    const handleAddToCart = async () => {
+      if (data?.items && addCartProductNumber) {
+        const adjustedIndex = addCartProductNumber - 1;
+        const matchedProduct = data.items[adjustedIndex];
+        console.log(matchedProduct);
+  
+        if (matchedProduct) {
+          const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
+          const id = matchedProduct.id.toString();
+          try {
+            await addItemToCart(id, url);
+            setDataItem(matchedProduct);
+            setAddCartProductNumber(null)
+            console.log(`Product ${id} added to cart!`);
+          } catch (error) {
+            console.error("Failed to add product to cart:", error);
+          }
+        }
+      }
+    };
+  
+    handleAddToCart();
+  }, [data, addCartProductNumber]);
 
   const handleProductClick = (product: Product) => {
     if (selectedProduct?.id === product.id) {
@@ -222,7 +250,7 @@ function ProductList() {
             setView("all_categories");
           }}
         >
-                    {t("view_all")}
+          {t("view_all")}
         </button>
       </div>
       <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">

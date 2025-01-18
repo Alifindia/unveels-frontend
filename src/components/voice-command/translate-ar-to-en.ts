@@ -253,6 +253,11 @@ export const arabicToEnglishSetPattern: { [key: string]: string } = {
   "نمط محدد" : "set pattern",
 };
 
+export const arabicToEnglishAddToCart: { [key: string]: string } = {
+  "أضف إلى سلة التسوق رقم المنتج" : "add to cart product number",
+  "اضف الى سله التسوق رقم المنتج" : "add to cart product number",
+};
+
 export const arabicToEnglishSetDark: { [key: string]: string } = {
   "مجموعة مظلمة عشرة في المئة" : "set dark 10%",
   "مجموعه مظلمه 10%" : "set dark 10%",
@@ -310,6 +315,9 @@ export function translateSelectProduct(text: any) {
     text.includes(keyword)
   );
   const containsSetDark = Object.keys(arabicToEnglishSetDark).some((keyword) =>
+    text.includes(keyword)
+  );
+  const containsAddToCart = Object.keys(arabicToEnglishAddToCart).some((keyword) =>
     text.includes(keyword)
   );
   
@@ -393,6 +401,16 @@ export function translateSelectProduct(text: any) {
   } else if (containsSection) {
     const Mapping = {
       ...arabicToEnglishSection,
+    };
+
+    Object.keys(Mapping).forEach((arabicWord) => {
+      const englishWord = Mapping[arabicWord];
+      translatedText = translatedText.replace(new RegExp(arabicWord, 'g'), englishWord);
+    });
+  } else if (containsAddToCart) {
+    const Mapping = {
+      ...arabicToEnglishAddToCart,
+      ...arabicToEnglishNumbers,
     };
 
     Object.keys(Mapping).forEach((arabicWord) => {
