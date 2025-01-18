@@ -5,7 +5,6 @@ const SuccessPopup = ({ product }: { product: any }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [animationClass, setAnimationClass] = useState(""); // Class untuk animasi
   const { setDataItem } = useCartContext();
-  console.log(isVisible)
   const handleClose = () => {
     setAnimationClass("animate-fade-top"); // Tambahkan animasi keluar
     setTimeout(() => {
@@ -14,7 +13,6 @@ const SuccessPopup = ({ product }: { product: any }) => {
     }, 400); // Pastikan waktu sinkron dengan durasi animasi
   };
 
-  console.log(product)
   useEffect(() => {
     if (product) {
       setAnimationClass("animate-fade-down"); // Tambahkan animasi masuk
