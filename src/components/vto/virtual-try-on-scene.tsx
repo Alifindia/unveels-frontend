@@ -1,6 +1,11 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import Webcam from "react-webcam";
-import { FilesetResolver, ImageSegmenter } from "@mediapipe/tasks-vision";
+import {
+  FaceLandmarker,
+  FilesetResolver,
+  HandLandmarker,
+  ImageSegmenter,
+} from "@mediapipe/tasks-vision";
 import { useCamera } from "../../context/recorder-context";
 import {
   VIDEO_WIDTH,
@@ -19,8 +24,6 @@ import { Blendshape } from "../../types/blendshape";
 import { useMakeup } from "../../context/makeup-context";
 import { Rnd } from "react-rnd";
 // new
-import * as faceLandmarksDetection from "@tensorflow-models/face-landmarks-detection";
-import * as handPoseDetection from "@tensorflow-models/hand-pose-detection";
 import "@tensorflow/tfjs-core";
 // Register WebGL backend.
 import "@tensorflow/tfjs-backend-webgl";
@@ -28,111 +31,7 @@ import "@mediapipe/face_mesh";
 import "@mediapipe/hands";
 import * as tf from "@tensorflow/tfjs";
 
-interface BeforeAfterCanvasProps {
-  image: HTMLImageElement | HTMLVideoElement;
-  mode: "IMAGE" | "VIDEO" | "LIVE";
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-}
-
-function BeforeAfterCanvas({ image, canvasRef, mode }: BeforeAfterCanvasProps) {
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      console.error("Gagal mendapatkan konteks 2D untuk overlay canvas.");
-      return;
-    }
-
-    let animationFrameId: number;
-
-    const setupCanvasSize = () => {
-      const { innerWidth: width, innerHeight: height } = window;
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
-    };
-
-    const draw = () => {
-      const { innerWidth: width, innerHeight: height } = window;
-
-      let imgAspect = 0;
-      if (mode === "IMAGE" && image instanceof HTMLImageElement) {
-        imgAspect = image.naturalWidth / image.naturalHeight;
-      } else if (
-        (mode === "VIDEO" || mode == "LIVE") &&
-        image instanceof HTMLVideoElement
-      ) {
-        imgAspect = image.videoWidth / image.videoHeight;
-      }
-
-      const canvasAspect = width / height;
-
-      let drawWidth: number;
-      let drawHeight: number;
-      let offsetX: number;
-      let offsetY: number;
-
-      if (imgAspect < canvasAspect) {
-        drawWidth = width;
-        drawHeight = width / imgAspect;
-        offsetX = 0;
-        offsetY = (height - drawHeight) / 2;
-      } else {
-        drawWidth = height * imgAspect;
-        drawHeight = height;
-        offsetX = (width - drawWidth) / 2;
-        offsetY = 0;
-      }
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.save();
-      ctx.scale(-1, 1);
-      ctx.drawImage(
-        image,
-        -offsetX - drawWidth,
-        offsetY,
-        drawWidth,
-        drawHeight,
-      );
-      ctx.restore();
-
-      if (
-        (mode === "VIDEO" || mode === "LIVE") &&
-        image instanceof HTMLVideoElement
-      ) {
-        animationFrameId = requestAnimationFrame(draw);
-      }
-    };
-
-    const startRendering = () => {
-      setupCanvasSize();
-      draw();
-
-      if (mode === "IMAGE") {
-        window.addEventListener("resize", () => {
-          setupCanvasSize();
-          draw();
-        });
-      }
-    };
-
-    startRendering();
-
-    return () => {
-      if (mode === "VIDEO" || mode === "LIVE") {
-        cancelAnimationFrame(animationFrameId);
-      }
-      if (mode === "IMAGE") {
-        window.removeEventListener("resize", setupCanvasSize);
-      }
-    };
-  }, [image, canvasRef, mode]);
-
-  return null;
-}
+import { BeforeAfterCanvas } from "./before-after-canvas";
 
 export function VirtualTryOnScene({
   mediaFile,
@@ -154,9 +53,15 @@ export function VirtualTryOnScene({
   const handLandmarksRef = useRef<Landmark[]>([]);
   const blendshapeRef = useRef<Blendshape[]>([]);
 
+  const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
+  const handLandmarkerRef = useRef<HandLandmarker | null>(null);
   const hairSegmenterRef = useRef<ImageSegmenter | null>(null);
+  // const nailsSegmenterRef = useRef<ImageSegmenter | null>(null);
+
   const hairRef = useRef<Float32Array | null>(null);
   const hairMaskRef = useRef<ImageData | null>(null);
+
+  const isDetectingRef = useRef<boolean>(false);
 
   // Using CameraContext
   const { criterias, flipCamera } = useCamera();
@@ -173,459 +78,270 @@ export function VirtualTryOnScene({
     showHairRef.current = showHair;
   }, [showHair]);
 
-  const initializeHairSegmenter = async () => {
-    try {
-      if (hairSegmenterRef.current !== null) {
-        throw new Error("HairSegmenter already initialized");
-      }
-      const filesetResolver = await FilesetResolver.forVisionTasks(
-        "/media/unveels/wasm",
-      );
-
-      const hairSegmenter = await ImageSegmenter.createFromOptions(
-        filesetResolver,
-        {
-          baseOptions: {
-            modelAssetPath: "/media/unveels/models/hair/hair_segmenter.tflite",
-            delegate: "GPU",
-          },
-          runningMode: "VIDEO",
-          outputCategoryMask: true,
-          outputConfidenceMasks: false,
-        },
-      );
-
-      hairSegmenterRef.current = hairSegmenter;
-    } catch (error) {
-      console.error("Gagal menginisialisasi HairSegmenter:", error);
-    }
-  };
-
-  const normalizeLandmarks = (
-    landmarks: { x: number; y: number; z: number }[],
-    videoWidth: number,
-    videoHeight: number,
-    canvasWidth: number,
-    canvasHeight: number,
-  ) => {
-    const videoAspect = videoWidth / videoHeight;
-    const canvasAspect = canvasWidth / canvasHeight;
-
-    const scale =
-      videoAspect > canvasAspect
-        ? canvasWidth / videoWidth
-        : canvasHeight / videoHeight;
-
-    const xOffset =
-      videoAspect > canvasAspect ? 0 : (canvasWidth - videoWidth * scale) / 2;
-    const yOffset =
-      videoAspect > canvasAspect ? (canvasHeight - videoHeight * scale) / 2 : 0;
-
-    const scaleFactor = 0.5;
-    const xShift = 0.5;
-    const yShift = 0.5;
-
-    return landmarks.map(({ x, y, z }) => {
-      const normalizedX = x * scale + xOffset;
-      const normalizedY = y * scale + yOffset;
-
-      const threeX =
-        ((normalizedX / canvasWidth) * 2 - 1) * scaleFactor + xShift;
-      const threeY =
-        ((normalizedY / canvasHeight) * 2 - 1) * scaleFactor + yShift;
-      const threeZ = z !== undefined ? z * 0.0021 : 0;
-
-      return { x: threeX, y: threeY, z: threeZ };
-    });
-  };
-
-  // Livestream Detection Function
-  const processLiveStream = async (
-    faces: [{ x: number; y: number; z: number; name?: string | [] }],
-    hands: handPoseDetection.Hand[],
-  ) => {
-    if (
-      webcamRef.current &&
-      webcamRef.current.video &&
-      webcamRef.current.video.readyState === 4 &&
-      hairSegmenterRef.current
-    ) {
-      const video = webcamRef.current.video;
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          const { innerWidth: width, innerHeight: height } = window;
-          const dpr = window.devicePixelRatio || 1;
-          canvas.width = width * dpr;
-          canvas.height = height * dpr;
-          ctx.scale(dpr, dpr);
-
-          const imgAspect = video.videoWidth / video.videoHeight;
-          const canvasAspect = width / height;
-
-          let drawWidth: number;
-          let drawHeight: number;
-          let offsetX: number;
-          let offsetY: number;
-
-          if (imgAspect < canvasAspect) {
-            drawWidth = width;
-            drawHeight = width / imgAspect;
-            offsetX = 0;
-            offsetY = (height - drawHeight) / 2;
-          } else {
-            drawWidth = height * imgAspect;
-            drawHeight = height;
-            offsetX = (width - drawWidth) / 2;
-            offsetY = 0;
-          }
-
-          ctx.clearRect(0, 0, width, height);
-
-          const startTimeMs = performance.now();
-
-          try {
-            if (faces.length > 0) {
-              const normalizedFaceLandmarks = normalizeLandmarks(
-                faces,
-                video.videoWidth,
-                video.videoHeight,
-                drawWidth,
-                drawHeight,
-              );
-
-              landmarksRef.current = normalizedFaceLandmarks;
-            } else {
-              landmarksRef.current = [];
-            }
-
-            if (hands.length > 0) {
-              const normalizedHandLandmarks = normalizeLandmarks(
-                hands[0].keypoints,
-                video.videoWidth,
-                video.videoHeight,
-                drawWidth,
-                drawHeight,
-              );
-
-              for (let i = 0; i < normalizedHandLandmarks.length; i++) {
-                normalizedHandLandmarks[i].z = hands[0].keypoints3D[i].z || 0;
-              }
-              handLandmarksRef.current = normalizedHandLandmarks;
-            } else {
-              handLandmarksRef.current = [];
-            }
-
-            if (showHairRef.current) {
-              const hairResults = hairSegmenterRef.current.segmentForVideo(
-                video,
-                startTimeMs,
-              );
-
-              if (hairResults?.categoryMask) {
-                hairRef.current = hairResults.categoryMask.getAsFloat32Array();
-
-                if (hairResults?.categoryMask) {
-                  hairRef.current =
-                    hairResults.categoryMask.getAsFloat32Array();
-                  let imageData = ctx.getImageData(
-                    0,
-                    0,
-                    video.videoWidth,
-                    video.videoHeight,
-                  ).data;
-
-                  let j = 0;
-                  for (let i = 0; i < hairRef.current.length; ++i) {
-                    const maskVal = Math.round(hairRef.current[i] * 255.0);
-
-                    // Proses hanya untuk label index 1
-                    if (maskVal === 1) {
-                      const legendColor =
-                        legendColors[maskVal % legendColors.length];
-                      imageData[j] = (legendColor[0] + imageData[j]) / 2;
-                      imageData[j + 1] =
-                        (legendColor[1] + imageData[j + 1]) / 2;
-                      imageData[j + 2] =
-                        (legendColor[2] + imageData[j + 2]) / 2;
-                      imageData[j + 3] =
-                        (legendColor[3] + imageData[j + 3]) / 2;
-                    }
-                    j += 4;
-                  }
-
-                  const uint8Array = new Uint8ClampedArray(imageData.buffer);
-                  const dataNew = new ImageData(
-                    uint8Array,
-                    video.videoWidth,
-                    video.videoHeight,
-                  );
-
-                  hairMaskRef.current = dataNew;
-                }
-              }
-            }
-          } catch (err) {
-            console.error("Detection error:", err);
-            setError(err as Error);
-          }
-        }
-      }
-    }
-  };
-
-  // Image Detection Function
-  const processImage = async (
-    faces: [{ x: number; y: number; z: number; name?: string | null }],
-    hands: handPoseDetection.Hand[],
-  ) => {
-    if (imageUploadRef.current) {
-      const img = imageUploadRef.current;
-      const canvas = canvasRef.current;
-
-      if (canvas) {
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          const { innerWidth: width, innerHeight: height } = window;
-          const dpr = window.devicePixelRatio || 1;
-          canvas.width = width * dpr;
-          canvas.height = height * dpr;
-          ctx.scale(dpr, dpr);
-
-          const imgAspect = img.width / img.height;
-          const canvasAspect = width / height;
-
-          let drawWidth: number;
-          let drawHeight: number;
-          let offsetX: number;
-          let offsetY: number;
-
-          if (imgAspect < canvasAspect) {
-            drawWidth = width;
-            drawHeight = width / imgAspect;
-            offsetX = 0;
-            offsetY = (height - drawHeight) / 2;
-          } else {
-            drawWidth = height * imgAspect;
-            drawHeight = height;
-            offsetX = (width - drawWidth) / 2;
-            offsetY = 0;
-          }
-
-          try {
-            const normalizedFaceLandmarks = normalizeLandmarks(
-              faces,
-              img.width,
-              img.height,
-              drawWidth,
-              drawHeight,
-            );
-
-            landmarksRef.current = normalizedFaceLandmarks;
-            // handLandmarksRef.current = normalizedHandLandmarks;
-          } catch (err) {
-            console.error("Detection error:", err);
-            setError(err as Error);
-          }
-
-          try {
-            if (hands.length > 0) {
-              const normalizedHandLandmarks = normalizeLandmarks(
-                hands[0].keypoints,
-                img.width,
-                img.height,
-                drawWidth,
-                drawHeight,
-              );
-              for (let i = 0; i < normalizedHandLandmarks.length; i++) {
-                normalizedHandLandmarks[i].z = hands[0].keypoints3D[i].z || 0;
-              }
-              handLandmarksRef.current = normalizedHandLandmarks;
-            }
-          } catch (err) {
-            console.error("Detection error:", err);
-            // setError(err as Error);
-          }
-        } else {
-          console.error("Canvas element is not properly initialized");
-        }
-      }
-    }
-  };
-
-  // Video Detection Function
-  const processVideo = async (
-    faces: [{ x: number; y: number; z: number; name?: string | [] }],
-    hands: [{ x: number; y: number; z: number; name?: string | [] }],
-  ) => {
-    if (videoUploadRef.current && videoUploadRef.current.readyState === 4) {
-      const video = videoUploadRef.current;
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          const { innerWidth: width, innerHeight: height } = window;
-          const dpr = window.devicePixelRatio || 1;
-          canvas.width = width * dpr;
-          canvas.height = height * dpr;
-          ctx.scale(dpr, dpr);
-
-          const imgAspect = video.videoWidth / video.videoHeight;
-          const canvasAspect = width / height;
-
-          let drawWidth: number;
-          let drawHeight: number;
-          let offsetX: number;
-          let offsetY: number;
-
-          if (imgAspect < canvasAspect) {
-            drawWidth = width;
-            drawHeight = width / imgAspect;
-            offsetX = 0;
-            offsetY = (height - drawHeight) / 2;
-          } else {
-            drawWidth = height * imgAspect;
-            drawHeight = height;
-            offsetX = (width - drawWidth) / 2;
-            offsetY = 0;
-          }
-
-          ctx.clearRect(0, 0, width, height);
-
-          try {
-            const normalizedFaceLandmarks = normalizeLandmarks(
-              faces,
-              video.videoWidth,
-              video.videoHeight,
-              drawWidth,
-              drawHeight,
-            );
-
-            const normalizedHandLandmarks = normalizeLandmarks(
-              hands[0].keypoints,
-              video.videoWidth,
-              video.videoHeight,
-              drawWidth,
-              drawHeight,
-            );
-            for (let i = 0; i < normalizedHandLandmarks.length; i++) {
-              normalizedHandLandmarks[i].z = hands[0].keypoints3D[i].z || 0;
-            }
-            landmarksRef.current = normalizedFaceLandmarks;
-            handLandmarksRef.current = normalizedHandLandmarks;
-          } catch (err) {
-            console.error("Detection error:", err);
-            setError(err as Error);
-          }
-        }
-      }
-    }
-  };
-
-  const runDetector = async (
-    media: HTMLVideoElement | HTMLImageElement,
-    mode: "LIVE" | "VIDEO" | "IMAGE",
-  ) => {
-    try {
-      await initializeHairSegmenter();
-    } catch (error) {
-      console.error("Gagal menginisialisasi HairSegmenter:", error);
-    }
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // Initialize face detector
-    const faceModel = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
-    const faceDetector = await faceLandmarksDetection.createDetector(
-      faceModel,
-      {
-        runtime: "mediapipe",
-        refineLandmarks: true,
-        solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh",
-      },
-    );
-
-    // Initialize hand detector
-    const handModel = handPoseDetection.SupportedModels.MediaPipeHands;
-    const handDetector = await handPoseDetection.createDetector(handModel, {
-      runtime: "mediapipe",
-      solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/hands",
-      modelType: "full",
-      maxHands: 1,
-    });
-
-    const detect = async (
-      faceNet: faceLandmarksDetection.FaceLandmarksDetector,
-      handNet: handPoseDetection.HandDetector,
-    ) => {
-      const inputTensor = tf.browser.fromPixels(media);
-
+  useEffect(() => {
+    let isMounted = true;
+    const initializeFaceLandmarker = async () => {
       try {
-        // Run both detections
-        const faces = await faceNet.estimateFaces(inputTensor, {
-          flipHorizontal: false,
-        });
+        const filesetResolver = await FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.17/wasm",
+        );
+        const landmarker = await FaceLandmarker.createFromOptions(
+          filesetResolver,
+          {
+            baseOptions: {
+              modelAssetPath:
+                "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+              delegate: "GPU",
+            },
+            runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
+            numFaces: 1,
+            minFaceDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5,
+            minFacePresenceConfidence: 0.5,
+            outputFaceBlendshapes: true,
+            outputFacialTransformationMatrixes: true,
+          },
+        );
 
-        const hands = await handNet.estimateHands(media, {
-          flipHorizontal: false,
-        });
+        const handLandmarker = await HandLandmarker.createFromOptions(
+          filesetResolver,
+          {
+            baseOptions: {
+              modelAssetPath:
+                "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+              delegate: "GPU",
+            },
+            runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
+            numHands: 2,
+            minHandDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5,
+          },
+        );
 
-        if (mode === "LIVE") {
-          processLiveStream(faces[0]?.keypoints || [], hands || []);
-        }
-        if (mode === "IMAGE") {
-          processImage(faces[0]?.keypoints || [], hands || []);
-        }
-        if (mode === "VIDEO") {
-          processVideo(faces[0]?.keypoints || [], hands || []);
-        }
+        const hairSegmenter = await ImageSegmenter.createFromOptions(
+          filesetResolver,
+          {
+            baseOptions: {
+              modelAssetPath:
+                "/media/unveels/models/hair/hair_segmenter.tflite",
+              delegate: "GPU",
+            },
+            runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
+            outputCategoryMask: true,
+            outputConfidenceMasks: false,
+          },
+        );
 
-        // Always call detect recursively to continue the video feed processing
-        requestAnimationFrame(() => detect(faceDetector, handDetector));
-      } catch (err) {
-        console.error("Error during detection", err);
-      } finally {
-        inputTensor.dispose(); // Clean up memory for input tensor
+        if (isMounted) {
+          faceLandmarkerRef.current = landmarker;
+          handLandmarkerRef.current = handLandmarker;
+          hairSegmenterRef.current = hairSegmenter;
+          startDetection();
+        }
+      } catch (error) {
+        console.error("Gagal menginisialisasi FaceLandmarker:", error);
+        if (isMounted) setError(error as Error);
       }
     };
 
-    detect(faceDetector, handDetector); // Start the initial detection loop
-  };
+    initializeFaceLandmarker();
 
-  const handleLiveStreamLoad = () => {
-    if (webcamRef.current) {
-      const video = webcamRef.current.video;
-      if (video) {
-        if (video.readyState === 4) {
-          console.log("Video ready, starting detection.");
-          runDetector(video, "LIVE");
-        } else {
-          console.log("Video not ready yet.");
+    // Cleanup pada unmount
+    return () => {
+      isMounted = false;
+      if (faceLandmarkerRef.current) {
+        faceLandmarkerRef.current.close();
+      }
+      if (handLandmarkerRef.current) {
+        handLandmarkerRef.current.close();
+      }
+      if (hairSegmenterRef.current) {
+        hairSegmenterRef.current.close();
+      }
+
+      isDetectingRef.current = false;
+    };
+  }, [mode]);
+
+  const startDetection = useCallback(() => {
+    if (isDetectingRef.current) return;
+    isDetectingRef.current = true;
+
+    const detect = async () => {
+      if (
+        faceLandmarkerRef.current &&
+        handLandmarkerRef.current &&
+        hairSegmenterRef.current
+      ) {
+        const canvas = canvasRef.current;
+
+        if (canvas) {
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            const { innerWidth: width, innerHeight: height } = window;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr);
+
+            let sourceElement: HTMLVideoElement | HTMLImageElement | null =
+              null;
+
+            if (
+              webcamRef.current &&
+              webcamRef.current.video &&
+              webcamRef.current.video.readyState === 4
+            ) {
+              sourceElement = webcamRef.current.video;
+            } else if (
+              videoUploadRef.current &&
+              videoUploadRef.current.readyState === 4
+            ) {
+              sourceElement = videoUploadRef.current;
+            } else if (imageUploadRef.current) {
+              sourceElement = imageUploadRef.current;
+            }
+
+            if (sourceElement) {
+              const imgAspect =
+                sourceElement instanceof HTMLVideoElement
+                  ? sourceElement.videoWidth / sourceElement.videoHeight
+                  : sourceElement.naturalWidth / sourceElement.naturalHeight;
+              const canvasAspect = width / height;
+
+              let drawWidth: number;
+              let drawHeight: number;
+              let offsetX: number;
+              let offsetY: number;
+
+              if (imgAspect < canvasAspect) {
+                drawWidth = width;
+                drawHeight = width / imgAspect;
+                offsetX = 0;
+                offsetY = (height - drawHeight) / 2;
+              } else {
+                drawWidth = height * imgAspect;
+                drawHeight = height;
+                offsetX = (width - drawWidth) / 2;
+                offsetY = 0;
+              }
+
+              ctx.clearRect(0, 0, width, height);
+
+              const startTimeMs = performance.now();
+              try {
+                const faceResults =
+                  sourceElement instanceof HTMLVideoElement
+                    ? faceLandmarkerRef.current.detectForVideo(
+                        sourceElement,
+                        startTimeMs,
+                      )
+                    : faceLandmarkerRef.current.detect(sourceElement);
+
+                const handResults =
+                  sourceElement instanceof HTMLVideoElement
+                    ? handLandmarkerRef.current.detectForVideo(
+                        sourceElement,
+                        startTimeMs,
+                      )
+                    : handLandmarkerRef.current.detect(sourceElement);
+
+                const hairResults =
+                  sourceElement instanceof HTMLVideoElement
+                    ? hairSegmenterRef.current.segmentForVideo(
+                        sourceElement,
+                        startTimeMs,
+                      )
+                    : hairSegmenterRef.current.segment(sourceElement);
+
+                if (faceResults.facialTransformationMatrixes.length > 0) {
+                  faceTransformRef.current =
+                    faceResults.facialTransformationMatrixes[0].data;
+                }
+
+                if (faceResults.faceBlendshapes.length > 0) {
+                  blendshapeRef.current =
+                    faceResults.faceBlendshapes[0].categories;
+                }
+
+                if (
+                  faceResults.faceLandmarks &&
+                  faceResults.faceLandmarks.length > 0
+                ) {
+                  landmarksRef.current = faceResults.faceLandmarks[0];
+                }
+
+                if (handResults.landmarks && handResults.landmarks.length > 0) {
+                  handLandmarksRef.current = handResults.landmarks[0];
+                }
+
+                // THIS FOR HAIR SEGMENTATION
+                // if (hairResults?.categoryMask) {
+                //   hairRef.current =
+                //     hairResults.categoryMask.getAsFloat32Array();
+
+                //   if (hairResults?.categoryMask) {
+                //     hairRef.current =
+                //       hairResults.categoryMask.getAsFloat32Array();
+                //     let imageData = ctx.getImageData(
+                //       0,
+                //       0,
+                //       sourceElement instanceof HTMLVideoElement
+                //         ? sourceElement.videoWidth
+                //         : sourceElement.naturalWidth,
+                //       sourceElement instanceof HTMLVideoElement
+                //         ? sourceElement.videoHeight
+                //         : sourceElement.naturalHeight,
+                //     ).data;
+
+                //     let j = 0;
+                //     for (let i = 0; i < hairRef.current.length; ++i) {
+                //       const maskVal = Math.round(hairRef.current[i] * 255.0);
+
+                //       // Proses hanya untuk label index 1
+                //       if (maskVal === 1) {
+                //         const legendColor =
+                //           legendColors[maskVal % legendColors.length];
+                //         imageData[j] = (legendColor[0] + imageData[j]) / 255;
+                //         imageData[j + 1] =
+                //           (legendColor[1] + imageData[j + 1]) / 255;
+                //         imageData[j + 2] =
+                //           (legendColor[2] + imageData[j + 2]) / 255;
+                //         imageData[j + 3] =
+                //           (legendColor[3] + imageData[j + 3]) / 255;
+                //       }
+                //       j += 4;
+                //     }
+
+                //     hairMaskRef.current = new ImageData(
+                //       new Uint8ClampedArray(imageData.buffer),
+                //       sourceElement instanceof HTMLVideoElement
+                //         ? sourceElement.videoWidth
+                //         : sourceElement.naturalWidth,
+                //       sourceElement instanceof HTMLVideoElement
+                //         ? sourceElement.videoHeight
+                //         : sourceElement.naturalHeight,
+                //     );
+
+                //     hairResults.close();
+                //   }
+                // }
+              } catch (err) {
+                console.error("Detection error:", err);
+                setError(err as Error);
+              }
+            }
+          }
         }
       }
-    }
-  };
 
-  const handleImageUpload = () => {
-    if (imageUploadRef.current) {
-      console.log("image uploaded");
-      runDetector(imageUploadRef.current, "IMAGE");
-    }
-  };
-
-  const handleVideoUpload = () => {
-    if (videoUploadRef.current) {
-      const video = videoUploadRef.current;
-      if (video) {
-        if (video.readyState === 4) {
-          console.log("Video ready, starting detection.");
-          runDetector(video, "VIDEO");
-        } else {
-          console.log("Video not ready yet.");
-        }
+      if (isDetectingRef.current) {
+        requestAnimationFrame(detect);
       }
-    }
-  };
+    };
+
+    detect();
+  }, []);
 
   const isDesktop =
     /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) == false;
@@ -662,7 +378,9 @@ export function VirtualTryOnScene({
   }, []);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center">
+    <div
+      className={`fixed inset-0 flex items-center justify-center ${mode === "LIVE" ? "" : "scale-x-[-1] transform"}`}
+    >
       {webcamRef.current &&
         webcamRef.current.video &&
         webcamRef.current.video.readyState === 4 &&
@@ -803,7 +521,6 @@ export function VirtualTryOnScene({
           className="hidden"
           ref={imageUploadRef}
           src={URL.createObjectURL(mediaFile)}
-          onLoad={handleImageUpload}
         />
       )}
 
@@ -815,7 +532,6 @@ export function VirtualTryOnScene({
           controls
           autoPlay
           loop
-          onLoadedData={handleVideoUpload}
         />
       )}
 
@@ -837,7 +553,6 @@ export function VirtualTryOnScene({
               err instanceof Error ? err : new Error("Webcam error occurred."),
             )
           }
-          onLoadedData={handleLiveStreamLoad}
         />
       )}
 
