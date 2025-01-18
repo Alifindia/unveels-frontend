@@ -437,6 +437,8 @@ export function VideoStream({
             if (results.faceLandmarks && results.faceLandmarks.length > 0) {
               const landmarks = results.faceLandmarks[0];
 
+              const faceLandmarks = applyStretchedLandmarks(landmarks);
+
               // Update glowOffset for animation
               glowOffset += glowSpeed;
               if (glowOffset > 1) glowOffset = 0;
@@ -455,7 +457,7 @@ export function VideoStream({
 
               // Draw connectors with scanner effect
               drawConnectorsFromFaces(
-                landmarks,
+                faceLandmarks,
                 gradient,
                 offsetX,
                 offsetY,
