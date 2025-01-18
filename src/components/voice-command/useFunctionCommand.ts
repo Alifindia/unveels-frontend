@@ -116,7 +116,7 @@ export function useFunctionCommand() {
     setSelectedColor: setSelectedColorPlumper,
     setSelectedTexture: setSelectedTexturePlumper,
   } = useLipPlumperContext();
-  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
+  const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
 
   const {
     colorFamily: colorFamilyEyebrows,
@@ -235,9 +235,7 @@ export function useFunctionCommand() {
     const trimmedText = text.trim();
     let selectResult = translateSelectProduct(trimmedText);
     let result = arabicToEnglishSection[trimmedText] || null;
-    console.log(selectResult)
     if (selectResult || result) {
-      console.log(`Translation found for: ${trimmedText}, resetting value.`);
       result = null;
       return selectResult || result
     } else {
@@ -319,7 +317,7 @@ export function useFunctionCommand() {
   const handleCommand = (transcript: any) => {
     const sectionRegex = /go to section (.+)/i;
     const subSectionRegex = /select (.+)/i;
-    const addCartRegex = /(.*?) add to cart/i;
+    const addCartRegex = /add to cart product number (\d+|\w+)/i;
     const colorModeRegex = /set (.+)/i;
     const textureModeRegex = /select texture (.+)/i;
     const ColorRegex = /select (.+)/i;
@@ -366,6 +364,24 @@ export function useFunctionCommand() {
         "twenty eight": 28,
         "twenty nine": 29,
         "thirty": 30,
+        "thirty one": 31,
+        "thirty two": 32,
+        "thirty three": 33,
+        "thirty four": 34,
+        "thirty five": 35,
+        "thirty six": 36,
+        "thirty seven": 37,
+        "thirty eight": 38,
+        "thirty nine": 39,
+        "forty": 40,
+      };
+
+      const numberPercent: { [key: string]: number } = {
+        "ten%": 10,
+        "twenty%": 20,
+        "thirty%": 30,
+        "forty%": 40,
+        "fivety%": 50,
       };
 
     if (selectProduct.test(transcript)) {
@@ -404,10 +420,18 @@ export function useFunctionCommand() {
         handleSubSectionCommand(subSection);
     }
     // Check for add cart
+    console.log(addCartRegex.test(transcript))
     if (addCartRegex.test(transcript)) {
-      const product = transcript.match(addCartRegex)[1].toLowerCase().trim();
-      console.log(product, "product");
+      let productNumber = transcript.match(addCartRegex)?.[1]; // Ambil angka atau kata dari grup pertama
+      if (productNumber && isNaN(Number(productNumber))) {
+        productNumber = numberWords[productNumber.toLowerCase()]?.toString();
+      }
+      const numericProductNumber = Number(productNumber);
+      if (!isNaN(numericProductNumber)) {
+        setAddCartProductNumber(numericProductNumber);
+      }
     }
+
     // Check for color mode
     if (colorModeRegex.test(transcript)) {
       const colorMode = capitalizeWords(
@@ -464,9 +488,12 @@ export function useFunctionCommand() {
     }
     // Check darknes
     if (darknesRegex.test(transcript)) {
-      const darknes = capitalizeWords(
+      let darknes = capitalizeWords(
         transcript.match(darknesRegex)[1].toLowerCase().trim(),
       );
+      if (darknes && isNaN(Number(darknes))) {
+        darknes = numberPercent[darknes.toLowerCase()]?.toString();
+      }
       handleSetDarknes(darknes);
     }
   };

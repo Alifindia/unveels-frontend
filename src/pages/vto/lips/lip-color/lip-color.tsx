@@ -8,10 +8,11 @@ import { useMakeup } from "../../../../context/makeup-context";
 import { LipColorProvider, useLipColorContext } from "./lip-color-context";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useLipColorQuery } from "./lip-color-query";
-import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import { baseApiUrl, extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
 import { useSelecProductNumberContext } from "../../select-product-context";
+import { useCartContext } from "../../../../context/cart-context";
 
 export function LipColorSelector() {
   console.log("render LipColorSelector");
@@ -246,7 +247,8 @@ function ShadesSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { selectedProductNumber, setSelectedProductNumber } = useSelecProductNumberContext()
+  const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber } = useSelecProductNumberContext()
+  const { addItemToCart, setDataItem } = useCartContext();
 
   const {
     colorFamily,
@@ -300,6 +302,31 @@ function ProductList() {
       }
     }
   }, [data, selectedProductNumber]);
+
+  useEffect(() => {
+    const handleAddToCart = async () => {
+      if (data?.items && addCartProductNumber) {
+        const adjustedIndex = addCartProductNumber - 1;
+        const matchedProduct = data.items[adjustedIndex];
+        console.log(matchedProduct);
+  
+        if (matchedProduct) {
+          const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
+          const id = matchedProduct.id.toString();
+          try {
+            await addItemToCart(id, url);
+            setDataItem(matchedProduct);
+            setAddCartProductNumber(null)
+            console.log(`Product ${id} added to cart!`);
+          } catch (error) {
+            console.error("Failed to add product to cart:", error);
+          }
+        }
+      }
+    };
+  
+    handleAddToCart();
+  }, [data, addCartProductNumber]);
   
   if (colorFamilyToInclude == null && data?.items != null) {
     setColorFamilyToInclude(

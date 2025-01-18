@@ -66,12 +66,13 @@ import {
   FindTheLookProvider,
   useFindTheLookContext,
 } from "../context/find-the-look-context";
-import { CartProvider } from "../context/cart-context";
+import { CartProvider, useCartContext } from "../context/cart-context";
 import { FilterProvider } from "../context/filter-context";
 import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
 import { SelecProductNumberProvider } from "./vto/select-product-context";
+import SuccessPopup from "../components/popup-add-to-cart";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -171,6 +172,7 @@ function Main() {
   const [showChangeModel, setShowChangeModel] = useState(false);
   const { view, setView, sectionName, mapTypes, groupedItemsData } =
     useFindTheLookContext();
+  const { dataItem } = useCartContext();
 
   if (view === "all_categories") {
     return (
@@ -206,6 +208,7 @@ function Main() {
           </div>
         )}
         <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+          <SuccessPopup product={dataItem} />
           <div className="absolute inset-0">
             <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
             <div className="pointer-events-none absolute inset-0"></div>

@@ -31,6 +31,7 @@ import { useCartContext } from "../context/cart-context";
 import { useTranslation } from "react-i18next";
 import { getCookie, getCurrencyAndRate } from "../utils/other";
 import { useSearchParams } from "react-router-dom";
+import SuccessPopup from "../components/popup-add-to-cart";
 
 export function SeeImprovement() {
   const { i18n } = useTranslation();
@@ -89,6 +90,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
     isLoading: modelLoading,
     loadModels,
   } = useModelLoader(steps);
+  const { dataItem } = useCartContext();
 
   useEffect(() => {
     loadModels();
@@ -98,6 +100,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
     <>
       {modelLoading && <ModelLoadingScreen progress={progress} />}
       <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+        <SuccessPopup product={dataItem} />
         <div className="absolute inset-0">
           {criterias.capturedImage ? (
             <SkinImprovementScene />
@@ -234,13 +237,14 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
     skinConcern,
   });
 
-  const { addItemToCart } = useCartContext();
+  const { addItemToCart, setDataItem } = useCartContext();
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
-  const handleAddToCart = async (id: string, url: string) => {
+  const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -299,6 +303,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                     handleAddToCart(
                       product.id.toString(),
                       `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      product
                     );
                   }}
                 >

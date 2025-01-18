@@ -82,6 +82,7 @@ import { FilterProvider } from "../context/filter-context";
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../utils/other";
 import UploadMediaDialog from "../components/vto/upload-media-dialog";
+import SuccessPopup from "../components/popup-add-to-cart";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -193,6 +194,7 @@ function Main() {
   const [showChangeModel, setShowChangeModel] = useState(false);
   const { view, setView, sectionName, mapTypes, groupedItemsData } =
     useFindTheLookContext();
+  const { dataItem } = useCartContext();
 
   if (view === "all_categories") {
     return (
@@ -228,7 +230,8 @@ function Main() {
           </div>
         )}
         <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
-          <div className="absolute inset-0">
+          <SuccessPopup product={dataItem} />
+          <div className={`absolute inset-0 ${mode !== "LIVE" ? "scale-x-[-1] transform" : ""}`}>
             <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
             <div className="pointer-events-none absolute inset-0"></div>
           </div>

@@ -17,6 +17,7 @@ import { LoadingProducts } from "../loading";
 import { useFilterContext } from "../../context/filter-context";
 import { getCurrencyAndRate } from "../../utils/other";
 import { exchangeRates } from "../../utils/constants";
+import SuccessPopup from "../popup-add-to-cart";
 
 export function VTOAllProductsPage({
   onClose,
@@ -54,9 +55,11 @@ export function VTOAllProductsPage({
     setSorting((prev) => !prev);
     setSort(sorting);
   };
+  const { dataItem } = useCartContext();
 
   return (
     <div className="fixed inset-0 flex flex-col bg-black px-2 font-sans text-white">
+      <SuccessPopup product={dataItem} />
       {isFilterVisible && (
         <div
           className="fixed inset-0 z-40 bg-black opacity-50"
@@ -203,11 +206,12 @@ function ProductHorizontalList({
     refetch, // Ensure refetch is included to avoid stale closures
   ]);
 
-  const { addItemToCart } = useCartContext();
+  const { addItemToCart, setDataItem } = useCartContext();
 
-  const handleAddToCart = async (id: string, url: string) => {
+  const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -229,24 +233,28 @@ function ProductHorizontalList({
               <div
                 key={product.id}
                 className="rounded-xl shadow"
-                onClick={() => {
-                  window.open(
-                    `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                    "_blank",
-                  );
-                }}
               >
-                <div className="relative aspect-square w-full overflow-hidden">
-                  <img
-                    src={imageUrl}
-                    alt="Product"
-                    className="h-full w-full rounded object-cover"
-                  />
-                </div>
+                <div 
+                  className="cursor-pointer"
+                  onClick={() => {
+                    window.open(
+                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      "_blank",
+                    );
+                  }}
+                >
+                  <div className="relative aspect-square w-full overflow-hidden">
+                    <img
+                      src={imageUrl}
+                      alt="Product"
+                      className="h-full w-full rounded object-cover"
+                    />
+                  </div>
 
-                <h3 className="line-clamp-2 h-10 pt-2.5 text-xs font-semibold text-white">
-                  {product.name}
-                </h3>
+                  <h3 className="line-clamp-2 h-10 pt-2.5 text-xs font-semibold text-white">
+                    {product.name}
+                  </h3>
+                </div>
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-white/60">
                     <BrandName
@@ -268,6 +276,7 @@ function ProductHorizontalList({
                       handleAddToCart(
                         product.id.toString(),
                         `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                        product
                       );
                     }}
                   >

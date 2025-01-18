@@ -202,11 +202,12 @@ function ProductHorizontalList({
     refetch, // Ensure refetch is included to avoid stale closures
   ]);
 
-  const { addItemToCart } = useCartContext();
+  const { addItemToCart, setDataItem } = useCartContext();
 
-  const handleAddToCart = async (id: string, url: string) => {
+  const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -267,6 +268,7 @@ function ProductHorizontalList({
                       handleAddToCart(
                         product.id.toString(),
                         `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                        product
                       );
                     }}
                   >

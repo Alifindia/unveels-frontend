@@ -41,13 +41,14 @@ export function RecommendationsTab({
   const { data: fragrances } = useFragrancesProductQuery(queryParams);
   const { data: lips } = useLipsProductQuery(queryParams);
   const { data: items } = useLookbookProductQuery(queryParams);
-  const { addItemToCart } = useCartContext();
+  const { addItemToCart, setDataItem } = useCartContext();
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
-  const handleAddToCart = async (id: string, url: string) => {
+  const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -142,7 +143,8 @@ export function RecommendationsTab({
                           product.id.toString(),
                           `${baseApiUrl}/${product.custom_attributes.find(
                             (attr) => attr.attribute_code === "url_key"
-                          )?.value as string}.html`
+                          )?.value as string}.html`,
+                          product
                         );
                       }}
                     >
@@ -332,7 +334,8 @@ export function RecommendationsTab({
                           product.id.toString(),
                           `${baseApiUrl}/${product.custom_attributes.find(
                             (attr) => attr.attribute_code === "url_key"
-                          )?.value as string}.html`
+                          )?.value as string}.html`,
+                          product
                         );
                       }}
                     >
