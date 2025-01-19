@@ -82,10 +82,53 @@ export function FindTheLook() {
   );
 }
 
+const groupedItems = (findTheLookItems: FindTheLookItems[]) => {
+  if (!findTheLookItems) return { makeup: [], accessories: [] };
+  return {
+    makeup: findTheLookItems.filter((item) => item.section === "makeup"),
+    accessories: findTheLookItems.filter(
+      (item) => item.section === "accessories",
+    ),
+  };
+};
+
 function Main({ isArabic }: { isArabic?: boolean }) {
   const { criterias } = useCamera();
   const [selectionMade, setSelectionMade] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+  const { view, setView, findTheLookItems, tab } =
+    useFindTheLookContext();
+  const [groupedItemsData, setGroupedItemsData] = useState<{
+    makeup: FindTheLookItems[];
+    accessories: FindTheLookItems[];
+  }>({
+    makeup: [],
+    accessories: [],
+  });
+  const removeDuplicateLabels = (items: any[]) => {
+    const seenLabels = new Set();
+    return items.filter((item) => {
+      if (seenLabels.has(item.label)) {
+        return false;
+      } else {
+        seenLabels.add(item.label);
+        return true;
+      }
+    });
+  };
+
+  useEffect(() => {
+    console.log(tab);
+  }, [tab]);
+
+  useEffect(() => {
+    if (findTheLookItems) {
+      const findTheLookItemsDup = removeDuplicateLabels(findTheLookItems);
+      const grouped = groupedItems(findTheLookItemsDup);
+      setGroupedItemsData(grouped);
+      console.log(groupedItemsData);
+    }
+  }, [findTheLookItems]);
 
   const modelsRef = useRef<{
     faceLandmarker: FaceLandmarker | null;
@@ -194,8 +237,6 @@ function Main({ isArabic }: { isArabic?: boolean }) {
     return <ModelLoadingScreen progress={progress} />;
   }
 
-  const { view, setView, findTheLookItems, tab, section, setTab, setSection } =
-    useFindTheLookContext();
   const { dataItem } = useCartContext();
   return (
     <>
@@ -215,7 +256,25 @@ function Main({ isArabic }: { isArabic?: boolean }) {
             )}
           </div>
           <TopNavigation cart={true} />
-
+          {view === "all_categories" && (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 10,
+              }}
+            >
+              <AllProductsPage
+                onClose={() => {
+                  setView("face");
+                }}
+                groupedItemsData={groupedItemsData}
+              />
+            </div>
+          )}
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
             <MainContent isArabic={isArabic}/>
             {view == "face" && tab === null && <Footer />}
@@ -533,15 +592,6 @@ function ProductList({ product_type }: { product_type: string }) {
   );
 }
 
-const groupedItems = (findTheLookItems: FindTheLookItems[]) => {
-  if (!findTheLookItems) return { makeup: [], accessories: [] };
-  return {
-    makeup: findTheLookItems.filter((item) => item.section === "makeup"),
-    accessories: findTheLookItems.filter(
-      (item) => item.section === "accessories",
-    ),
-  };
-};
 
 function BottomContent({ isArabic }: { isArabic?: boolean }) {
   const { criterias, setCriterias } = useCamera();
@@ -638,14 +688,14 @@ function BottomContent({ isArabic }: { isArabic?: boolean }) {
       );
     }
 
-    return (
-      <AllProductsPage
-        onClose={() => {
-          setView("face");
-        }}
-        groupedItemsData={groupedItemsData}
-      />
-    );
+    // return (
+    //   <AllProductsPage
+    //     onClose={() => {
+    //       setView("face");
+    //     }}
+    //     groupedItemsData={groupedItemsData}
+    //   />
+    // );
   }
 
   return <VideoScene isArabic={isArabic}/>;
