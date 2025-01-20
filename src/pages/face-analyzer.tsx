@@ -93,7 +93,7 @@ function MainContent({ isArabic }: { isArabic?: boolean }) {
         {
           baseOptions: {
             modelAssetPath: `/media/unveels/models/face-landmarker/face_landmarker.task`,
-            delegate: "GPU",
+            delegate: "CPU",
           },
           outputFaceBlendshapes: true,
           minFaceDetectionConfidence: 0.7,

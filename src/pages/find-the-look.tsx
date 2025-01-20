@@ -153,7 +153,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
         {
           baseOptions: {
             modelAssetPath: `/media/unveels/models/face-landmarker/face_landmarker.task`,
-            delegate: "GPU",
+            delegate: "CPU",
           },
           runningMode: "IMAGE",
           numFaces: 1,
