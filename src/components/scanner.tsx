@@ -71,34 +71,28 @@ export function Scanner() {
         const screenHeight = window.innerHeight;
         const aspectRatio = naturalWidth / naturalHeight;
         let width, height;
-        if (naturalWidth > screenWidth || naturalHeight > screenHeight) {
-          if (screenWidth / aspectRatio <= screenHeight) {
-            width = screenWidth;
-            height = screenWidth / aspectRatio;
-          } else {
-            width = screenHeight * aspectRatio;
-            height = screenHeight;
-          }
+        if (aspectRatio < screenWidth / screenHeight) {
+          // Scale based on height (similar to your IMAGE mode)
+          height = screenHeight;
+          width = screenHeight * aspectRatio;
         } else {
-          width = naturalWidth;
-          height = naturalHeight;
+          // Scale based on width (similar to your IMAGE mode)
+          width = screenWidth;
+          height = screenWidth / aspectRatio;
         }
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
-  
         canvas.width = width * dpr;
         canvas.height = height * dpr;
       } else {
         const width = window.innerWidth;
         const height = window.innerHeight;
-  
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
-  
         canvas.width = width * dpr;
         canvas.height = height * dpr;
-      } 
-    };
+      }
+    };    
 
     // Update ukuran canvas saat pertama kali dan ketika ukuran layar berubah
     updateCanvasSize();
