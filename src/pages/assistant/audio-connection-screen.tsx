@@ -204,16 +204,17 @@ const AudioConnectionScreen = ({ onBack }: { onBack: () => void }) => {
 
       setText(respond.chat);
       setLanguage(respond.lang);
-
-      // make speech
-      const audioSrc = await makeSpeech(respond.chat, respond.lang);
-
-      // delay to make sure it connect
-      setTimeout(() => {
-        setAudioSource(`${talkingAvatarHost}${audioSrc.data.filename}`);
-        setBlendshape(audioSrc.data.blendData);
-        setSpeak(true);
-      }, 1000);
+      
+      if (!respond.isFinished) {
+        const audioSrc = await makeSpeech(respond.chat, respond.lang);
+      
+        // Delay to make sure it connects
+        setTimeout(() => {
+          setAudioSource(`${talkingAvatarHost}${audioSrc.data.filename}`);
+          setBlendshape(audioSrc.data.blendData);
+          setSpeak(true);
+        }, 1000);
+      }
     } catch (error) {
       console.error("Error fetching AI response:", error);
     } finally {
