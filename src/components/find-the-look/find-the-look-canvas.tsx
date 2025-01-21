@@ -8,6 +8,7 @@ import {
 import { Landmark } from "../../types/landmark";
 import { extractSkinColor } from "../../utils/imageProcessing";
 import { useFindTheLookContext } from "../../context/find-the-look-context";
+import { useCamera } from "../../context/recorder-context";
 
 interface FindTheLookCanvasProps {
   image: HTMLImageElement;
@@ -42,6 +43,7 @@ export function FindTheLookCanvas({
 }: FindTheLookCanvasProps) {
   const { selectedItems: cart } = useFindTheLookContext();
   const { findTheLookItems, addFindTheLookItem } = useFindTheLookContext();
+  const { runningMode } = useCamera();
 
   const hitboxesRef = useRef<Hitbox[]>([]);
 
@@ -283,20 +285,42 @@ export function FindTheLookCanvas({
 
       let drawWidth, drawHeight, offsetX, offsetY, scaleX, scaleY;
 
-      if (imgAspect < canvasAspect) {
-        drawWidth = width;
-        drawHeight = width / imgAspect;
-        offsetX = 0;
-        offsetY = (height - drawHeight) / 2;
-        scaleX = drawWidth / image.naturalWidth;
-        scaleY = drawHeight / image.naturalHeight;
+      // Check for runningMode IMAGE and adjust accordingly
+      if (runningMode === 'IMAGE') {
+        if (imgAspect < canvasAspect) {
+          // Scale based on height
+          drawHeight = height;
+          drawWidth = height * imgAspect;
+          offsetX = (width - drawWidth) / 2;
+          offsetY = 0;
+          scaleX = drawWidth / image.naturalWidth;
+          scaleY = drawHeight / image.naturalHeight;
+        } else {
+          // Scale based on width
+          drawWidth = width;
+          drawHeight = width / imgAspect;
+          offsetX = 0;
+          offsetY = (height - drawHeight) / 2;
+          scaleX = drawWidth / image.naturalWidth;
+          scaleY = drawHeight / image.naturalHeight;
+        }
       } else {
-        drawWidth = height * imgAspect;
-        drawHeight = height;
-        offsetX = (width - drawWidth) / 2;
-        offsetY = 0;
-        scaleX = drawWidth / image.naturalWidth;
-        scaleY = drawHeight / image.naturalHeight;
+        // Default behavior if not runningMode IMAGE
+        if (imgAspect < canvasAspect) {
+          drawWidth = width;
+          drawHeight = width / imgAspect;
+          offsetX = 0;
+          offsetY = (height - drawHeight) / 2;
+          scaleX = drawWidth / image.naturalWidth;
+          scaleY = drawHeight / image.naturalHeight;
+        } else {
+          drawWidth = height * imgAspect;
+          drawHeight = height;
+          offsetX = (width - drawWidth) / 2;
+          offsetY = 0;
+          scaleX = drawWidth / image.naturalWidth;
+          scaleY = drawHeight / image.naturalHeight;
+        }
       }
 
       ctx.clearRect(0, 0, width, height);

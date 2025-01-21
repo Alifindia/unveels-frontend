@@ -689,7 +689,7 @@ export function VideoStream({
           />
         </div>
       ) : (
-        <>
+        <div className={`${runningMode === "IMAGE" ? "w-full lg:w-auto h-auto lg:h-full flex items-center justify-center relative" : ""}`}>
           {runningMode === "LIVE_CAMERA" && (
             <>
               {/* Webcam Video */}
@@ -732,17 +732,23 @@ export function VideoStream({
               ref={imageRef}
               src={imageRef.current?.src}
               alt="Uploaded"
-              className="h-auto max-w-full object-cover"
+              className="w-full h-full object-contain"
             />
           )}
 
           {/* Overlay Canvas */}
           {(criterias.runningMode === "LIVE_CAMERA" ||
-            criterias.runningMode === "VIDEO" ||
-            criterias.runningMode === "IMAGE") && (
+            criterias.runningMode === "VIDEO") && (
             <canvas
               ref={canvasRef}
               className={`pointer-events-none absolute left-0 top-0 h-full w-screen transform ${runningMode !== "LIVE_CAMERA" ? "scale-x-[-1]" : ""}`}
+            />
+          )}
+          {(
+            criterias.runningMode === "IMAGE") && (
+            <canvas
+              ref={canvasRef}
+              className={`pointer-events-none absolute left-0 top-0 h-full max-w-full transform ${runningMode !== "LIVE_CAMERA" ? "scale-x-[-1]" : ""}`}
             />
           )}
 
@@ -751,7 +757,7 @@ export function VideoStream({
 
           {/* Error Display */}
           {error && <ErrorOverlay message={error.message} />}
-        </>
+        </div>
       )}
     </div>
   );
