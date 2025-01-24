@@ -87,7 +87,7 @@ const ContactLenses: React.FC<ContactLensProps> = React.memo(
       return new MeshBasicMaterial({
         map: selectedTexture,
         transparent: true,
-        opacity: 0.5,
+        opacity: 0.3,
       });
     }, [selectedTexture]);
 
