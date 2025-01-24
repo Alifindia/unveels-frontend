@@ -44,6 +44,20 @@ export function RecommendationsTab({
   const { addItemToCart, setDataItem } = useCartContext();
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
+  const handleAddAllToCart = (profiles: any) => {
+    console.log(profiles)
+    profiles.products.forEach((product: { custom_attributes: any[]; id: { toString: () => string; }; }) => {
+      const urlKey = product.custom_attributes.find(
+        (attr) => attr.attribute_code === "url_key"
+      )?.value;
+
+      handleAddToCart(
+        product.id.toString(),
+        `${baseApiUrl}/${urlKey}.html`,
+        profiles
+      );
+    });
+  };
 
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
@@ -224,6 +238,10 @@ export function RecommendationsTab({
                       <button
                         type="button"
                         className="flex h-7 w-full items-center justify-center border border-white text-[0.5rem] font-semibold"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleAddAllToCart(profile);
+                        }}
                       >
                         {t("viewpersonality.addcart")}
                       </button>
