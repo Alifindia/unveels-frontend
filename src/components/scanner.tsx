@@ -3,7 +3,7 @@ import { useCamera } from "../context/recorder-context";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 
 export function Scanner() {
-  const { criterias } = useCamera();
+  const { criterias, runningMode } = useCamera();
   const [imageLoaded, setImageLoaded] = useState<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const workerRef = useRef<Worker | null>(null);
@@ -64,15 +64,35 @@ export function Scanner() {
 
     const updateCanvasSize = () => {
       const dpr = window.devicePixelRatio || 1;
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-    };
+      if (runningMode === "IMAGE" && imageLoaded) {
+        // Gunakan ukuran asli gambar untuk mode IMAGE
+        const { naturalWidth, naturalHeight } = imageLoaded;
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const aspectRatio = naturalWidth / naturalHeight;
+        let width, height;
+        if (aspectRatio < screenWidth / screenHeight) {
+          // Scale based on height (similar to your IMAGE mode)
+          height = screenHeight;
+          width = screenHeight * aspectRatio;
+        } else {
+          // Scale based on width (similar to your IMAGE mode)
+          width = screenWidth;
+          height = screenWidth / aspectRatio;
+        }
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+      } else {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+      }
+    };    
 
     // Update ukuran canvas saat pertama kali dan ketika ukuran layar berubah
     updateCanvasSize();
@@ -114,16 +134,17 @@ export function Scanner() {
   return (
     <>
       <div
-        className="fixed inset-0 flex items-center justify-center"
-        style={{
-          width: "100vw",
-          height: "100vh",
-        }}
+        className={`fixed inset-0 flex items-center justify-center ${runningMode === "IMAGE" ? "h-screen w-auto" : ""}`}
+        style={runningMode !== "IMAGE" ? { width: "100vw", height: "100vh" } : {}}
       >
         <canvas
           ref={canvasRef}
-          className="absolute left-0 top-0 h-full w-full"
-          style={{}}
+          className={`${runningMode === "IMAGE" ? "h-full w-full" : "absolute left-0 top-0"}`}
+          style={{
+            objectFit: "contain",
+            height: "100%",
+            width: "100%",
+          }}
         />
       </div>
     </>
