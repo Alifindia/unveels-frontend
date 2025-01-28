@@ -167,7 +167,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
     async () => {
       const accesoriesDetectorInstance = await ObjectDetector.createFromOptions(
         await FilesetResolver.forVisionTasks(
-          "/media/unveels/wasm",
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
         ),
         {
           baseOptions: {

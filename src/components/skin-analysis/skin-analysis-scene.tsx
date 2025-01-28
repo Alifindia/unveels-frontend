@@ -52,7 +52,7 @@ export function SkinAnalysisScene({ data }: SkinAnalysisSceneProps) {
     const initializeFaceLandmarker = async () => {
       try {
         const filesetResolver = await FilesetResolver.forVisionTasks(
-          "/media/unveels/wasm",
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
         );
         const landmarker = await FaceLandmarker.createFromOptions(
           filesetResolver,

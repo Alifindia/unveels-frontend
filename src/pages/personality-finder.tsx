@@ -94,7 +94,7 @@ function MainContent({isArabic} : {isArabic?: boolean}) {
   const steps = [
     async () => {
       const vision = await FilesetResolver.forVisionTasks(
-        "/media/unveels/wasm",
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
       );
       const faceLandmarkerInstance = await FaceLandmarker.createFromOptions(
         vision,
