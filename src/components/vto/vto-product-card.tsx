@@ -23,10 +23,11 @@ export function VTOProductCard({
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
   const isSelected = selectedProduct?.id === product.id;
-  const { addItemToCart, setDataItem } = useCartContext();
+  const { addItemToCart, setDataItem, setType } = useCartContext();
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setType("unit")
       setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {

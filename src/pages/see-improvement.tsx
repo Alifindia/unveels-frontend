@@ -90,7 +90,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
     isLoading: modelLoading,
     loadModels,
   } = useModelLoader(steps);
-  const { dataItem } = useCartContext();
+  const { dataItem, type } = useCartContext();
 
   useEffect(() => {
     loadModels();
@@ -100,7 +100,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
     <>
       {modelLoading && <ModelLoadingScreen progress={progress} />}
       <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
-        <SuccessPopup product={dataItem} />
+        <SuccessPopup product={dataItem} type={type} />
         <div className="absolute inset-0">
           {criterias.capturedImage ? (
             <SkinImprovementScene />
@@ -237,13 +237,14 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
     skinConcern,
   });
 
-  const { addItemToCart, setDataItem } = useCartContext();
+  const { addItemToCart, setDataItem, setType } = useCartContext();
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setType("unit")
       setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {

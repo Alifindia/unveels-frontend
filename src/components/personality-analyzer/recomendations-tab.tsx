@@ -41,7 +41,7 @@ export function RecommendationsTab({
   const { data: fragrances } = useFragrancesProductQuery(queryParams);
   const { data: lips } = useLipsProductQuery(queryParams);
   const { data: items } = useLookbookProductQuery(queryParams);
-  const { addItemToCart, setDataItem } = useCartContext();
+  const { addItemToCart, setDataItem, setType } = useCartContext();
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
   const handleAddAllToCart = (profiles: any) => {
@@ -62,6 +62,7 @@ export function RecommendationsTab({
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setType("unit")
       setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {

@@ -400,7 +400,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
     console.log("Video detector is ready: ", ready);
     isVideoDetectorReady.current = ready;
   };
-  const { dataItem } = useCartContext();
+  const { dataItem, type } = useCartContext();
 
   return (
     <>
@@ -408,7 +408,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
         <ModelLoadingScreen progress={loading.progress} />
       )}
       <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
-        <SuccessPopup product={dataItem} />
+        <SuccessPopup product={dataItem} type={type} />
         {isInferenceCompleted &&
           criterias.capturedImage != null &&
           model != null && (
@@ -642,13 +642,14 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
     skinConcern,
   });
   console.log(data);
-  const { addItemToCart, setDataItem } = useCartContext();
+  const { addItemToCart, setDataItem, setType } = useCartContext();
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
 
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setType("unit")
       setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
@@ -1463,12 +1464,37 @@ export function AllProductsPage({
   const { sort, setSort } = useFilterContext();
   const { selectedItems: cart, dispatch } = useFindTheLookContext();
   const { t } = useTranslation();
-  const addItemToCart = () => {};
-  const { dataItem } = useCartContext();
+  const { addItemToCart, setDataItem, dataItem, type, setType } = useCartContext();
+
+  const allProducts = [
+    ...groupedItemsData.makeup.flatMap((category) => {
+      const { attributeName, values } = mapTypes[category.label] || {};
+      return values ? useProducts({ product_type_key: attributeName, type_ids: values }).data?.items || [] : [];
+    }),
+  ];
+  
+  const handleAddAllItemTocart = async () => {
+    try {
+      if (!allProducts.length) {
+        console.warn("No products found to add to cart.");
+        return;
+      }
+      for (const product of allProducts) {
+        await addItemToCart(
+          product.id.toString(),
+          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`
+        );
+      }
+      setType("all")
+      console.log("All products added to cart!");
+    } catch (error) {
+      console.error("Failed to add all products to cart:", error);
+    }
+  };
 
   return (
     <div className="fixed inset-0 flex flex-col bg-black px-2 font-sans text-white">
-      <SuccessPopup product={dataItem} />
+      <SuccessPopup product={dataItem} type={type}/>
       {isFilterVisible && (
         <div
           className="fixed inset-0 z-40 bg-black opacity-50"
@@ -1519,7 +1545,9 @@ export function AllProductsPage({
           <button
             type="button"
             className="flex h-10 w-full items-center justify-center border border-white bg-white text-xs font-semibold text-black"
-            onClick={addItemToCart}
+            onClick={() => {
+              handleAddAllItemTocart();
+            }}
           >
             {t("viewftl.add_all_to_cart")}
           </button>
@@ -1611,18 +1639,21 @@ function ProductHorizontalList({
     refetch, // Ensure refetch is included to avoid stale closures
   ]);
 
-  const { addItemToCart, setDataItem } = useCartContext();
+  const { addItemToCart, setDataItem, setType } = useCartContext();
 
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setType("unit")
       setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
     }
   };
-
+  if (!data?.items?.length) {
+    return null;
+  }
   return (
     <div key={category}>
       <div className="py-4">

@@ -254,10 +254,10 @@ function Result({ inferenceResult, isArabic }: { inferenceResult: Classifier[], 
   const [selectedTab, setTab] = useState(tabs[0].title);
 
   const { criterias } = useCamera();
-  const { dataItem } = useCartContext();
+  const { dataItem, type } = useCartContext();
   return (
     <div className="relative flex h-screen flex-col bg-black font-sans text-white">
-      <SuccessPopup product={dataItem} />
+      <SuccessPopup product={dataItem} type={type} />
       {/* Navigation */}
       <div className="mb-14">
         <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-3 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">

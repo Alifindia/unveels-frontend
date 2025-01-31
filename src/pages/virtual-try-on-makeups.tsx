@@ -172,7 +172,7 @@ function Main() {
   const [showChangeModel, setShowChangeModel] = useState(false);
   const { view, setView, sectionName, mapTypes, groupedItemsData } =
     useFindTheLookContext();
-  const { dataItem } = useCartContext();
+  const { dataItem, type } = useCartContext();
 
   if (view === "all_categories") {
     return (
@@ -208,7 +208,7 @@ function Main() {
           </div>
         )}
         <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
-          <SuccessPopup product={dataItem} />
+          <SuccessPopup product={dataItem} type={type} />
           <div className="absolute inset-0">
             <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
             <div className="pointer-events-none absolute inset-0"></div>

@@ -168,7 +168,7 @@ function ProductList() {
   const { t } = useTranslation();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
-  const { addItemToCart, setDataItem } = useCartContext();
+  const { addItemToCart, setDataItem, setType } = useCartContext();
   
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
@@ -203,6 +203,7 @@ function ProductList() {
           const id = matchedProduct.id.toString();
           try {
             await addItemToCart(id, url);
+            setType("unit")
             setDataItem(matchedProduct);
             setAddCartProductNumber(null)
             console.log(`Product ${id} added to cart!`);

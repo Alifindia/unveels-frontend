@@ -55,11 +55,11 @@ export function VTOAllProductsPage({
     setSorting((prev) => !prev);
     setSort(sorting);
   };
-  const { dataItem } = useCartContext();
+  const { dataItem, type } = useCartContext();
 
   return (
     <div className="fixed inset-0 flex flex-col bg-black px-2 font-sans text-white">
-      <SuccessPopup product={dataItem} />
+      <SuccessPopup product={dataItem} type={type} />
       {isFilterVisible && (
         <div
           className="fixed inset-0 z-40 bg-black opacity-50"
@@ -206,11 +206,12 @@ function ProductHorizontalList({
     refetch, // Ensure refetch is included to avoid stale closures
   ]);
 
-  const { addItemToCart, setDataItem } = useCartContext();
+  const { addItemToCart, setDataItem, setType } = useCartContext();
 
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
+      setType("unit")
       setDataItem(dataProduct)
       console.log(`Product ${id} added to cart!`);
     } catch (error) {

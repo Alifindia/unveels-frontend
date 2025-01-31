@@ -20,6 +20,8 @@ interface CartContextType {
   reloadMiniCart: () => void;
   dataItem: any;
   setDataItem: (data: any) => void;
+  type: any;
+  setType: (data: any) => void;
 }
 
 // CartContext
@@ -31,6 +33,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItemCount, setCartItemCount] = useState<number>(0);
   const [summaryCount, setSummaryCount] = useState<number>(0); // Initialize with 0
   const [dataItem, setDataItem] = useState(null);
+  const [type, setType] = useState("");
 
   // Fungsi untuk memperbarui jumlah item di cart
   const updateCartItemCount = async () => {
@@ -178,6 +181,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       value={{
         dataItem,
         setDataItem,
+        type,
+        setType,
         guestCartId,
         setGuestCartId,
         cartItemCount,
