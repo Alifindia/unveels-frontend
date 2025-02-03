@@ -240,6 +240,7 @@ export function VirtualTryOnScene({
               ctx.clearRect(0, 0, width, height);
 
               const startTimeMs = performance.now();
+              ctx.drawImage(sourceElement, 0, 0, 480 / dpr, 480 / dpr);
               try {
                 const hairResults =
                   sourceElement instanceof HTMLVideoElement
@@ -327,8 +328,6 @@ export function VirtualTryOnScene({
                 ) {
                   landmarksRef.current = faceResults.faceLandmarks[0];
                 }
-
-                ctx.drawImage(sourceElement, 0, 0, 480 / dpr, 480 / dpr);
 
                 // if (handResults.landmarks && handResults.landmarks.length > 0) {
                 //   handLandmarksRef.current = handResults.landmarks[0];
