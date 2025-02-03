@@ -295,8 +295,6 @@ export function VirtualTryOnScene({
                   hairResults.close();
                 }
 
-                ctx.drawImage(sourceElement, 0, 0, 480 / dpr, 480 / dpr);
-
                 const faceResults =
                   sourceElement instanceof HTMLVideoElement
                     ? faceLandmarkerRef.current.detectForVideo(
@@ -329,6 +327,8 @@ export function VirtualTryOnScene({
                 ) {
                   landmarksRef.current = faceResults.faceLandmarks[0];
                 }
+
+                ctx.drawImage(sourceElement, 0, 0, 480 / dpr, 480 / dpr);
 
                 // if (handResults.landmarks && handResults.landmarks.length > 0) {
                 //   handLandmarksRef.current = handResults.landmarks[0];
