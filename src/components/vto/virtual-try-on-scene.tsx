@@ -72,7 +72,7 @@ export function VirtualTryOnScene({
     setLipTexture,
   } = useMakeup();
 
-  const { setShowGlasess, setShowWatch, setShowRing} = useAccesories();
+  const { setShowGlasess, setShowWatch, setShowRing } = useAccesories();
   const showHairRef = useRef(showHair);
 
   useEffect(() => {
@@ -241,22 +241,6 @@ export function VirtualTryOnScene({
 
               const startTimeMs = performance.now();
               try {
-                const faceResults =
-                  sourceElement instanceof HTMLVideoElement
-                    ? faceLandmarkerRef.current.detectForVideo(
-                        sourceElement,
-                        startTimeMs,
-                      )
-                    : faceLandmarkerRef.current.detect(sourceElement);
-
-                const handResults =
-                  sourceElement instanceof HTMLVideoElement
-                    ? handLandmarkerRef.current.detectForVideo(
-                        sourceElement,
-                        startTimeMs,
-                      )
-                    : handLandmarkerRef.current.detect(sourceElement);
-
                 const hairResults =
                   sourceElement instanceof HTMLVideoElement
                     ? hairSegmenterRef.current.segmentForVideo(
@@ -265,28 +249,6 @@ export function VirtualTryOnScene({
                       )
                     : hairSegmenterRef.current.segment(sourceElement);
 
-                if (faceResults.facialTransformationMatrixes.length > 0) {
-                  faceTransformRef.current =
-                    faceResults.facialTransformationMatrixes[0].data;
-                }
-
-                if (faceResults.faceBlendshapes.length > 0) {
-                  blendshapeRef.current =
-                    faceResults.faceBlendshapes[0].categories;
-                }
-
-                if (
-                  faceResults.faceLandmarks &&
-                  faceResults.faceLandmarks.length > 0
-                ) {
-                  landmarksRef.current = faceResults.faceLandmarks[0];
-                }
-
-                if (handResults.landmarks && handResults.landmarks.length > 0) {
-                  handLandmarksRef.current = handResults.landmarks[0];
-                }
-
-                ctx.drawImage(sourceElement, 0, 0, 480 / dpr, 480 / dpr);
                 if (hairResults?.categoryMask) {
                   hairRef.current =
                     hairResults.categoryMask.getAsFloat32Array();
@@ -332,6 +294,45 @@ export function VirtualTryOnScene({
 
                   hairResults.close();
                 }
+
+                ctx.drawImage(sourceElement, 0, 0, 480 / dpr, 480 / dpr);
+
+                const faceResults =
+                  sourceElement instanceof HTMLVideoElement
+                    ? faceLandmarkerRef.current.detectForVideo(
+                        sourceElement,
+                        startTimeMs,
+                      )
+                    : faceLandmarkerRef.current.detect(sourceElement);
+
+                // const handResults =
+                //   sourceElement instanceof HTMLVideoElement
+                //     ? handLandmarkerRef.current.detectForVideo(
+                //         sourceElement,
+                //         startTimeMs,
+                //       )
+                //     : handLandmarkerRef.current.detect(sourceElement);
+
+                if (faceResults.facialTransformationMatrixes.length > 0) {
+                  faceTransformRef.current =
+                    faceResults.facialTransformationMatrixes[0].data;
+                }
+
+                if (faceResults.faceBlendshapes.length > 0) {
+                  blendshapeRef.current =
+                    faceResults.faceBlendshapes[0].categories;
+                }
+
+                if (
+                  faceResults.faceLandmarks &&
+                  faceResults.faceLandmarks.length > 0
+                ) {
+                  landmarksRef.current = faceResults.faceLandmarks[0];
+                }
+
+                // if (handResults.landmarks && handResults.landmarks.length > 0) {
+                //   handLandmarksRef.current = handResults.landmarks[0];
+                // }
               } catch (err) {
                 console.error("Detection error:", err);
                 setError(err as Error);
