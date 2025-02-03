@@ -63,13 +63,32 @@ export function VirtualTryOnScene({
 
   const legendColors = [[225, 194, 150, 255]];
 
-  const { showHair, setShowHair } = useMakeup();
+  const {
+    showHair,
+    setShowHair,
+    setLipColors,
+    setShowLipColor,
+    setLipColorMode,
+    setLipTexture,
+  } = useMakeup();
+
+  const { setShowGlasess, setShowWatch, setShowRing} = useAccesories();
   const showHairRef = useRef(showHair);
 
   useEffect(() => {
     // tf.enableDebugMode();
     showHairRef.current = showHair;
   }, [showHair]);
+
+  useEffect(() => {
+    setLipColors(["#ff0000"]);
+    setShowLipColor(true);
+    setLipColorMode("One");
+    setLipTexture("Matte");
+    setShowGlasess(true);
+    setShowWatch(true);
+    setShowRing(true);
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -230,13 +249,13 @@ export function VirtualTryOnScene({
                       )
                     : faceLandmarkerRef.current.detect(sourceElement);
 
-                // const handResults =
-                //   sourceElement instanceof HTMLVideoElement
-                //     ? handLandmarkerRef.current.detectForVideo(
-                //         sourceElement,
-                //         startTimeMs,
-                //       )
-                //     : handLandmarkerRef.current.detect(sourceElement);
+                const handResults =
+                  sourceElement instanceof HTMLVideoElement
+                    ? handLandmarkerRef.current.detectForVideo(
+                        sourceElement,
+                        startTimeMs,
+                      )
+                    : handLandmarkerRef.current.detect(sourceElement);
 
                 const hairResults =
                   sourceElement instanceof HTMLVideoElement
@@ -263,17 +282,11 @@ export function VirtualTryOnScene({
                   landmarksRef.current = faceResults.faceLandmarks[0];
                 }
 
-                // if (handResults.landmarks && handResults.landmarks.length > 0) {
-                //   handLandmarksRef.current = handResults.landmarks[0];
-                // }
+                if (handResults.landmarks && handResults.landmarks.length > 0) {
+                  handLandmarksRef.current = handResults.landmarks[0];
+                }
 
-                ctx.drawImage(
-                  sourceElement,
-                  0,
-                  0,
-                  480 / dpr,
-                  480 / dpr,
-                );
+                ctx.drawImage(sourceElement, 0, 0, 480 / dpr, 480 / dpr);
                 if (hairResults?.categoryMask) {
                   hairRef.current =
                     hairResults.categoryMask.getAsFloat32Array();

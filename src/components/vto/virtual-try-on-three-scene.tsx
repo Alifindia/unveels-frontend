@@ -492,8 +492,8 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
           {/* )} */}
 
           <>
-            {/* <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} /> */}
-            {/* <FingerOccluder
+            {/* <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} />
+            <FingerOccluder
               planeSize={planeSize}
               handLandmarks={handlandmarks}
             /> */}
