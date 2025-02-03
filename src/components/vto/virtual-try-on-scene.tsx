@@ -240,7 +240,6 @@ export function VirtualTryOnScene({
               ctx.clearRect(0, 0, width, height);
 
               const startTimeMs = performance.now();
-              ctx.drawImage(sourceElement, 0, 0, 480 / dpr, 480 / dpr);
               try {
                 const hairResults =
                   sourceElement instanceof HTMLVideoElement
@@ -249,6 +248,15 @@ export function VirtualTryOnScene({
                         startTimeMs,
                       )
                     : hairSegmenterRef.current.segment(sourceElement);
+
+                const faceResults =
+                  sourceElement instanceof HTMLVideoElement
+                    ? faceLandmarkerRef.current.detectForVideo(
+                        sourceElement,
+                        startTimeMs,
+                      )
+                    : faceLandmarkerRef.current.detect(sourceElement);
+                ctx.drawImage(sourceElement, 0, 0, 480 / dpr, 480 / dpr);
 
                 if (hairResults?.categoryMask) {
                   hairRef.current =
@@ -295,14 +303,6 @@ export function VirtualTryOnScene({
 
                   hairResults.close();
                 }
-
-                const faceResults =
-                  sourceElement instanceof HTMLVideoElement
-                    ? faceLandmarkerRef.current.detectForVideo(
-                        sourceElement,
-                        startTimeMs,
-                      )
-                    : faceLandmarkerRef.current.detect(sourceElement);
 
                 // const handResults =
                 //   sourceElement instanceof HTMLVideoElement
