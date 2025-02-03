@@ -270,7 +270,7 @@ export function VirtualTryOnScene({
                       : sourceElement.naturalHeight,
                   ).data;
 
-                  const legendColors = [[0, 255, 0, 0.05]]; // Ubah alpha menjadi 0.1 (10%)
+                  const legendColors = [[0, 255, 0, 0.08]]; // Ubah alpha menjadi 0.1 (10%)
                   let j = 0;
                   for (let i = 0; i < hairRef.current.length; ++i) {
                     const maskVal = Math.round(hairRef.current[i] * 255.0);
@@ -280,11 +280,11 @@ export function VirtualTryOnScene({
                       const legendColor =
                         legendColors[maskVal % legendColors.length];
                       // Blend warna dengan alpha yang sangat rendah
-                      imageData[j] = legendColor[0] * 0.05 + imageData[j] * 0.9; // Red
+                      imageData[j] = legendColor[0] * 0.08 + imageData[j] * 0.9; // Red
                       imageData[j + 1] =
-                        legendColor[1] * 0.05 + imageData[j + 1] * 0.9; // Green
+                        legendColor[1] * 0.08 + imageData[j + 1] * 0.9; // Green
                       imageData[j + 2] =
-                        legendColor[2] * 0.05 + imageData[j + 2] * 0.9; // Blue
+                        legendColor[2] * 0.08 + imageData[j + 2] * 0.9; // Blue
                       imageData[j + 3] = 255; // Keep full opacity for the final result
                     }
                     j += 4;
