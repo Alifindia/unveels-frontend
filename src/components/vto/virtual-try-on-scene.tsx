@@ -24,13 +24,6 @@ import { Blendshape } from "../../types/blendshape";
 import { useMakeup } from "../../context/makeup-context";
 import { Rnd } from "react-rnd";
 // new
-import "@tensorflow/tfjs-core";
-// Register WebGL backend.
-import "@tensorflow/tfjs-backend-webgl";
-import "@mediapipe/face_mesh";
-import "@mediapipe/hands";
-import * as tf from "@tensorflow/tfjs";
-
 import { BeforeAfterCanvas } from "./before-after-canvas";
 
 export function VirtualTryOnScene({
@@ -70,7 +63,7 @@ export function VirtualTryOnScene({
 
   const legendColors = [[225, 194, 150, 255]];
 
-  const { showHair } = useMakeup();
+  const { showHair, setShowHair } = useMakeup();
   const showHairRef = useRef(showHair);
 
   useEffect(() => {
@@ -118,24 +111,24 @@ export function VirtualTryOnScene({
           },
         );
 
-        // const hairSegmenter = await ImageSegmenter.createFromOptions(
-        //   filesetResolver,
-        //   {
-        //     baseOptions: {
-        //       modelAssetPath:
-        //         "/media/unveels/models/hair/hair_segmenter.tflite",
-        //       delegate: "GPU",
-        //     },
-        //     runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
-        //     outputCategoryMask: true,
-        //     outputConfidenceMasks: false,
-        //   },
-        // );
+        const hairSegmenter = await ImageSegmenter.createFromOptions(
+          filesetResolver,
+          {
+            baseOptions: {
+              modelAssetPath:
+                "/media/unveels/models/hair/hair_segmenter.tflite",
+              delegate: "GPU",
+            },
+            runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
+            outputCategoryMask: true,
+            outputConfidenceMasks: false,
+          },
+        );
 
         if (isMounted) {
           faceLandmarkerRef.current = landmarker;
           handLandmarkerRef.current = handLandmarker;
-          // hairSegmenterRef.current = hairSegmenter;
+          hairSegmenterRef.current = hairSegmenter;
           startDetection();
         }
       } catch (error) {
@@ -166,12 +159,12 @@ export function VirtualTryOnScene({
   const startDetection = useCallback(() => {
     if (isDetectingRef.current) return;
     isDetectingRef.current = true;
-
+    setShowHair(true);
     const detect = async () => {
       if (
         faceLandmarkerRef.current &&
-        handLandmarkerRef.current
-        // hairSegmenterRef.current
+        handLandmarkerRef.current &&
+        hairSegmenterRef.current
       ) {
         const canvas = canvasRef.current;
 
@@ -246,13 +239,13 @@ export function VirtualTryOnScene({
                       )
                     : handLandmarkerRef.current.detect(sourceElement);
 
-                // const hairResults =
-                //   sourceElement instanceof HTMLVideoElement
-                //     ? hairSegmenterRef.current.segmentForVideo(
-                //         sourceElement,
-                //         startTimeMs,
-                //       )
-                //     : hairSegmenterRef.current.segment(sourceElement);
+                const hairResults =
+                  sourceElement instanceof HTMLVideoElement
+                    ? hairSegmenterRef.current.segmentForVideo(
+                        sourceElement,
+                        startTimeMs,
+                      )
+                    : hairSegmenterRef.current.segment(sourceElement);
 
                 if (faceResults.facialTransformationMatrixes.length > 0) {
                   faceTransformRef.current =
@@ -275,56 +268,58 @@ export function VirtualTryOnScene({
                   handLandmarksRef.current = handResults.landmarks[0];
                 }
 
-                // if (hairResults?.categoryMask) {
-                //   hairRef.current =
-                //     hairResults.categoryMask.getAsFloat32Array();
+                ctx.drawImage(
+                  sourceElement,
+                  0,
+                  0,
+                  (isDesktop ? VIDEO_WIDTH : videoDimensions.width) / dpr,
+                  (isDesktop ? VIDEO_HEIGHT : videoDimensions.height) / dpr,
+                );
+                if (hairResults?.categoryMask) {
+                  hairRef.current =
+                    hairResults.categoryMask.getAsFloat32Array();
+                  let imageData = ctx.getImageData(
+                    0,
+                    0,
+                    sourceElement instanceof HTMLVideoElement
+                      ? sourceElement.videoWidth
+                      : sourceElement.naturalWidth,
+                    sourceElement instanceof HTMLVideoElement
+                      ? sourceElement.videoHeight
+                      : sourceElement.naturalHeight,
+                  ).data;
 
-                //   if (hairResults?.categoryMask) {
-                //     hairRef.current =
-                //       hairResults.categoryMask.getAsFloat32Array();
-                //     let imageData = ctx.getImageData(
-                //       0,
-                //       0,
-                //       sourceElement instanceof HTMLVideoElement
-                //         ? sourceElement.videoWidth
-                //         : sourceElement.naturalWidth,
-                //       sourceElement instanceof HTMLVideoElement
-                //         ? sourceElement.videoHeight
-                //         : sourceElement.naturalHeight,
-                //     ).data;
+                  let j = 0;
+                  for (let i = 0; i < hairRef.current.length; ++i) {
+                    const maskVal = Math.round(hairRef.current[i] * 255.0);
 
-                //     let j = 0;
-                //     for (let i = 0; i < hairRef.current.length; ++i) {
-                //       const maskVal = Math.round(hairRef.current[i] * 255.0);
+                    // Proses hanya untuk label index 1
+                    if (maskVal === 1) {
+                      const legendColor =
+                        legendColors[maskVal % legendColors.length];
+                      imageData[j] = (legendColor[0] + imageData[j]) / 255;
+                      imageData[j + 1] =
+                        (legendColor[1] + imageData[j + 1]) / 255;
+                      imageData[j + 2] =
+                        (legendColor[2] + imageData[j + 2]) / 255;
+                      imageData[j + 3] =
+                        (legendColor[3] + imageData[j + 3]) / 255;
+                    }
+                    j += 4;
+                  }
 
-                //       // Proses hanya untuk label index 1
-                //       if (maskVal === 1) {
-                //         const legendColor =
-                //           legendColors[maskVal % legendColors.length];
-                //         imageData[j] = (legendColor[0] + imageData[j]) / 255;
-                //         imageData[j + 1] =
-                //           (legendColor[1] + imageData[j + 1]) / 255;
-                //         imageData[j + 2] =
-                //           (legendColor[2] + imageData[j + 2]) / 255;
-                //         imageData[j + 3] =
-                //           (legendColor[3] + imageData[j + 3]) / 255;
-                //       }
-                //       j += 4;
-                //     }
+                  hairMaskRef.current = new ImageData(
+                    new Uint8ClampedArray(imageData.buffer),
+                    sourceElement instanceof HTMLVideoElement
+                      ? sourceElement.videoWidth
+                      : sourceElement.naturalWidth,
+                    sourceElement instanceof HTMLVideoElement
+                      ? sourceElement.videoHeight
+                      : sourceElement.naturalHeight,
+                  );
 
-                //     hairMaskRef.current = new ImageData(
-                //       new Uint8ClampedArray(imageData.buffer),
-                //       sourceElement instanceof HTMLVideoElement
-                //         ? sourceElement.videoWidth
-                //         : sourceElement.naturalWidth,
-                //       sourceElement instanceof HTMLVideoElement
-                //         ? sourceElement.videoHeight
-                //         : sourceElement.naturalHeight,
-                //     );
-
-                //     hairResults.close();
-                //   }
-                // }
+                  hairResults.close();
+                }
               } catch (err) {
                 console.error("Detection error:", err);
                 setError(err as Error);

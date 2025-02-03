@@ -78,7 +78,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   const { skinToneThreeSceneRef, setScreenshotImage } = useCamera();
   const hairMaskTextureRef = useRef<Texture | null>(null);
 
-  const [maskOpacity, setMaskOpacity] = useState(0.5);
+  const [maskOpacity, setMaskOpacity] = useState(1);
 
   const isFlipped = true;
 
@@ -466,18 +466,18 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
               <Necklace planeSize={planeSize} landmarks={landmarks} />
             )}
 
-            <HeadOccluder planeSize={planeSize} landmarks={landmarks} />
-            <NeckOccluder planeSize={planeSize} landmarks={landmarks} />
+            {/* <HeadOccluder planeSize={planeSize} landmarks={landmarks} /> */}
+            {/* <NeckOccluder planeSize={planeSize} landmarks={landmarks} /> */}
           </>
 
-          {showHair && (
+          {/* {showHair && ( */}
             <>
               {hairMaskTextureRef.current && (
                 <mesh
-                  position={[0, 0, 100]}
+                  position={[0, 0, -500]}
                   scale={[-1, 1, 1]}
                   {...props}
-                  renderOrder={3}
+                  renderOrder={0}
                 >
                   <planeGeometry args={[planeSize[0], planeSize[1]]} />
                   <meshBasicMaterial
@@ -489,14 +489,14 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
                 </mesh>
               )}
             </>
-          )}
+          {/* )} */}
 
           <>
-            <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} />
-            <FingerOccluder
+            {/* <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} /> */}
+            {/* <FingerOccluder
               planeSize={planeSize}
               handLandmarks={handlandmarks}
-            />
+            /> */}
 
             {showWatch && (
               <Watch planeSize={planeSize} handLandmarks={handlandmarks} />
