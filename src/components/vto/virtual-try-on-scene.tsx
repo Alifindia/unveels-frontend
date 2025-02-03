@@ -159,7 +159,6 @@ export function VirtualTryOnScene({
   const startDetection = useCallback(() => {
     if (isDetectingRef.current) return;
     isDetectingRef.current = true;
-    setShowHair(true);
     const detect = async () => {
       if (
         faceLandmarkerRef.current &&
@@ -272,8 +271,8 @@ export function VirtualTryOnScene({
                   sourceElement,
                   0,
                   0,
-                  (isDesktop ? VIDEO_WIDTH : videoDimensions.width) / dpr,
-                  (isDesktop ? VIDEO_HEIGHT : videoDimensions.height) / dpr,
+                  (isDesktop ? VIDEO_WIDTH : videoDimensions.height) / dpr,
+                  (isDesktop ? VIDEO_HEIGHT : videoDimensions.width) / dpr,
                 );
                 if (hairResults?.categoryMask) {
                   hairRef.current =
@@ -335,6 +334,7 @@ export function VirtualTryOnScene({
     };
 
     detect();
+    setShowHair(true);
   }, []);
 
   const isDesktop =
