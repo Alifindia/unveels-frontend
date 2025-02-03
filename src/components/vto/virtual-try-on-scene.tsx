@@ -230,13 +230,13 @@ export function VirtualTryOnScene({
                       )
                     : faceLandmarkerRef.current.detect(sourceElement);
 
-                const handResults =
-                  sourceElement instanceof HTMLVideoElement
-                    ? handLandmarkerRef.current.detectForVideo(
-                        sourceElement,
-                        startTimeMs,
-                      )
-                    : handLandmarkerRef.current.detect(sourceElement);
+                // const handResults =
+                //   sourceElement instanceof HTMLVideoElement
+                //     ? handLandmarkerRef.current.detectForVideo(
+                //         sourceElement,
+                //         startTimeMs,
+                //       )
+                //     : handLandmarkerRef.current.detect(sourceElement);
 
                 const hairResults =
                   sourceElement instanceof HTMLVideoElement
@@ -263,16 +263,16 @@ export function VirtualTryOnScene({
                   landmarksRef.current = faceResults.faceLandmarks[0];
                 }
 
-                if (handResults.landmarks && handResults.landmarks.length > 0) {
-                  handLandmarksRef.current = handResults.landmarks[0];
-                }
+                // if (handResults.landmarks && handResults.landmarks.length > 0) {
+                //   handLandmarksRef.current = handResults.landmarks[0];
+                // }
 
                 ctx.drawImage(
                   sourceElement,
                   0,
                   0,
-                  (isDesktop ? VIDEO_WIDTH : videoDimensions.height) / dpr,
-                  (isDesktop ? VIDEO_HEIGHT : videoDimensions.width) / dpr,
+                  480 / dpr,
+                  480 / dpr,
                 );
                 if (hairResults?.categoryMask) {
                   hairRef.current =
@@ -537,8 +537,8 @@ export function VirtualTryOnScene({
           screenshotFormat="image/jpeg"
           mirrored={false}
           videoConstraints={{
-            width: isDesktop ? VIDEO_WIDTH : videoDimensions.height,
-            height: isDesktop ? VIDEO_HEIGHT : videoDimensions.width,
+            width: 480,
+            height: 480,
             facingMode: criterias.flipped ? "environment" : "user",
             frameRate: { ideal: 30 },
           }}
