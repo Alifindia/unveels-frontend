@@ -61,8 +61,6 @@ export function VirtualTryOnScene({
   const { envMapAccesories, setEnvMapAccesories } = useAccesories();
   const { envMapMakeup, setEnvMapMakeup } = useMakeup();
 
-  const legendColors = [[225, 194, 150, 255]];
-
   const {
     showHair,
     setShowHair,
@@ -272,6 +270,7 @@ export function VirtualTryOnScene({
                       : sourceElement.naturalHeight,
                   ).data;
 
+                  const legendColors = [[0, 255, 0, 0.1]]; // Ubah alpha menjadi 0.1 (10%)
                   let j = 0;
                   for (let i = 0; i < hairRef.current.length; ++i) {
                     const maskVal = Math.round(hairRef.current[i] * 255.0);
@@ -280,13 +279,13 @@ export function VirtualTryOnScene({
                     if (maskVal === 1) {
                       const legendColor =
                         legendColors[maskVal % legendColors.length];
-                      imageData[j] = (legendColor[0] + imageData[j]) / 255;
+                      // Blend warna dengan alpha yang sangat rendah
+                      imageData[j] = legendColor[0] * 0.1 + imageData[j] * 0.9; // Red
                       imageData[j + 1] =
-                        (legendColor[1] + imageData[j + 1]) / 255;
+                        legendColor[1] * 0.1 + imageData[j + 1] * 0.9; // Green
                       imageData[j + 2] =
-                        (legendColor[2] + imageData[j + 2]) / 255;
-                      imageData[j + 3] =
-                        (legendColor[3] + imageData[j + 3]) / 255;
+                        legendColor[2] * 0.1 + imageData[j + 2] * 0.9; // Blue
+                      imageData[j + 3] = 255; // Keep full opacity for the final result
                     }
                     j += 4;
                   }
