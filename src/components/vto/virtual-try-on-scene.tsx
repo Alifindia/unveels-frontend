@@ -548,6 +548,7 @@ export function VirtualTryOnScene({
           controls
           autoPlay
           loop
+          playsInline
         />
       )}
 
@@ -559,10 +560,10 @@ export function VirtualTryOnScene({
           screenshotFormat="image/jpeg"
           mirrored={false}
           videoConstraints={{
-            width: 480,
-            height: 480,
+            width: isDesktop ? VIDEO_WIDTH : videoDimensions.height,
+            height: isDesktop ? VIDEO_HEIGHT : videoDimensions.width,
             facingMode: criterias.flipped ? "environment" : "user",
-            frameRate: { ideal: 30 },
+            frameRate: { ideal: 60 },
           }}
           onUserMediaError={(err) =>
             setError(
