@@ -175,6 +175,22 @@ export const arabicToEnglishSetMode: { [key: string]: string } = {
   "مجموعه خماسيه" : "set penta",
 };
 
+export const arabicToEnglishSelectParentSkin: { [key: string]: string } = {
+  "اختاري لون البشرة الفاتحة" : "select fair skin color",
+  "اختاري لون البشره الفاتحه" : "select fair skin color",
+  "اختاري لون البشره الفاتح" : "select fair skin color",
+  "اختاري لون بشرة متوسط" : "select medium skin color",
+  "اختاري لون بشره متوسطه" : "select medium skin color",
+  "اختاري لون بشره متوسط" : "select medium skin color",
+  "اختاري لون البشرة الزيتوني" : "select olive skin color",
+  "اختاري لون البشره الزيتونيه" : "select olive skin color",
+  "اختاري لون البشرة البرونزي" : "select tan skin color",
+  "اختاري لون البشره البرون" : "select tan skin color",
+  "اختاري لون البشره البرونزي" : "select tan skin color",
+  "اختار لون البشرة البني" : "select brown skin color",
+  "اختاري لون البشره البني" : "select brown skin color",
+};
+
 export const arabicToEnglishSelectColor: { [key: string]: string } = {
   "اختر اللون": "select",
   "اختري اللون": "select",
@@ -320,7 +336,9 @@ export function translateSelectProduct(text: any) {
   const containsAddToCart = Object.keys(arabicToEnglishAddToCart).some((keyword) =>
     text.includes(keyword)
   );
-  
+  const containsSelectParentSkin = Object.keys(arabicToEnglishSelectParentSkin).some((keyword) =>
+    text.includes(keyword)
+  );
   const numbersMapping = {
     ...arabicToEnglishNumbers,
   };
@@ -417,6 +435,15 @@ export function translateSelectProduct(text: any) {
       const englishWord = Mapping[arabicWord];
       translatedText = translatedText.replace(new RegExp(arabicWord, 'g'), englishWord);
     });
+  } else if (containsSelectParentSkin) {
+    const Mapping = {
+      ...arabicToEnglishSelectParentSkin,
+    };
+
+    Object.keys(Mapping).forEach((arabicWord) => {
+      const englishWord = Mapping[arabicWord];
+      translatedText = translatedText.replace(new RegExp(arabicWord, 'g'), englishWord);
+    });
   }
 
   Object.keys(numbersMapping).forEach((arabicWord) => {
@@ -426,6 +453,8 @@ export function translateSelectProduct(text: any) {
   // if (!isFullyTranslated || arabicWordsRemaining) {
   //   return null;
   // }
-
+  if (translatedText.includes("select tan skin colorزي")) {
+    return "select tan skin color";
+  }
   return translatedText;
 }
