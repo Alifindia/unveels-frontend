@@ -254,7 +254,17 @@ export function VirtualTryOnScene({
                         startTimeMs,
                       )
                     : faceLandmarkerRef.current.detect(sourceElement);
-                ctx.drawImage(sourceElement, 0, 0, 480 / dpr, 480 / dpr);
+                ctx.drawImage(
+                  sourceElement,
+                  0,
+                  0,
+                  (sourceElement instanceof HTMLVideoElement
+                    ? sourceElement.videoWidth
+                    : sourceElement.naturalWidth) / dpr,
+                  (sourceElement instanceof HTMLVideoElement
+                    ? sourceElement.videoHeight
+                    : sourceElement.naturalHeight) / dpr,
+                );
 
                 if (hairResults?.categoryMask) {
                   hairRef.current =
