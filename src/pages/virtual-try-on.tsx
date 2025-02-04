@@ -69,7 +69,10 @@ import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-conte
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
 import VoiceCommand from "../components/voice-command/voice-command";
 import { VirtualTryOnMakeupsVoiceProvider } from "../context/virtual-try-on-makeups-voice-context";
-import { SelecProductNumberProvider, useSelecProductNumberContext } from "./vto/select-product-context";
+import {
+  SelecProductNumberProvider,
+  useSelecProductNumberContext,
+} from "./vto/select-product-context";
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
 import {
@@ -231,8 +234,18 @@ function Main() {
         )}
         <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
           <SuccessPopup product={dataItem} type={type} />
-          <div className={`absolute inset-0 ${mode !== "LIVE" ? "scale-x-[-1] transform" : ""}`}>
-            <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+          <div
+            className={`absolute inset-0 ${mode !== "LIVE" ? "scale-x-[-1] transform" : ""}`}
+          >
+            {mode === "IMAGE" && (
+              <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+            )}
+            {mode === "VIDEO" && (
+              <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+            )}
+            {mode === "LIVE" && (
+              <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+            )}
             <div className="pointer-events-none absolute inset-0"></div>
           </div>
           <TopNavigation />
@@ -272,7 +285,7 @@ function MainContent() {
           }}
           className="flex h-3 w-full items-center justify-center bg-transparent"
         >
-          <div className="h-1 w-8 xl:w-10 rounded-full bg-gray-400" />
+          <div className="h-1 w-8 rounded-full bg-gray-400 xl:w-10" />
         </button>
       </div>
       {collapsed ? null : <BottomContent />}
@@ -388,7 +401,7 @@ export function Makeups() {
   ];
 
   const [selectedMakeup, setSelectedMakeup] = useState<string | null>(null);
-  const { setSelectedProductNumber } = useSelecProductNumberContext()
+  const { setSelectedProductNumber } = useSelecProductNumberContext();
 
   return (
     <>
@@ -400,8 +413,8 @@ export function Makeups() {
               className="flex flex-col items-center space-y-2"
               data-selected={selectedMakeup === option.name}
               onClick={() => {
-                setSelectedMakeup(option.name)
-                setSelectedProductNumber(null)
+                setSelectedMakeup(option.name);
+                setSelectedProductNumber(null);
               }}
             >
               <div
