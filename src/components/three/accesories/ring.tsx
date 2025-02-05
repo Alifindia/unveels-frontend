@@ -24,6 +24,7 @@ const RingInner: React.FC<RingProps> = React.memo(
 
     useEffect(() => {
       const loader = new GLTFLoader();
+      console.log(RING)
       loader.load(
         RING,
         (gltf) => {
@@ -68,11 +69,15 @@ const RingInner: React.FC<RingProps> = React.memo(
 
         const fingerSize = calculateDistance(middleFingerMCP, ringFingerMCP);
 
+        const isTilted = Math.abs(ringFingerMCP.x - middleFingerMCP.x) > 0.035;
+        const isHandFar = Math.abs(middleFingerMCP.z - ringFingerDIP.z) > 0.1;
+        const ringFingerY = isTilted || isHandFar
+          ? -(ringFingerDIP.y - 0.468) * outputHeight
+          : -(ringFingerDIP.y - 0.5) * outputHeight;
         const ringFingerX = (1 - ringFingerDIP.x - 0.5) * outputWidth;
-        const ringFingerY = -(ringFingerDIP.y - 0.5) * outputHeight;
         const ringFingerZ = 200;
 
-        const scaleFactor = (fingerSize * outputWidth) / 6;
+        const scaleFactor = (fingerSize * outputWidth) / 6.2;
 
         ringRef.current.position.set(ringFingerX, ringFingerY, ringFingerZ);
         ringRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -81,6 +86,9 @@ const RingInner: React.FC<RingProps> = React.memo(
 
         if (quaternion) {
           ringRef.current.setRotationFromQuaternion(quaternion);
+        }
+        if (!isTilted) {
+          ringRef.current.rotateY(Math.PI / 1.1);
         }
       } else {
         ringRef.current.visible = false;
