@@ -297,7 +297,7 @@ export function TryOnSelector() {
             <Fragment key={shadeTab}>
               <button
                 key={shadeTab}
-                className={`relative h-10 grow border-b font-luxury text-[8px] sm:text-[10px] lg:text-[12px] ${
+                className={`relative h-10 grow border-b font-luxury text-[10px] sm:text-[12px] lg:text-[14px]  ${
                   isActive
                     ? activeClassNames
                     : "border-transparent text-gray-500"
