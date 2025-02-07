@@ -1517,7 +1517,7 @@ export const LASHES_ONE =
   "/media/unveels/vto-assets/texture/lashes/eyelashes-1.png";
 
 export const LASHES_TWO =
-  "/media/unveels/vto/eyelashesh/eyelashes-2.png";
+  "/media/unveels/vto-assets/texture/lashes/eyelashes-2.png";
 
 export const LASHES_THREE =
   "/media/unveels/vto/eyelashesh/eyelashes-3.png";
