@@ -83,7 +83,12 @@ const FaceMesh: React.FC<FaceMeshProps> = ({
   }, [geometry]);
 
   useFrame(() => {
-    if (!landmarks.current) return;
+    if (!landmarks.current) {
+      if (meshRef.current) {
+        meshRef.current.visible = false;
+      }
+      return;
+    };
     if (landmarks.current.length > 0) {
       if (
         geometryRef.current &&
@@ -103,7 +108,7 @@ const FaceMesh: React.FC<FaceMeshProps> = ({
           const landmark = modifiedLandmarks[i];
           const x = (landmark.x - 0.5) * outputWidth;
           const y = -(landmark.y - 0.5) * outputHeight;
-          const z = landmark.z;
+          const z = -landmark.z * Math.max(outputWidth, outputHeight);
           position.setXYZ(i, x, y, z);
         }
 

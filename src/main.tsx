@@ -22,13 +22,13 @@ function renderApp(containerId: string, skus?: string[]) {
 
   const root = createRoot(container);
   root.render(
-    <StrictMode>
+    // <StrictMode>
       <QueryClientProvider client={queryClient}>
         <CartProvider>
           <App />
         </CartProvider>
       </QueryClientProvider>
-    </StrictMode>,
+    // </StrictMode>,
   );
 }
 
@@ -97,24 +97,24 @@ function createAndRenderContainer(initialRoute: string, skus?: string[]) {
 if (window.__INITIAL_ROUTE__) {
   console.log("Initial route", window.__INITIAL_ROUTE__);
   createRoot(document.getElementById("root")!).render(
-    <StrictMode>
+    // <StrictMode>
       <QueryClientProvider client={queryClient}>
         <CartProvider>
           <App />
         </CartProvider>
       </QueryClientProvider>
-    </StrictMode>,
+    // </StrictMode>,
   );
 } else {
   if (import.meta.env.DEV) {
     createRoot(document.getElementById("root")!).render(
-      <StrictMode>
+      // <StrictMode>
         <QueryClientProvider client={queryClient}>
           <CartProvider>
             <App />
           </CartProvider>
         </QueryClientProvider>
-      </StrictMode>,
+      // </StrictMode>,
     );
 
     console.log("Rendered default route");

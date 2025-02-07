@@ -58,7 +58,11 @@ const RingInner: React.FC<RingProps> = React.memo(
     }, [scene]);
 
     useFrame(() => {
-      if (!handLandmarks.current || !ringRef.current) return;
+      if (!ringRef.current) return;
+      if (!handLandmarks.current) {
+        ringRef.current.visible = false;
+        return;
+      }
       if (handLandmarks.current.length > 0) {
         ringRef.current.visible = true;
 

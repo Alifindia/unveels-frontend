@@ -29,9 +29,11 @@ import { BeforeAfterCanvas } from "./before-after-canvas";
 export function VirtualTryOnScene({
   mediaFile,
   mode = "LIVE",
+  modelImageSrc,
 }: {
   mediaFile: File | null;
   mode: "IMAGE" | "VIDEO" | "LIVE";
+  modelImageSrc?: string | null;
 }) {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -61,32 +63,16 @@ export function VirtualTryOnScene({
   const { envMapAccesories, setEnvMapAccesories } = useAccesories();
   const { envMapMakeup, setEnvMapMakeup } = useMakeup();
 
-  const {
-    showHair,
-    setShowHair,
-    setLipColors,
-    setShowLipColor,
-    setLipColorMode,
-    setLipTexture,
-  } = useMakeup();
+  const { showHair, showFoundation } = useMakeup();
 
-  const { setShowGlasess, setShowWatch, setShowRing } = useAccesories();
   const showHairRef = useRef(showHair);
+  const showFoundationRef = useRef(showFoundation);
 
   useEffect(() => {
     // tf.enableDebugMode();
     showHairRef.current = showHair;
-  }, [showHair]);
-
-  useEffect(() => {
-    setLipColors(["#ff0000"]);
-    setShowLipColor(true);
-    setLipColorMode("One");
-    setLipTexture("Matte");
-    setShowGlasess(true);
-    setShowWatch(true);
-    setShowRing(true);
-  }, []);
+    showFoundationRef.current = showFoundation;
+  }, [showHair, showFoundation]);
 
   useEffect(() => {
     let isMounted = true;
@@ -105,9 +91,9 @@ export function VirtualTryOnScene({
             },
             runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
             numFaces: 1,
-            minFaceDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5,
-            minFacePresenceConfidence: 0.5,
+            minFaceDetectionConfidence: 0.9,
+            minTrackingConfidence: 0.9,
+            minFacePresenceConfidence: 0.9,
             outputFaceBlendshapes: true,
             outputFacialTransformationMatrixes: true,
           },
@@ -123,8 +109,8 @@ export function VirtualTryOnScene({
             },
             runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
             numHands: 2,
-            minHandDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5,
+            minHandDetectionConfidence: 0.9,
+            minTrackingConfidence: 0.9,
           },
         );
 
@@ -133,7 +119,7 @@ export function VirtualTryOnScene({
           {
             baseOptions: {
               modelAssetPath:
-                "/media/unveels/models/hair/hair_segmenter.tflite",
+                "/media/unveels/models/hair/selfie_multiclass.tflite",
               delegate: "GPU",
             },
             runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
@@ -176,6 +162,43 @@ export function VirtualTryOnScene({
   const startDetection = useCallback(() => {
     if (isDetectingRef.current) return;
     isDetectingRef.current = true;
+
+    const leftEye = [
+      246, 161, 160, 159, 158, 157, 173, 155, 154, 153, 145, 144, 163, 7,
+    ];
+    const rightEye = [
+      263, 466, 388, 387, 386, 385, 384, 398, 362, 382, 381, 380, 374, 373, 390,
+      249,
+    ];
+    const mounth = [
+      308, 415, 310, 311, 312, 13, 82, 81, 80, 191, 62, 78, 95, 88, 178, 87, 14,
+      317, 402, 319,
+    ];
+
+    const isInsideEyeArea = (
+      x: number,
+      y: number,
+      landmarks: any[],
+      eyePoints: number[],
+      sourceWidth: number,
+      sourceHeight: number,
+    ) => {
+      let inside = false;
+      let j = eyePoints.length - 1;
+      for (let i = 0; i < eyePoints.length; i++) {
+        let xi = landmarks[eyePoints[i]].x * sourceWidth;
+        let yi = landmarks[eyePoints[i]].y * sourceHeight;
+        let xj = landmarks[eyePoints[j]].x * sourceWidth;
+        let yj = landmarks[eyePoints[j]].y * sourceHeight;
+
+        if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
+          inside = !inside;
+        }
+        j = i;
+      }
+      return inside;
+    };
+
     const detect = async () => {
       if (
         faceLandmarkerRef.current &&
@@ -185,7 +208,7 @@ export function VirtualTryOnScene({
         const canvas = canvasRef.current;
 
         if (canvas) {
-          const ctx = canvas.getContext("2d");
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
           if (ctx) {
             const { innerWidth: width, innerHeight: height } = window;
             const dpr = window.devicePixelRatio || 1;
@@ -212,6 +235,16 @@ export function VirtualTryOnScene({
             }
 
             if (sourceElement) {
+              const sourceWidth =
+                sourceElement instanceof HTMLVideoElement
+                  ? sourceElement.videoWidth
+                  : sourceElement.naturalWidth;
+
+              const sourceHeight =
+                sourceElement instanceof HTMLVideoElement
+                  ? sourceElement.videoHeight
+                  : sourceElement.naturalHeight;
+
               const imgAspect =
                 sourceElement instanceof HTMLVideoElement
                   ? sourceElement.videoWidth / sourceElement.videoHeight
@@ -258,61 +291,101 @@ export function VirtualTryOnScene({
                   sourceElement,
                   0,
                   0,
-                  (sourceElement instanceof HTMLVideoElement
-                    ? sourceElement.videoWidth
-                    : sourceElement.naturalWidth) / dpr,
-                  (sourceElement instanceof HTMLVideoElement
-                    ? sourceElement.videoHeight
-                    : sourceElement.naturalHeight) / dpr,
+                  sourceWidth / dpr,
+                  sourceHeight / dpr,
                 );
 
+                console.time("RENDERING HAIR");
                 if (hairResults?.categoryMask) {
                   hairRef.current =
                     hairResults.categoryMask.getAsFloat32Array();
                   let imageData = ctx.getImageData(
                     0,
                     0,
-                    sourceElement instanceof HTMLVideoElement
-                      ? sourceElement.videoWidth
-                      : sourceElement.naturalWidth,
-                    sourceElement instanceof HTMLVideoElement
-                      ? sourceElement.videoHeight
-                      : sourceElement.naturalHeight,
+                    sourceWidth,
+                    sourceHeight,
                   ).data;
 
-                  const legendColors = [[0, 255, 0, 0.08]]; // Ubah alpha menjadi 0.1 (10%)
+                  const legendColors = [[0, 255, 0, 0.08]];
+                  const skinColors = [[255, 220, 117, 0.1]];
                   let j = 0;
                   for (let i = 0; i < hairRef.current.length; ++i) {
+                    const x = i % sourceWidth;
+                    const y = Math.floor(i / sourceWidth);
                     const maskVal = Math.round(hairRef.current[i] * 255.0);
 
-                    // Proses hanya untuk label index 1
-                    if (maskVal === 1) {
-                      const legendColor =
-                        legendColors[maskVal % legendColors.length];
-                      // Blend warna dengan alpha yang sangat rendah
-                      imageData[j] = legendColor[0] * 0.08 + imageData[j] * 0.9; // Red
-                      imageData[j + 1] =
-                        legendColor[1] * 0.08 + imageData[j + 1] * 0.9; // Green
-                      imageData[j + 2] =
-                        legendColor[2] * 0.08 + imageData[j + 2] * 0.9; // Blue
-                      imageData[j + 3] = 255; // Keep full opacity for the final result
-                    }
+                    // const insideLeftEye = isInsideEyeArea(
+                    //   x,
+                    //   y,
+                    //   faceResults.faceLandmarks[0],
+                    //   leftEye,
+                    //   sourceWidth,
+                    //   sourceHeight,
+                    // );
+                    // const insideRightEye = isInsideEyeArea(
+                    //   x,
+                    //   y,
+                    //   faceResults.faceLandmarks[0],
+                    //   rightEye,
+                    //   sourceWidth,
+                    //   sourceHeight,
+                    // );
+                    // const insideMounth = isInsideEyeArea(
+                    //   x,
+                    //   y,
+                    //   faceResults.faceLandmarks[0],
+                    //   mounth,
+                    //   sourceWidth,
+                    //   sourceHeight,
+                    // );
+
+                    // if (insideLeftEye || insideRightEye || insideMounth) {
+                      // Jika dalam area mata, buat transparan
+                    // } else {
+                      if (maskVal === 1) {
+                        if (showHairRef.current) {
+                          const legendColor =
+                            legendColors[maskVal % legendColors.length];
+                          imageData[j] =
+                            legendColor[0] * 0.08 + imageData[j] * 0.9;
+                          imageData[j + 1] =
+                            legendColor[1] * 0.08 + imageData[j + 1] * 0.9;
+                          imageData[j + 2] =
+                            legendColor[2] * 0.08 + imageData[j + 2] * 0.9;
+                          imageData[j + 3] = 255;
+                        }
+                      } else if (maskVal === 3) {
+                        if (showFoundationRef.current) {
+                          const skinColor =
+                            skinColors[maskVal % legendColors.length];
+                          imageData[j] =
+                            skinColor[0] * 0.1 + imageData[j] * 0.9;
+                          imageData[j + 1] =
+                            skinColor[1] * 0.1 + imageData[j + 1] * 0.9;
+                          imageData[j + 2] =
+                            skinColor[2] * 0.1 + imageData[j + 2] * 0.9;
+                          imageData[j + 3] = 255;
+                        }
+                      } else {
+                        // imageData[j] = 0;
+                        // imageData[j + 1] = 0;
+                        // imageData[j + 2] = 0;
+                        // imageData[j + 3] = 0;
+                      }
+                    // }
                     j += 4;
                   }
 
                   hairMaskRef.current = new ImageData(
                     new Uint8ClampedArray(imageData.buffer),
-                    sourceElement instanceof HTMLVideoElement
-                      ? sourceElement.videoWidth
-                      : sourceElement.naturalWidth,
-                    sourceElement instanceof HTMLVideoElement
-                      ? sourceElement.videoHeight
-                      : sourceElement.naturalHeight,
+                    sourceWidth,
+                    sourceHeight,
                   );
 
                   hairResults.close();
                 }
 
+                console.timeEnd("RENDERING HAIR");
                 // const handResults =
                 //   sourceElement instanceof HTMLVideoElement
                 //     ? handLandmarkerRef.current.detectForVideo(
@@ -331,16 +404,8 @@ export function VirtualTryOnScene({
                     faceResults.faceBlendshapes[0].categories;
                 }
 
-                if (
-                  faceResults.faceLandmarks &&
-                  faceResults.faceLandmarks.length > 0
-                ) {
-                  landmarksRef.current = faceResults.faceLandmarks[0];
-                }
-
-                // if (handResults.landmarks && handResults.landmarks.length > 0) {
-                //   handLandmarksRef.current = handResults.landmarks[0];
-                // }
+                landmarksRef.current = faceResults.faceLandmarks[0];
+                // handLandmarksRef.current = handResults.landmarks[0];
               } catch (err) {
                 console.error("Detection error:", err);
                 setError(err as Error);
@@ -356,7 +421,6 @@ export function VirtualTryOnScene({
     };
 
     detect();
-    setShowHair(true);
   }, []);
 
   const isDesktop =
@@ -532,11 +596,17 @@ export function VirtualTryOnScene({
         </Rnd>
       )}
 
-      {mode == "IMAGE" && mediaFile && (
+      {mode == "IMAGE" && (mediaFile || modelImageSrc) && (
         <img
           className="hidden"
           ref={imageUploadRef}
-          src={URL.createObjectURL(mediaFile)}
+          src={
+            mediaFile
+              ? URL.createObjectURL(mediaFile)
+              : modelImageSrc
+                ? modelImageSrc
+                : ""
+          }
         />
       )}
 
@@ -582,7 +652,7 @@ export function VirtualTryOnScene({
         gl={{
           toneMapping: ACESFilmicToneMapping,
           toneMappingExposure: 1,
-          antialias: true,
+          antialias: false,
           outputColorSpace: SRGBColorSpace,
         }}
       >

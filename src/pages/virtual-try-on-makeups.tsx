@@ -80,63 +80,63 @@ interface VirtualTryOnProvider {
 
 export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
   return (
-  <SelecProductNumberProvider>
-    <WatchesProvider>
-      <HandwearProvider>
-        <ScarvesProvider>
-          <NeckwearProvider>
-            <TiaraProvider>
-              <HeadbandProvider>
-                <HatsProvider>
-                  <GlassesProvider>
-                    <EarringsProvider>
-                      <HairColorProvider>
-                        <PressOnNailsProvider>
-                          <NailPolishProvider>
-                            <MascaraProvider>
-                              <LenseProvider>
-                                <LashesProvider>
-                                  <EyebrowsProvider>
-                                    <EyeShadowProvider>
-                                      <EyeLinerProvider>
-                                        <ConcealerProvider>
-                                          <ContourProvider>
-                                            <BronzerProvider>
-                                              <HighlighterProvider>
-                                                <FoundationProvider>
-                                                  <BlushProvider>
-                                                    <LipColorProvider>
-                                                      <LipLinerProvider>
-                                                        <LipPlumperProvider>
-                                                          {children}
-                                                        </LipPlumperProvider>
-                                                      </LipLinerProvider>
-                                                    </LipColorProvider>
-                                                  </BlushProvider>
-                                                </FoundationProvider>
-                                              </HighlighterProvider>
-                                            </BronzerProvider>
-                                          </ContourProvider>
-                                        </ConcealerProvider>
-                                      </EyeLinerProvider>
-                                    </EyeShadowProvider>
-                                  </EyebrowsProvider>
-                                </LashesProvider>
-                              </LenseProvider>
-                            </MascaraProvider>
-                          </NailPolishProvider>
-                        </PressOnNailsProvider>
-                      </HairColorProvider>
-                    </EarringsProvider>
-                  </GlassesProvider>
-                </HatsProvider>
-              </HeadbandProvider>
-            </TiaraProvider>
-          </NeckwearProvider>
-        </ScarvesProvider>
-      </HandwearProvider>
-    </WatchesProvider>
-  </SelecProductNumberProvider>
+    <SelecProductNumberProvider>
+      <WatchesProvider>
+        <HandwearProvider>
+          <ScarvesProvider>
+            <NeckwearProvider>
+              <TiaraProvider>
+                <HeadbandProvider>
+                  <HatsProvider>
+                    <GlassesProvider>
+                      <EarringsProvider>
+                        <HairColorProvider>
+                          <PressOnNailsProvider>
+                            <NailPolishProvider>
+                              <MascaraProvider>
+                                <LenseProvider>
+                                  <LashesProvider>
+                                    <EyebrowsProvider>
+                                      <EyeShadowProvider>
+                                        <EyeLinerProvider>
+                                          <ConcealerProvider>
+                                            <ContourProvider>
+                                              <BronzerProvider>
+                                                <HighlighterProvider>
+                                                  <FoundationProvider>
+                                                    <BlushProvider>
+                                                      <LipColorProvider>
+                                                        <LipLinerProvider>
+                                                          <LipPlumperProvider>
+                                                            {children}
+                                                          </LipPlumperProvider>
+                                                        </LipLinerProvider>
+                                                      </LipColorProvider>
+                                                    </BlushProvider>
+                                                  </FoundationProvider>
+                                                </HighlighterProvider>
+                                              </BronzerProvider>
+                                            </ContourProvider>
+                                          </ConcealerProvider>
+                                        </EyeLinerProvider>
+                                      </EyeShadowProvider>
+                                    </EyebrowsProvider>
+                                  </LashesProvider>
+                                </LenseProvider>
+                              </MascaraProvider>
+                            </NailPolishProvider>
+                          </PressOnNailsProvider>
+                        </HairColorProvider>
+                      </EarringsProvider>
+                    </GlassesProvider>
+                  </HatsProvider>
+                </HeadbandProvider>
+              </TiaraProvider>
+            </NeckwearProvider>
+          </ScarvesProvider>
+        </HandwearProvider>
+      </WatchesProvider>
+    </SelecProductNumberProvider>
   );
 }
 
@@ -170,6 +170,8 @@ function Main() {
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
   const [showChangeModel, setShowChangeModel] = useState(false);
+  const [modelImageSrc, setModelImageSrc] = useState<string | null>(null);
+
   const { view, setView, sectionName, mapTypes, groupedItemsData } =
     useFindTheLookContext();
   const { dataItem, type } = useCartContext();
@@ -189,7 +191,15 @@ function Main() {
 
   if (view === "face") {
     if (showChangeModel) {
-      return <ChangeModel onClose={() => setShowChangeModel(false)} />;
+      return (
+        <ChangeModel
+          onClose={() => setShowChangeModel(false)}
+          onChooseImageSrc={(src) => {
+            setModelImageSrc(src);
+            setMode("IMAGE");
+          }}
+        />
+      );
     }
     return (
       <>
@@ -210,7 +220,19 @@ function Main() {
         <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
           <SuccessPopup product={dataItem} type={type} />
           <div className="absolute inset-0">
-            <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+            {mode === "IMAGE" && (
+              <VirtualTryOnScene
+                mediaFile={mediaFile}
+                mode={mode}
+                modelImageSrc={modelImageSrc}
+              />
+            )}
+            {mode === "VIDEO" && (
+              <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+            )}
+            {mode === "LIVE" && (
+              <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+            )}
             <div className="pointer-events-none absolute inset-0"></div>
           </div>
           <TopNavigation cart={false} />

@@ -157,6 +157,8 @@ function Main() {
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
   const [showChangeModel, setShowChangeModel] = useState(false);
+  const [modelImageSrc, setModelImageSrc] = useState<string | null>(null);
+
   const { view, setView, sectionName, mapTypes, groupedItemsData } =
     useFindTheLookContext();
 
@@ -175,7 +177,15 @@ function Main() {
 
   if (view === "face") {
     if (showChangeModel) {
-      return <ChangeModel onClose={() => setShowChangeModel(false)} />;
+      return (
+        <ChangeModel
+          onClose={() => setShowChangeModel(false)}
+          onChooseImageSrc={(src) => {
+            setModelImageSrc(src);
+            setMode("IMAGE");
+          }}
+        />
+      );
     }
     return (
       <>

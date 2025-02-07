@@ -58,16 +58,18 @@ const GlasessInner: React.FC<Glasessrops> = React.memo(
     }, [scene]);
 
     useFrame(() => {
-      if (!landmarks.current || !glasessRef.current) return;
-      // console.log(landmarks.current);
-
+      if (!glasessRef.current) return;
+      if (!landmarks.current) {
+        glasessRef.current.visible = false;
+        return;
+      }
       if (landmarks.current.length > 0) {
         glasessRef.current.visible = true;
         const centerEye = landmarks.current[168];
 
         const centerEyeX = (1 - centerEye.x - 0.5) * outputWidth;
         const centerEyeY = -(centerEye.y - 0.5) * outputHeight;
-        const centerEyeZ = -centerEye.z * 100;
+        const centerEyeZ = -centerEye.z * Math.max(outputHeight, outputWidth);
 
         const faceSize = calculateDistance(
           landmarks.current[162],
@@ -77,7 +79,7 @@ const GlasessInner: React.FC<Glasessrops> = React.memo(
         // Set position and scale
         glasessRef.current.position.set(centerEyeX, centerEyeY, centerEyeZ);
 
-        const scaleFactor = (faceSize * outputWidth) / 5.5;
+        const scaleFactor = (faceSize * outputWidth) / 5;
 
         glasessRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 

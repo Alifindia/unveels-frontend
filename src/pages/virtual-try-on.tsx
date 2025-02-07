@@ -195,6 +195,8 @@ function Main() {
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
   const [showChangeModel, setShowChangeModel] = useState(false);
+  const [modelImageSrc, setModelImageSrc] = useState<string | null>(null);
+
   const { view, setView, sectionName, mapTypes, groupedItemsData } =
     useFindTheLookContext();
   const { dataItem, type } = useCartContext();
@@ -214,7 +216,15 @@ function Main() {
 
   if (view === "face") {
     if (showChangeModel) {
-      return <ChangeModel onClose={() => setShowChangeModel(false)} />;
+      return (
+        <ChangeModel
+          onClose={() => setShowChangeModel(false)}
+          onChooseImageSrc={(src) => {
+            setModelImageSrc(src);
+            setMode("IMAGE");
+          }}
+        />
+      );
     }
     return (
       <>
@@ -234,11 +244,13 @@ function Main() {
         )}
         <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
           <SuccessPopup product={dataItem} type={type} />
-          <div
-            className={`absolute inset-0 ${mode !== "LIVE" ? "scale-x-[-1] transform" : ""}`}
-          >
+          <div className={`absolute inset-0`}>
             {mode === "IMAGE" && (
-              <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+              <VirtualTryOnScene
+                mediaFile={mediaFile}
+                mode={mode}
+                modelImageSrc={modelImageSrc}
+              />
             )}
             {mode === "VIDEO" && (
               <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
