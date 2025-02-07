@@ -47,6 +47,7 @@ import NailIndex from "../three/accesories/nails/nail-index";
 import NailRing from "../three/accesories/nails/nail-ring";
 import NailPinky from "../three/accesories/nails/nail-pinky";
 import FingerOccluder from "../three/accesories/finger-occluder";
+import Lashes from "../three/makeup/lashes";
 
 interface VirtualTryOnThreeSceneProps extends MeshProps {
   videoRef: React.RefObject<Webcam | HTMLVideoElement | HTMLImageElement>;
@@ -97,6 +98,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
     showHair,
     showEyeShadow,
     showEyeliner,
+    showLashes,
     showNails,
   } = useMakeup();
 
@@ -112,7 +114,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   } = useAccesories();
 
   const filterRef = useRef<ShaderMaterial>(null);
-
+  console.log(showLashes, showEyeliner)
   // State for slider-controlled factors
   const [archFactor, setArchFactor] = useState(0.0);
   const [pinchFactor, setPinchFactor] = useState(0.0);
@@ -442,6 +444,14 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
 
             {showEyeliner && (
               <Eyeliner
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showLashes && (
+              <Lashes
                 planeSize={planeSize}
                 landmarks={landmarks}
                 isFlipped={isFlipped}

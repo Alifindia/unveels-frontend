@@ -5,6 +5,8 @@ interface LashesContextType {
   setColorFamily: (color: string | null) => void;
   selectedPattern: string | null;
   setSelectedPattern: (pattern: string | null) => void;
+  selectedColor: string | null;
+  setSelectedColor: (color: string | null) => void;
 }
 
 // Create the context
@@ -15,12 +17,14 @@ export function LashesProvider({ children }: { children: React.ReactNode }) {
   const [colorFamily, setColorFamily] = useState<string | null>(null);
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null);
 
+  const [selectedColor, setColor] = useState<string | null>(null);
   return (
     <LashesContext.Provider
       value={{
         colorFamily,
         setColorFamily,
-
+        selectedColor,
+        setSelectedColor: setColor,
         selectedPattern,
         setSelectedPattern,
       }}
