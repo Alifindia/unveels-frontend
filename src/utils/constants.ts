@@ -1512,6 +1512,34 @@ export const skinAnalysisDataItem: SkinAnalysisItem[] = [
   },
 ];
 
+//lashes
+export const LASHES_ONE =
+  "/media/unveels/vto-assets/texture/lashes/eyelashes-1.png";
+
+export const LASHES_TWO =
+  "/media/unveels/vto-assets/texture/lashes/eyelashes-2.png";
+
+export const LASHES_THREE =
+  "/media/unveels/vto-assets/texture/lashes/eyelashes-3.png";
+
+export const LASHES_FOUR =
+  "/media/unveels/vto-assets/texture/lashes/eyelashes-4.png";
+
+export const LASHES_FIVE =
+  "/media/unveels/vto-assets/texture/lashes/eyelashes-5.png";
+
+export const LASHES_SIX =
+  "/media/unveels/vto-assets/texture/lashes/eyelashes-6.png";
+
+export const LASHES_SEVEN =
+  "/media/unveels/vto-assets/texture/lashes/eyelashes-7.png";
+
+export const LASHES_EIGHT =
+  "/media/unveels/vto-assets/texture/lashes/eyelashes-8.png";
+
+export const LASHES_NINE =
+  "/media/unveels/vto-assets/texture/lashes/eyelashes-9.png";
+
 // eyeliner
 export const EYELINER_ONE =
   "/media/unveels/vto-assets/texture/eyeliner/single-color/eyeliner_01.png";

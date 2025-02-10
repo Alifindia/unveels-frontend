@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import { getCookie } from "../../../../utils/other";
 import { useCartContext } from "../../../../context/cart-context";
 import { baseApiUrl } from "../../../../utils/apiUtils";
+import { useMakeup } from "../../../../context/makeup-context";
 
 const colorFamilies = [{ name: "Black", value: "#000000" }];
 
@@ -93,12 +94,16 @@ function FamilyColorSelector() {
 }
 
 function ColorSelector() {
+  const { selectedColor, setSelectedColor } = useLashesContext();
   return (
     <div className="mx-auto w-full">
       <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
+          onClick={() => {
+            setSelectedColor(null);
+          }}
         >
           <Icons.empty className="size-5 sm:size-[1.875rem]" />
         </button>
@@ -109,7 +114,8 @@ function ColorSelector() {
             palette={{
               color: color,
             }}
-            selected={true}
+            selected={selectedColor === color}
+            onClick={() => setSelectedColor(color)}
           />
         ))}
       </div>
@@ -173,12 +179,24 @@ function ProductList() {
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
-  const { colorFamily, selectedPattern } = useLashesContext();
+  const { setColorFamily, colorFamily, selectedPattern, setSelectedColor, selectedColor } = useLashesContext();
 
   const { data, isLoading } = useLashesQuery({
     color: colorFamily,
     pattern: selectedPattern,
   });
+  const { setLashesColor, setLashesPattern, setShowLashes } = useMakeup();
+
+  useEffect(() => {
+    setLashesColor(selectedColor || "#ffffff");
+    var pattern = patterns["eyelashes"].findIndex(
+      (e) => e.value == selectedPattern,
+    );
+    console.log(pattern)
+    setLashesPattern(pattern != -1 ? pattern : 0);
+    setShowLashes(selectedColor != null);
+    console.log(selectedColor)
+  }, [selectedColor, selectedPattern]);
 
   useEffect(() => {
     if (data?.items && selectedProductNumber) {
@@ -187,6 +205,15 @@ function ProductList() {
       console.log(selectedProductNumber)
       if (matchedProduct) {
         setSelectedProduct(matchedProduct);
+        setColorFamily(
+          matchedProduct.custom_attributes.find((item) => item.attribute_code === "color")
+            ?.value,
+        );
+        setSelectedColor(
+          matchedProduct.custom_attributes.find(
+            (item) => item.attribute_code === "hexacode",
+          )?.value,
+        );
       }
     }
   }, [data, selectedProductNumber]);
@@ -221,10 +248,21 @@ function ProductList() {
     if (selectedProduct?.id === product.id) {
       setSelectedProduct(null);
       setSelectedProductNumber(null);
+      setColorFamily(null);
+      setSelectedColor(null);
       return
     }
     console.log(product);
     setSelectedProduct(product);
+    setColorFamily(
+      product.custom_attributes.find((item) => item.attribute_code === "color")
+        ?.value,
+    );
+    setSelectedColor(
+      product.custom_attributes.find(
+        (item) => item.attribute_code === "hexacode",
+      )?.value,
+    );
   };
 
   return (

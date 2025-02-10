@@ -1,6 +1,6 @@
 import { MeshProps, useFrame, useThree } from "@react-three/fiber";
 import React, { useMemo, useRef, Suspense, useEffect } from "react";
-import { Mesh, MeshStandardMaterial, Object3D } from "three";
+import { BufferGeometry, Line, LineBasicMaterial, Mesh, MeshStandardMaterial, Object3D, Vector3 } from "three";
 import { Landmark } from "../../../types/landmark";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../utils/calculateDistance";
@@ -24,6 +24,7 @@ const RingInner: React.FC<RingProps> = React.memo(
 
     useEffect(() => {
       const loader = new GLTFLoader();
+      console.log(RING)
       loader.load(
         RING,
         (gltf) => {
@@ -69,14 +70,23 @@ const RingInner: React.FC<RingProps> = React.memo(
         const middleFingerMCP = handLandmarks.current[9];
         const ringFingerMCP = handLandmarks.current[13];
         const ringFingerDIP = handLandmarks.current[14];
+        const midpoint = {
+          x: (ringFingerMCP.x + ringFingerDIP.x) / 2,
+          y: (ringFingerMCP.y + ringFingerDIP.y) / 2,
+          z: (ringFingerMCP.z + ringFingerDIP.z) / 2,
+        };
 
         const fingerSize = calculateDistance(middleFingerMCP, ringFingerMCP);
 
-        const ringFingerX = (1 - ringFingerDIP.x - 0.5) * outputWidth;
-        const ringFingerY = -(ringFingerDIP.y - 0.5) * outputHeight;
+        const isTilted = Math.abs(ringFingerMCP.x - middleFingerMCP.x) > 0.035;
+        const isHandFar = Math.abs(middleFingerMCP.z - ringFingerDIP.z) > 0.1;
+        const ringFingerY = isTilted || isHandFar
+          ? -(midpoint.y - 0.525) * outputHeight
+          : -(midpoint.y - 0.5) * outputHeight;
+        const ringFingerX = (1 - midpoint.x - 0.5) * outputWidth;
         const ringFingerZ = 200;
 
-        const scaleFactor = (fingerSize * outputWidth) / 6;
+        const scaleFactor = isTilted ? (fingerSize * outputWidth) / 6.8 : (fingerSize * outputWidth) / 8
 
         ringRef.current.position.set(ringFingerX, ringFingerY, ringFingerZ);
         ringRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -85,6 +95,9 @@ const RingInner: React.FC<RingProps> = React.memo(
 
         if (quaternion) {
           ringRef.current.setRotationFromQuaternion(quaternion);
+        }
+        if (!isTilted) {
+          ringRef.current.rotateY(Math.PI / 1.1);
         }
       } else {
         ringRef.current.visible = false;
