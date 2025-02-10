@@ -59,7 +59,11 @@ const FingerOccluderInner: React.FC<FingerOccluderProps> = React.memo(
     }, [scene]);
 
     useFrame(() => {
-      if (!handLandmarks.current || !occluderRef.current) return;
+      if (!occluderRef.current) return;
+      if (!handLandmarks.current) {
+        occluderRef.current.visible = false;
+        return;
+      }
       if (handLandmarks.current.length > 0) {
         occluderRef.current.visible = true;
         const middleFingerMCP = handLandmarks.current[9];

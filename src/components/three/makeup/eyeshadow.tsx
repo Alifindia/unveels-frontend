@@ -338,7 +338,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[0], // Fallback to white if no color selected
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: oneModeTexture,
       alphaTest: 0,
     });
@@ -349,7 +349,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[0],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: dualStandardTexture,
       alphaTest: 0,
     });
@@ -360,7 +360,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[1],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: dualHighTexture,
       alphaTest: 0,
     });
@@ -371,7 +371,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[0],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: triStandardTexture,
       alphaTest: 0,
     });
@@ -382,7 +382,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[1],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: triHighTexture,
       alphaTest: 0,
     });
@@ -393,7 +393,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[2],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: triMidTexture,
       alphaTest: 0,
     });
@@ -404,7 +404,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[0],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: quadStandardTexture,
       alphaTest: 0,
     });
@@ -415,7 +415,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[1],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: quadHighTexture,
       alphaTest: 0,
     });
@@ -426,7 +426,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[2],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: quadMidTexture,
       alphaTest: 0,
     });
@@ -437,7 +437,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[3],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: quadLowerTexture,
       alphaTest: 0,
     });
@@ -448,7 +448,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[0],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: pentaStandardTexture,
       alphaTest: 0,
     });
@@ -459,7 +459,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[1],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: pentaHighTexture,
       alphaTest: 0,
     });
@@ -470,7 +470,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[2],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: pentaMidTexture,
       alphaTest: 0,
     });
@@ -481,7 +481,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[3],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: pentaLowerTexture,
       alphaTest: 0,
     });
@@ -492,7 +492,7 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[4],
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.77,
       alphaMap: pentaSideTexture,
       alphaTest: 0,
     });

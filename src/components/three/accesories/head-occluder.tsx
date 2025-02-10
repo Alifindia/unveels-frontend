@@ -6,6 +6,7 @@ import { HEAD_OCCLUDER } from "../../../utils/constants";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../utils/calculateDistance";
 import { calculateFaceOrientation } from "../../../utils/calculateFaceOrientation";
+import { Max } from "@tensorflow/tfjs-core";
 
 interface HeadOccluderProps extends MeshProps {
   landmarks: React.RefObject<Landmark[]>;
@@ -65,16 +66,16 @@ const HeadOccluderInner: React.FC<HeadOccluderProps> = React.memo(
 
         const centerHeadX = (1 - centerHead.x - 0.5) * outputWidth;
         const centerHeadY = -(centerHead.y - 0.5) * outputHeight;
-        const centerHeadZ = -centerHead.z * 100;
+        const centerHeadZ = -centerHead.z * Math.max(outputWidth, outputHeight);
 
         const faceSize = calculateDistance(
           landmarks.current[162],
           landmarks.current[389],
         );
 
-        occluderRef.current.position.set(centerHeadX, centerHeadY, centerHeadZ);
+        occluderRef.current.position.set(centerHeadX, centerHeadY, centerHeadZ - 80);
 
-        const scaleFactor = (faceSize * outputWidth) / 14;
+        const scaleFactor = (faceSize * outputWidth) / 15;
 
         occluderRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 

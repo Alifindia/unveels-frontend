@@ -99,7 +99,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/rest": {
-        target: "https://unveels.com/",
+        target: process.env.VITE_API_BASE_URL + "/",
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/rest/, "/en/rest"),

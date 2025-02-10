@@ -79,7 +79,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   const { skinToneThreeSceneRef, setScreenshotImage } = useCamera();
   const hairMaskTextureRef = useRef<Texture | null>(null);
 
-  const [maskOpacity, setMaskOpacity] = useState(0.5);
+  const [maskOpacity, setMaskOpacity] = useState(1);
 
   const isFlipped = true;
 
@@ -140,7 +140,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   };
 
   const imageDataToImage = (imageData: ImageData): HTMLImageElement => {
-    const processedImageData = processImageDataWithTransparency(imageData);
+    const processedImageData = imageData;
     const canvas = document.createElement("canvas");
     canvas.width = processedImageData.width;
     canvas.height = processedImageData.height;
@@ -316,6 +316,46 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
     <>
       {videoTexture && (
         <>
+          <>
+            {hairMaskTextureRef.current && (
+              <mesh
+                position={[0, 0, -499]}
+                {...props}
+                renderOrder={0}
+              >
+                <planeGeometry args={[planeSize[0], planeSize[1]]} />
+                <shaderMaterial
+                  ref={filterRef}
+                  vertexShader={FaceShader.vertexShader}
+                  fragmentShader={FaceShader.fragmentShader}
+                  side={DoubleSide}
+                  uniforms={{
+                    videoTexture: { value: hairMaskTextureRef.current },
+                    leftEyebrow: {
+                      value: [
+                        new Vector2(),
+                        new Vector2(),
+                        new Vector2(),
+                        new Vector2(),
+                      ],
+                    },
+                    rightEyebrow: {
+                      value: [
+                        new Vector2(),
+                        new Vector2(),
+                        new Vector2(),
+                        new Vector2(),
+                      ],
+                    },
+                    archFactor: { value: archFactor },
+                    pinchFactor: { value: pinchFactor },
+                    horizontalShiftFactor: { value: horizontalShiftFactor },
+                    verticalShiftFactor: { value: verticalShiftFactor },
+                  }}
+                />
+              </mesh>
+            )}
+          </>
           <mesh position={[0, 0, -500]} {...props} renderOrder={2}>
             <planeGeometry args={[planeSize[0], planeSize[1]]} />
             <shaderMaterial
@@ -350,13 +390,13 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
           </mesh>
 
           <>
-            {showFoundation && (
+            {/* {showFoundation && (
               <Foundation
                 planeSize={planeSize}
                 landmarks={landmarks}
                 isFlipped={isFlipped}
               />
-            )}
+            )} */}
 
             {showBlush && (
               <Blush
@@ -480,27 +520,26 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
             <NeckOccluder planeSize={planeSize} landmarks={landmarks} />
           </>
 
-          {showHair && (
-            <>
-              {hairMaskTextureRef.current && (
-                <mesh
-                  position={[0, 0, 100]}
-                  scale={[-1, 1, 1]}
-                  {...props}
-                  renderOrder={3}
-                >
-                  <planeGeometry args={[planeSize[0], planeSize[1]]} />
-                  <meshBasicMaterial
-                    map={hairMaskTextureRef.current}
-                    side={DoubleSide}
-                    transparent
-                    opacity={maskOpacity}
-                  />
-                </mesh>
-              )}
-            </>
-          )}
-
+          {/* {showHair && ( */}
+          {/* <>
+            {hairMaskTextureRef.current && (
+              <mesh
+                position={[0, 0, -499]}
+                scale={[-1, 1, 1]}
+                {...props}
+                renderOrder={2}
+              >
+                <planeGeometry args={[planeSize[0], planeSize[1]]} />
+                <meshBasicMaterial
+                  map={hairMaskTextureRef.current}
+                  side={DoubleSide}
+                  transparent
+                  opacity={maskOpacity}
+                />
+              </mesh>
+            )}
+          </> */}
+          {/* )} */}
           <>
             <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} />
             <FingerOccluder

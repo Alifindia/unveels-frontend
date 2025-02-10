@@ -2,20 +2,21 @@ import React, { CSSProperties, useEffect, useState } from "react";
 
 interface ChangeModelProps {
   onClose: () => void;
+  onChooseImageSrc: (src: string) => void;
 }
-const ChangeModel: React.FC<ChangeModelProps> = ({ onClose }) => {
+const ChangeModel: React.FC<ChangeModelProps> = ({ onClose, onChooseImageSrc: onChooseImageIndex }) => {
   const [showGrid, setShowGrid] = useState(true);
 
   const images = [
     { src: "/media/unveels/vto/choose-model/model1.png", alt: "Model image 1" },
     { src: "/media/unveels/vto/choose-model/model2.png", alt: "Model image 2" },
-    { src: "/media/unveels/vto/choose-model/model3.png", alt: "Model image 3" },
+    { src: "/media/unveels/vto/choose-model/model3.jpeg", alt: "Model image 3" },
     { src: "/media/unveels/vto/choose-model/model4.png", alt: "Model image 4" },
-    { src: "/media/unveels/vto/choose-model/model5.png", alt: "Model image 5" },
-    { src: "/media/unveels/vto/choose-model/model6.png", alt: "Model image 6" },
-    { src: "/media/unveels/vto/choose-model/model7.png", alt: "Model image 7" },
-    { src: "/media/unveels/vto/choose-model/model8.png", alt: "Model image 8" },
-    { src: "/media/unveels/vto/choose-model/model9.png", alt: "Model image 9" },
+    { src: "/media/unveels/vto/choose-model/model5.jpeg", alt: "Model image 5" },
+    { src: "/media/unveels/vto/choose-model/model6.jpeg", alt: "Model image 6" },
+    { src: "/media/unveels/vto/choose-model/model7.jpeg", alt: "Model image 7" },
+    { src: "/media/unveels/vto/choose-model/model8.jpeg", alt: "Model image 8" },
+    { src: "/media/unveels/vto/choose-model/model9.jpeg", alt: "Model image 9" },
   ];
 
   const handleBack = () => {
@@ -32,6 +33,10 @@ const ChangeModel: React.FC<ChangeModelProps> = ({ onClose }) => {
         images={images}
         onBack={handleBack}
         onDismiss={handleDismiss}
+        onChooseImageSrc={(src)=> {
+          handleBack();
+          onChooseImageIndex(src);
+        }}
       />
     </div>
   );
@@ -46,12 +51,14 @@ interface ImageGridProps {
   }[];
   onBack?: () => void;
   onDismiss?: () => void;
+  onChooseImageSrc: (src: string) => void
 }
 
 const ImageGrid: React.FC<ImageGridProps> = ({
   images = [],
   onBack,
   onDismiss,
+  onChooseImageSrc: onChooseImageIndex
 }) => {
   const [loadedImages, setLoadedImages] = useState<number[]>([]);
   const [imageDimensions, setImageDimensions] = useState<{
@@ -129,6 +136,7 @@ const ImageGrid: React.FC<ImageGridProps> = ({
                   key={index}
                   className="relative overflow-hidden rounded-lg"
                   style={{ paddingBottom: `${aspectRatio * 100}%` }}
+                  onClick={() => onChooseImageIndex(src)}
                 >
                   <img
                     src={src}

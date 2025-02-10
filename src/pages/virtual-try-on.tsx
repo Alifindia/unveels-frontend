@@ -69,7 +69,10 @@ import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-conte
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
 import VoiceCommand from "../components/voice-command/voice-command";
 import { VirtualTryOnMakeupsVoiceProvider } from "../context/virtual-try-on-makeups-voice-context";
-import { SelecProductNumberProvider, useSelecProductNumberContext } from "./vto/select-product-context";
+import {
+  SelecProductNumberProvider,
+  useSelecProductNumberContext,
+} from "./vto/select-product-context";
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
 import {
@@ -192,6 +195,8 @@ function Main() {
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
   const [showChangeModel, setShowChangeModel] = useState(false);
+  const [modelImageSrc, setModelImageSrc] = useState<string | null>(null);
+
   const { view, setView, sectionName, mapTypes, groupedItemsData } =
     useFindTheLookContext();
   const { dataItem, type } = useCartContext();
@@ -211,7 +216,15 @@ function Main() {
 
   if (view === "face") {
     if (showChangeModel) {
-      return <ChangeModel onClose={() => setShowChangeModel(false)} />;
+      return (
+        <ChangeModel
+          onClose={() => setShowChangeModel(false)}
+          onChooseImageSrc={(src) => {
+            setModelImageSrc(src);
+            setMode("IMAGE");
+          }}
+        />
+      );
     }
     return (
       <>
@@ -231,8 +244,20 @@ function Main() {
         )}
         <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
           <SuccessPopup product={dataItem} type={type} />
-          <div className={`absolute inset-0 ${mode !== "LIVE" ? "scale-x-[-1] transform" : ""}`}>
-            <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+          <div className={`absolute inset-0`}>
+            {mode === "IMAGE" && (
+              <VirtualTryOnScene
+                mediaFile={mediaFile}
+                mode={mode}
+                modelImageSrc={modelImageSrc}
+              />
+            )}
+            {mode === "VIDEO" && (
+              <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+            )}
+            {mode === "LIVE" && (
+              <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+            )}
             <div className="pointer-events-none absolute inset-0"></div>
           </div>
           <TopNavigation />
@@ -272,7 +297,7 @@ function MainContent() {
           }}
           className="flex h-3 w-full items-center justify-center bg-transparent"
         >
-          <div className="h-1 w-8 xl:w-10 rounded-full bg-gray-400" />
+          <div className="h-1 w-8 rounded-full bg-gray-400 xl:w-10" />
         </button>
       </div>
       {collapsed ? null : <BottomContent />}
@@ -388,7 +413,7 @@ export function Makeups() {
   ];
 
   const [selectedMakeup, setSelectedMakeup] = useState<string | null>(null);
-  const { setSelectedProductNumber } = useSelecProductNumberContext()
+  const { setSelectedProductNumber } = useSelecProductNumberContext();
 
   return (
     <>
@@ -400,8 +425,8 @@ export function Makeups() {
               className="flex flex-col items-center space-y-2"
               data-selected={selectedMakeup === option.name}
               onClick={() => {
-                setSelectedMakeup(option.name)
-                setSelectedProductNumber(null)
+                setSelectedMakeup(option.name);
+                setSelectedProductNumber(null);
               }}
             >
               <div
@@ -605,7 +630,7 @@ export function TopNavigation({}: {}) {
       <div className="flex flex-col gap-4">
         <a
           className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          href="https://unveels.com/technologies"
+          href={import.meta.env.VITE_API_BASE_URL + "/technologies"}
         >
           <ChevronLeft className="size-6 text-white" />
         </a>
@@ -624,7 +649,7 @@ export function TopNavigation({}: {}) {
           <a
             type="button"
             className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            href="https://unveels.com/technologies"
+            href={import.meta.env.VITE_API_BASE_URL + "/technologies"}
           >
             <X className="size-6 text-white" />
           </a>

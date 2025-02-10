@@ -458,7 +458,15 @@ function Main() {
             onChange={handleUploadVideo}
           />
         </div>
-        <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+        {mode === "IMAGE" && (
+          <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+        )}
+        {mode === "VIDEO" && (
+          <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+        )}
+        {mode === "LIVE" && (
+          <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+        )}
         <div className="pointer-events-none absolute inset-0"></div>
       </div>
     </div>

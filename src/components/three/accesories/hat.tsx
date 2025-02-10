@@ -57,15 +57,18 @@ const HatInner: React.FC<Hatrops> = React.memo(({ landmarks, planeSize }) => {
   }, [scene]);
 
   useFrame(() => {
-    if (!landmarks.current || !hatRef.current) return;
-
+    if (!hatRef.current) return;
+    if (!landmarks.current) {
+      hatRef.current.visible = false;
+      return;
+    }
     if (landmarks.current.length > 0) {
       hatRef.current.visible = true;
       const topHead = landmarks.current[10];
 
       const topHeadX = (1 - topHead.x - 0.5) * outputWidth;
       const topHeadY = -(topHead.y - 0.5) * outputHeight;
-      const topHeadZ = -topHead.z * 100;
+      const topHeadZ = -topHead.z * Math.max(outputHeight, outputWidth);
 
       const faceSize = calculateDistance(
         landmarks.current[162],
@@ -75,7 +78,7 @@ const HatInner: React.FC<Hatrops> = React.memo(({ landmarks, planeSize }) => {
       // Set position and scale
       hatRef.current.position.set(topHeadX, topHeadY, topHeadZ);
 
-      const scaleFactor = (faceSize * outputWidth) / 5;
+      const scaleFactor = (faceSize * outputWidth) / 6;
 
       hatRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
