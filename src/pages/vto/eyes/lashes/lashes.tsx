@@ -189,9 +189,10 @@ function ProductList() {
 
   useEffect(() => {
     setLashesColor(selectedColor || "#ffffff");
-    var pattern = patterns["eyeliners"].findIndex(
+    var pattern = patterns["eyelashes"].findIndex(
       (e) => e.value == selectedPattern,
     );
+    console.log(pattern)
     setLashesPattern(pattern != -1 ? pattern : 0);
     setShowLashes(selectedColor != null);
     console.log(selectedColor)

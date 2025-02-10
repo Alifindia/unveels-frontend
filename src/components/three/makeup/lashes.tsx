@@ -54,7 +54,7 @@ const LashesInner: React.FC<LashesProps> = ({
     const materialOptions: Partial<MeshBasicMaterialParameters> = {
       color: new Color(lashesColor),
       transparent: !!alphaMap,
-      opacity: 0.3,
+      opacity: 0.4,
     };
 
     if (alphaMap) {
