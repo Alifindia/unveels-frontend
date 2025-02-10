@@ -10,10 +10,10 @@ type FilterGroup = {
   filters: Filter[];
 };
 
-export const baseApiUrl = "https://unveels.com/";
+export const baseApiUrl = import.meta.env.VITE_API_BASE_URL + "/";
 export const baseUrl = import.meta.env.PROD ? baseApiUrl : "";
 export const baseMediaUrl =
-  "https://unveels.com/media/catalog/product/cache/df714aaa5e59335a5bf39a17764906ba";
+  import.meta.env.VITE_API_BASE_URL + "/media/catalog/product";
 
 export function mediaUrl(imagePath: string | undefined) {
   if (!imagePath) {

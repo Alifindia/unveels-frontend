@@ -295,7 +295,6 @@ export function VirtualTryOnScene({
                   sourceHeight / dpr,
                 );
 
-                console.time("RENDERING HAIR");
                 if (hairResults?.categoryMask) {
                   hairRef.current =
                     hairResults.categoryMask.getAsFloat32Array();
@@ -385,14 +384,13 @@ export function VirtualTryOnScene({
                   hairResults.close();
                 }
 
-                console.timeEnd("RENDERING HAIR");
-                // const handResults =
-                //   sourceElement instanceof HTMLVideoElement
-                //     ? handLandmarkerRef.current.detectForVideo(
-                //         sourceElement,
-                //         startTimeMs,
-                //       )
-                //     : handLandmarkerRef.current.detect(sourceElement);
+                const handResults =
+                  sourceElement instanceof HTMLVideoElement
+                    ? handLandmarkerRef.current.detectForVideo(
+                        sourceElement,
+                        startTimeMs,
+                      )
+                    : handLandmarkerRef.current.detect(sourceElement);
 
                 if (faceResults.facialTransformationMatrixes.length > 0) {
                   faceTransformRef.current =
@@ -405,7 +403,7 @@ export function VirtualTryOnScene({
                 }
 
                 landmarksRef.current = faceResults.faceLandmarks[0];
-                // handLandmarksRef.current = handResults.landmarks[0];
+                handLandmarksRef.current = handResults.landmarks[0];
               } catch (err) {
                 console.error("Detection error:", err);
                 setError(err as Error);

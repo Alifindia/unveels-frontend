@@ -208,7 +208,7 @@ export function useFunctionCommand() {
   const [sectionName, setSectionName] = useState("");
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState("");
-  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_BARD_API_KEY);
+  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_API_BASE_URL);
   const getLastPathSegment = (path: string): string => {
     if (!path) return "";
     const lastSlashIndex = path.lastIndexOf("/");

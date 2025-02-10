@@ -25,7 +25,7 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
     const nailsRef = useRef<Object3D | null>(null);
     const { scene, viewport } = useThree();
     const { envMapAccesories } = useAccesories();
-    const { nailsColor, showNails } = useMakeup();
+    const { nailsColor } = useMakeup();
 
     const outputWidth = planeSize[0];
     const outputHeight = planeSize[1];
@@ -35,14 +35,14 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
       loader.load(
         NAILS,
         (gltf) => {
-          const nails = gltf.scene;
-          nails.traverse((child) => {
+          const ring = gltf.scene;
+          ring.traverse((child) => {
             if ((child as Mesh).isMesh) {
               const mesh = child as Mesh;
               if (mesh.material instanceof MeshStandardMaterial) {
                 mesh.material.envMap = envMapAccesories;
                 mesh.material.color.set(nailsColor); // Set initial color
-                mesh.material.visible = showNails;
+                mesh.material.side = FrontSide;
                 mesh.material.transparent = true;
                 mesh.material.opacity = 0.3;
                 mesh.material.needsUpdate = true;
@@ -51,13 +51,13 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
             }
           });
 
-          nailsRef.current = nails;
-          scene.add(nails);
-          console.log("nails model loaded successfully");
+          nailsRef.current = ring;
+          scene.add(ring);
+          console.log("Ring model loaded successfully");
         },
         undefined,
         (error) => {
-          console.error("An error occurred loading the nails model: ", error);
+          console.error("An error occurred loading the ring model: ", error);
         },
       );
 
@@ -66,97 +66,51 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
           scene.remove(nailsRef.current);
         }
       };
-    }, [scene, envMapAccesories, nailsColor]);
+    }, [scene, envMapAccesories, nailsColor]); // Adding nailsColor to the dependency array
 
     useFrame(() => {
       if (!handLandmarks.current || !nailsRef.current) return;
-    
       if (handLandmarks.current.length > 0) {
-        const thumbBase = handLandmarks.current[1];
-        const pinkyBase = handLandmarks.current[17];
-        const middleFingerPIP = handLandmarks.current[10];
-        const middleFingerMCP = handLandmarks.current[9];
-        const middleFingerDIP = handLandmarks.current[12];
-        const nailsFingerMCP = handLandmarks.current[13];
-    
-        // Calculate distances to detect bending
-        const pipToDipDistance = calculateDistance(middleFingerPIP, middleFingerDIP);
-        const mcpToPipDistance = calculateDistance(middleFingerMCP, middleFingerPIP);
-        const isFingerBent = pipToDipDistance < mcpToPipDistance * 0.8;
-        const isPalmFacingBack = thumbBase.z > pinkyBase.z;
-        const isLeftHand = thumbBase.x > pinkyBase.x;
-
-        if (!isPalmFacingBack && !isFingerBent) {
-          nailsRef.current.visible = false;
-          return;
-        }
-
         nailsRef.current.visible = true;
+        const middleFingerMCP = handLandmarks.current[9];
+        const nailsFingerMCP = handLandmarks.current[13];
+        const nailsFingerDIP = handLandmarks.current[12];
+
         const fingerSize = calculateDistance(middleFingerMCP, nailsFingerMCP);
+
+        // Scale coordinates proportionally with the viewport
+        const nailsFingerX = (1 - nailsFingerDIP.x - 0.5) * outputWidth;
+        const nailsFingerY = -(nailsFingerDIP.y - 0.5) * outputHeight;
         const nailsFingerZ = 200;
-        const scaleFactor = (fingerSize * outputWidth) / 1.5;
-    
-        let nailsFingerX: number;
-        let nailsFingerY: number;
-    
-        if (isPalmFacingBack) {
-          if (isLeftHand) {
-            nailsFingerX = (1 - middleFingerDIP.x - 0.494) * outputWidth;
-            nailsFingerY = -(middleFingerDIP.y - 0.509) * outputHeight;
-          } else {
-            nailsFingerX = (1 - middleFingerDIP.x - 0.496) * outputWidth;
-            nailsFingerY = -(middleFingerDIP.y - 0.506) * outputHeight;
-          }
-        } else {
-          if (isLeftHand) {
-            nailsFingerX = (1 - middleFingerDIP.x - 0.49) * outputWidth;
-            nailsFingerY = -(middleFingerDIP.y - 0.522) * outputHeight;
-          } else {
-            nailsFingerX = (1 - middleFingerDIP.x - 0.495) * outputWidth;
-            nailsFingerY = -(middleFingerDIP.y - 0.512) * outputHeight;
-          }
-        }
-    
+
+        const scaleFactor = (fingerSize * outputWidth) / 2.4;
+
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
-    
+        nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
         const quaternion = handQuaternion(handLandmarks.current, 15, 12);
-    
+
         if (quaternion) {
           nailsRef.current.setRotationFromQuaternion(quaternion);
         }
-    
-        if (isPalmFacingBack) {
-          if (isLeftHand) {
-            nailsRef.current.rotation.y += 9.6;
-            nailsRef.current.scale.set(scaleFactor * 0.47, scaleFactor, scaleFactor * 0.5);
-          } else {
-            nailsRef.current.rotation.y += 9.2;
-            nailsRef.current.scale.set(scaleFactor * 0.49, scaleFactor, scaleFactor * 0.52);
-          }
-        } else if (isFingerBent) {
-          if (isLeftHand) {
-            nailsRef.current.rotation.y += 0.23;
-            nailsRef.current.scale.set(scaleFactor * 0.7, scaleFactor, scaleFactor * 0.9);  
-          } else {
-            nailsRef.current.rotation.y -= 0.18;
-            nailsRef.current.scale.set(scaleFactor * 0.7, scaleFactor, scaleFactor * 0.9);
-          }
-        }
 
-        nailsRef.current.traverse((child) => {
-          if ((child as Mesh).isMesh) {
-            const mesh = child as Mesh;
-            if (mesh.material instanceof MeshStandardMaterial) {
-              mesh.material.color.set(nailsColor);
-              mesh.material.needsUpdate = true;
+        // Update nail color dynamically during the frame
+        if (nailsRef.current) {
+          nailsRef.current.traverse((child) => {
+            if ((child as Mesh).isMesh) {
+              const mesh = child as Mesh;
+              if (mesh.material instanceof MeshStandardMaterial) {
+                mesh.material.color.set(nailsColor); // Dynamically update color
+                mesh.material.needsUpdate = true;
+              }
             }
-          }
-        });
+          });
+        }
       } else {
         nailsRef.current.visible = false;
       }
     });
-    
+
     return null;
   },
 );

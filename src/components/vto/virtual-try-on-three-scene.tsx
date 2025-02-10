@@ -48,6 +48,7 @@ import NailRing from "../three/accesories/nails/nail-ring";
 import NailPinky from "../three/accesories/nails/nail-pinky";
 import FingerOccluder from "../three/accesories/finger-occluder";
 import FaceVisualizer from "../three/face/face-visualizer";
+import HandVisualizer from "../three/accesories/hand-visualizer";
 
 interface VirtualTryOnThreeSceneProps extends MeshProps {
   videoRef: React.RefObject<Webcam | HTMLVideoElement | HTMLImageElement>;
@@ -532,6 +533,9 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
           </> */}
           {/* )} */}
 
+            <HandVisualizer
+              planeSize={planeSize}
+              handLandmarks={handlandmarks} />
           <>
             <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} />
             <FingerOccluder

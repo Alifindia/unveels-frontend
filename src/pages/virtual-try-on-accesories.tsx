@@ -382,7 +382,7 @@ export function TopNavigation({}: {}) {
       <div className="flex flex-col gap-4">
         <a
           className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          href="https://unveels.com/technologies"
+          href={import.meta.env.VITE_API_BASE_URL + "/technologies"}
         >
           <ChevronLeft className="size-6 text-white" />
         </a>
@@ -401,7 +401,7 @@ export function TopNavigation({}: {}) {
           <a
             type="button"
             className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            href="https://unveels.com/technologies"
+            href={import.meta.env.VITE_API_BASE_URL + "/technologies"}
           >
             <X className="size-6 text-white" />
           </a>

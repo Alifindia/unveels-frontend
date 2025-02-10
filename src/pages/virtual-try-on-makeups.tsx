@@ -412,14 +412,14 @@ export function TopNavigation({ cart = false }: { cart?: boolean }) {
         setBackClickCount(1);
         window.location.href = "/virtual-try-on/makeups";
       } else {
-        window.location.href = "https://unveels.com/technologies";
+        window.location.href = import.meta.env.VITE_API_BASE_URL + "/technologies";
       }
     }
   };
 
   const handleCloseClick = () => {
     if (process.env.NODE_ENV === "production") {
-      window.location.href = "https://unveels.com/technologies";
+      window.location.href = import.meta.env.VITE_API_BASE_URL + "/technologies";
     }
   };
 

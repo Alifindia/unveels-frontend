@@ -27,7 +27,7 @@ const HandVisualizer: React.FC<WatchProps> = React.memo(
       handLandmarks.current.forEach(landmark => {
         const x = -(landmark.x - 0.5) * outputWidth;
         const y = -(landmark.y - 0.5) * outputHeight;
-        const z = -landmark.z * 100; // Adjust Z scaling if necessary
+        const z = -landmark.z * outputWidth; // Adjust Z scaling if necessary
 
         positions.push(x, y, z);
       });
