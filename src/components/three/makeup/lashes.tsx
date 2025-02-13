@@ -54,7 +54,7 @@ const LashesInner: React.FC<LashesProps> = ({
     const materialOptions: Partial<MeshBasicMaterialParameters> = {
       color: new Color(lashesColor),
       transparent: !!alphaMap,
-      opacity: 0.4,
+      opacity: 0.77,
     };
 
     if (alphaMap) {
@@ -64,7 +64,7 @@ const LashesInner: React.FC<LashesProps> = ({
 
     return new MeshBasicMaterial(materialOptions);
   }, [lashesColor, alphaMap]);
-  
+
   return (
     <FaceMesh
       landmarks={landmarks}
