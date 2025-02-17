@@ -413,7 +413,7 @@ export function VirtualTryOnScene({
                 landmarksRef.current = faceResults.faceLandmarks[0];
                 handLandmarksRef.current = handResults.landmarks[0];
               } catch (err) {
-                console.error("Detection error:", err);
+                // console.error("Detection error:", err);
                 // setError(err as Error);
               }
             }
