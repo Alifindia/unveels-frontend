@@ -25,6 +25,7 @@ import { useMakeup } from "../../context/makeup-context";
 import { Rnd } from "react-rnd";
 // new
 import { BeforeAfterCanvas } from "./before-after-canvas";
+import { hexToRgb } from "../../utils/colorUtils";
 
 export function VirtualTryOnScene({
   mediaFile,
@@ -63,16 +64,20 @@ export function VirtualTryOnScene({
   const { envMapAccesories, setEnvMapAccesories } = useAccesories();
   const { envMapMakeup, setEnvMapMakeup } = useMakeup();
 
-  const { showHair, showFoundation } = useMakeup();
+  const { showHair, hairColor, showFoundation, foundationColor } = useMakeup();
 
   const showHairRef = useRef(showHair);
   const showFoundationRef = useRef(showFoundation);
+  const foundationColorRef = useRef(foundationColor);
+  const hairColorRef = useRef(hairColor);
 
   useEffect(() => {
     // tf.enableDebugMode();
     showHairRef.current = showHair;
     showFoundationRef.current = showFoundation;
-  }, [showHair, showFoundation]);
+    foundationColorRef.current = foundationColor;
+    hairColorRef.current = hairColor;
+  }, [showHair, showFoundation, foundationColor, hairColor]);
 
   useEffect(() => {
     let isMounted = true;
@@ -305,8 +310,11 @@ export function VirtualTryOnScene({
                     sourceHeight,
                   ).data;
 
-                  const legendColors = [[0, 255, 0, 0.08]];
-                  const skinColors = [[255, 220, 117, 0.1]];
+                  const hairColor = hexToRgb(hairColorRef.current);
+                  const hairLegend = [[hairColor.r, hairColor.g, hairColor.b, 0.08]];
+                  const foundationColor = hexToRgb(foundationColorRef.current);
+                  const skinColorLegend = [[foundationColor.r, foundationColor.g, foundationColor.b, 0.1]];
+
                   let j = 0;
                   for (let i = 0; i < hairRef.current.length; ++i) {
                     const x = i % sourceWidth;
@@ -344,7 +352,7 @@ export function VirtualTryOnScene({
                       if (maskVal === 1) {
                         if (showHairRef.current) {
                           const legendColor =
-                            legendColors[maskVal % legendColors.length];
+                            hairLegend[maskVal % hairLegend.length];
                           imageData[j] =
                             legendColor[0] * 0.08 + imageData[j] * 0.9;
                           imageData[j + 1] =
@@ -356,7 +364,7 @@ export function VirtualTryOnScene({
                       } else if (maskVal === 3) {
                         if (showFoundationRef.current) {
                           const skinColor =
-                            skinColors[maskVal % legendColors.length];
+                            skinColorLegend[maskVal % hairLegend.length];
                           imageData[j] =
                             skinColor[0] * 0.1 + imageData[j] * 0.9;
                           imageData[j + 1] =

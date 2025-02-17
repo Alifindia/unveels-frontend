@@ -103,3 +103,17 @@ export const rgbToHsv = (
 
   return { h, s, v };
 };
+
+
+export const hexToRgb = (hex: string) => {
+    hex = hex.replace(/^#/, '');
+    if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+    }
+    let num = parseInt(hex, 16);
+    return {
+        r: (num >> 16) & 255,
+        g: (num >> 8) & 255,
+        b: num & 255
+    };
+}

@@ -155,10 +155,11 @@ function ProductList() {
     setColorFamilyToInclude,
   } = useHairColorContext();
 
-  const { setShowHair, setHairColor } = useMakeup();
+  const { setShowHair, setHairColor, hairColor } = useMakeup();
 
   useEffect(() => {
     if (selectedColor) {
+      console.log("SELECTED", hairColor)
       setHairColor(selectedColor);
       setShowHair(true);
     }
@@ -205,7 +206,7 @@ function ProductList() {
         const adjustedIndex = addCartProductNumber - 1;
         const matchedProduct = data.items[adjustedIndex];
         console.log(matchedProduct);
-  
+
         if (matchedProduct) {
           const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
           const id = matchedProduct.id.toString();
@@ -221,7 +222,7 @@ function ProductList() {
         }
       }
     };
-  
+
     handleAddToCart();
   }, [data, addCartProductNumber]);
 
