@@ -414,7 +414,7 @@ export function VirtualTryOnScene({
                 handLandmarksRef.current = handResults.landmarks[0];
               } catch (err) {
                 console.error("Detection error:", err);
-                setError(err as Error);
+                // setError(err as Error);
               }
             }
           }
