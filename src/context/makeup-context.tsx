@@ -40,7 +40,9 @@ interface MakeupContextProps {
   setShowEyeShadow: (show: boolean) => void;
 
   eyeshadowMode: "One" | "Dual" | "Tri" | "Quad" | "Penta" | string;
-  setEyeShadowMode: (mode: "One" | "Dual" | "Tri" | "Quad" | "Penta" | string) => void;
+  setEyeShadowMode: (
+    mode: "One" | "Dual" | "Tri" | "Quad" | "Penta" | string,
+  ) => void;
 
   //Eyeliner
   showEyeliner: boolean;
@@ -189,6 +191,7 @@ interface MakeupContextProps {
 
   envMapMakeup: Texture | null;
   setEnvMapMakeup: (texture: Texture | null) => void;
+  showMakeup: boolean;
 }
 
 const MakeupContext = createContext<MakeupContextProps | undefined>(undefined);
@@ -441,6 +444,24 @@ export const MakeupProvider: React.FC<MakeupProviderProps> = ({
 
   const [envMapMakeup, setEnvMapMakeup] = useState<Texture | null>(null);
 
+  const showMakeup =
+    showFoundation ||
+    showBlush ||
+    showEyeShadow ||
+    showConcealer ||
+    showHighlighter ||
+    showContour ||
+    showLipliner ||
+    showLipplumper ||
+    showLipColor ||
+    showBronzer ||
+    showLens ||
+    showEyebrows ||
+    showEyeliner ||
+    showLashes ||
+    showMascara ||
+    showNails;
+
   return (
     <MakeupContext.Provider
       value={{
@@ -605,6 +626,8 @@ export const MakeupProvider: React.FC<MakeupProviderProps> = ({
 
         envMapMakeup,
         setEnvMapMakeup,
+
+        showMakeup,
       }}
     >
       {children}

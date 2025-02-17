@@ -29,6 +29,11 @@ interface AccesoriesContextProps {
 
   showRing: boolean;
   setShowRing: (show: boolean) => void;
+
+  showFace: boolean;
+
+  showHand: boolean;
+
 }
 
 const AccesoriesContext = createContext<AccesoriesContextProps | undefined>(
@@ -54,6 +59,9 @@ export const AccesoriesProvider: React.FC<AccesoriesProviderProps> = ({
   const [showWatch, setShowWatch] = useState(false);
   const [showBracelet, setShowBracelet] = useState(false);
   const [showRing, setShowRing] = useState(false);
+
+  const showFace = showHat || showGlasess || showHeadband || showEarring || showNecklace;
+  const showHand = showRing || showWatch || showBracelet;
 
   return (
     <AccesoriesContext.Provider
@@ -84,6 +92,8 @@ export const AccesoriesProvider: React.FC<AccesoriesProviderProps> = ({
 
         showRing,
         setShowRing,
+        showFace,
+        showHand
       }}
     >
       {children}

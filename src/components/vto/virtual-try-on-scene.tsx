@@ -64,12 +64,16 @@ export function VirtualTryOnScene({
   const { envMapAccesories, setEnvMapAccesories } = useAccesories();
   const { envMapMakeup, setEnvMapMakeup } = useMakeup();
 
-  const { showHair, hairColor, showFoundation, foundationColor } = useMakeup();
+  const { showHair, hairColor, showFoundation, foundationColor, showMakeup } =
+    useMakeup();
+  const { showHand, showFace } = useAccesories();
 
   const showHairRef = useRef(showHair);
   const showFoundationRef = useRef(showFoundation);
   const foundationColorRef = useRef(foundationColor);
   const hairColorRef = useRef(hairColor);
+  const showFaceRef = useRef(showMakeup || showFace);
+  const showHandRef = useRef(showHand);
 
   useEffect(() => {
     // tf.enableDebugMode();
@@ -77,7 +81,9 @@ export function VirtualTryOnScene({
     showFoundationRef.current = showFoundation;
     foundationColorRef.current = foundationColor;
     hairColorRef.current = hairColor;
-  }, [showHair, showFoundation, foundationColor, hairColor]);
+    showFaceRef.current = showMakeup || showFace;
+    showHandRef.current = showHand;
+  }, [showHair, showFoundation, foundationColor, hairColor, showMakeup]);
 
   useEffect(() => {
     let isMounted = true;
@@ -277,78 +283,81 @@ export function VirtualTryOnScene({
 
               const startTimeMs = performance.now();
               try {
-                const hairResults =
-                  sourceElement instanceof HTMLVideoElement
-                    ? hairSegmenterRef.current.segmentForVideo(
-                        sourceElement,
-                        startTimeMs,
-                      )
-                    : hairSegmenterRef.current.segment(sourceElement);
-
-                const faceResults =
-                  sourceElement instanceof HTMLVideoElement
-                    ? faceLandmarkerRef.current.detectForVideo(
-                        sourceElement,
-                        startTimeMs,
-                      )
-                    : faceLandmarkerRef.current.detect(sourceElement);
-                ctx.drawImage(
-                  sourceElement,
-                  0,
-                  0,
-                  sourceWidth / dpr,
-                  sourceHeight / dpr,
-                );
-
-                if (hairResults?.categoryMask) {
-                  hairRef.current =
-                    hairResults.categoryMask.getAsFloat32Array();
-                  let imageData = ctx.getImageData(
+                if (showHairRef.current) {
+                  ctx.drawImage(
+                    sourceElement,
                     0,
                     0,
-                    sourceWidth,
-                    sourceHeight,
-                  ).data;
+                    sourceWidth / dpr,
+                    sourceHeight / dpr,
+                  );
 
-                  const hairColor = hexToRgb(hairColorRef.current);
-                  const hairLegend = [[hairColor.r, hairColor.g, hairColor.b, 0.08]];
-                  const foundationColor = hexToRgb(foundationColorRef.current);
-                  const skinColorLegend = [[foundationColor.r, foundationColor.g, foundationColor.b, 0.1]];
+                  const hairResults =
+                    sourceElement instanceof HTMLVideoElement
+                      ? hairSegmenterRef.current.segmentForVideo(
+                          sourceElement,
+                          startTimeMs,
+                        )
+                      : hairSegmenterRef.current.segment(sourceElement);
 
-                  let j = 0;
-                  for (let i = 0; i < hairRef.current.length; ++i) {
-                    const x = i % sourceWidth;
-                    const y = Math.floor(i / sourceWidth);
-                    const maskVal = Math.round(hairRef.current[i] * 255.0);
+                  if (hairResults?.categoryMask) {
+                    hairRef.current =
+                      hairResults.categoryMask.getAsFloat32Array();
+                    let imageData = ctx.getImageData(
+                      0,
+                      0,
+                      sourceWidth,
+                      sourceHeight,
+                    ).data;
 
-                    // const insideLeftEye = isInsideEyeArea(
-                    //   x,
-                    //   y,
-                    //   faceResults.faceLandmarks[0],
-                    //   leftEye,
-                    //   sourceWidth,
-                    //   sourceHeight,
-                    // );
-                    // const insideRightEye = isInsideEyeArea(
-                    //   x,
-                    //   y,
-                    //   faceResults.faceLandmarks[0],
-                    //   rightEye,
-                    //   sourceWidth,
-                    //   sourceHeight,
-                    // );
-                    // const insideMounth = isInsideEyeArea(
-                    //   x,
-                    //   y,
-                    //   faceResults.faceLandmarks[0],
-                    //   mounth,
-                    //   sourceWidth,
-                    //   sourceHeight,
-                    // );
+                    const hairColor = hexToRgb(hairColorRef.current);
+                    const hairLegend = [[0, 255, 0, 0.08]];
+                    const foundationColor = hexToRgb(
+                      foundationColorRef.current,
+                    );
+                    const skinColorLegend = [
+                      [
+                        foundationColor.r,
+                        foundationColor.g,
+                        foundationColor.b,
+                        0.1,
+                      ],
+                    ];
 
-                    // if (insideLeftEye || insideRightEye || insideMounth) {
+                    let j = 0;
+                    for (let i = 0; i < hairRef.current.length; ++i) {
+                      const x = i % sourceWidth;
+                      const y = Math.floor(i / sourceWidth);
+                      const maskVal = Math.round(hairRef.current[i] * 255.0);
+
+                      // const insideLeftEye = isInsideEyeArea(
+                      //   x,
+                      //   y,
+                      //   faceResults.faceLandmarks[0],
+                      //   leftEye,
+                      //   sourceWidth,
+                      //   sourceHeight,
+                      // );
+                      // const insideRightEye = isInsideEyeArea(
+                      //   x,
+                      //   y,
+                      //   faceResults.faceLandmarks[0],
+                      //   rightEye,
+                      //   sourceWidth,
+                      //   sourceHeight,
+                      // );
+                      // const insideMounth = isInsideEyeArea(
+                      //   x,
+                      //   y,
+                      //   faceResults.faceLandmarks[0],
+                      //   mounth,
+                      //   sourceWidth,
+                      //   sourceHeight,
+                      // );
+
+                      // if (insideLeftEye || insideRightEye || insideMounth) {
                       // Jika dalam area mata, buat transparan
-                    // } else {
+                      // } else {
                       if (maskVal === 1) {
                         if (showHairRef.current) {
                           const legendColor =
@@ -379,39 +388,52 @@ export function VirtualTryOnScene({
                         // imageData[j + 2] = 0;
                         // imageData[j + 3] = 0;
                       }
-                    // }
-                    j += 4;
+                      // }
+                      j += 4;
+                    }
+
+                    hairMaskRef.current = new ImageData(
+                      new Uint8ClampedArray(imageData.buffer),
+                      sourceWidth,
+                      sourceHeight,
+                    );
+
+                    hairResults.close();
+                  }
+                }
+
+                if (showFaceRef.current) {
+                  const faceResults =
+                    sourceElement instanceof HTMLVideoElement
+                      ? faceLandmarkerRef.current.detectForVideo(
+                          sourceElement,
+                          startTimeMs,
+                        )
+                      : faceLandmarkerRef.current.detect(sourceElement);
+                  if (faceResults.facialTransformationMatrixes.length > 0) {
+                    faceTransformRef.current =
+                      faceResults.facialTransformationMatrixes[0].data;
                   }
 
-                  hairMaskRef.current = new ImageData(
-                    new Uint8ClampedArray(imageData.buffer),
-                    sourceWidth,
-                    sourceHeight,
-                  );
+                  if (faceResults.faceBlendshapes.length > 0) {
+                    blendshapeRef.current =
+                      faceResults.faceBlendshapes[0].categories;
+                  }
 
-                  hairResults.close();
+                  landmarksRef.current = faceResults.faceLandmarks[0];
                 }
 
-                // const handResults =
-                //   sourceElement instanceof HTMLVideoElement
-                //     ? handLandmarkerRef.current.detectForVideo(
-                //         sourceElement,
-                //         startTimeMs,
-                //       )
-                //     : handLandmarkerRef.current.detect(sourceElement);
+                if (showHandRef.current) {
+                  const handResults =
+                    sourceElement instanceof HTMLVideoElement
+                      ? handLandmarkerRef.current.detectForVideo(
+                          sourceElement,
+                          startTimeMs,
+                        )
+                      : handLandmarkerRef.current.detect(sourceElement);
 
-                if (faceResults.facialTransformationMatrixes.length > 0) {
-                  faceTransformRef.current =
-                    faceResults.facialTransformationMatrixes[0].data;
+                  handLandmarksRef.current = handResults.landmarks[0];
                 }
-
-                if (faceResults.faceBlendshapes.length > 0) {
-                  blendshapeRef.current =
-                    faceResults.faceBlendshapes[0].categories;
-                }
-
-                landmarksRef.current = faceResults.faceLandmarks[0];
-                // handLandmarksRef.current = handResults.landmarks[0];
               } catch (err) {
                 // console.error("Detection error:", err);
                 // setError(err as Error);
