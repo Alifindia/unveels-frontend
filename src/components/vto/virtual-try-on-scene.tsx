@@ -130,7 +130,7 @@ export function VirtualTryOnScene({
           {
             baseOptions: {
               modelAssetPath:
-                "/media/unveels/models/hair/hair_segmenter.tflite",
+                "/media/unveels/models/hair/selfie_multiclass.tflite",
               delegate: "GPU",
             },
             runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
