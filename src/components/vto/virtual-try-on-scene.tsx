@@ -658,8 +658,10 @@ export function VirtualTryOnScene({
           screenshotFormat="image/jpeg"
           mirrored={false}
           videoConstraints={{
-            width: isDesktop ? VIDEO_WIDTH : videoDimensions.height,
-            height: isDesktop ? VIDEO_HEIGHT : videoDimensions.width,
+            // width: isDesktop ? VIDEO_WIDTH : videoDimensions.height,
+            // height: isDesktop ? VIDEO_HEIGHT : videoDimensions.width,
+            width: VIDEO_WIDTH,
+            height: VIDEO_HEIGHT,
             facingMode: criterias.flipped ? "environment" : "user",
             frameRate: { ideal: 60 },
           }}
