@@ -287,6 +287,10 @@ function MainContent() {
   const { criterias } = useCamera();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    navigate("/virtual-try-on/makeups");
+  }, [])
+
   return (
     <>
       <div className="flex justify-center">
