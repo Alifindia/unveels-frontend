@@ -48,6 +48,7 @@ import NailRing from "../three/accesories/nails/nail-ring";
 import NailPinky from "../three/accesories/nails/nail-pinky";
 import FingerOccluder from "../three/accesories/finger-occluder";
 import Lashes from "../three/makeup/lashes";
+import Bangle from "../three/accesories/bangles";
 
 interface VirtualTryOnThreeSceneProps extends MeshProps {
   videoRef: React.RefObject<Webcam | HTMLVideoElement | HTMLImageElement>;
@@ -114,7 +115,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   } = useAccesories();
 
   const filterRef = useRef<ShaderMaterial>(null);
-  console.log(showLashes, showEyeliner)
+  console.log(showLashes, showEyeliner);
   // State for slider-controlled factors
   const [archFactor, setArchFactor] = useState(0.0);
   const [pinchFactor, setPinchFactor] = useState(0.0);
@@ -262,21 +263,6 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   }, [videoTexture]);
 
   useFrame(() => {
-    if (hairMask) {
-      if (hairMask.current) {
-        const image = imageDataToImage(hairMask.current);
-        const loader = new TextureLoader();
-
-        loader.load(image.src, (texture) => {
-          if (!hairMaskTextureRef.current) {
-            hairMaskTextureRef.current = texture;
-          } else {
-            hairMaskTextureRef.current.image = texture.image;
-            hairMaskTextureRef.current.needsUpdate = true;
-          }
-        });
-      }
-    }
     if (filterRef.current && landmarks.current) {
       const uniforms = filterRef.current.uniforms;
 
@@ -316,7 +302,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
     <>
       {videoTexture && (
         <>
-          <>
+          {/* <>
             {hairMaskTextureRef.current && (
               <mesh
                 position={[0, 0, -499]}
@@ -355,39 +341,41 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
                 />
               </mesh>
             )}
-          </>
-          <mesh position={[0, 0, -500]} {...props} renderOrder={2}>
-            <planeGeometry args={[planeSize[0], planeSize[1]]} />
-            <shaderMaterial
-              ref={filterRef}
-              vertexShader={FaceShader.vertexShader}
-              fragmentShader={FaceShader.fragmentShader}
-              side={DoubleSide}
-              uniforms={{
-                videoTexture: { value: videoTexture },
-                leftEyebrow: {
-                  value: [
-                    new Vector2(),
-                    new Vector2(),
-                    new Vector2(),
-                    new Vector2(),
-                  ],
-                },
-                rightEyebrow: {
-                  value: [
-                    new Vector2(),
-                    new Vector2(),
-                    new Vector2(),
-                    new Vector2(),
-                  ],
-                },
-                archFactor: { value: archFactor },
-                pinchFactor: { value: pinchFactor },
-                horizontalShiftFactor: { value: horizontalShiftFactor },
-                verticalShiftFactor: { value: verticalShiftFactor },
-              }}
-            />
-          </mesh>
+          </> */}
+          {!showHair && (
+            <mesh position={[0, 0, -500]} {...props} renderOrder={0}>
+              <planeGeometry args={[planeSize[0], planeSize[1]]} />
+              <shaderMaterial
+                ref={filterRef}
+                vertexShader={FaceShader.vertexShader}
+                fragmentShader={FaceShader.fragmentShader}
+                side={DoubleSide}
+                uniforms={{
+                  videoTexture: { value: videoTexture },
+                  leftEyebrow: {
+                    value: [
+                      new Vector2(),
+                      new Vector2(),
+                      new Vector2(),
+                      new Vector2(),
+                    ],
+                  },
+                  rightEyebrow: {
+                    value: [
+                      new Vector2(),
+                      new Vector2(),
+                      new Vector2(),
+                      new Vector2(),
+                    ],
+                  },
+                  archFactor: { value: archFactor },
+                  pinchFactor: { value: pinchFactor },
+                  horizontalShiftFactor: { value: horizontalShiftFactor },
+                  verticalShiftFactor: { value: verticalShiftFactor },
+                }}
+              />
+            </mesh>
+          )}
 
           <>
             {/* {showFoundation && (
@@ -575,6 +563,9 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
                   handLandmarks={handlandmarks}
                 />
               </>
+            )}
+            {showBracelet && (
+              <Bangle planeSize={planeSize} handLandmarks={handlandmarks} />
             )}
           </>
         </>

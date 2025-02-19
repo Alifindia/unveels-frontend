@@ -1823,7 +1823,10 @@ export const HAND_OCCLUDER =
 export const WATCH = "/media/unveels/vto-assets/watch/watch.glb";
 
 // ring
-export const RING = "/media/unveels/vto-assets/watch/gelang_5.glb";
+export const RING = "/media/unveels/vto-assets/ring/ring.glb";
+
+// bangle
+export const BANGLE = "/media/unveels/vto-assets/watch/gelang_1.glb";
 
 // hat
 export const HAT = "/media/unveels/vto-assets/hat/hat6.glb";

@@ -38,6 +38,7 @@ export function VirtualTryOnScene({
 }) {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
   const beforeAfterCanvasRef = useRef<HTMLCanvasElement>(null);
   const imageUploadRef = useRef<HTMLImageElement>(null);
   const videoUploadRef = useRef<HTMLVideoElement>(null);
@@ -83,7 +84,7 @@ export function VirtualTryOnScene({
     hairColorRef.current = hairColor;
     showFaceRef.current = showMakeup || showFace;
     showHandRef.current = showHand;
-  }, [showHair, showFoundation, foundationColor, hairColor, showMakeup]);
+  }, [showHair, showFoundation, foundationColor, hairColor, showMakeup, showHand]);
 
   useEffect(() => {
     let isMounted = true;
@@ -174,42 +175,6 @@ export function VirtualTryOnScene({
     if (isDetectingRef.current) return;
     isDetectingRef.current = true;
 
-    const leftEye = [
-      246, 161, 160, 159, 158, 157, 173, 155, 154, 153, 145, 144, 163, 7,
-    ];
-    const rightEye = [
-      263, 466, 388, 387, 386, 385, 384, 398, 362, 382, 381, 380, 374, 373, 390,
-      249,
-    ];
-    const mounth = [
-      308, 415, 310, 311, 312, 13, 82, 81, 80, 191, 62, 78, 95, 88, 178, 87, 14,
-      317, 402, 319,
-    ];
-
-    const isInsideEyeArea = (
-      x: number,
-      y: number,
-      landmarks: any[],
-      eyePoints: number[],
-      sourceWidth: number,
-      sourceHeight: number,
-    ) => {
-      let inside = false;
-      let j = eyePoints.length - 1;
-      for (let i = 0; i < eyePoints.length; i++) {
-        let xi = landmarks[eyePoints[i]].x * sourceWidth;
-        let yi = landmarks[eyePoints[i]].y * sourceHeight;
-        let xj = landmarks[eyePoints[j]].x * sourceWidth;
-        let yj = landmarks[eyePoints[j]].y * sourceHeight;
-
-        if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
-          inside = !inside;
-        }
-        j = i;
-      }
-      return inside;
-    };
-
     const detect = async () => {
       if (
         faceLandmarkerRef.current &&
@@ -217,10 +182,13 @@ export function VirtualTryOnScene({
         hairSegmenterRef.current
       ) {
         const canvas = canvasRef.current;
-
-        if (canvas) {
+        const bgCanvas = backgroundCanvasRef.current;
+        if (canvas && bgCanvas) {
           const ctx = canvas.getContext("2d", { willReadFrequently: true });
-          if (ctx) {
+          const bgCtx = bgCanvas?.getContext("2d", {
+            willReadFrequently: true,
+          });
+          if (ctx && bgCtx) {
             const { innerWidth: width, innerHeight: height } = window;
             const dpr = window.devicePixelRatio || 1;
             canvas.width = width * dpr;
@@ -255,6 +223,9 @@ export function VirtualTryOnScene({
                 sourceElement instanceof HTMLVideoElement
                   ? sourceElement.videoHeight
                   : sourceElement.naturalHeight;
+
+              bgCanvas.width = sourceWidth;
+              bgCanvas.height = sourceHeight;
 
               const imgAspect =
                 sourceElement instanceof HTMLVideoElement
@@ -326,38 +297,7 @@ export function VirtualTryOnScene({
 
                     let j = 0;
                     for (let i = 0; i < hairRef.current.length; ++i) {
-                      const x = i % sourceWidth;
-                      const y = Math.floor(i / sourceWidth);
                       const maskVal = Math.round(hairRef.current[i] * 255.0);
-
-                      // const insideLeftEye = isInsideEyeArea(
-                      //   x,
-                      //   y,
-                      //   faceResults.faceLandmarks[0],
-                      //   leftEye,
-                      //   sourceWidth,
-                      //   sourceHeight,
-                      // );
-                      // const insideRightEye = isInsideEyeArea(
-                      //   x,
-                      //   y,
-                      //   faceResults.faceLandmarks[0],
-                      //   rightEye,
-                      //   sourceWidth,
-                      //   sourceHeight,
-                      // );
-                      // const insideMounth = isInsideEyeArea(
-                      //   x,
-                      //   y,
-                      //   faceResults.faceLandmarks[0],
-                      //   mounth,
-                      //   sourceWidth,
-                      //   sourceHeight,
-                      // );
-
-                      // if (insideLeftEye || insideRightEye || insideMounth) {
-                      // Jika dalam area mata, buat transparan
-                      // } else {
                       if (maskVal === 1) {
                         if (showHairRef.current) {
                           const legendColor =
@@ -388,7 +328,6 @@ export function VirtualTryOnScene({
                         // imageData[j + 2] = 0;
                         // imageData[j + 3] = 0;
                       }
-                      // }
                       j += 4;
                     }
 
@@ -397,7 +336,7 @@ export function VirtualTryOnScene({
                       sourceWidth,
                       sourceHeight,
                     );
-
+                    bgCtx?.putImageData(hairMaskRef.current, 0, 0);
                     hairResults.close();
                   }
                 }
@@ -660,8 +599,8 @@ export function VirtualTryOnScene({
           videoConstraints={{
             // width: isDesktop ? VIDEO_WIDTH : videoDimensions.height,
             // height: isDesktop ? VIDEO_HEIGHT : videoDimensions.width,
-            width: VIDEO_WIDTH,
-            height: VIDEO_HEIGHT,
+            // width: VIDEO_WIDTH,
+            // height: VIDEO_HEIGHT,
             facingMode: criterias.flipped ? "environment" : "user",
             frameRate: { ideal: 60 },
           }}
@@ -717,6 +656,17 @@ export function VirtualTryOnScene({
         style={{ zIndex: 40 }}
       />
 
+      <canvas
+        ref={backgroundCanvasRef}
+        className={`pointer-events-none absolute left-1/2 top-1/2 scale-x-[-1] transform`}
+        style={{
+          zIndex: 40,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          transform: "translate(-50%, -50%) scaleX(-1)",
+        }}
+      />
       {/* Error Display */}
       {error && <ErrorOverlay message={error.message} />}
     </div>
