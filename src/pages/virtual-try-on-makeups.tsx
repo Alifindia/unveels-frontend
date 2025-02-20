@@ -405,12 +405,13 @@ function BottomContent() {
 export function TopNavigation({ cart = false }: { cart?: boolean }) {
   const { flipCamera } = useCamera();
   const [backClickCount, setBackClickCount] = useState(0);
+  const navigate = useNavigate();
 
   const handleBackClick = () => {
     if (process.env.NODE_ENV === "production") {
       if (backClickCount === 0) {
         setBackClickCount(1);
-        window.location.href = "/virtual-try-on/makeups";
+        navigate("/virtual-try-on/makeups");
       } else {
         window.location.href = import.meta.env.VITE_API_BASE_URL + "/technologies";
       }
