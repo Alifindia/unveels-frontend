@@ -126,26 +126,15 @@ function Main({ isArabic }: { isArabic?: boolean }) {
           throw new Error("Invalid model input shape");
         }
 
-        const dummyInput: tf.Tensor = tf.randomUniform(
-          yolov8.inputs[0].shape,
-          0,
-          1,
-          "float32",
-        );
-
-        const warmupResult = yolov8.execute(dummyInput);
-        const warmupResults: tf.Tensor[] = Array.isArray(warmupResult)
-          ? warmupResult
-          : [warmupResult as tf.Tensor];
-
         setLoading({ loading: false, progress: 1 });
         setModel({
           net: yolov8,
           inputShape: yolov8.inputs[0].shape,
-          outputShape: warmupResults.map((e) => e.shape),
+          outputShape: [
+            [1, 50, 8400],
+            [1, 160, 160, 32],
+          ],
         });
-
-        tf.dispose([...warmupResults, dummyInput]);
       } catch (error) {
         setLoading({ loading: false, progress: 0 });
         console.error("Error loading model:", error);
