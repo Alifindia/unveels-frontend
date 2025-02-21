@@ -7,7 +7,11 @@ import { SkinColorProvider } from "../components/skin-tone-finder-scene/skin-col
 import { MakeupProvider } from "../context/makeup-context";
 import { InferenceProvider } from "../context/inference-context";
 import { useEffect, useRef } from "react";
-import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+import {
+  FaceLandmarker,
+  FilesetResolver,
+  ImageSegmenter,
+} from "@mediapipe/tasks-vision";
 import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { useTranslation } from "react-i18next";
@@ -31,7 +35,7 @@ export function SkinToneFinderWeb() {
         <SkinColorProvider>
           <MakeupProvider>
             <div className="h-full min-h-dvh">
-              <Main isArabic={isArabic}/>
+              <Main isArabic={isArabic} />
             </div>
           </MakeupProvider>
         </SkinColorProvider>
@@ -40,9 +44,10 @@ export function SkinToneFinderWeb() {
   );
 }
 
-function Main({isArabic}: {isArabic: boolean}) {
+function Main({ isArabic }: { isArabic: boolean }) {
   const { criterias } = useCamera();
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
+  const imageSegmenterRef = useRef<ImageSegmenter | null>(null);
 
   const steps = [
     async () => {
@@ -64,6 +69,25 @@ function Main({isArabic}: {isArabic: boolean}) {
       );
       faceLandmarkerRef.current = faceLandmarkerInstance;
     },
+    async () => {
+      const filesetResolver = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+      );
+      const imageSegmenter = await ImageSegmenter.createFromOptions(
+        filesetResolver,
+        {
+          baseOptions: {
+            modelAssetPath:
+              "/media/unveels/models/hair/selfie_multiclass.tflite",
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          outputCategoryMask: true,
+          outputConfidenceMasks: false,
+        },
+      );
+      imageSegmenterRef.current = imageSegmenter;
+    },
   ];
 
   const {
@@ -84,7 +108,10 @@ function Main({isArabic}: {isArabic: boolean}) {
       <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
         <div className="absolute inset-0">
           <VideoStream debugMode={false} faceScannerColor="43, 221, 217" />
-          <SkinToneFinderScene faceLandmarker={faceLandmarkerRef.current} />
+          <SkinToneFinderScene
+            faceLandmarker={faceLandmarkerRef.current}
+            imageSegmenter={imageSegmenterRef.current}
+          />
         </div>
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">

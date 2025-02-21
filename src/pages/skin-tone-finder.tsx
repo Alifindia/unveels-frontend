@@ -39,7 +39,11 @@ import {
   useInferenceContext,
 } from "../context/inference-context";
 import { TopNavigation } from "../components/top-navigation";
-import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+import {
+  FaceLandmarker,
+  FilesetResolver,
+  ImageSegmenter,
+} from "@mediapipe/tasks-vision";
 import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { ScreenshotPreview } from "../components/screenshot-preview";
@@ -75,7 +79,7 @@ export function SkinToneFinder() {
             <FindTheLookProvider>
               <FilterProvider>
                 <div className="h-full min-h-dvh">
-                  <Main isArabic={isArabic}/>
+                  <Main isArabic={isArabic} />
                 </div>
               </FilterProvider>
             </FindTheLookProvider>
@@ -86,11 +90,12 @@ export function SkinToneFinder() {
   );
 }
 
-function Main({isArabic}: {isArabic: boolean}) {
+function Main({ isArabic }: { isArabic: boolean }) {
   const { criterias, status, setRunningMode } = useCamera();
   const [collapsed, setCollapsed] = useState(false);
   const { isInferenceFinished } = useInferenceContext();
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
+  const imageSegmenterRef = useRef<ImageSegmenter | null>(null);
 
   const steps = [
     async () => {
@@ -111,6 +116,25 @@ function Main({isArabic}: {isArabic: boolean}) {
         },
       );
       faceLandmarkerRef.current = faceLandmarkerInstance;
+    },
+    async () => {
+      const filesetResolver = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+      );
+      const imageSegmenter = await ImageSegmenter.createFromOptions(
+        filesetResolver,
+        {
+          baseOptions: {
+            modelAssetPath:
+              "/media/unveels/models/hair/selfie_multiclass.tflite",
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          outputCategoryMask: true,
+          outputConfidenceMasks: false,
+        },
+      );
+      imageSegmenterRef.current = imageSegmenter;
     },
   ];
 
@@ -189,7 +213,10 @@ function Main({isArabic}: {isArabic: boolean}) {
           {!criterias.isCaptured ? (
             <VideoStream debugMode={false} faceScannerColor="43, 221, 217" />
           ) : (
-            <SkinToneFinderScene faceLandmarker={faceLandmarkerRef.current} />
+            <SkinToneFinderScene
+              faceLandmarker={faceLandmarkerRef.current}
+              imageSegmenter={imageSegmenterRef.current}
+            />
           )}
         </div>
         <TopNavigation cart={isInferenceFinished} />
@@ -198,7 +225,10 @@ function Main({isArabic}: {isArabic: boolean}) {
           {criterias.isCaptured ? "" : <VideoScene isArabic={isArabic} />}
           {isInferenceFinished && <Sidebar setCollapsed={setCollapsed} />}
           {isInferenceFinished && (
-            <div className="bg-black/10 p-2 shadow-lg backdrop-blur-sm">
+            <div
+              className="bg-black/10 p-2 shadow-lg backdrop-blur-sm"
+              style={{ zIndex: 2 }}
+            >
               <MainContent collapsed={collapsed} setCollapsed={setCollapsed} />
               <Footer />
             </div>
@@ -309,7 +339,7 @@ function MatchedShades() {
   const [selectedTne, setSelectedTone] = useState(tone_types[0]);
   const { skinType, hexSkin } = useSkinColor();
   const { setView } = useFindTheLookContext();
-  const { setShowFoundation, setFoundationColor }= useMakeup()
+  const { setShowFoundation, setFoundationColor } = useMakeup();
   const skinToneId = skin_tones.find((tone) => tone.name === skinType)?.id;
 
   const { data } = useSkinToneProductQuery({
@@ -342,7 +372,7 @@ function MatchedShades() {
                 onClick={() => {
                   setShowFoundation(true);
                   setFoundationColor(option.color);
-                  setSelectedTone(option)
+                  setSelectedTone(option);
                 }}
               >
                 {t(
@@ -435,7 +465,7 @@ function OtherShades() {
             onClick={() => {
               setShowFoundation(true);
               setFoundationColor(tone.color);
-              setSelectedTone(tone)
+              setSelectedTone(tone);
             }}
           >
             <div
@@ -548,7 +578,8 @@ function ProductList({ products }: { products: Array<Product> }) {
                 <p className="text-[0.5rem] text-white/60">{brand}</p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.625rem] font-bold text-white">
-                    {currencySymbol}{(product.price * rate).toFixed(3)}
+                    {currencySymbol}
+                    {(product.price * rate).toFixed(3)}
                   </span>
                 </div>
               </div>
@@ -584,7 +615,7 @@ interface SidebarProps {
 function Sidebar({ setCollapsed }: SidebarProps) {
   const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
   return (
-    <div className="pointer-events-none flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
+    <div className="flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto"  style={{zIndex: 10}}>
       <div className="relative p-0.5">
         <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 

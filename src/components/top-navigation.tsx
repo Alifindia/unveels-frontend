@@ -18,7 +18,7 @@ export function TopNavigation({
   const isDevelopment = process.env.NODE_ENV === "development";
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+    <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto" style={{ zIndex: 10 }}>
       <div className="flex flex-col gap-4">
         <a
           className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
