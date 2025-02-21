@@ -46,13 +46,13 @@ export function VTOProductCard({
   return (
     <div
       style={cardStyle}
-      className="w-[70px] lg:w-[80px] xl:w-[100px] 2xl:w-[120px] "
+      className="w-[70px] lg:w-[80px] xl:w-[90px] 2xl:w-[120px]"
     >
       <div 
         className="cursor-pointer"
         onClick={onClick}
       >
-        <div className="relative h-[40px] w-[70px] lg:h-[45px] lg:w-[80px] xl:h-[55px] xl:w-[100px] 2xl:h-[70px] 2xl:w-[120px] overflow-hidden">
+        <div className="relative h-[40px] w-[70px] lg:h-[45px] lg:w-[80px] xl:h-[50px] xl:w-[90px] 2xl:h-[70px] 2xl:w-[120px] overflow-hidden">
           <img
             src={imageUrl}
             alt="Product"

@@ -117,7 +117,7 @@ function ColorSelector() {
             reset();
           }}
         >
-          <Icons.empty className="size-5 sm:size-[1.875rem]" />
+          <Icons.empty className="size-5 sm:size-[1rem] 2xl:size-6" />
         </button>
         {lenses.map((path, index) => (
           <button

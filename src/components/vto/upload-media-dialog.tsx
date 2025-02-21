@@ -35,7 +35,7 @@ function UploadMediaDialog({
     <Dialog.Root>
       <Dialog.Trigger asChild>
         <button type="button" className="flex items-center justify-center">
-          <Icons.upload className="size-4 text-white xl:size-5 2xl:size-6" />
+          <Icons.upload className="size-3 text-white xl:size-4 2xl:size-5" />
         </button>
       </Dialog.Trigger>
       <Dialog.Portal>

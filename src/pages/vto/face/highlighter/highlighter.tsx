@@ -104,7 +104,7 @@ function ColorSelector() {
             reset();
           }}
         >
-          <Icons.empty className="size-5 sm:size-[1.875rem]" />
+          <Icons.empty className="size-5 sm:size-[1rem] 2xl:size-6" />
         </button>
         {extracted_sub_colors.map((color, index) => (
           <ColorPalette
@@ -148,7 +148,7 @@ function TextureSelector() {
             key={texture.value}
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-2 py-0.5 text-white/80 sm:px-3 sm:py-1",
+              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
               {
                 "border-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                   selectedTexture === texture.value,

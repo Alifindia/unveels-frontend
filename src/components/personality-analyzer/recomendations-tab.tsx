@@ -81,20 +81,20 @@ export function RecommendationsTab({
             modules={[Navigation]}
             navigation
             pagination={{ clickable: true }}
-            spaceBetween={2}
-            slidesPerView={1}
+            spaceBetween={8}
+            slidesPerView={3}
             breakpoints={{
               640: {
-                slidesPerView: 2,
-                spaceBetween: 2,
+                slidesPerView: 3,
+                spaceBetween: 8,
               },
               768: {
                 slidesPerView: 4,
-                spaceBetween: 2,
+                spaceBetween: 8,
               },
               1024: {
                 slidesPerView: 7,
-                spaceBetween: 2,
+                spaceBetween: 8,
               },
             }}
             wrapperClass={fragrances.items.length < 7 ? "lg:justify-center" : ""}
@@ -183,20 +183,20 @@ export function RecommendationsTab({
             modules={[Navigation, Pagination]}
             navigation
             pagination={{ clickable: true }}
-            spaceBetween={2}
-            slidesPerView={1}
+            spaceBetween={8}
+            slidesPerView={3}
             breakpoints={{
               640: {
-                slidesPerView: 2,
-                spaceBetween: 2,
+                slidesPerView: 3,
+                spaceBetween: 8,
               },
               768: {
                 slidesPerView: 4,
-                spaceBetween: 2,
+                spaceBetween: 8,
               },
               1024: {
                 slidesPerView: 7,
-                spaceBetween: 2,
+                spaceBetween: 8,
               },
             }}
             wrapperClass={items.profiles.length < 7 ? "lg:justify-center" : ""}
@@ -276,20 +276,20 @@ export function RecommendationsTab({
             modules={[Navigation]}
             navigation
             pagination={{ clickable: true }}
-            spaceBetween={2}
-            slidesPerView={1}
+            spaceBetween={8}
+            slidesPerView={3}
             breakpoints={{
               640: {
-                slidesPerView: 2,
-                spaceBetween: 2,
+                slidesPerView: 3,
+                spaceBetween: 8,
               },
               768: {
                 slidesPerView: 4,
-                spaceBetween: 2,
+                spaceBetween: 8,
               },
               1024: {
                 slidesPerView: 7,
-                spaceBetween: 2,
+                spaceBetween: 8,
               },
             }}
             wrapperClass={lips.items.length < 7 ? "lg:justify-center" : ""}

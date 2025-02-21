@@ -106,14 +106,14 @@ function ColorSelector() {
     extractHexa.length > 0 ? extractHexa : extractSubColor;
 
   return (
-    <div className="mx-auto w-full py-1 lg:py-1.5">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 xl:py-1 2xl:py-2.5">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-0.5 no-scrollbar sm:space-x-4">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
           onClick={() => setSelectedColor(null)}
         >
-          <Icons.empty className="size-5 sm:size-[1.875rem]" />
+          <Icons.empty className="size-5 sm:size-[1rem] 2xl:size-6" />
         </button>
         {extracted_sub_colors.map((color, index) => (
           <ColorPalette
@@ -179,7 +179,7 @@ function OccasionSelector() {
           key={occasion.value}
           type="button"
           className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-2 py-0.5 text-white/80 sm:px-3 sm:py-1",
+            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
             {
               "selectedShape-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                 selectedOccasion === occasion.value,
@@ -206,7 +206,7 @@ function FabricSelector() {
           key={fabric.value}
           type="button"
           className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-2 py-0.5 text-white/80 sm:px-3 sm:py-1",
+            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
             {
               "selectedShape-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                 selectedFabric === fabric.value,

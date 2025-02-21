@@ -83,7 +83,7 @@ function ColorSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-1 lg:py-1.5">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
       <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
         <button
           type="button"
@@ -92,7 +92,7 @@ function ColorSelector() {
             reset();
           }}
         >
-          <Icons.empty className="size-5 sm:size-[1.875rem]" />
+          <Icons.empty className="size-5 sm:size-[1rem] 2xl:size-6" />
         </button>
         {extracted_sub_colors.map((color, index) => (
           <ColorPalette
@@ -128,7 +128,7 @@ function ShapeSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-1 lg:py-1.5">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
       <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
         {bronzers.map((path, index) => (
           <button
@@ -180,7 +180,7 @@ function TextureSelector() {
             key={texture.value}
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-2 py-0.5 text-white/80 sm:px-3 sm:py-1",
+              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
               {
                 "border-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                   selectedTexture === texture.value,
