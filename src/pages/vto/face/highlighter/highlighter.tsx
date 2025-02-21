@@ -104,7 +104,7 @@ function ColorSelector() {
             reset();
           }}
         >
-          <Icons.empty className="size-5 sm:size-[1.375rem] xl:size-[1rem]" />
+          <Icons.empty className="size-5 sm:size-[1rem] 2xl:size-6" />
         </button>
         {extracted_sub_colors.map((color, index) => (
           <ColorPalette

@@ -105,7 +105,7 @@ function ColorSelector() {
             setSelectedColor(null);
           }}
         >
-          <Icons.empty className="size-5 sm:size-[1.375rem] xl:size-[1rem]" />
+          <Icons.empty className="size-5 sm:size-[1rem] 2xl:size-6" />
         </button>
         {["#000000"].map((color, index) => (
           <ColorPalette

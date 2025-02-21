@@ -41,7 +41,7 @@ export function ColorPalette({
     return (
       <button
         className={clsx("shrink-0 rounded-full border border-transparent transform transition-all", {
-          "size-5 sm:size-[1.375rem] xl:size-[1rem]": size === "large",
+          "size-5 sm:size-[1rem] 2xl:size-6": size === "large",
           "size-2.5": size === "small",
             "scale-[1.3] border-white": selected,
           },
@@ -56,7 +56,7 @@ export function ColorPalette({
     return (
       <button
         className={clsx("shrink-0 rounded-full border border-transparent", {
-          "size-5 sm:size-[1.375rem] xl:size-[1rem]": size === "large",
+          "size-5 sm:size-[1rem] 2xl:size-6": size === "large",
           "size-2.5": size === "small",
           "scale-[1.5] border-white": selected,
         })}
@@ -71,7 +71,7 @@ export function ColorPalette({
   return (
     <button
       className={clsx("shrink-0 rounded-full border border-transparent", {
-        "size-5 sm:size-[1.375rem] xl:size-[1rem]": size === "large",
+        "size-5 sm:size-[1rem] 2xl:size-6": size === "large",
         "size-2.5": size === "small",
         "scale-[1.5] border-white": selected,
       })}
