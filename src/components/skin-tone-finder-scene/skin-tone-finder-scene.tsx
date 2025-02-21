@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useCamera } from "../../context/recorder-context";
-import { FaceLandmarker } from "@mediapipe/tasks-vision";
+import {
+  FaceLandmarker,
+  ImageSegmenter,
+  NormalizedLandmark,
+} from "@mediapipe/tasks-vision";
 import { Canvas } from "@react-three/fiber";
 import { useSkinColor } from "./skin-color-context"; // Pastikan path ini benar
 import { Landmark } from "../../types/landmark";
@@ -11,6 +15,7 @@ import { useMakeup } from "../../context/makeup-context";
 import { Rnd } from "react-rnd";
 import { useInferenceContext } from "../../context/inference-context";
 import { Scanner } from "../scanner";
+import { hexToRgb } from "../../utils/colorUtils";
 
 interface ImageCanvasProps {
   image: HTMLImageElement;
@@ -82,16 +87,19 @@ function ImageCanvas({ image, canvasRef }: ImageCanvasProps) {
 interface SkinToneFinderSceneProps {
   debugMode?: boolean; // Opsional untuk mode debug
   faceLandmarker: FaceLandmarker | null; // Model diterima sebagai prop
+  imageSegmenter: ImageSegmenter | null;
 }
 
 export function SkinToneFinderScene({
   debugMode = false,
   faceLandmarker,
+  imageSegmenter,
 }: SkinToneFinderSceneProps) {
   return (
     <SkinToneFinderInnerScene
       debugMode={debugMode}
       faceLandmarker={faceLandmarker}
+      imageSegmenter={imageSegmenter}
     />
   );
 }
@@ -99,11 +107,13 @@ export function SkinToneFinderScene({
 interface SkinToneFinderInnerSceneProps {
   debugMode: boolean;
   faceLandmarker: FaceLandmarker | null;
+  imageSegmenter: ImageSegmenter | null;
 }
 
 function SkinToneFinderInnerScene({
   debugMode,
   faceLandmarker,
+  imageSegmenter,
 }: SkinToneFinderInnerSceneProps) {
   const { criterias } = useCamera();
   const [imageLoaded, setImageLoaded] = useState<HTMLImageElement | null>(null);
@@ -112,10 +122,14 @@ function SkinToneFinderInnerScene({
 
   const landmarksRef = useRef<Landmark[]>([]);
 
-  const { setSkinColor } = useSkinColor();
+  const { setSkinColor, hexColor } = useSkinColor();
   const { setFoundationColor, setShowFoundation } = useMakeup();
 
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
+  const categoryMask = useRef<Float32Array<ArrayBufferLike> | null>(null);
+  const firstFaceRef = useRef<NormalizedLandmark[] | null>(null);
   const divRef = useRef<HTMLCanvasElement>(null);
 
   const { setIsInferenceFinished } = useInferenceContext();
@@ -188,6 +202,7 @@ function SkinToneFinderInnerScene({
       window.removeEventListener("message", handleMessage);
     };
   }, []);
+  const { foundationColor, showFoundation } = useMakeup();
 
   useEffect(() => {
     if (criterias.screenshotImage) {
@@ -240,9 +255,12 @@ function SkinToneFinderInnerScene({
           await new Promise((resolve) => setTimeout(resolve, 2000));
 
           const results = await faceLandmarker.detect(imageLoaded);
+          const hairResults = await imageSegmenter?.segment(imageLoaded);
+
           if (results && results.faceLandmarks.length > 0) {
             // Asumsikan wajah pertama
             const firstFace = results.faceLandmarks[0];
+            firstFaceRef.current = firstFace;
             // Konversi landmark ke koordinat normal dengan z
             const normalizedLandmarks = firstFace.map((landmark) => ({
               x: landmark.x,
@@ -266,6 +284,12 @@ function SkinToneFinderInnerScene({
               extractedSkinColor.hexColor,
               extractedSkinColor.skinType,
             );
+
+            if (hairResults?.categoryMask) {
+              categoryMask.current =
+                hairResults.categoryMask.getAsFloat32Array();
+              hairResults.close();
+            }
 
             setIsInferenceFinished(true);
             setIsInferenceCompleted(true);
@@ -310,6 +334,145 @@ function SkinToneFinderInnerScene({
     processImage();
   }, [imageLoaded, faceLandmarker]);
 
+  useEffect(() => {
+    const leftEye = [
+      246, 161, 160, 159, 158, 157, 173, 155, 154, 153, 145, 144, 163, 7,
+    ];
+    const rightEye = [
+      263, 466, 388, 387, 386, 385, 384, 398, 362, 382, 381, 380, 374, 373, 390,
+      249,
+    ];
+    const mounth = [
+      308, 415, 310, 311, 312, 13, 82, 81, 80, 191, 62, 78, 95, 88, 178, 87, 14,
+      317, 402, 319,
+    ];
+
+    const isInsideEyeArea = (
+      x: number,
+      y: number,
+      landmarks: any[],
+      eyePoints: number[],
+      sourceWidth: number,
+      sourceHeight: number,
+    ) => {
+      let inside = false;
+      let j = eyePoints.length - 1;
+      for (let i = 0; i < eyePoints.length; i++) {
+        let xi = landmarks[eyePoints[i]].x * sourceWidth;
+        let yi = landmarks[eyePoints[i]].y * sourceHeight;
+        let xj = landmarks[eyePoints[j]].x * sourceWidth;
+        let yj = landmarks[eyePoints[j]].y * sourceHeight;
+
+        if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
+          inside = !inside;
+        }
+        j = i;
+      }
+      return inside;
+    };
+    const changeColor = () => {
+      if (!imageLoaded) return;
+
+      const bgCanvas = backgroundCanvasRef.current;
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext("2d", { willReadFrequently: true });
+      const bgCtx = bgCanvas?.getContext("2d", {
+        willReadFrequently: true,
+      });
+
+      if (!canvas) return;
+      if (!bgCanvas) return;
+      const { innerWidth: width, innerHeight: height } = window;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      bgCanvas.width = imageLoaded.naturalHeight;
+      bgCanvas.height = imageLoaded.naturalHeight;
+      ctx?.scale(dpr, dpr);
+
+      ctx?.drawImage(
+        imageLoaded,
+        0,
+        0,
+        imageLoaded.naturalWidth / dpr,
+        imageLoaded.naturalHeight / dpr,
+      );
+
+      let imageData = ctx?.getImageData(
+        0,
+        0,
+        imageLoaded.naturalWidth,
+        imageLoaded.naturalHeight,
+      ).data;
+
+      if (!imageData) return;
+      const colorRgb = hexToRgb(foundationColor);
+      const skinColorLegend = [[colorRgb.r, colorRgb.g, colorRgb.b, 0.08]];
+
+      let j = 0;
+      if (!categoryMask.current) return;
+      if (!firstFaceRef.current) return;
+      if (foundationColor != "") {
+        for (let i = 0; i < categoryMask.current.length; ++i) {
+          const x = i % imageLoaded.naturalWidth;
+          const y = Math.floor(i / imageLoaded.naturalWidth);
+          const maskVal = Math.round(categoryMask.current[i] * 255.0);
+
+          const insideLeftEye = isInsideEyeArea(
+            x,
+            y,
+            firstFaceRef.current,
+            leftEye,
+            imageLoaded.naturalWidth,
+            imageLoaded.naturalHeight,
+          );
+          const insideRightEye = isInsideEyeArea(
+            x,
+            y,
+            firstFaceRef.current,
+            rightEye,
+            imageLoaded.naturalWidth,
+            imageLoaded.naturalHeight,
+          );
+          const insideMounth = isInsideEyeArea(
+            x,
+            y,
+            firstFaceRef.current,
+            mounth,
+            imageLoaded.naturalWidth,
+            imageLoaded.naturalHeight,
+          );
+
+          if (insideLeftEye || insideRightEye || insideMounth) {
+            // Jika dalam area mata, buat transparan
+          } else {
+            if (maskVal === 3) {
+              const skinColor = skinColorLegend[0];
+              imageData[j] = skinColor[0] * 0.08 + imageData[j] * 0.9;
+              imageData[j + 1] = skinColor[1] * 0.08 + imageData[j + 1] * 0.9;
+              imageData[j + 2] = skinColor[2] * 0.08 + imageData[j + 2] * 0.9;
+              imageData[j + 3] = 255;
+            } else {
+              // imageData[j] = 0;
+              // imageData[j + 1] = 0;
+              // imageData[j + 2] = 0;
+              // imageData[j + 3] = 0;
+            }
+          }
+          j += 4;
+        }
+      }
+
+      const image = new ImageData(
+        new Uint8ClampedArray(imageData.buffer),
+        imageLoaded.naturalWidth,
+        imageLoaded.naturalHeight,
+      );
+
+      bgCtx?.putImageData(image, 0, 0);
+    };
+    changeColor();
+  }, [showFoundation, foundationColor, imageLoaded, isInferenceCompleted]);
   // Jika tidak ada gambar yang ditangkap, render hanya canvas overlay
   if (!criterias.capturedImage || !imageLoaded) {
     return null;
@@ -322,7 +485,7 @@ function SkinToneFinderInnerScene({
           {showScannerAfterInference || !isInferenceCompleted ? (
             <Scanner />
           ) : (
-            <div className="fixed inset-0 flex">
+            <div className="fixed inset-0 flex" style={{zIndex: 1}}>
               {/* Render kondisional overlay canvas */}
               {/* Overlay Canvas */}
               <Rnd
@@ -369,7 +532,7 @@ function SkinToneFinderInnerScene({
 
               {/* 3D Canvas */}
               <Canvas
-                className="absolute left-0 top-0 h-full w-full"
+                className="absolute left-0 top-0 hidden h-full w-full"
                 ref={divRef}
                 style={{ zIndex: 0 }}
                 orthographic
@@ -392,6 +555,24 @@ function SkinToneFinderInnerScene({
       ) : (
         <></>
       )}
+
+      <canvas
+        ref={canvasRef}
+        className={`pointer-events-none absolute left-0 top-0 hidden h-full w-full`}
+        style={{ zIndex: 0 }}
+      />
+
+      <canvas
+        ref={backgroundCanvasRef}
+        className={`pointer-events-none absolute left-1/2 top-1/2 scale-x-[-1] transform`}
+        style={{
+          zIndex: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          transform: "translate(-50%, -50%) scaleX(-1)",
+        }}
+      />
     </>
   );
 }
