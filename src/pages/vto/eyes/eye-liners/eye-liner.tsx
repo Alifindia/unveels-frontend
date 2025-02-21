@@ -94,7 +94,7 @@ function ColorSelector() {
   ).flatMap((item) => item.split(","));
 
   return (
-    <div className="mx-auto w-full py-1 lg:py-1.5">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
       <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
         <button
           type="button"
@@ -103,7 +103,7 @@ function ColorSelector() {
             setSelectedColor(null);
           }}
         >
-          <Icons.empty className="size-5 sm:size-[1.875rem]" />
+          <Icons.empty className="size-5 sm:size-[1.375rem] xl:size-[1rem]" />
         </button>
 
         {extracted_sub_colors.map((color, index) => (

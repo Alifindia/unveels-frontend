@@ -699,16 +699,16 @@ function Sidebar({
         <div className="flex flex-col gap-4 rounded-full bg-black/25 px-1.5 py-2 backdrop-blur-md">
           {/* <VoiceCommand /> */}
           <button className="" onClick={screenShoot}>
-            <Icons.camera className="size-4 text-white xl:size-5 2xl:size-6" />
+            <Icons.camera className="size-3 text-white xl:size-4 2xl:size-5" />
           </button>
           <button className="" onClick={flipCamera}>
-            <Icons.flipCamera className="size-4 text-white xl:size-5 2xl:size-6" />
+            <Icons.flipCamera className="size-3 text-white xl:size-4 2xl:size-5" />
           </button>
           <button className="" onClick={onExpandClick}>
-            <Icons.expand className="size-4 text-white xl:size-5 2xl:size-6" />
+            <Icons.expand className="size-3 text-white xl:size-4 2xl:size-5" />
           </button>
           <button className="" onClick={compareCapture}>
-            <Icons.compare className="size-4 text-white xl:size-5 2xl:size-6" />
+            <Icons.compare className="size-3 text-white xl:size-4 2xl:size-5" />
           </button>
           <UploadMediaDialog
             setMediaFile={setMediaFile}

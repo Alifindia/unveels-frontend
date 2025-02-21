@@ -134,14 +134,14 @@ function ColorSelector() {
 
  
   return (
-    <div className="mx-auto w-full py-1 lg:py-1.5">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4 xl:py-1 2xl:py-2.5">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-0.5 no-scrollbar sm:space-x-4">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
           onClick={handleClearSelection}
         >
-          <Icons.empty className="size-5 sm:size-[1.875rem]" />
+          <Icons.empty className="size-5 sm:size-[1.375rem] xl:size-[1rem]" />
         </button>
         {extracted_sub_colors.map((color, index) => (
           <ColorPalette
@@ -161,14 +161,14 @@ function ColorSelector() {
 function TextureSelector() {
   const { selectedTexture, setSelectedTexture } = useLipColorContext();
   return (
-    <div className="mx-auto w-full py-1 lg:py-1.5">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 no-scrollbar">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
+      <div className="flex w-full items-center space-x-1 xl:space-x-2 overflow-x-auto py-1 no-scrollbar">
         {textures.map((texture, index) => (
           <button
             key={texture.label}
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-2 py-0.5 text-white/80 sm:px-3 sm:py-1",
+              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
               {
                 "border-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                   selectedTexture === texture.value,
@@ -215,7 +215,7 @@ function ShadesSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-1 lg:py-1.5">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
       <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
         {shades.map((shade, index) => (
           <button
