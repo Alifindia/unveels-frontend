@@ -378,9 +378,28 @@ export function RecommendationsTab({
       </div>
       <style>
         {`
-          .swiper-button-next,
-          .swiper-button-prev {
-            color: rgb(209 213 219);
+          @media (min-width: 1024px) { /* lg */
+            .swiper-button-next,
+            .swiper-button-prev {
+              transform: scale(0.6);
+              color: rgb(209 213 219);
+            }
+          }
+
+          @media (min-width: 1280px) { /* xl */
+            .swiper-button-next,
+            .swiper-button-prev {
+              transform: scale(0.7);
+              color: rgb(209 213 219);
+            }
+          }
+
+          @media (min-width: 1536px) { /* 2xl */
+            .swiper-button-next,
+            .swiper-button-prev {
+              transform: scale(0.8);
+              color: rgb(209 213 219);
+            }
           }
 
           .swiper-button-next:hover,

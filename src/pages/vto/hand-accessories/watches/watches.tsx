@@ -48,7 +48,7 @@ function FamilyColorSelector() {
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar"
       data-mode="lip-color"
     >
       {colors
@@ -111,7 +111,7 @@ function ColorSelector() {
     extractHexa.length > 0 ? extractHexa : extractSubColor;
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
       <div className="flex w-full items-center space-x-3 overflow-x-auto py-0.5 no-scrollbar sm:space-x-4">
         <button
           type="button"
@@ -139,7 +139,7 @@ function ModeSelector() {
 
   return (
     <>
-      <div className="flex h-[35px] w-full items-center justify-between text-center sm:h-10">
+      <div className="flex h-[30px] w-full items-center justify-between text-center sm:h-[35px]">
         <button
           className={clsx(
             "relative grow text-[10.4px] sm:text-base lg:text-[20px]",
@@ -211,7 +211,7 @@ function ShapeSelector() {
           {cloneElement(shapeIcons[shape.label] ?? <Icons.watchshapeCircle />, {
             className: "size-4 sm:size-6",
           })}
-          <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{shape.label}</span>
+          <span className="text-[9.8px] xl:text-[10px] 2xl:text-sm">{shape.label}</span>
         </button>
       ))}
     </div>
@@ -248,7 +248,7 @@ function MaterialSelector() {
             )
           }
         >
-          <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{material.label}</span>
+          <span className="text-[9.8px] xl:text-[10px] 2xl:text-sm">{material.label}</span>
         </button>
       ))}
     </div>
@@ -322,7 +322,7 @@ function WatchesProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-0.5"
+          className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Watches: {

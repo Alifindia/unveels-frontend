@@ -45,7 +45,7 @@ function HeadbandFamilyColorSelector() {
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar"
       data-mode="lip-color"
     >
       {colors
@@ -107,7 +107,7 @@ function HeadbandColorSelector() {
     extractHexa.length > 0 ? extractHexa : extractSubColor;
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
       <div className="flex w-full items-center space-x-3 overflow-x-auto py-0.5 no-scrollbar sm:space-x-4">
         <button
           type="button"
@@ -136,7 +136,7 @@ function HeadbandFabricSelector() {
   const { selectedFabric, setSelectedFabric } = useHeadbandContext();
 
   return (
-    <div className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar">
+    <div className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar">
       {fabrics.map((material, index) => (
         <button
           key={material.value}
@@ -154,7 +154,7 @@ function HeadbandFabricSelector() {
             )
           }
         >
-          <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{material.label}</span>
+          <span className="text-[9.8px] xl:text-[10px] 2xl:text-sm">{material.label}</span>
         </button>
       ))}
     </div>
@@ -222,7 +222,7 @@ function HeadbandProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-0.5"
+          className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Headband: {

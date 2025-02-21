@@ -52,7 +52,7 @@ export function VTOProductCard({
         className="cursor-pointer"
         onClick={onClick}
       >
-        <div className="relative h-[40px] w-[70px] lg:h-[45px] lg:w-[80px] xl:h-[50px] xl:w-[90px] 2xl:h-[70px] 2xl:w-[120px] overflow-hidden">
+        <div className="relative h-[40px] w-[70px] lg:h-[40px] lg:w-[80px] xl:h-[45px] xl:w-[90px] 2xl:h-[70px] 2xl:w-[120px] overflow-hidden">
           <img
             src={imageUrl}
             alt="Product"
@@ -68,7 +68,7 @@ export function VTOProductCard({
         <BrandName brandId={getProductAttributes(product, "brand")} />
       </p>
       <div className="flex items-end gap-1 justify-between space-x-1 pt-1">
-        <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] w-24 bg-clip-text text-[0.28rem] lg:text-[0.325rem] xl:text-[0.425rem] 2xl:text-[0.525rem] font-semibold text-white">
+        <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] w-24 bg-clip-text text-[0.28rem] lg:text-[0.300rem] xl:text-[0.400rem] 2xl:text-[0.525rem] font-semibold text-white">
           {currencySymbol}{(product.price * rate).toFixed(3)}
         </div>
         <button

@@ -83,7 +83,7 @@ function ColorSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
       <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
         <button
           type="button"
@@ -128,7 +128,7 @@ function ShapeSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
       <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
         {bronzers.map((path, index) => (
           <button
@@ -174,7 +174,7 @@ function TextureSelector() {
 
   return (
     <div className="mx-auto w-full">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-1 2xl:py-2 no-scrollbar sm:space-x-4">
         {textures.map((texture, index) => (
           <button
             key={texture.value}
@@ -299,7 +299,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-0.5"
+          className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Bronzers: {

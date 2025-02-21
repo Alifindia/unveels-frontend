@@ -38,16 +38,16 @@ export function LashesSelector() {
 
       <ColorSelector />
 
-      <div className="flex h-[35px] w-full items-center justify-between text-center sm:h-10">
+      <div className="flex h-[30px] w-full items-center justify-between text-center sm:h-[35px]">
         <Link
-          className={`relative grow text-[10.4px] sm:text-base lg:text-[20px]`}
+          className={`relative grow text-[10.4px] lg:text-[13px] 2xl:text-[20px]`}
           to="/virtual-try-on/lashes"
         >
           <span className={"text-white"}>Lashes</span>
         </Link>
         <div className="h-5 border-r border-white"></div>
         <Link
-          className={`relative grow text-[10.4px] sm:text-base lg:text-[20px]`}
+          className={`relative grow text-[10.4px] lg:text-[13px] 2xl:text-[20px]`}
           to="/virtual-try-on/mascara"
         >
           <span className={"text-white/60"}>Mascara</span>
@@ -66,7 +66,7 @@ function FamilyColorSelector() {
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar"
       data-mode="lip-color"
     >
       {colorFamilies.map((item, index) => (
@@ -86,7 +86,7 @@ function FamilyColorSelector() {
               background: item.value,
             }}
           />
-          <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{item.name}</span>
+          <span className="text-[9.8px] xl:text-[10px] 2xl:text-sm">{item.name}</span>
         </button>
       ))}
     </div>
@@ -97,7 +97,7 @@ function ColorSelector() {
   const { selectedColor, setSelectedColor } = useLashesContext();
   return (
     <div className="mx-auto w-full">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-1 2xl:py-2 no-scrollbar sm:space-x-4">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
@@ -138,7 +138,8 @@ const eyelashes = [
 function ShapeSelector() {
   const { selectedPattern, setSelectedPattern } = useLashesContext();
   return (
-    <div className="mx-auto w-full !border-t-0 py-2">
+    <div className="mx-auto w-full !border-t-0 
+py-1 2xl:py-2">
       <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
         {patterns.eyelashes.map((pattern, index) => (
           <button
@@ -269,7 +270,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-0.5"
+          className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Lash: {

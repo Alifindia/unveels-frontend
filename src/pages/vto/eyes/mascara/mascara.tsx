@@ -35,7 +35,7 @@ export function MascaraSelector() {
 
       <ColorSelector />
 
-      <div className="flex h-[35px] w-full items-center justify-between text-center sm:h-10">
+      <div className="flex h-[30px] w-full items-center justify-between text-center sm:h-[35px]">
         <Link
           className={`relative grow text-xs lg:text-[14px]`}
           to="/virtual-try-on/lashes"
@@ -62,7 +62,7 @@ function FamilyColorSelector() {
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar"
       data-mode="lip-color"
     >
       {colors
@@ -107,7 +107,7 @@ function ColorSelector() {
 
   return (
     <div className="mx-auto w-full">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-1 2xl:py-2 no-scrollbar sm:space-x-4">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
@@ -234,7 +234,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-0.5"
+          className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Mascara: {

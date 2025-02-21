@@ -44,7 +44,7 @@ function FamilyColorSelector() {
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar"
       data-mode="lip-color"
     >
       {colors
@@ -126,7 +126,7 @@ function FabricSelector() {
   const { selectedFabric, setSelectedFabric } = useScarvesContext();
 
   return (
-    <div className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar">
+    <div className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar">
       {fabrics.map((material, index) => (
         <button
           key={material.value}
@@ -140,7 +140,7 @@ function FabricSelector() {
           )}
           onClick={() => setSelectedFabric(material.value)}
         >
-          <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{material.label}</span>
+          <span className="text-[9.8px] xl:text-[10px] 2xl:text-sm">{material.label}</span>
         </button>
       ))}
     </div>
@@ -201,7 +201,7 @@ function ScarvesProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.625rem] text-white sm:py-0.5"
+          className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
             setMapTypes({
               Scarf: {

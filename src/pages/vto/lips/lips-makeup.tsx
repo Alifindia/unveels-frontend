@@ -26,7 +26,7 @@ export function LipsMode() {
             type="button"
             className="inline-flex items-center px-3 py-1 border rounded-full gap-x-2 whitespace-nowrap border-white/80 text-white/80"
           >
-            <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{t('vto.'+mode.name)}</span>
+            <span className="text-[9.8px] xl:text-[10px] 2xl:text-sm">{t('vto.'+mode.name)}</span>
           </button>
         </Link>
       ))}

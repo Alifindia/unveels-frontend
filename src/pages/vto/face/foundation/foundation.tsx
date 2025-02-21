@@ -75,7 +75,7 @@ function FamilyColorSelector() {
                 background: item.color,
               }}
             />
-            <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{item.name}</span>
+            <span className="text-[9.8px] xl:text-[10px] 2xl:text-sm">{item.name}</span>
           </button>
         ))}
     </div>
@@ -112,7 +112,7 @@ function ColorSelector() {
 
   return (
     <div className="mx-auto w-full">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-1 2xl:py-2 no-scrollbar sm:space-x-4">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
@@ -156,7 +156,7 @@ function TextureSelector() {
 
   return (
     <div className="mx-auto w-full">
-      <div className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar">
+      <div className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar">
         {textures.map((texture, index) => (
           <button
             key={texture.value}
@@ -170,7 +170,7 @@ function TextureSelector() {
             )}
             onClick={() => setMaterial(index, texture)}
           >
-            <span className="text-[9.8px] xl:text-xs 2xl:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] xl:text-[10px] 2xl:text-sm">{texture.label}</span>
           </button>
         ))}
       </div>

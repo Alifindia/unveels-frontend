@@ -39,7 +39,7 @@ function FamilyColorSelector() {
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto py-2 no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar"
       data-mode="lip-color"
     >
       {colors.filter((c) => colorFamilyToInclude?.includes(c.value)).map((item, index) => (
@@ -134,7 +134,7 @@ function ColorSelector() {
 
  
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
       <div className="flex w-full items-center space-x-3 overflow-x-auto py-0.5 no-scrollbar sm:space-x-4">
         <button
           type="button"
@@ -161,7 +161,7 @@ function ColorSelector() {
 function TextureSelector() {
   const { selectedTexture, setSelectedTexture } = useLipColorContext();
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
       <div className="flex w-full items-center space-x-1 xl:space-x-2 overflow-x-auto py-1 no-scrollbar">
         {textures.map((texture, index) => (
           <button
@@ -215,7 +215,7 @@ function ShadesSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 xl:py-1">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
       <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
         {shades.map((shade, index) => (
           <button
