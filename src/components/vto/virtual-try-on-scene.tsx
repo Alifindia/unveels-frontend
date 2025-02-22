@@ -84,7 +84,7 @@ export function VirtualTryOnScene({
     hairColorRef.current = hairColor;
     showFaceRef.current = showMakeup || showFace;
     showHandRef.current = showHand;
-  }, [showHair, showFoundation, foundationColor, hairColor, showMakeup, showHand]);
+  }, [showHair, showFoundation, foundationColor, hairColor, showMakeup, showHand, showFace]);
 
   useEffect(() => {
     let isMounted = true;
