@@ -53,7 +53,7 @@ const MascaraInner: React.FC<MascaraProps> = ({
     const materialOptions: Partial<MeshBasicMaterialParameters> = {
       color: new Color(mascaraColor),
       transparent: !!alphaMap,
-      opacity: 0.77,
+      opacity: 0.4,
     };
 
     if (alphaMap) {

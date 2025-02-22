@@ -8,7 +8,10 @@ import { useMakeup } from "../../../../context/makeup-context";
 import { LipColorProvider, useLipColorContext } from "./lip-color-context";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useLipColorQuery } from "./lip-color-query";
-import { baseApiUrl, extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import {
+  baseApiUrl,
+  extractUniqueCustomAttributes,
+} from "../../../../utils/apiUtils";
 import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
 import { useSelecProductNumberContext } from "../../select-product-context";
@@ -16,7 +19,7 @@ import { useCartContext } from "../../../../context/cart-context";
 
 export function LipColorSelector() {
   console.log("render LipColorSelector");
-  
+
   return (
     <div className="mx-auto w-full divide-y px-2">
       <div>
@@ -35,35 +38,38 @@ export function LipColorSelector() {
 }
 
 function FamilyColorSelector() {
-  const { colorFamily, setColorFamily, colorFamilyToInclude } = useLipColorContext();
+  const { colorFamily, setColorFamily, colorFamilyToInclude } =
+    useLipColorContext();
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto py-1 no-scrollbar 2xl:py-2"
       data-mode="lip-color"
     >
-      {colors.filter((c) => colorFamilyToInclude?.includes(c.value)).map((item, index) => (
-        <button
-          type="button"
-          className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
-            {
-              "border-white/80": colorFamily === item.value,
-            },
-          )}
-          onClick={() =>
-            setColorFamily(colorFamily === item.value ? null : item.value)
-          }
-        >
-          <div
-            className="size-2.5 shrink-0 rounded-full"
-            style={{
-              background: item.hex,
-            }}
-          />
-          <span className="text-[0.625rem]">{item.label}</span>
-        </button>
-      ))}
+      {colors
+        .filter((c) => colorFamilyToInclude?.includes(c.value))
+        .map((item, index) => (
+          <button
+            type="button"
+            className={clsx(
+              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
+              {
+                "border-white/80": colorFamily === item.value,
+              },
+            )}
+            onClick={() =>
+              setColorFamily(colorFamily === item.value ? null : item.value)
+            }
+          >
+            <div
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                background: item.hex,
+              }}
+            />
+            <span className="text-[0.625rem]">{item.label}</span>
+          </button>
+        ))}
     </div>
   );
 }
@@ -79,31 +85,31 @@ function ColorSelector() {
   const { selectedColors, setSelectedColors, selectedMode, colorFamily } =
     useLipColorContext();
 
-     const { data } = useLipColorQuery({
-       color: colorFamily,
-       sub_color: null,
-       texture: null,
-     });
+  const { data } = useLipColorQuery({
+    color: colorFamily,
+    sub_color: null,
+    texture: null,
+  });
 
-     if (!colorFamily) {
-       return null;
-     }
+  if (!colorFamily) {
+    return null;
+  }
 
-     const extracted_sub_colors = extractUniqueCustomAttributes(
-       data?.items ?? [],
-       "hexacode",
-     ).flatMap((item) => item.split(","));
+  const extracted_sub_colors = extractUniqueCustomAttributes(
+    data?.items ?? [],
+    "hexacode",
+  ).flatMap((item) => item.split(","));
 
   const handleColorClick = (color: string) => {
     console.log("handleColorClick");
     console.log(data, "data");
-    
+
     if (!showLipColor) setShowLipColor(true);
 
     // Handle color deselection
     if (selectedColors.includes(color)) {
       const newColors = selectedColors.filter((c) => c !== color);
-    console.log(newColors, "newColors");
+      console.log(newColors, "newColors");
       setSelectedColors(newColors);
       setLipColors(newColors);
       return;
@@ -121,7 +127,7 @@ function ColorSelector() {
         ? [...selectedColors, color]
         : [...selectedColors.slice(1), color]; // Remove oldest, add new
     console.log(newColors, "newColors");
-    
+
     setSelectedColors(newColors);
     setLipColors(newColors);
   };
@@ -132,7 +138,6 @@ function ColorSelector() {
     setShowLipColor(false);
   };
 
- 
   return (
     <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
       <div className="flex w-full items-center space-x-3 overflow-x-auto py-0.5 no-scrollbar sm:space-x-4">
@@ -162,7 +167,7 @@ function TextureSelector() {
   const { selectedTexture, setSelectedTexture } = useLipColorContext();
   return (
     <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
-      <div className="flex w-full items-center space-x-1 xl:space-x-2 overflow-x-auto py-1 no-scrollbar">
+      <div className="flex w-full items-center space-x-1 overflow-x-auto py-1 no-scrollbar xl:space-x-2">
         {textures.map((texture, index) => (
           <button
             key={texture.label}
@@ -247,7 +252,12 @@ function ShadesSelector() {
 
 function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
+  const {
+    selectedProductNumber,
+    setSelectedProductNumber,
+    addCartProductNumber,
+    setAddCartProductNumber,
+  } = useSelecProductNumberContext();
   const { addItemToCart, setDataItem, setType } = useCartContext();
 
   const {
@@ -262,14 +272,26 @@ function ProductList() {
     selectedMode,
   } = useLipColorContext();
 
-  const { setLipColors, setLipColorMode, setShowLipColor } = useMakeup();
+  const { setLipColors, setLipColorMode, setShowLipColor, setLipTexture } =
+    useMakeup();
 
   useEffect(() => {
     setLipColors(selectedColors);
     setLipColorMode(selectedMode as "One" | "Dual" | "Ombre");
     setSelectedColors(selectedColors);
     setShowLipColor(selectedColors.length > 0);
-  }, [selectedColors, selectedMode, selectedColors]);
+    const texture = textures.find((t) => t.value == selectedTexture);
+    setLipTexture(
+      texture?.label as
+        | "Matte"
+        | "Gloss"
+        | "Satin"
+        | "Sheer"
+        | "Shimmer"
+        | "Metalic"
+        | "Holographic",
+    );
+  }, [selectedColors, selectedMode, selectedColors, selectedTexture]);
 
   const { data, isLoading } = useLipColorQuery({
     color: colorFamily,
@@ -291,8 +313,8 @@ function ProductList() {
         );
         setColorFamily(
           matchedProduct.custom_attributes.find(
-            (item) => item.attribute_code === "color"
-          )?.value || null
+            (item) => item.attribute_code === "color",
+          )?.value || null,
         );
         setSelectedTexture(
           matchedProduct.custom_attributes.find(
@@ -309,15 +331,15 @@ function ProductList() {
         const adjustedIndex = addCartProductNumber - 1;
         const matchedProduct = data.items[adjustedIndex];
         console.log(matchedProduct);
-  
+
         if (matchedProduct) {
           const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
           const id = matchedProduct.id.toString();
           try {
             await addItemToCart(id, url);
-            setType("unit")
+            setType("unit");
             setDataItem(matchedProduct);
-            setAddCartProductNumber(null)
+            setAddCartProductNumber(null);
             console.log(`Product ${id} added to cart!`);
           } catch (error) {
             console.error("Failed to add product to cart:", error);
@@ -325,27 +347,27 @@ function ProductList() {
         }
       }
     };
-  
+
     handleAddToCart();
   }, [data, addCartProductNumber]);
-  
+
   if (colorFamilyToInclude == null && data?.items != null) {
     setColorFamilyToInclude(
       data.items.map(
         (d) =>
-          d.custom_attributes.find((c) => c.attribute_code === "color")?.value
+          d.custom_attributes.find((c) => c.attribute_code === "color")?.value,
       ),
     );
   }
-  
+
   const handleProductClick = (product: Product) => {
     if (selectedProduct?.id === product.id) {
       setSelectedProduct(null);
       setSelectedProductNumber(null);
       setColorFamily(null);
       setSelectedColors([]);
-      setSelectedTexture(null)
-      return
+      setSelectedTexture(null);
+      return;
     }
     setSelectedProduct(product);
     setColorFamily(
@@ -373,7 +395,7 @@ function ProductList() {
           return (
             <VTOProductCard
               product={product}
-              productNumber={index+1}
+              productNumber={index + 1}
               key={product.id}
               selectedProduct={selectedProduct}
               setSelectedProduct={setSelectedProduct}

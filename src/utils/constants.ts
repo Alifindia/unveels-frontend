@@ -1997,3 +1997,5 @@ export const EYESHADOW_TEXTURE_PENTA_P_THREE_FOUR =
   "/media/unveels/vto-assets/texture/eyeshadow/penta/p2/s5c3-d.png";
 export const EYESHADOW_TEXTURE_PENTA_P_THREE_FIVE =
   "/media/unveels/vto-assets/texture/eyeshadow/penta/p2/s5c3-e.png";
+
+export const SHIMMER_TEXTURE = "/media/unveels/vto-assets/texture/shimmer.png";
