@@ -75,6 +75,7 @@ export function VirtualTryOnScene({
   const hairColorRef = useRef(hairColor);
   const showFaceRef = useRef(showMakeup || showFace);
   const showHandRef = useRef(showHand);
+  const showHairSegmenterRef = useRef(showHair || showFoundation);
 
   useEffect(() => {
     // tf.enableDebugMode();
@@ -84,6 +85,7 @@ export function VirtualTryOnScene({
     hairColorRef.current = hairColor;
     showFaceRef.current = showMakeup || showFace;
     showHandRef.current = showHand;
+    showHairSegmenterRef.current = showHair || showFoundation;
   }, [showHair, showFoundation, foundationColor, hairColor, showMakeup, showHand, showFace]);
 
   useEffect(() => {
@@ -254,7 +256,7 @@ export function VirtualTryOnScene({
 
               const startTimeMs = performance.now();
               try {
-                if (showHairRef.current) {
+                if (showHairSegmenterRef.current) {
                   ctx.drawImage(
                     sourceElement,
                     0,

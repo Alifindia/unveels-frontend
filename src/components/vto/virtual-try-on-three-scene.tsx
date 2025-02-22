@@ -342,7 +342,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
               </mesh>
             )}
           </> */}
-          {!showHair && (
+          {!showHair && !showFoundation && (
             <mesh position={[0, 0, -500]} {...props} renderOrder={0}>
               <planeGeometry args={[planeSize[0], planeSize[1]]} />
               <shaderMaterial
