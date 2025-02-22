@@ -6,7 +6,10 @@ import { colors } from "../../../../api/attributes/color";
 import { ColorPalette } from "../../../../components/color-palette";
 import { LoadingProducts } from "../../../../components/loading";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
-import { baseApiUrl, extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import {
+  baseApiUrl,
+  extractUniqueCustomAttributes,
+} from "../../../../utils/apiUtils";
 import { MascaraProvider, useMascaraContext } from "./mascara-context";
 import { useMascaraQuery } from "./mascara-query";
 import { useEffect, useState } from "react";
@@ -17,6 +20,7 @@ import { getLashMakeupProductTypeIds } from "../../../../api/attributes/makeups"
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../../../../utils/other";
 import { useCartContext } from "../../../../context/cart-context";
+import { useMakeup } from "../../../../context/makeup-context";
 
 export function MascaraSelector() {
   const { i18n } = useTranslation();
@@ -62,7 +66,7 @@ function FamilyColorSelector() {
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar"
+      className="flex w-full items-center space-x-2 overflow-x-auto py-1 no-scrollbar 2xl:py-2"
       data-mode="lip-color"
     >
       {colors
@@ -107,7 +111,7 @@ function ColorSelector() {
 
   return (
     <div className="mx-auto w-full">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-1 2xl:py-2 no-scrollbar sm:space-x-4">
+      <div className="flex w-full items-center space-x-3 overflow-x-auto py-1 no-scrollbar sm:space-x-4 2xl:py-2">
         <button
           type="button"
           className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
@@ -134,9 +138,15 @@ function ColorSelector() {
 function ProductList() {
   const { t } = useTranslation();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
+  const {
+    selectedProductNumber,
+    setSelectedProductNumber,
+    addCartProductNumber,
+    setAddCartProductNumber,
+  } = useSelecProductNumberContext();
+
   const { addItemToCart, setDataItem, setType } = useCartContext();
-  
+  const { setShowMascara, setMascaraColor, setShowLashes } = useMakeup();
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -146,7 +156,14 @@ function ProductList() {
     setSelectedColor,
     colorFamilyToInclude,
     setColorFamilyToInclude,
+    selectedColor,
   } = useMascaraContext();
+
+  useEffect(() => {
+    setMascaraColor(selectedColor || "#000000");
+    setShowMascara(selectedColor != null);
+    setShowLashes(false);
+  }, [selectedColor]);
 
   const { data, isLoading } = useMascaraQuery({
     color: colorFamily,
@@ -166,18 +183,18 @@ function ProductList() {
     if (data?.items && selectedProductNumber) {
       const adjustedIndex = selectedProductNumber - 1;
       const matchedProduct = data.items[adjustedIndex];
-      console.log(selectedProductNumber)
+
       if (matchedProduct) {
         setSelectedProduct(matchedProduct);
         setSelectedColor(
           matchedProduct.custom_attributes.find(
             (item) => item.attribute_code === "hexacode",
-          )?.value || null
+          )?.value || null,
         );
         setColorFamily(
           matchedProduct.custom_attributes.find(
             (item) => item.attribute_code === "color",
-          )?.value || null
+          )?.value || null,
         );
       }
     }
@@ -189,15 +206,15 @@ function ProductList() {
         const adjustedIndex = addCartProductNumber - 1;
         const matchedProduct = data.items[adjustedIndex];
         console.log(matchedProduct);
-  
+
         if (matchedProduct) {
           const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
           const id = matchedProduct.id.toString();
           try {
             await addItemToCart(id, url);
-            setType("unit")
+            setType("unit");
             setDataItem(matchedProduct);
-            setAddCartProductNumber(null)
+            setAddCartProductNumber(null);
             console.log(`Product ${id} added to cart!`);
           } catch (error) {
             console.error("Failed to add product to cart:", error);
@@ -205,17 +222,17 @@ function ProductList() {
         }
       }
     };
-  
+
     handleAddToCart();
   }, [data, addCartProductNumber]);
-  
+
   const handleProductClick = (product: Product) => {
     if (selectedProduct?.id === product.id) {
       setSelectedProduct(null);
       setSelectedProductNumber(null);
       setColorFamily(null);
       setSelectedColor(null);
-      return
+      return;
     }
     console.log(product);
     setSelectedProduct(product);
@@ -234,7 +251,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
+          className="p-0 text-[0.550rem] text-white sm:py-0.5 2xl:text-[0.625rem]"
           onClick={() => {
             setMapTypes({
               Mascara: {
@@ -261,7 +278,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
-                productNumber={index+1}
+                productNumber={index + 1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

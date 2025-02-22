@@ -31,7 +31,7 @@ export function LashesSelector() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
-  
+
   return (
     <div className="mx-auto w-full divide-y px-2">
       <FamilyColorSelector />
@@ -138,7 +138,7 @@ const eyelashes = [
 function ShapeSelector() {
   const { selectedPattern, setSelectedPattern } = useLashesContext();
   return (
-    <div className="mx-auto w-full !border-t-0 
+    <div className="mx-auto w-full !border-t-0
 py-1 2xl:py-2">
       <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
         {patterns.eyelashes.map((pattern, index) => (
@@ -176,7 +176,7 @@ function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
   const { addItemToCart, setDataItem, setType } = useCartContext();
-  
+
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -186,7 +186,7 @@ function ProductList() {
     color: colorFamily,
     pattern: selectedPattern,
   });
-  const { setLashesColor, setLashesPattern, setShowLashes } = useMakeup();
+  const { setLashesColor, setLashesPattern, setShowLashes, setShowMascara } = useMakeup();
 
   useEffect(() => {
     setLashesColor(selectedColor || "#ffffff");
@@ -197,6 +197,7 @@ function ProductList() {
     setLashesPattern(pattern != -1 ? pattern : 0);
     setShowLashes(selectedColor != null);
     console.log(selectedColor)
+    setShowMascara(false);
   }, [selectedColor, selectedPattern]);
 
   useEffect(() => {
@@ -225,7 +226,7 @@ function ProductList() {
         const adjustedIndex = addCartProductNumber - 1;
         const matchedProduct = data.items[adjustedIndex];
         console.log(matchedProduct);
-  
+
         if (matchedProduct) {
           const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
           const id = matchedProduct.id.toString();
@@ -241,7 +242,7 @@ function ProductList() {
         }
       }
     };
-  
+
     handleAddToCart();
   }, [data, addCartProductNumber]);
 

@@ -176,6 +176,7 @@ function Main() {
           // lashes
           if (data.showLashes !== undefined) {
             setShowLashes(data.showLashes);
+            setShowMascara(!data.showLashes);
           }
 
           if (data.lashesColor !== undefined) {
@@ -189,6 +190,7 @@ function Main() {
           // mascara
           if (data.showMascara !== undefined) {
             setShowMascara(data.showMascara);
+            setShowLashes(!data.showMascara)
           }
 
           if (data.mascaraColor !== undefined) {

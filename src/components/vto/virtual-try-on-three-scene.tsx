@@ -49,6 +49,7 @@ import NailPinky from "../three/accesories/nails/nail-pinky";
 import FingerOccluder from "../three/accesories/finger-occluder";
 import Lashes from "../three/makeup/lashes";
 import Bangle from "../three/accesories/bangles";
+import Mascara from "../three/makeup/mascara";
 
 interface VirtualTryOnThreeSceneProps extends MeshProps {
   videoRef: React.RefObject<Webcam | HTMLVideoElement | HTMLImageElement>;
@@ -101,6 +102,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
     showEyeliner,
     showLashes,
     showNails,
+    showMascara
   } = useMakeup();
 
   const {
@@ -480,6 +482,14 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
 
             {showLashes && (
               <Lashes
+                planeSize={planeSize}
+                landmarks={landmarks}
+                isFlipped={isFlipped}
+              />
+            )}
+
+            {showMascara && (
+              <Mascara
                 planeSize={planeSize}
                 landmarks={landmarks}
                 isFlipped={isFlipped}
