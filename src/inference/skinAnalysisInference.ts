@@ -29,7 +29,7 @@ export const renderBoxes = (
 
   boxesToDraw.forEach((detection: FaceResults) => {
     // filter based on class threshold
-    const score = (detection.score * 100).toFixed(1);
+    const score = Math.ceil(detection.score * 100);
 
     const [y1, x1, height, width] = detection.box;
 
@@ -380,7 +380,7 @@ export const detectFrame = async (
 
         toDraw.push({
           box: upSampleBox,
-          score: score * 100,
+          score: Math.ceil(score * 100),
           class: label,
           label: labels[label] ?? 'Unknown',
           color,
@@ -388,7 +388,7 @@ export const detectFrame = async (
 
         skinAnalysisResult.push({
           label: labels[label] ?? 'Unknown',
-          score: score * 100,
+          score: Math.ceil(score * 100),
           class: label
         })
         tf.dispose([rowData, proto, upsampleProto, mask]);

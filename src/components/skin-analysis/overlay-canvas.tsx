@@ -169,7 +169,7 @@ function OverlayCanvas({
           ctx.shadowOffsetY = 1;
 
           ctx.fillText(
-            `${bbox.label} ${bbox.score.toFixed(2)}%`,
+            `${bbox.label} ${bbox.score}%`,
             labelX,
             labelY - 5,
           );
