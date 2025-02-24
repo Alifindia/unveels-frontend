@@ -96,8 +96,10 @@ const NecklaceInner: React.FC<NecklaceProps> = React.memo(
           }
 
           necklaceRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-          necklaceRef.current.translateZ(-(scaleFactor * 12));
+          necklaceRef.current.translateZ(-(scaleFactor * 10));
+          necklaceRef.current.rotation.y = 0;
           necklaceRef.current.rotation.z = 0;
+          necklaceRef.current.rotation.x = 0;
         }
       } else {
         necklaceRef.current.visible = false;

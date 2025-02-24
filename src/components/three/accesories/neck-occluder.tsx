@@ -76,14 +76,14 @@ const NeckOccluderInner: React.FC<NeckOccluderProps> = React.memo(
 
         const neckLandmarkX = (1 - neckLandmark.x - 0.5) * outputWidth;
         const neckLandmarkY = -(neckLandmark.y - 0.5) * outputHeight;
-        const neckLandmarkZ = -neckLandmark.z * 200;
+        const neckLandmarkZ = -neckLandmark.z * outputWidth;
 
         const faceSize = calculateDistance(
           landmarks.current[162],
           landmarks.current[389],
         );
 
-        const scaleFactor = (faceSize * outputWidth) / 14;
+        const scaleFactor = (faceSize * outputWidth) / 13;
 
         if (neckLandmark) {
           occluderRef.current.position.set(
@@ -99,8 +99,10 @@ const NeckOccluderInner: React.FC<NeckOccluderProps> = React.memo(
           }
 
           occluderRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-          occluderRef.current.translateZ(-(scaleFactor * 12));
+          occluderRef.current.translateZ(-(scaleFactor * 10));
           occluderRef.current.rotation.z = 0;
+          occluderRef.current.rotation.y = 0;
+          occluderRef.current.rotation.x = 0;
         }
       } else {
         occluderRef.current.visible = false;
