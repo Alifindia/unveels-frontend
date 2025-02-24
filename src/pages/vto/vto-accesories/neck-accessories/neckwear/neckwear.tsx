@@ -27,7 +27,7 @@ function useActiveNeckwear(): "Chokers" | "Necklaces" | "Pendants" {
 
   // Extract the neckwear type from the path
   const pathSegments = location.pathname.split("/");
-  const activeNeckwear = pathSegments.includes("virtual-try-on")
+  const activeNeckwear = pathSegments.includes("virtual-try-on") || pathSegments.includes("virtual-try-on-accesories")
     ? pathSegments[2]
     : null;
 
@@ -55,7 +55,7 @@ export function NeckwearSelector() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
-  
+
   return (
     <div className="mx-auto w-full divide-y px-2">
       <FamilyColorSelector />

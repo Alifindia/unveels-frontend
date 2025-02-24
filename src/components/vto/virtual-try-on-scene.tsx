@@ -65,7 +65,7 @@ export function VirtualTryOnScene({
   const { envMapAccesories, setEnvMapAccesories } = useAccesories();
   const { envMapMakeup, setEnvMapMakeup } = useMakeup();
 
-  const { showHair, hairColor, showFoundation, foundationColor, showMakeup } =
+  const { showHair, hairColor, showFoundation, foundationColor, showMakeup, showNails } =
     useMakeup();
   const { showHand, showFace } = useAccesories();
 
@@ -74,7 +74,7 @@ export function VirtualTryOnScene({
   const foundationColorRef = useRef(foundationColor);
   const hairColorRef = useRef(hairColor);
   const showFaceRef = useRef(showMakeup || showFace);
-  const showHandRef = useRef(showHand);
+  const showHandRef = useRef(showHand || showHand);
   const showHairSegmenterRef = useRef(showHair || showFoundation);
 
   useEffect(() => {
@@ -84,9 +84,9 @@ export function VirtualTryOnScene({
     foundationColorRef.current = foundationColor;
     hairColorRef.current = hairColor;
     showFaceRef.current = showMakeup || showFace;
-    showHandRef.current = showHand;
+    showHandRef.current = showHand || showNails;
     showHairSegmenterRef.current = showHair || showFoundation;
-  }, [showHair, showFoundation, foundationColor, hairColor, showMakeup, showHand, showFace]);
+  }, [showHair, showFoundation, foundationColor, hairColor, showMakeup, showHand, showFace, showNails]);
 
   useEffect(() => {
     let isMounted = true;
