@@ -1,6 +1,7 @@
 import * as tf from "@tensorflow/tfjs";
 import { SkinAnalysisResult } from "../types/skinAnalysisResult";
 import { FaceResults } from "../types/faceResults";
+import { ImageSegmenter } from "@mediapipe/tasks-vision";
 const labels = [
   "acne",
   "blackhead",
@@ -428,6 +429,367 @@ export const detectFrame = async (
     tf.engine().endScope();
   }
 };
+
+const legendColors = [
+  [0, 0, 0, 0],
+  [128, 62, 117, 255],
+  [255, 104, 0, 255],
+  [166, 189, 215, 255],
+  [193, 0, 32, 255],
+  [206, 162, 98, 255],
+  [129, 112, 102, 255],
+  [0, 125, 52, 255],
+  [246, 118, 142, 255],
+  [0, 83, 138, 255],
+  [255, 112, 92, 255],
+  [83, 55, 112, 255],
+  [255, 142, 0, 255],
+  [179, 40, 81, 255],
+  [244, 200, 0, 255],
+  [127, 24, 13, 255],
+  [147, 170, 0, 255],
+  [89, 51, 21, 255],
+  [241, 58, 19, 255],
+  [35, 44, 22, 255],
+  [0, 161, 194, 255] // Vivid Blue
+];
+
+const calculateMean = (arr: Float32Array<ArrayBufferLike>) => {
+  if (arr.length === 0) return 0;
+  const sum = arr.reduce((acc, val) => acc + val, 0);
+  return sum / (arr.length - (arr.length * 0.85));
+};
+
+export const detectSegment = async (
+  source: HTMLImageElement,
+  canvasRef: HTMLCanvasElement,
+  segmenter: ImageSegmenter,
+  labels: string[],
+  layerId: number = 0 // Parameter baru untuk mengidentifikasi layer
+): Promise<[FaceResults[], SkinAnalysisResult[]]> => {
+  try {
+    // Sesuaikan ukuran canvas utama jika ini adalah layer pertama
+    if (layerId === 0) {
+      canvasRef.width = source.naturalWidth;
+      canvasRef.height = source.naturalHeight;
+    }
+
+    // Buat offscreen canvas untuk proses segmentasi
+    const offscreen = new OffscreenCanvas(source.naturalWidth, source.naturalHeight);
+    const offscreenCtx = offscreen.getContext('2d');
+    if (!offscreenCtx) throw "Offscreen canvas context not found";
+
+    // Jika ini adalah layer pertama, clear dan gambar image source
+    if (layerId === 0) {
+      const canvasCtx = canvasRef.getContext('2d');
+      if (!canvasCtx) throw "Canvas not found";
+      canvasCtx.clearRect(0, 0, canvasRef.width, canvasRef.height);
+      canvasCtx.drawImage(source, 0, 0);
+    }
+
+    // Draw the source image to offscreen canvas to get image data
+    offscreenCtx.drawImage(source, 0, 0);
+
+    // Get image data from offscreen canvas
+    let imageData = offscreenCtx.getImageData(0, 0, source.naturalWidth, source.naturalHeight).data;
+
+    // Perform segmentation
+    const result = segmenter.segment(source);
+    if (result.categoryMask == null) throw "Category mask not found";
+    const mask = result.categoryMask.getAsFloat32Array();
+
+    // Access confidence scores and calculate mean for each class
+    const confidenceScores: { [key: number]: number } = {};
+    const skinResult: SkinAnalysisResult[] = [];
+    if (result.confidenceMasks) {
+      for (let numClass = 0; numClass < result.confidenceMasks.length; numClass++) {
+        const confidenceMask = result.confidenceMasks[numClass].getAsFloat32Array();
+        // Calculate mean score for this class
+        confidenceScores[numClass] = calculateMean(confidenceMask);
+        skinResult.push({
+          label: labels[numClass] ?? 'Unknown',
+          score: Math.ceil(confidenceScores[numClass] * 100),
+          class: numClass
+        });
+      }
+    }
+
+    // Blend colors with image data on offscreen canvas
+    let j = 0;
+    for (let i = 0; i < mask.length; ++i) {
+      const maskVal = Math.round(mask[i] * 255.0);
+      const legendColor = legendColors[maskVal % legendColors.length];
+      imageData[j] = (legendColor[0] + imageData[j]) / 2;
+      imageData[j + 1] = (legendColor[1] + imageData[j + 1]) / 2;
+      imageData[j + 2] = (legendColor[2] + imageData[j + 2]) / 2;
+      imageData[j + 3] = (legendColor[3] + imageData[j + 3]) / 2;
+      j += 4;
+    }
+
+    // Put modified image data back to offscreen canvas
+    const uint8Array = new Uint8ClampedArray(imageData.buffer);
+    const dataNew = new ImageData(uint8Array, source.naturalWidth, source.naturalHeight);
+    offscreenCtx.putImageData(dataNew, 0, 0);
+
+    // Get unique categories and use the mean confidence scores
+    const uniqueCategories: Set<number> = new Set();
+    const categoryScores: { [key: number]: number } = {}; // Object to store category scores
+
+    for (let i = 0; i < mask.length; ++i) {
+      const maskVal = Math.round(mask[i] * 255.0);
+      if (maskVal > 0) { // Ignore background (usually 0)
+        uniqueCategories.add(maskVal);
+        // Use the pre-calculated mean confidence score for this class
+        if (confidenceScores[maskVal] !== undefined) {
+          categoryScores[maskVal] = confidenceScores[maskVal];
+        }
+      }
+    }
+
+    const width = source.naturalWidth;
+    const height = source.naturalHeight;
+
+    // Untuk setiap kategori, cari connected components
+    const faceResults: FaceResults[] = [];
+    uniqueCategories.forEach(category => {
+      // Buat array boolean untuk mask dari kategori ini
+      const categoryMask = new Array(width * height).fill(false);
+      for (let i = 0; i < mask.length; i++) {
+        if (Math.round(mask[i] * 255.0) === category) {
+          categoryMask[i] = true;
+        }
+      }
+
+      // Temukan connected components dengan flood fill
+      const visited = new Array(width * height).fill(false);
+      let components = [];
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const idx = y * width + x;
+
+          if (categoryMask[idx] && !visited[idx]) {
+            // Mulai flood fill untuk component baru
+            const component = {
+              pixels: [],
+              minX: width,
+              minY: height,
+              maxX: 0,
+              maxY: 0,
+              score: 0
+            };
+
+            // Queue untuk flood fill
+            const queue = [{ x, y }];
+            visited[idx] = true;
+
+            while (queue.length > 0) {
+              const pixel = queue.shift();
+              const px = pixel?.x || 0;
+              const py = pixel?.y || 0;
+              const pidx = py * width + px;
+
+              // Tambahkan pixel ini ke component
+              component.pixels.push({ x: px, y: py });
+
+              // Update bounding box
+              component.minX = Math.min(component.minX, px);
+              component.minY = Math.min(component.minY, py);
+              component.maxX = Math.max(component.maxX, px);
+              component.maxY = Math.max(component.maxY, py);
+
+              // Periksa 4 tetangga (atas, bawah, kiri, kanan)
+              const neighbors = [
+                { x: px, y: py - 1 }, // atas
+                { x: px, y: py + 1 }, // bawah
+                { x: px - 1, y: py }, // kiri
+                { x: px + 1, y: py }  // kanan
+              ];
+
+              for (const neighbor of neighbors) {
+                const nx = neighbor.x;
+                const ny = neighbor.y;
+
+                // Pastikan tetangga dalam batas gambar
+                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                  const nidx = ny * width + nx;
+
+                  // Jika tetangga adalah bagian dari kategori yang sama dan belum dikunjungi
+                  if (categoryMask[nidx] && !visited[nidx]) {
+                    queue.push({ x: nx, y: ny });
+                    visited[nidx] = true;
+                  }
+                }
+              }
+            }
+
+            // Tambahkan score dari categoryScores
+            component.score = categoryScores[category] || 0;
+
+            components.push(component);
+          }
+        }
+      }
+
+      // Gabungkan components yang berdekatan
+      const DISTANCE_THRESHOLD = 20; // Jarak maksimal antar bounding box untuk digabungkan
+      let mergedComponents = [];
+
+      // Tandai komponen mana yang sudah digabungkan
+      const merged = new Array(components.length).fill(false);
+
+      for (let i = 0; i < components.length; i++) {
+        if (merged[i]) continue; // Skip jika sudah digabungkan
+
+        let mergedComponent = {
+          minX: components[i].minX,
+          minY: components[i].minY,
+          maxX: components[i].maxX,
+          maxY: components[i].maxY,
+          pixels: [...components[i].pixels],
+          score: components[i].score
+        };
+
+        merged[i] = true;
+
+        // Periksa semua komponen lain untuk digabungkan
+        let mergeHappened = true;
+
+        // Lakukan iterasi hingga tidak ada lagi penggabungan
+        while (mergeHappened) {
+          mergeHappened = false;
+
+          for (let j = 0; j < components.length; j++) {
+            if (merged[j]) continue; // Skip yang sudah digabungkan
+
+            // Hitung jarak antar bounding box
+            const horizontalOverlap =
+              !(mergedComponent.maxX < components[j].minX || components[j].maxX < mergedComponent.minX);
+            const verticalOverlap =
+              !(mergedComponent.maxY < components[j].minY || components[j].maxY < mergedComponent.minY);
+
+            let minDistance = Infinity;
+
+            // Jika overlap secara horizontal, hitung jarak vertikal
+            if (horizontalOverlap) {
+              if (mergedComponent.maxY < components[j].minY) {
+                minDistance = components[j].minY - mergedComponent.maxY;
+              } else if (components[j].maxY < mergedComponent.minY) {
+                minDistance = mergedComponent.minY - components[j].maxY;
+              } else {
+                minDistance = 0; // Overlap
+              }
+            }
+            // Jika overlap secara vertikal, hitung jarak horizontal
+            else if (verticalOverlap) {
+              if (mergedComponent.maxX < components[j].minX) {
+                minDistance = components[j].minX - mergedComponent.maxX;
+              } else if (components[j].maxX < mergedComponent.minX) {
+                minDistance = mergedComponent.minX - components[j].maxX;
+              } else {
+                minDistance = 0; // Overlap
+              }
+            }
+            // Jika tidak overlap sama sekali, hitung jarak Euclidean antar titik terdekat
+            else {
+              // Titik-titik sudut dari kedua bounding box
+              const corners1 = [
+                { x: mergedComponent.minX, y: mergedComponent.minY },
+                { x: mergedComponent.maxX, y: mergedComponent.minY },
+                { x: mergedComponent.minX, y: mergedComponent.maxY },
+                { x: mergedComponent.maxX, y: mergedComponent.maxY }
+              ];
+
+              const corners2 = [
+                { x: components[j].minX, y: components[j].minY },
+                { x: components[j].maxX, y: components[j].minY },
+                { x: components[j].minX, y: components[j].maxY },
+                { x: components[j].maxX, y: components[j].maxY }
+              ];
+
+              // Cari jarak terdekat antara semua kemungkinan pasangan titik
+              for (const c1 of corners1) {
+                for (const c2 of corners2) {
+                  const dist = Math.sqrt(
+                    Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2)
+                  );
+                  minDistance = Math.min(minDistance, dist);
+                }
+              }
+            }
+
+            // Jika jarak cukup dekat, gabungkan
+            if (minDistance <= DISTANCE_THRESHOLD) {
+              mergedComponent.minX = Math.min(mergedComponent.minX, components[j].minX);
+              mergedComponent.minY = Math.min(mergedComponent.minY, components[j].minY);
+              mergedComponent.maxX = Math.max(mergedComponent.maxX, components[j].maxX);
+              mergedComponent.maxY = Math.max(mergedComponent.maxY, components[j].maxY);
+              mergedComponent.pixels = [...mergedComponent.pixels, ...components[j].pixels];
+
+              // Gunakan score maksimal untuk komponen yang digabungkan
+              mergedComponent.score = Math.max(mergedComponent.score, components[j].score);
+
+              merged[j] = true;
+              mergeHappened = true;
+            }
+          }
+        }
+
+        mergedComponents.push(mergedComponent);
+      }
+
+      // Gambar bounding box untuk setiap merged component
+      const legendColor = legendColors[category % legendColors.length];
+      mergedComponents.forEach((component, index) => {
+        // Gambar bounding box ke offscreen canvas
+        offscreenCtx.strokeStyle = `rgba(${legendColor[0]}, ${legendColor[1]}, ${legendColor[2]}, 1.0)`;
+        offscreenCtx.lineWidth = 2;
+        const boxWidth = component.maxX - component.minX;
+        const boxHeight = component.maxY - component.minY;
+        offscreenCtx.strokeRect(component.minX, component.minY, boxWidth, boxHeight);
+
+        // Format confidence score untuk ditampilkan
+        const scorePercent = (component.score * 100).toFixed(1);
+        const scoreText = ` (${scorePercent}%)`;
+
+        // Label kategori dengan nomor component dan score
+        offscreenCtx.fillStyle = `rgba(${legendColor[0]}, ${legendColor[1]}, ${legendColor[2]}, 0.7)`;
+        offscreenCtx.fillRect(component.minX, component.minY - 20, 120, 20);
+        offscreenCtx.fillStyle = "white";
+        offscreenCtx.font = "12px Arial";
+        offscreenCtx.fillText(`Class ${category}#${index + 1}${scoreText}`, component.minX + 5, component.minY - 5);
+
+        faceResults.push({
+          box: [component.minY, component.minX, boxHeight, boxWidth],
+          score: Math.ceil(component.score * 100),
+          class: category,
+          label: labels[category] ?? 'Unknown',
+          color: '#ffffff',
+        });
+      });
+    });
+
+    // Akhirnya, gambar hasil dari offscreen canvas ke canvas utama
+    const canvasCtx = canvasRef.getContext('2d');
+    if (!canvasCtx) throw "Canvas not found";
+
+    // Gunakan composite operation yang sesuai berdasarkan layerId
+    if (layerId === 0) {
+      canvasCtx.globalCompositeOperation = 'source-over';
+    } else {
+      canvasCtx.globalCompositeOperation = 'screen'; // Atau 'lighter'
+    }
+
+    // Gambar hasil dari offscreen canvas ke canvas utama
+    canvasCtx.drawImage(offscreen, 0, 0);
+
+    return [faceResults, skinResult];
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error in face detection");
+  }
+};
+
 
 /**
  * Function to detect video from every source.

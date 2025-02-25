@@ -19,7 +19,7 @@ import * as tflite from "@tensorflow/tfjs-tflite";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
 // import { Scanner } from "../components/scanner";
 import { GraphModel } from "@tensorflow/tfjs";
-import { detectFrame } from "../inference/skinAnalysisInference";
+import { detectFrame, detectSegment } from "../inference/skinAnalysisInference";
 import { base64ToImage } from "../utils/imageProcessing";
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../utils/other";
@@ -31,6 +31,8 @@ import {
   runTFLiteInference,
 } from "../utils/tfliteInference";
 import { useModelLoader } from "../hooks/useModelLoader";
+import { FilesetResolver, ImageSegmenter } from "@mediapipe/tasks-vision";
+import { Scanner } from "../components/scanner";
 
 interface Model {
   net: tf.GraphModel;
@@ -67,6 +69,9 @@ function Main({ isArabic }: { isArabic?: boolean }) {
   const { criterias } = useCamera();
 
   const modelSkinAnalysisRef = useRef<tflite.TFLiteModel | null>(null);
+  const modelOneRef = useRef<ImageSegmenter | null>(null);
+  const modelTwoRef = useRef<ImageSegmenter | null>(null);
+  const modelThreeRef = useRef<ImageSegmenter | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const {
@@ -90,8 +95,6 @@ function Main({ isArabic }: { isArabic?: boolean }) {
 
   const [loading, setLoading] = useState({ loading: true, progress: 0 });
 
-  const [model, setModel] = useState<Model | null>(null);
-
   const steps = [
     async () => {
       const model = await loadTFLiteModel(
@@ -99,6 +102,48 @@ function Main({ isArabic }: { isArabic?: boolean }) {
       );
 
       modelSkinAnalysisRef.current = model;
+    },
+    async () => {
+      const filesetResolver = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.17/wasm",
+      );
+      modelOneRef.current = await ImageSegmenter.createFromOptions(
+        filesetResolver,
+        {
+          baseOptions: {
+            modelAssetPath: "/media/unveels/models/skin-analysis/skin-1.tflite",
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          outputCategoryMask: true,
+          outputConfidenceMasks: true,
+        },
+      );
+      modelTwoRef.current = await ImageSegmenter.createFromOptions(
+        filesetResolver,
+        {
+          baseOptions: {
+            modelAssetPath:
+              "/media/unveels/models/hair/selfie_multiclass.tflite",
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          outputCategoryMask: true,
+          outputConfidenceMasks: true,
+        },
+      );
+      modelThreeRef.current = await ImageSegmenter.createFromOptions(
+        filesetResolver,
+        {
+          baseOptions: {
+            modelAssetPath: "/media/unveels/models/skin-analysis/skin-3.tflite",
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          outputCategoryMask: true,
+          outputConfidenceMasks: true,
+        },
+      );
     },
   ];
 
@@ -109,46 +154,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
   } = useModelLoader(steps);
 
   useEffect(() => {
-    const loadModel = async () => {
-      try {
-        await tf.ready();
-
-        const yolov8: GraphModel = await tf.loadGraphModel(
-          `/media/unveels/models/skin-analysis/best_web_model/model.json`,
-          {
-            onProgress: (fractions: number) => {
-              setLoading({ loading: true, progress: fractions });
-            },
-          },
-        );
-
-        if (!yolov8.inputs[0]?.shape) {
-          throw new Error("Invalid model input shape");
-        }
-
-        setLoading({ loading: false, progress: 1 });
-        setModel({
-          net: yolov8,
-          inputShape: yolov8.inputs[0].shape,
-          outputShape: [
-            [1, 50, 8400],
-            [1, 160, 160, 32],
-          ],
-        });
-      } catch (error) {
-        setLoading({ loading: false, progress: 0 });
-        console.error("Error loading model:", error);
-      }
-    };
-
-    loadModel();
-
     loadModels();
-    return () => {
-      if (model?.net) {
-        model.net.dispose();
-      }
-    };
   }, []);
 
   useEffect(() => {
@@ -174,74 +180,107 @@ function Main({ isArabic }: { isArabic?: boolean }) {
         setIsLoading(true);
         setInferenceError(null);
 
-        // Tambahkan delay sebelum inferensi
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
         try {
-          if (model != null) {
-            const image = await base64ToImage(criterias.capturedImage, true);
-            console.log("converting success");
+          const image = await base64ToImage(criterias.capturedImage, true);
+          console.log("converting success");
 
-            if (canvasRef.current == null) {
-              throw new Error("Canvas ref is null");
+          if (canvasRef.current == null) {
+            throw new Error("Canvas ref is null");
+          }
+          let age = 30;
+          if (modelSkinAnalysisRef.current != null) {
+            const preprocessedImage = await preprocessTFLiteImage(
+              criterias.capturedImage,
+              200,
+              200,
+            );
+            const ageData = await runTFLiteInference(
+              modelSkinAnalysisRef.current,
+              preprocessedImage,
+              200,
+              200,
+            );
+            if (ageData instanceof tf.Tensor) {
+              const data = await ageData.data();
+              age = data[0] * 77;
+              ageData.dispose();
             }
-            let age = 30;
-            if (modelSkinAnalysisRef.current != null) {
-              const preprocessedImage = await preprocessTFLiteImage(
-                criterias.capturedImage,
-                200,
-                200,
-              );
-              const ageData = await runTFLiteInference(
-                modelSkinAnalysisRef.current,
-                preprocessedImage,
-                200,
-                200,
-              );
-              if (ageData instanceof tf.Tensor) {
-                const data = await ageData.data();
-                age = data[0] * 77;
-                ageData.dispose();
-              }
-            }
-            const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] =
-              await detectFrame(image, model, canvasRef.current);
+          }
+          if (modelOneRef.current == null) throw new Error("Model ref is null");
+          if (modelTwoRef.current == null) throw new Error("Model ref is null");
+          if (modelThreeRef.current == null)
+            throw new Error("Model ref is null");
 
-            if (skinAnalysisResult) {
-              setInferenceResult(skinAnalysisResult[0]);
-              console.log("Skin Analysis Result:", skinAnalysisResult);
-              const resultString = JSON.stringify([
-                ...skinAnalysisResult[1],
-                {
-                  label: "imageData",
-                  class: 1000,
-                  score: 0,
-                  data: criterias.capturedImage,
-                },
-                {
-                  label: "age",
-                  class: 1001,
-                  score: Math.round(age),
-                },
-              ]);
-              console.log("Skin Analysis Result as JSON:", resultString);
+          const skin1: [FaceResults[], SkinAnalysisResult[]] =
+            await detectSegment(image, canvasRef.current, modelTwoRef.current, [
+              "background",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+            ], 0);
 
-              setIsInferenceCompleted(true);
+          const skin2: [FaceResults[], SkinAnalysisResult[]] =
+            await detectSegment(image, canvasRef.current, modelOneRef.current, [
+              "background",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+            ], 1);
+            const skin3: [FaceResults[], SkinAnalysisResult[]] =
+            await detectSegment(image, canvasRef.current, modelThreeRef.current, [
+              "background",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+              "class1",
+            ], 1);
+          if (skin1) {
+            setInferenceResult([...skin1[0], ...skin2[0], ...skin3[0]]);
+            console.log("Skin Analysis Result:", skin1);
+            const resultString = JSON.stringify([
+              ...skin1[1],
+              ...skin2[1],
+              ...skin3[1],
+              {
+                label: "imageData",
+                class: 1000,
+                score: 0,
+                data: criterias.capturedImage,
+              },
+              {
+                label: "age",
+                class: 1001,
+                score: Math.round(age),
+              },
+            ]);
+            console.log("Skin Analysis Result as JSON:", resultString);
 
-              if ((window as any).flutter_inappwebview) {
-                (window as any).flutter_inappwebview
-                  .callHandler("detectionResult", resultString)
-                  .then((result: any) => {
-                    console.log("Flutter responded with:", result);
-                  })
-                  .catch((error: any) => {
-                    console.error("Error calling Flutter handler:", error);
-                  });
+            setIsInferenceCompleted(true);
 
-                setTimeout(() => {
-                  setShowScannerAfterInference(false); // Hentikan scanner setelah 2 detik
-                }, 2000);
-              }
+            if ((window as any).flutter_inappwebview) {
+              (window as any).flutter_inappwebview
+                .callHandler("detectionResult", resultString)
+                .then((result: any) => {
+                  console.log("Flutter responded with:", result);
+                })
+                .catch((error: any) => {
+                  console.error("Error calling Flutter handler:", error);
+                });
+
+              setTimeout(() => {
+                setShowScannerAfterInference(false); // Hentikan scanner setelah 2 detik
+              }, 2000);
             }
           }
         } catch (error: any) {
@@ -271,46 +310,44 @@ function Main({ isArabic }: { isArabic?: boolean }) {
 
   return (
     <>
-      {(loading.loading || !isVideoDetectorReady || modelLoading) && (
-        <ModelLoadingScreen progress={loading.progress} />
+      {(!isVideoDetectorReady || modelLoading) && (
+        <ModelLoadingScreen progress={progress} />
       )}
       <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
-        {isInferenceCompleted &&
-          criterias.capturedImage != null &&
-          model != null && (
-            <div className="absolute inset-0">
-              <img
-                src={criterias.capturedImage}
-                width={model.inputShape[2]}
-                height={model.inputShape[1]}
-                className="h-full w-full scale-x-[-1] transform object-cover"
-              />
-            </div>
-          )}
+        {isInferenceCompleted && criterias.capturedImage != null && (
+          <div className="absolute inset-0">
+            <img
+              src={criterias.capturedImage}
+              className="h-full w-full scale-x-[-1] transform object-cover"
+            />
+          </div>
+        )}
         <div className="absolute inset-0">
           <>
-            {model != null && (
-              <canvas
-                width={model.inputShape[2]}
-                height={model.inputShape[1]}
-                ref={canvasRef}
-                className="h-full w-full object-cover blur-sm"
-                style={{ opacity: 0.5 }}
-              />
-            )}
+            <canvas
+              ref={canvasRef}
+              className={`pointer-events-none absolute left-1/2 top-1/2`}
+              style={{
+                zIndex: 40,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                transform: "translate(-50%, -50%)",
+              }}
+            />
             {!isLoading && inferenceResult != null ? (
               <>
                 <SkinAnalysisScene data={inferenceResult} />
               </>
             ) : (
               <>
-                {isInferenceCompleted ? (
+                {isLoading ? (
                   <>
-                    {/* {showScannerAfterInference || !isInferenceCompleted ? (
+                    {showScannerAfterInference || !isInferenceCompleted ? (
                       <Scanner />
                     ) : (
                       <></>
-                    )} */}
+                    )}
                   </>
                 ) : (
                   <>
