@@ -112,7 +112,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
         {
           baseOptions: {
             modelAssetPath: "/media/unveels/models/skin-analysis/skin-1.tflite",
-            delegate: "CPU",
+            delegate: "GPU",
           },
           runningMode: "IMAGE",
           outputCategoryMask: true,
@@ -125,7 +125,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
           baseOptions: {
             modelAssetPath:
               "/media/unveels/models/hair/selfie_multiclass.tflite",
-            delegate: "CPU",
+            delegate: "GPU",
           },
           runningMode: "IMAGE",
           outputCategoryMask: true,
@@ -137,7 +137,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
         {
           baseOptions: {
             modelAssetPath: "/media/unveels/models/skin-analysis/skin-3.tflite",
-            delegate: "CPU",
+            delegate: "GPU",
           },
           runningMode: "IMAGE",
           outputCategoryMask: true,
