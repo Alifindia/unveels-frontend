@@ -93,8 +93,8 @@ function OverlayCanvas({
         const adjustedResults: BboxLandmark[] = adjustBoundingBoxes(
           data,
           landmarks as Landmark[],
-          640,
-          640,
+          image.naturalWidth,
+          image.naturalHeight,
           50, // Threshold diperbesar menjadi 50
         );
 
