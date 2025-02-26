@@ -782,6 +782,8 @@ export const detectSegment = async (
 
     // Gambar hasil dari offscreen canvas ke canvas utama
     canvasCtx.drawImage(offscreen, 0, 0);
+    segmenter.close();
+    result.close();
 
     return [faceResults, skinResult];
   } catch (error) {
