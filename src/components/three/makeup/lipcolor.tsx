@@ -85,14 +85,14 @@ const LipColorInner: React.FC<LipColorProps> = ({
     const glossyMaterial = new MeshStandardMaterial({
       color: color,
       transparent: true,
-      opacity: 1,
+      opacity: 0.5,
       alphaMap: standardTexture,
       alphaTest: 0,
       metalness: 0.3,
       roughness: 0.3,
       envMap: envMapMakeup,
     });
-    return lipTexture === "Glossy" ? glossyMaterial : material;
+    return lipTexture === "Glossy" || lipTexture === "Shimmer" ? glossyMaterial : material;
   }, [lipColors, standardTexture, lipTexture]);
 
   const shimmerMaterial = useMemo(() => {

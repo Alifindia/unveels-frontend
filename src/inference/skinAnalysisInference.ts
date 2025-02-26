@@ -484,11 +484,7 @@ export const detectSegment = async (
       const canvasCtx = canvasRef.getContext('2d');
       if (!canvasCtx) throw "Canvas not found";
       canvasCtx.clearRect(0, 0, canvasRef.width, canvasRef.height);
-      canvasCtx.drawImage(source, 0, 0);
     }
-
-    // Draw the source image to offscreen canvas to get image data
-    offscreenCtx.drawImage(source, 0, 0);
 
     // Get image data from offscreen canvas
     let imageData = offscreenCtx.getImageData(0, 0, source.naturalWidth, source.naturalHeight).data;
@@ -742,22 +738,22 @@ export const detectSegment = async (
       const legendColor = legendColors[category % legendColors.length];
       mergedComponents.forEach((component, index) => {
         // Gambar bounding box ke offscreen canvas
-        offscreenCtx.strokeStyle = `rgba(${legendColor[0]}, ${legendColor[1]}, ${legendColor[2]}, 1.0)`;
-        offscreenCtx.lineWidth = 2;
+        // offscreenCtx.strokeStyle = `rgba(${legendColor[0]}, ${legendColor[1]}, ${legendColor[2]}, 1.0)`;
+        // offscreenCtx.lineWidth = 2;
         const boxWidth = component.maxX - component.minX;
         const boxHeight = component.maxY - component.minY;
-        offscreenCtx.strokeRect(component.minX, component.minY, boxWidth, boxHeight);
+        // offscreenCtx.strokeRect(component.minX, component.minY, boxWidth, boxHeight);
 
-        // Format confidence score untuk ditampilkan
-        const scorePercent = Math.ceil(component.score * 100);
-        const scoreText = ` (${scorePercent}%)`;
+        // // Format confidence score untuk ditampilkan
+        // const scorePercent = Math.ceil(component.score * 100);
+        // const scoreText = ` (${scorePercent}%)`;
 
         // Label kategori dengan nomor component dan score
-        offscreenCtx.fillStyle = `rgba(${legendColor[0]}, ${legendColor[1]}, ${legendColor[2]}, 0.7)`;
-        offscreenCtx.fillRect(component.minX, component.minY - 20, 120, 20);
-        offscreenCtx.fillStyle = "white";
-        offscreenCtx.font = "12px Arial";
-        offscreenCtx.fillText(`${labels[category]}#${index + 1}${scoreText}`, component.minX + 5, component.minY - 5);
+        // offscreenCtx.fillStyle = `rgba(${legendColor[0]}, ${legendColor[1]}, ${legendColor[2]}, 0.7)`;
+        // offscreenCtx.fillRect(component.minX, component.minY - 20, 120, 20);
+        // offscreenCtx.fillStyle = "white";
+        // offscreenCtx.font = "12px Arial";
+        // offscreenCtx.fillText(`${labels[category]}#${index + 1}${scoreText}`, component.minX + 5, component.minY - 5);
 
         faceResults.push({
           box: [component.minY, component.minX, boxHeight, boxWidth],
