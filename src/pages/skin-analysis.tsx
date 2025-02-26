@@ -43,7 +43,7 @@ import { useTranslation } from "react-i18next";
 import { getCookie, getCurrencyAndRate } from "../utils/other";
 import { GraphModel } from "@tensorflow/tfjs-converter";
 import { base64ToImage } from "../utils/imageProcessing";
-import { detectFrame } from "../inference/skinAnalysisInference";
+import { detectFrame, detectSegment } from "../inference/skinAnalysisInference";
 import { Link } from "react-router-dom";
 import { FindTheLookItems } from "../types/findTheLookItems";
 import { FilterProvider, useFilterContext } from "../context/filter-context";
@@ -62,6 +62,7 @@ import {
 } from "../utils/tfliteInference";
 import { useModelLoader } from "../hooks/useModelLoader";
 import SuccessPopup from "../components/popup-add-to-cart";
+import { FilesetResolver, ImageSegmenter } from "@mediapipe/tasks-vision";
 
 interface Model {
   net: tf.GraphModel;
@@ -102,6 +103,9 @@ function Main({ isArabic }: { isArabic: boolean }) {
   const { criterias } = useCamera();
 
   const modelSkinAnalysisRef = useRef<tflite.TFLiteModel | null>(null);
+  const modelOneRef = useRef<ImageSegmenter | null>(null);
+  const modelTwoRef = useRef<ImageSegmenter | null>(null);
+  const modelThreeRef = useRef<ImageSegmenter | null>(null);
 
   const {
     isLoading,
@@ -132,6 +136,48 @@ function Main({ isArabic }: { isArabic: boolean }) {
       );
 
       modelSkinAnalysisRef.current = model;
+    },
+    async () => {
+      const filesetResolver = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.17/wasm",
+      );
+      modelOneRef.current = await ImageSegmenter.createFromOptions(
+        filesetResolver,
+        {
+          baseOptions: {
+            modelAssetPath: "/media/unveels/models/skin-analysis/skin-1.tflite",
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          outputCategoryMask: true,
+          outputConfidenceMasks: true,
+        },
+      );
+      modelTwoRef.current = await ImageSegmenter.createFromOptions(
+        filesetResolver,
+        {
+          baseOptions: {
+            modelAssetPath:
+              "/media/unveels/models/hair/selfie_multiclass.tflite",
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          outputCategoryMask: true,
+          outputConfidenceMasks: true,
+        },
+      );
+      modelThreeRef.current = await ImageSegmenter.createFromOptions(
+        filesetResolver,
+        {
+          baseOptions: {
+            modelAssetPath: "/media/unveels/models/skin-analysis/skin-3.tflite",
+            delegate: "GPU",
+          },
+          runningMode: "IMAGE",
+          outputCategoryMask: true,
+          outputConfidenceMasks: true,
+        },
+      );
     },
   ];
 
@@ -252,47 +298,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
   }, [tab]);
 
   useEffect(() => {
-    const loadModel = async () => {
-      try {
-        await tf.ready();
-
-        const yolov8: GraphModel = await tf.loadGraphModel(
-          `/media/unveels/models/skin-analysis/best_web_model/model.json`,
-          {
-            onProgress: (fractions: number) => {
-              setLoading({ loading: true, progress: fractions });
-            },
-          },
-        );
-
-        if (!yolov8.inputs[0]?.shape) {
-          throw new Error("Invalid model input shape");
-        }
-
-        setLoading({ loading: false, progress: 1 });
-        setModel({
-          net: yolov8,
-          inputShape: yolov8.inputs[0].shape,
-          outputShape: [
-            [1, 50, 8400],
-            [1, 160, 160, 32],
-          ],
-        });
-
-      } catch (error) {
-        setLoading({ loading: false, progress: 0 });
-        console.error("Error loading model:", error);
-      }
-    };
-
-    loadModel();
     loadModels();
-
-    return () => {
-      if (model?.net) {
-        model.net.dispose();
-      }
-    };
   }, []);
 
   useEffect(() => {
@@ -311,7 +317,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         try {
-          if (model != null) {
+          if (modelSkinAnalysisRef.current != null) {
             const image = await base64ToImage(criterias.capturedImage, true);
             console.log("converting success");
 
@@ -337,19 +343,47 @@ function Main({ isArabic }: { isArabic: boolean }) {
                 ageData.dispose();
               }
             }
-            const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] =
-              await detectFrame(image, model, canvasRef.current);
+            if (modelOneRef.current == null)
+              throw new Error("Model ref is null");
+            if (modelTwoRef.current == null)
+              throw new Error("Model ref is null");
+            if (modelThreeRef.current == null)
+              throw new Error("Model ref is null");
 
-            // const skinAnalysisResult: [FaceResults[], SkinAnalysisResult[]] =
-            // await skinAnalysisInference(
-            //   criterias.capturedImage,
-            //   modelSkinAnalysisRef.current,
-            // );
+            const skin1: [FaceResults[], SkinAnalysisResult[]] =
+              await detectSegment(
+                image,
+                canvasRef.current,
+                modelOneRef.current,
+                0,
+                0,
+              );
 
-            if (skinAnalysisResult) {
-              setInferenceResult(skinAnalysisResult[0]);
+            // const skin2: [FaceResults[], SkinAnalysisResult[]] =
+            //   await detectSegment(image, canvasRef.current, modelOneRef.current, [
+            //     "background",
+            //     "class1",
+            //     "class1",
+            //     "class1",
+            //     "class1",
+            //     "class1",
+            //     "class1",
+            //     "class1",
+            //   ], 1);
+            const skin3: [FaceResults[], SkinAnalysisResult[]] =
+              await detectSegment(
+                image,
+                canvasRef.current,
+                modelThreeRef.current,
+                2,
+                1,
+              );
+
+            if (skin1) {
+              setInferenceResult([...skin1[0], ...skin3[0]]);
               setSkinAnalysisResult([
-                ...skinAnalysisResult[1],
+                ...skin1[1],
+                ...skin3[1],
                 {
                   class: 1000,
                   score: 0,
@@ -394,34 +428,32 @@ function Main({ isArabic }: { isArabic: boolean }) {
 
   return (
     <>
-      {(isVideoDetectorReady.current == false || model == null || modelLoading) && (
+      {(isVideoDetectorReady.current == false || modelLoading) && (
         <ModelLoadingScreen progress={loading.progress} />
       )}
       <div className="relative mx-auto h-full min-h-dvh w-full overflow-hidden bg-black">
         <SuccessPopup product={dataItem} type={type} />
-        {isInferenceCompleted &&
-          criterias.capturedImage != null &&
-          model != null && (
-            <div className="absolute inset-0">
-              <img
-                src={criterias.capturedImage}
-                width={model.inputShape[2]}
-                height={model.inputShape[1]}
-                className="h-full w-full scale-x-[-1] transform object-cover"
-              />
-            </div>
-          )}
+        {isInferenceCompleted && criterias.capturedImage != null && (
+          <div className="absolute inset-0">
+            <img
+              src={criterias.capturedImage}
+              className="h-full w-full scale-x-[-1] transform object-cover"
+            />
+          </div>
+        )}
         <div className="absolute inset-0">
           <>
-            {model != null && (
-              <canvas
-                width={model.inputShape[2]}
-                height={model.inputShape[1]}
-                ref={canvasRef}
-                className="h-full w-full object-cover blur-sm"
-                style={{ opacity: 0.5 }}
-              />
-            )}
+            <canvas
+              ref={canvasRef}
+              className={`pointer-events-none absolute left-1/2 top-1/2 blur-[1px]`}
+              style={{
+                zIndex: 40,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                transform: "translate(-50%, -50%)",
+              }}
+            />
             {!isLoading && inferenceResult != null ? (
               <>
                 <SkinAnalysisScene data={inferenceResult} />
@@ -639,8 +671,8 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
-      setType("unit")
-      setDataItem(dataProduct)
+      setType("unit");
+      setDataItem(dataProduct);
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -701,7 +733,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                     handleAddToCart(
                       product.id.toString(),
                       `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                      product
+                      product,
                     );
                   }}
                 >
@@ -818,6 +850,7 @@ function AnalysisResults({
       className={clsx(
         "fixed inset-0 flex h-dvh flex-col bg-black font-sans text-white",
       )}
+      style={{zIndex: 9999}}
     >
       {/* Navigation */}
       <div className="flex items-center justify-between px-4 py-2">
@@ -869,8 +902,7 @@ function AnalysisResults({
           <div className="flex items-center gap-x-2">
             <Icons.hashtagCircle className="size-5" />
             <div className="text-lg">
-              {t("viewskinan.skin_age")}:{" "}
-              {getTotalScoreByLabel("age")}
+              {t("viewskinan.skin_age")}: {getTotalScoreByLabel("age")}
             </div>
           </div>
         </div>
@@ -1454,12 +1486,16 @@ export function AllProductsPage({
   const { sort, setSort } = useFilterContext();
   const { selectedItems: cart, dispatch } = useFindTheLookContext();
   const { t } = useTranslation();
-  const { addItemToCart, setDataItem, dataItem, type, setType } = useCartContext();
+  const { addItemToCart, setDataItem, dataItem, type, setType } =
+    useCartContext();
 
   const allProducts = [
     ...groupedItemsData.makeup.flatMap((category) => {
       const { attributeName, values } = mapTypes[category.label] || {};
-      return values ? useProducts({ product_type_key: attributeName, type_ids: values }).data?.items || [] : [];
+      return values
+        ? useProducts({ product_type_key: attributeName, type_ids: values })
+            .data?.items || []
+        : [];
     }),
   ];
 
@@ -1472,10 +1508,10 @@ export function AllProductsPage({
       for (const product of allProducts) {
         await addItemToCart(
           product.id.toString(),
-          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`
+          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
         );
       }
-      setType("all")
+      setType("all");
       console.log("All products added to cart!");
     } catch (error) {
       console.error("Failed to add all products to cart:", error);
@@ -1484,7 +1520,7 @@ export function AllProductsPage({
 
   return (
     <div className="fixed inset-0 flex flex-col bg-black px-2 font-sans text-white">
-      <SuccessPopup product={dataItem} type={type}/>
+      <SuccessPopup product={dataItem} type={type} />
       {isFilterVisible && (
         <div
           className="fixed inset-0 z-40 bg-black opacity-50"
@@ -1634,8 +1670,8 @@ function ProductHorizontalList({
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
-      setType("unit")
-      setDataItem(dataProduct)
+      setType("unit");
+      setDataItem(dataProduct);
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -1659,12 +1695,9 @@ function ProductHorizontalList({
               "https://picsum.photos/id/237/200/300";
 
             return (
-              <div
-                key={product.id}
-                className="rounded-xl shadow"
-              >
+              <div key={product.id} className="rounded-xl shadow">
                 <div
-                className="cursor-pointer"
+                  className="cursor-pointer"
                   onClick={() => {
                     window.open(
                       `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
@@ -1672,7 +1705,7 @@ function ProductHorizontalList({
                     );
                   }}
                 >
-                  <div className="relative aspect-square w-full overflow-hidden" >
+                  <div className="relative aspect-square w-full overflow-hidden">
                     <img
                       src={imageUrl}
                       alt="Product"
@@ -1692,7 +1725,8 @@ function ProductHorizontalList({
                   </p>
                   <div className="flex flex-wrap items-center justify-end gap-x-1">
                     <span className="text-sm font-bold text-white">
-                      {currencySymbol}{(product.price * rate).toFixed(3)}
+                      {currencySymbol}
+                      {(product.price * rate).toFixed(3)}
                     </span>
                   </div>
                 </div>
@@ -1705,7 +1739,7 @@ function ProductHorizontalList({
                       handleAddToCart(
                         product.id.toString(),
                         `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                        product
+                        product,
                       );
                     }}
                   >
