@@ -749,7 +749,7 @@ export const detectSegment = async (
         offscreenCtx.strokeRect(component.minX, component.minY, boxWidth, boxHeight);
 
         // Format confidence score untuk ditampilkan
-        const scorePercent = (component.score * 100).toFixed(1);
+        const scorePercent = Math.ceil(component.score * 100);
         const scoreText = ` (${scorePercent}%)`;
 
         // Label kategori dengan nomor component dan score
@@ -757,7 +757,7 @@ export const detectSegment = async (
         offscreenCtx.fillRect(component.minX, component.minY - 20, 120, 20);
         offscreenCtx.fillStyle = "white";
         offscreenCtx.font = "12px Arial";
-        offscreenCtx.fillText(`Class ${category}#${index + 1}${scoreText}`, component.minX + 5, component.minY - 5);
+        offscreenCtx.fillText(`${labels[category]}#${index + 1}${scoreText}`, component.minX + 5, component.minY - 5);
 
         faceResults.push({
           box: [component.minY, component.minX, boxHeight, boxWidth],
