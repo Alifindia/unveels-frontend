@@ -212,7 +212,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
             throw new Error("Model ref is null");
 
           const skin1: [FaceResults[], SkinAnalysisResult[]] =
-            await detectSegment(image, canvasRef.current, modelTwoRef.current, [
+            await detectSegment(image, canvasRef.current, modelOneRef.current, [
               "background",
               "class1",
               "class1",
