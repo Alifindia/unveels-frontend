@@ -685,11 +685,13 @@ export function VideoStream({
           <img
             src={capturedImageSrc}
             alt="Captured"
-            className={`h-full w-full ${criterias.flipped ? "" : "scale-x-[-1]"} transform object-cover`}
+            className={`h-full w-full scale-x-[-1] transform object-cover`}
           />
         </div>
       ) : (
-        <div className={`${runningMode === "IMAGE" ? "w-full lg:w-auto h-auto lg:h-full flex items-center justify-center relative" : ""}`}>
+        <div
+          className={`${runningMode === "IMAGE" ? "relative flex h-auto w-full items-center justify-center lg:h-full lg:w-auto" : ""}`}
+        >
           {runningMode === "LIVE_CAMERA" && (
             <>
               {/* Webcam Video */}
@@ -697,7 +699,7 @@ export function VideoStream({
                 audio={false}
                 ref={webcamRef}
                 screenshotFormat="image/jpeg"
-                mirrored={false}
+                mirrored={criterias.flipped}
                 videoConstraints={{
                   // width: VIDEO_WIDTH,
                   // height: VIDEO_HEIGHT,
@@ -732,7 +734,7 @@ export function VideoStream({
               ref={imageRef}
               src={imageRef.current?.src}
               alt="Uploaded"
-              className="w-full h-full object-contain"
+              className="h-full w-full object-contain"
             />
           )}
 
@@ -741,11 +743,10 @@ export function VideoStream({
             criterias.runningMode === "VIDEO") && (
             <canvas
               ref={canvasRef}
-              className={`pointer-events-none absolute left-0 top-0 h-full w-screen transform ${runningMode !== "LIVE_CAMERA" ? "scale-x-[-1]" : ""}`}
+              className={`pointer-events-none absolute left-0 top-0 h-full w-screen transform ${runningMode !== "LIVE_CAMERA" || criterias.flipped ? "scale-x-[-1]" : ""}`}
             />
           )}
-          {(
-            criterias.runningMode === "IMAGE") && (
+          {criterias.runningMode === "IMAGE" && (
             <canvas
               ref={canvasRef}
               className={`pointer-events-none absolute left-0 top-0 h-full max-w-full transform ${runningMode !== "LIVE_CAMERA" ? "scale-x-[-1]" : ""}`}
