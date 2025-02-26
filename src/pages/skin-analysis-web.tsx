@@ -341,13 +341,13 @@ function Main({ isArabic }: { isArabic?: boolean }) {
               </>
             ) : (
               <>
-                {isLoading ? (
+                {isInferenceCompleted ? (
                   <>
-                    {showScannerAfterInference || !isInferenceCompleted ? (
+                    {/* {showScannerAfterInference || !isInferenceCompleted ? (
                       <Scanner />
                     ) : (
                       <></>
-                    )}
+                    )} */}
                   </>
                 ) : (
                   <>
