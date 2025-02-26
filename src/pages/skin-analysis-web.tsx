@@ -223,17 +223,17 @@ function Main({ isArabic }: { isArabic?: boolean }) {
               "class1",
             ], 0);
 
-          const skin2: [FaceResults[], SkinAnalysisResult[]] =
-            await detectSegment(image, canvasRef.current, modelOneRef.current, [
-              "background",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
-            ], 1);
+          // const skin2: [FaceResults[], SkinAnalysisResult[]] =
+          //   await detectSegment(image, canvasRef.current, modelOneRef.current, [
+          //     "background",
+          //     "class1",
+          //     "class1",
+          //     "class1",
+          //     "class1",
+          //     "class1",
+          //     "class1",
+          //     "class1",
+          //   ], 1);
             const skin3: [FaceResults[], SkinAnalysisResult[]] =
             await detectSegment(image, canvasRef.current, modelThreeRef.current, [
               "background",
@@ -246,11 +246,11 @@ function Main({ isArabic }: { isArabic?: boolean }) {
               "class1",
             ], 1);
           if (skin1) {
-            setInferenceResult([...skin1[0], ...skin2[0], ...skin3[0]]);
+            setInferenceResult([...skin1[0], ...skin3[0]]);
             console.log("Skin Analysis Result:", skin1);
             const resultString = JSON.stringify([
               ...skin1[1],
-              ...skin2[1],
+              // ...skin2[1],
               ...skin3[1],
               {
                 label: "imageData",
