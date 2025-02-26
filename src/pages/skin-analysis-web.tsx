@@ -212,14 +212,13 @@ function Main({ isArabic }: { isArabic?: boolean }) {
             throw new Error("Model ref is null");
 
           const skin1: [FaceResults[], SkinAnalysisResult[]] =
-            await detectSegment(image, canvasRef.current, modelOneRef.current, [
-              "background",
-              "acne",
-              "pores",
-              "spots",
-              "wriinkles",
-
-            ], 0);
+            await detectSegment(
+              image,
+              canvasRef.current,
+              modelOneRef.current,
+              0,
+              0,
+            );
 
           // const skin2: [FaceResults[], SkinAnalysisResult[]] =
           //   await detectSegment(image, canvasRef.current, modelOneRef.current, [
@@ -232,14 +231,15 @@ function Main({ isArabic }: { isArabic?: boolean }) {
           //     "class1",
           //     "class1",
           //   ], 1);
-            const skin3: [FaceResults[], SkinAnalysisResult[]] =
-            await detectSegment(image, canvasRef.current, modelThreeRef.current, [
-              "background",
-              "dark circles",
-              "oily",
-              "eyebags",
-              "redness",
-            ], 1);
+          const skin3: [FaceResults[], SkinAnalysisResult[]] =
+            await detectSegment(
+              image,
+              canvasRef.current,
+              modelThreeRef.current,
+              2,
+              1,
+            );
+
           if (skin1) {
             setInferenceResult([...skin1[0], ...skin3[0]]);
             console.log("Skin Analysis Result:", skin1);
@@ -321,7 +321,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
           <>
             <canvas
               ref={canvasRef}
-              className={`pointer-events-none absolute left-1/2 top-1/2 blur-[2px]`}
+              className={`pointer-events-none absolute left-1/2 top-1/2 blur-[1px]`}
               style={{
                 zIndex: 40,
                 width: "100%",

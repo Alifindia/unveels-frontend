@@ -457,16 +457,50 @@ const legendColors = [
 const calculateMean = (arr: Float32Array<ArrayBufferLike>) => {
   if (arr.length === 0) return 0;
   const sum = arr.reduce((acc, val) => acc + val, 0);
-  return sum * 20 / arr.length;
+  return sum / (arr.length * 0.15);
 };
 
+const modelLabel1 = {
+  labels: ["background", "acne", "pores", "spots", "wrinkles"],
+  colors: [
+    [0, 0, 0, 0],        // background
+    [247, 37, 133, 255],   // acne
+    [244, 235, 36, 255],   // pores
+    [15, 56, 204, 255],    // spots
+    [0, 255, 56, 255],     // wrinkles
+  ],
+};
+
+const modelLabel2 = {
+  labels: ["background"],
+  colors: [[0, 0, 0, 0]], // background
+};
+
+const modelLabel3 = {
+  labels: ["background", "dark circles", "eyebags", "oily", "redness"],
+  colors: [
+    [0, 0, 0, 0],        // background
+    [107, 19, 177, 255],   // dark circles
+    [0, 224, 255, 255],    // eyebags
+    [181, 23, 158, 255],   // oily
+    [189, 142, 255, 255],  // redness
+  ],
+};
+const modelLabel: { labels: string[], colors: number[][] }[] = [
+  modelLabel1,
+  modelLabel2,
+  modelLabel3,
+]
 export const detectSegment = async (
   source: HTMLImageElement,
   canvasRef: HTMLCanvasElement,
   segmenter: ImageSegmenter,
-  labels: string[],
+  labelId: number = 0,
   layerId: number = 0 // Parameter baru untuk mengidentifikasi layer
 ): Promise<[FaceResults[], SkinAnalysisResult[]]> => {
+  const labels = modelLabel[labelId].labels;
+  const colors = modelLabel[labelId].colors;
+
   try {
     // Sesuaikan ukuran canvas utama jika ini adalah layer pertama
     if (layerId === 0) {
@@ -514,7 +548,7 @@ export const detectSegment = async (
     let j = 0;
     for (let i = 0; i < mask.length; ++i) {
       const maskVal = Math.round(mask[i] * 255.0);
-      const legendColor = legendColors[maskVal % legendColors.length];
+      const legendColor = colors[(maskVal % colors.length)];
       imageData[j] = (legendColor[0] + imageData[j]) / 2;
       imageData[j + 1] = (legendColor[1] + imageData[j + 1]) / 2;
       imageData[j + 2] = (legendColor[2] + imageData[j + 2]) / 2;
