@@ -214,13 +214,11 @@ function Main({ isArabic }: { isArabic?: boolean }) {
           const skin1: [FaceResults[], SkinAnalysisResult[]] =
             await detectSegment(image, canvasRef.current, modelOneRef.current, [
               "background",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
+              "acne",
+              "pores",
+              "spots",
+              "wriinkles",
+
             ], 0);
 
           // const skin2: [FaceResults[], SkinAnalysisResult[]] =
@@ -237,13 +235,10 @@ function Main({ isArabic }: { isArabic?: boolean }) {
             const skin3: [FaceResults[], SkinAnalysisResult[]] =
             await detectSegment(image, canvasRef.current, modelThreeRef.current, [
               "background",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
-              "class1",
+              "dark circles",
+              "oily",
+              "eyebags",
+              "redness",
             ], 1);
           if (skin1) {
             setInferenceResult([...skin1[0], ...skin3[0]]);
