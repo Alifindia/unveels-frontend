@@ -321,7 +321,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
           <>
             <canvas
               ref={canvasRef}
-              className={`pointer-events-none absolute left-1/2 top-1/2`}
+              className={`pointer-events-none absolute left-1/2 top-1/2 blur-[2px]`}
               style={{
                 zIndex: 40,
                 width: "100%",
