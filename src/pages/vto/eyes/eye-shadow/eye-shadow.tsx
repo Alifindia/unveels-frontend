@@ -5,7 +5,10 @@ import { filterTextures } from "../../../../api/attributes/texture";
 import { Icons } from "../../../../components/icons";
 import { LoadingProducts } from "../../../../components/loading";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
-import { baseApiUrl, extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import {
+  baseApiUrl,
+  extractUniqueCustomAttributes,
+} from "../../../../utils/apiUtils";
 import { EyeShadowProvider, useEyeShadowContext } from "./eye-shadow-context";
 import { useEyeshadowsQuery } from "./eye-shadow-query";
 import { ColorPalette } from "../../../../components/color-palette";
@@ -185,7 +188,7 @@ function TextureSelector() {
   const { selectedTexture, setSelectedTexture } = useEyeShadowContext();
   return (
     <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
-      <div className="flex w-full items-center space-x-1 xl:space-x-2 overflow-x-auto py-1 no-scrollbar">
+      <div className="flex w-full items-center space-x-1 overflow-x-auto py-1 no-scrollbar xl:space-x-2">
         {textures.map((texture, index) => (
           <button
             key={texture.value}
@@ -291,7 +294,12 @@ function ModeSelector() {
 function ProductList() {
   const { t } = useTranslation();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
+  const {
+    selectedProductNumber,
+    setSelectedProductNumber,
+    addCartProductNumber,
+    setAddCartProductNumber,
+  } = useSelecProductNumberContext();
   const { addItemToCart, setDataItem, setType } = useCartContext();
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
@@ -332,18 +340,22 @@ function ProductList() {
     if (data?.items && selectedProductNumber) {
       const adjustedIndex = selectedProductNumber - 1;
       const matchedProduct = data.items[adjustedIndex];
-      console.log(selectedProductNumber)
+      console.log(selectedProductNumber);
+      console.log(matchedProduct);
       if (matchedProduct) {
+        const hexaColors = matchedProduct.custom_attributes
+          .find((item) => item.attribute_code === "hexacode")
+          ?.value.split(",");
+        console.log("RIZQI HEXA DONG", hexaColors);
         setSelectedProduct(matchedProduct);
-        setSelectedColors(
-          matchedProduct.custom_attributes
-            .find((item) => item.attribute_code === "hexacode")
-            ?.value.split(","),
-        );
+        if (hexaColors) {
+          console.log("RIZQI", hexaColors);
+          setSelectedColors(hexaColors);
+        }
         setSelectedTexture(
           matchedProduct.custom_attributes.find(
             (item) => item.attribute_code === "texture",
-          )?.value || null
+          )?.value || null,
         );
       }
     }
@@ -355,15 +367,15 @@ function ProductList() {
         const adjustedIndex = addCartProductNumber - 1;
         const matchedProduct = data.items[adjustedIndex];
         console.log(matchedProduct);
-  
+
         if (matchedProduct) {
           const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
           const id = matchedProduct.id.toString();
           try {
             await addItemToCart(id, url);
-            setType("unit")
+            setType("unit");
             setDataItem(matchedProduct);
-            setAddCartProductNumber(null)
+            setAddCartProductNumber(null);
             console.log(`Product ${id} added to cart!`);
           } catch (error) {
             console.error("Failed to add product to cart:", error);
@@ -371,7 +383,7 @@ function ProductList() {
         }
       }
     };
-  
+
     handleAddToCart();
   }, [data, addCartProductNumber]);
 
@@ -381,15 +393,18 @@ function ProductList() {
       setSelectedProductNumber(null);
       setSelectedTexture(null);
       setSelectedColors([]);
-      return
+      return;
     }
     console.log(product);
     setSelectedProduct(product);
-    setSelectedColors(
-      product.custom_attributes
-        .find((item) => item.attribute_code === "hexacode")
-        ?.value.split(","),
-    );
+    const hexa = product.custom_attributes
+      .find((item) => item.attribute_code === "hexacode")
+      ?.value.split(",");
+    if (hexa) {
+      setSelectedColors(hexa);
+    } else {
+      setSelectedColors([]);
+    }
     setSelectedTexture(
       product.custom_attributes
         .find((item) => item.attribute_code === "texture")
@@ -401,7 +416,7 @@ function ProductList() {
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
+          className="p-0 text-[0.550rem] text-white sm:py-0.5 2xl:text-[0.625rem]"
           onClick={() => {
             setMapTypes({
               Eyeshadows: {
@@ -428,7 +443,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
-                productNumber={index+1}
+                productNumber={index + 1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

@@ -43,7 +43,7 @@ const LipplumperInner: React.FC<LipplumperProps> = ({
           alphaMap: lipplumperTexture,
           alphaTest: 0,
         });
-  }, [lipplumperColor]);
+  }, [lipplumperColor, lipTexture]);
 
   const shimmerMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({

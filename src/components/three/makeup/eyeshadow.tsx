@@ -4,6 +4,7 @@ import {
   Color,
   MeshBasicMaterial,
   MeshBasicMaterialParameters,
+  MeshStandardMaterial,
   TextureLoader,
 } from "three";
 import FaceMesh from "../face-mesh";
@@ -78,7 +79,13 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
   planeSize,
   isFlipped,
 }) => {
-  const { eyeshadowMode, eyeshadowColor, eyeshadowPattern } = useMakeup();
+  const {
+    eyeshadowMode,
+    eyeshadowColor,
+    eyeshadowPattern,
+    eyeshadowMaterial,
+    envMapMakeup,
+  } = useMakeup();
 
   const shapeIndex = useMemo(() => eyeshadowPattern, [eyeshadowPattern]);
 
@@ -342,30 +349,60 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: oneModeTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, oneModeTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[0],
+      transparent: true,
+      opacity: 0.8,
+      alphaMap: oneModeTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, oneModeTexture, eyeshadowMaterial]);
 
   const dualStandardMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[0],
       transparent: true,
-      opacity: 0.77,
+      opacity: 0.3,
       alphaMap: dualStandardTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, dualStandardTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[0],
+      transparent: true,
+      opacity: 0.3,
+      alphaMap: dualStandardTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, dualStandardTexture, eyeshadowMaterial]);
 
   const dualHighMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
       color: eyeshadowColor[1],
       transparent: true,
-      opacity: 0.77,
+      opacity: 0.3,
       alphaMap: dualHighTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, dualHighTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[1],
+      transparent: true,
+      opacity: 0.3,
+      alphaMap: dualHighTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, dualHighTexture, eyeshadowMaterial]);
 
   const triStandardMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -375,8 +412,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: triStandardTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, triStandardTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[0],
+      transparent: true,
+      opacity: 0.4,
+      alphaMap: triStandardTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, triStandardTexture, eyeshadowMaterial]);
 
   const triHighMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -386,8 +433,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: triHighTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, triHighTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[1],
+      transparent: true,
+      opacity: 0.4,
+      alphaMap: triHighTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, triHighTexture, eyeshadowMaterial]);
 
   const triMidMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -397,8 +454,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: triMidTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, triMidTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[2],
+      transparent: true,
+      opacity: 0.4,
+      alphaMap: triMidTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, triMidTexture, eyeshadowMaterial]);
 
   const quadStandardMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -408,8 +475,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: quadStandardTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, quadStandardTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[0],
+      transparent: true,
+      opacity: 0.8,
+      alphaMap: quadStandardTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, quadStandardTexture, eyeshadowMaterial]);
 
   const quadHighMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -419,8 +496,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: quadHighTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, quadHighTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[1],
+      transparent: true,
+      opacity: 0.8,
+      alphaMap: quadHighTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, quadHighTexture, eyeshadowMaterial]);
 
   const quadMidMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -430,8 +517,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: quadMidTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, quadMidTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[2],
+      transparent: true,
+      opacity: 0.8,
+      alphaMap: quadMidTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, quadMidTexture, eyeshadowMaterial]);
 
   const quadLowerMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -441,8 +538,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: quadLowerTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, quadLowerTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[3],
+      transparent: true,
+      opacity: 0.8,
+      alphaMap: quadLowerTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, quadLowerTexture, eyeshadowMaterial]);
 
   const pentaStandardMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -452,8 +559,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: pentaStandardTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, pentaStandardTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[0],
+      transparent: true,
+      opacity: 0.8,
+      alphaMap: pentaStandardTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, pentaStandardTexture, eyeshadowMaterial]);
 
   const pentaHighMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -463,8 +580,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: pentaHighTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, pentaHighTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[1],
+      transparent: true,
+      opacity: 0.8,
+      alphaMap: pentaHighTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, pentaHighTexture, eyeshadowMaterial]);
 
   const pentaMidMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -474,8 +601,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: pentaMidTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, pentaMidTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[2],
+      transparent: true,
+      opacity: 0.8,
+      alphaMap: pentaMidTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, pentaMidTexture, eyeshadowMaterial]);
 
   const pentaLowerMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -485,8 +622,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: pentaLowerTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, pentaLowerTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[3],
+      transparent: true,
+      opacity: 0.8,
+      alphaMap: pentaLowerTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, pentaLowerTexture, eyeshadowMaterial]);
 
   const pentaSideMaterial = useMemo(() => {
     const material = new MeshBasicMaterial({
@@ -496,8 +643,18 @@ const EyeShadowInner: React.FC<EyeShadowProps> = ({
       alphaMap: pentaSideTexture,
       alphaTest: 0,
     });
-    return material;
-  }, [eyeshadowColor, pentaSideTexture]);
+    const glossyMaterial = new MeshStandardMaterial({
+      color: eyeshadowColor[4],
+      transparent: true,
+      opacity: 0.8,
+      alphaMap: pentaSideTexture,
+      alphaTest: 0,
+      metalness: 0.3,
+      roughness: 0.3,
+      envMap: envMapMakeup,
+    });
+    return eyeshadowMaterial == 2 ? glossyMaterial : material;
+  }, [eyeshadowColor, pentaSideTexture, eyeshadowMaterial]);
 
   // Cleanup materials to prevent memory leaks
   useEffect(() => {

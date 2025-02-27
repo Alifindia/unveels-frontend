@@ -151,7 +151,7 @@ const LipColorInner: React.FC<LipColorProps> = ({
     });
 
     return lipTexture === "Glossy" ? glossyMaterial : material;
-  }, [lipColors, highTexture]);
+  }, [lipColors, highTexture, lipTexture]);
 
   useEffect(() => {
     return () => {
@@ -159,7 +159,7 @@ const LipColorInner: React.FC<LipColorProps> = ({
       dualStandardMaterial.dispose();
       dualHighMaterial.dispose();
     };
-  }, [singleMaterial, dualStandardMaterial, dualHighMaterial]);
+  }, [singleMaterial, dualStandardMaterial, dualHighMaterial, lipTexture]);
 
   return (
     <>
