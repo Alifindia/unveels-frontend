@@ -531,6 +531,11 @@ export const detectSegment = async (
     // Access confidence scores and calculate mean for each class
     const confidenceScores: { [key: number]: number } = {};
     const skinResult: SkinAnalysisResult[] = [];
+    let firmness = 100;
+    let moistures = 100;
+    let texture = 100;
+    let radiance = 100;
+
     if (result.confidenceMasks) {
       for (let numClass = 0; numClass < result.confidenceMasks.length; numClass++) {
         const confidenceMask = result.confidenceMasks[numClass].getAsFloat32Array();
@@ -541,7 +546,37 @@ export const detectSegment = async (
           score: Math.ceil(confidenceScores[numClass] * 100),
           class: numClass
         });
+        if (labels[numClass] == "redness" || labels[numClass] == "pores" || labels[numClass] == "eyebags") {
+          firmness -= Math.ceil(confidenceScores[numClass] * 100);
+        }
+        if (labels[numClass] == "redness" || labels[numClass] == "pores" || labels[numClass] == "acne" || labels[numClass] == "dry" || labels[numClass] == "oily") {
+          moistures -= Math.ceil(confidenceScores[numClass] * 100);
+        }
+        if (labels[numClass] == "eyebags") {
+          radiance -= Math.ceil(confidenceScores[numClass] * 100);
+        }
+        texture -= 5;
       }
+      skinResult.push({
+        label: 'firmness',
+        score: firmness,
+        class: 14
+      });
+      skinResult.push({
+        label: 'moisture',
+        score: moistures,
+        class: 15
+      });
+      skinResult.push({
+        label: 'radiance',
+        score: radiance - moistures - firmness,
+        class: 16
+      });
+      skinResult.push({
+        label: 'texture',
+        score: texture,
+        class: 17
+      });
     }
 
     // Blend colors with image data on offscreen canvas
