@@ -253,6 +253,10 @@ const routes = [
           { path: "bracelets", element: <HandwearSelector /> },
           { path: "bangles", element: <HandwearSelector /> },
           { path: "watches", element: <WatchesSelector /> },
+          // Nails
+          { path: "nails", element: <NailsMode /> },
+          { path: "nail-polish", element: <NailPolishSelector /> },
+          { path: "press-on-nails", element: <PressOnNailsSelector /> },
         ],
       },
     ],
@@ -283,9 +287,7 @@ function Home() {
       <LinkButton to="/virtual-try-on-makeups/makeups">
         Virtual Try On Makeup
       </LinkButton>
-      <LinkButton to="/smart-beauty/makeups">
-        Smart Beauty
-      </LinkButton>
+      <LinkButton to="/smart-beauty/makeups">Smart Beauty</LinkButton>
       <LinkButton to="/virtual-try-on-accesories/accesories">
         Virtual Try On Accesories
       </LinkButton>

@@ -157,12 +157,14 @@ function ProductList() {
     texture: selectedTexture,
   });
 
-  const { setShowLipplumper, setLipplumperColor } = useMakeup();
+  const { setShowLipplumper, setLipplumperColor, setLipTexture } = useMakeup();
 
   useEffect(() => {
     setLipplumperColor(selectedColor || "#ffffff");
     setShowLipplumper(selectedColor != null);
-  }, [selectedColor]);
+    const texture = textures.find((t) => t.value == selectedTexture);
+    setLipTexture(texture?.label as "Matte" | "Gloss" | "Satin" | "Sheer" | "Shimmer" | "Metalic" | "Holographic");
+  }, [selectedColor, selectedTexture]);
 
   useEffect(() => {
     if (data?.items && selectedProductNumber) {
@@ -191,7 +193,7 @@ function ProductList() {
         const adjustedIndex = addCartProductNumber - 1;
         const matchedProduct = data.items[adjustedIndex];
         console.log(matchedProduct);
-  
+
         if (matchedProduct) {
           const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
           const id = matchedProduct.id.toString();
@@ -207,7 +209,7 @@ function ProductList() {
         }
       }
     };
-  
+
     handleAddToCart();
   }, [data, addCartProductNumber]);
 

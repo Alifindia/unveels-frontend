@@ -652,7 +652,7 @@ export function VideoStream({
     cancel: cancelCountdown,
     isActive: isCountdownActive,
   } = useCountdown({
-    initialCount: 3,
+    initialCount: isNeedDetectOrientation ? 3 : 5,
     onComplete: capture,
   });
 

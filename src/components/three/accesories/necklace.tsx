@@ -66,26 +66,28 @@ const NecklaceInner: React.FC<NecklaceProps> = React.memo(
         necklaceRef.current.visible = true;
         const neckLandmark = landmarks.current[152];
 
-        const neckDistance =
-          calculateDistance(landmarks.current[197], landmarks.current[152]) *
-          outputWidth *
-          1.5;
+        const neckDistance = calculateDistance(
+          landmarks.current[197],
+          landmarks.current[152],
+        );
 
-        const neckLandmarkX = (1 - neckLandmark.x - 0.49) * outputWidth;
-        const neckLandmarkY = -(neckLandmark.y - 0.62) * outputHeight;
-        const neckLandmarkZ = -neckLandmark.z * 200;
+        const neckLandmarkX = (1 - neckLandmark.x - 0.5) * outputWidth;
+        const neckLandmarkY = -(neckLandmark.y - 0.5) * outputHeight;
+        const neckLandmarkZ =
+          -neckLandmark.z * Math.max(outputHeight, outputWidth);
 
         const faceSize = calculateDistance(
           landmarks.current[162],
           landmarks.current[389],
-        );
+        )
 
+        const neck = (neckDistance * outputWidth)
         const scaleFactor = (faceSize * outputWidth) / 15;
 
         if (neckLandmark) {
           necklaceRef.current.position.set(
             neckLandmarkX,
-            neckLandmarkY - (neckDistance * 0.9),
+            neckLandmarkY - neck,
             neckLandmarkZ,
           );
 
