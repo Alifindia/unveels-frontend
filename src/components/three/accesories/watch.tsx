@@ -80,7 +80,7 @@ const WatchInner: React.FC<WatchProps> = React.memo(
         const wristSize = calculateDistance(wrist, thumbBase);
         const wristX = (1 - wrist.x - 0.5) * outputWidth;
         const wristY = -(wrist.y - 0.5) * outputHeight;
-        const wristZ = 230;
+        const wristZ = -wrist.z * Math.max(outputHeight, outputWidth);
         let scaleFactor: number
         if (isPalmFacingBack) {
           scaleFactor = (wristSize * outputWidth) / 3.7;

@@ -67,16 +67,11 @@ const HandOccluderInner: React.FC<HandOccluderProps> = React.memo(
 
         const wristSize = calculateDistance(wrist, thumbBase);
 
-        // Scale coordinates proportionally with the viewport
-        const scaleX = viewport.width / outputWidth;
-        const scaleY = viewport.height / outputHeight;
+        const wristX = (1 - wrist.x - 0.5) * outputWidth;
+        const wristY = -(wrist.y - 0.5) * outputHeight;
+        const wristZ = -wrist.z * outputWidth;
 
-        const wristX =
-          (1 - wrist.x) * outputWidth * scaleX - viewport.width / 2;
-        const wristY = -wrist.y * outputHeight * scaleY + viewport.height / 2;
-        const wristZ = 200;
-
-        const scaleFactor = (wristSize * outputWidth) / 4;
+        const scaleFactor = (wristSize * outputWidth) / 3.5;
 
         occluderRef.current.position.set(wristX, wristY, wristZ);
         occluderRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);

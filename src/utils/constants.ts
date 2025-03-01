@@ -1819,7 +1819,11 @@ export const NECK_OCCLUDER =
 export const HAND_OCCLUDER =
   "/media/unveels/vto-assets/occluder/wristOccluder.glb";
 
-// watch
+// finger occluder
+export const FINGER_OCCLUDER =
+  "/media/unveels/vto-assets/occluder/fingerOccluder.glb";
+
+  // watch
 export const WATCH = "/media/unveels/vto-assets/watch/watch.glb";
 
 // ring

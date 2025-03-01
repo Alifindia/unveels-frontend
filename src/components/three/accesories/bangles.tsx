@@ -42,7 +42,7 @@ const BangleInner: React.FC<BangleProps> = React.memo(
                 mesh.material.needsUpdate = true;
                 mesh.material.visible = showBracelet;
               }
-              child.renderOrder = 4;
+              child.renderOrder = 5;
             }
           });
 
@@ -80,40 +80,20 @@ const BangleInner: React.FC<BangleProps> = React.memo(
         const wristSize = calculateDistance(wrist, thumbBase);
         const wristX = (1 - wrist.x - 0.5) * outputWidth;
         const wristY = -(wrist.y - 0.5) * outputHeight;
-        const wristZ = 230;
-        let scaleFactor: number
-        if (isPalmFacingBack) {
-          scaleFactor = (wristSize * outputWidth) / 3.7;
-        } else {
-          scaleFactor = (wristSize * outputWidth) / 3.48;
-        }
+        const wristZ = -wrist.z * Math.max(outputHeight, outputWidth);
+        const scaleFactor = wristSize * outputWidth;
+
         bangleRef.current.position.set(wristX, wristY, wristZ);
         bangleRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
-
-        const isRightHand = thumbBase.x < indexBase.x;
 
         const quaternion = handQuaternion(handLandmarks.current);
 
         if (quaternion) {
-          const adjustment = new Quaternion();
-
-          if (isPalmFacingBack) {
-            adjustment.setFromAxisAngle(new Vector3(1, 0, 0), Math.PI);
-          } else {
-            adjustment.setFromAxisAngle(new Vector3(1, 0, 0), 0);
-          }
-
-          if (!isRightHand) {
-            adjustment.multiply(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), Math.PI));
-          }
-
-          bangleRef.current.quaternion.copy(quaternion).multiply(adjustment);
+          bangleRef.current.setRotationFromQuaternion(quaternion);
         }
 
         const isWristBent = wristSize < 0.1;
-        bangleRef.current.visible = !isWristBent;
-      } else {
-        bangleRef.current.visible = false;
+        bangleRef.current.visible = true;
       }
     });
 
