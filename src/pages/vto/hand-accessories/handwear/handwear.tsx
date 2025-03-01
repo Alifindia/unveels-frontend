@@ -112,14 +112,6 @@ function ColorSelector() {
     material: null,
   });
 
-  useEffect(() => {
-    if (selectedColor === null) {
-      setShowRing(false);
-    } else {
-      setShowRing(true);
-    }
-  }, [selectedColor]);
-
   const extractHexa = extractUniqueCustomAttributes(
     data?.items ?? [],
     "hexacode",
