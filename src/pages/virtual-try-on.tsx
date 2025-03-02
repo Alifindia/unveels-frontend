@@ -628,16 +628,28 @@ function RecorderStatus() {
 
 export function TopNavigation({}: {}) {
   const isDevelopment = process.env.NODE_ENV === "development";
+  const [backClickCount, setBackClickCount] = useState(0);
+
+  const handleBackClick = () => {
+    if (process.env.NODE_ENV === "production") {
+      if (backClickCount === 0) {
+        setBackClickCount(1);
+        window.location.href = "/virtual-try-on/accesories";
+      } else {
+        window.location.href = import.meta.env.VITE_API_BASE_URL + "/technologies";
+      }
+    }
+  };
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
       <div className="flex flex-col gap-4">
-        <a
+        <button
           className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          href={import.meta.env.VITE_API_BASE_URL + "/technologies"}
+          onClick={handleBackClick}
         >
           <ChevronLeft className="size-6 text-white" />
-        </a>
+        </button>
       </div>
 
       <div className="flex flex-col gap-4">

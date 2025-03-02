@@ -38,8 +38,6 @@ export function FoundationSelector() {
         <ColorSelector />
       </div>
 
-      <TextureSelector />
-
       <ProductList />
     </div>
   );
@@ -241,7 +239,7 @@ function ProductList() {
         const adjustedIndex = addCartProductNumber - 1;
         const matchedProduct = data.items[adjustedIndex];
         console.log(matchedProduct);
-  
+
         if (matchedProduct) {
           const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
           const id = matchedProduct.id.toString();
@@ -257,7 +255,7 @@ function ProductList() {
         }
       }
     };
-  
+
     handleAddToCart();
   }, [data, addCartProductNumber]);
 
@@ -280,7 +278,7 @@ function ProductList() {
       setSelectedTexture(null)
       return
     }
-    console.log(product);    
+    console.log(product);
     setSelectedProduct(product);
     setColorFamily(
       product.custom_attributes.find(
