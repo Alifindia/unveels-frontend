@@ -26,6 +26,7 @@ import { Rnd } from "react-rnd";
 // new
 import { BeforeAfterCanvas } from "./before-after-canvas";
 import { hexToRgb } from "../../utils/colorUtils";
+import { ModelLoadingScreen } from "../model-loading-screen";
 
 export function VirtualTryOnScene({
   mediaFile,
@@ -82,9 +83,13 @@ export function VirtualTryOnScene({
   const showFaceRef = useRef(showMakeup || showFace);
   const showHandRef = useRef(showHand || showHand);
   const showHairSegmenterRef = useRef(showHair || showFoundation);
+  const [loadingModel, setLoadingModel] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
 
   const initializeFaceLandmarker = async () => {
     if (faceLandmarkerRef.current) return;
+    setLoadingModel(true);
+    setLoadingMessage("Loading for face detector...");
     const filesetResolver = await FilesetResolver.forVisionTasks(
       "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.17/wasm",
     );
@@ -103,10 +108,13 @@ export function VirtualTryOnScene({
       outputFacialTransformationMatrixes: true,
     });
     faceLandmarkerRef.current = landmarker;
+    setLoadingModel(false);
   };
 
   const initializeHandLandmarker = async () => {
     if (handLandmarkerRef.current) return;
+    setLoadingModel(true);
+    setLoadingMessage("Loading for hand detector...");
     const filesetResolver = await FilesetResolver.forVisionTasks(
       "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.17/wasm",
     );
@@ -126,10 +134,13 @@ export function VirtualTryOnScene({
       },
     );
     handLandmarkerRef.current = handLandmarker;
+    setLoadingModel(false);
   };
 
   const initializeImageSegmenter = async () => {
     if (hairSegmenterRef.current) return;
+    setLoadingModel(true);
+    setLoadingMessage("Loading for selfie detector...");
     const filesetResolver = await FilesetResolver.forVisionTasks(
       "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.17/wasm",
     );
@@ -148,6 +159,7 @@ export function VirtualTryOnScene({
     );
 
     hairSegmenterRef.current = hairSegmenter;
+    setLoadingModel(false);
   };
 
   useEffect(() => {
@@ -181,9 +193,10 @@ export function VirtualTryOnScene({
 
   useEffect(() => {
     let isMounted = true;
-    const initializeFaceLandmarker = async () => {
+    const startLandmarker = async () => {
       try {
         if (isMounted) {
+          initializeFaceLandmarker();
           startDetection();
         }
       } catch (error) {
@@ -192,7 +205,7 @@ export function VirtualTryOnScene({
       }
     };
 
-    initializeFaceLandmarker();
+    startLandmarker();
 
     // Cleanup pada unmount
     return () => {
@@ -316,7 +329,9 @@ export function VirtualTryOnScene({
                     ).data;
 
                     const hairColor = hexToRgb(hairColorRef.current);
-                    const hairLegend = [[0, 255, 0, 0.08]];
+                    const hairLegend = [
+                      [hairColor.r, hairColor.g, hairColor.b, 0.15],
+                    ];
                     const foundationColor = hexToRgb(
                       foundationColorRef.current,
                     );
@@ -337,11 +352,11 @@ export function VirtualTryOnScene({
                           const legendColor =
                             hairLegend[maskVal % hairLegend.length];
                           imageData[j] =
-                            legendColor[0] * 0.08 + imageData[j] * 0.9;
+                            legendColor[0] * 0.15 + imageData[j] * 0.9;
                           imageData[j + 1] =
-                            legendColor[1] * 0.08 + imageData[j + 1] * 0.9;
+                            legendColor[1] * 0.15 + imageData[j + 1] * 0.9;
                           imageData[j + 2] =
-                            legendColor[2] * 0.08 + imageData[j + 2] * 0.9;
+                            legendColor[2] * 0.15 + imageData[j + 2] * 0.9;
                           imageData[j + 3] = 255;
                         }
                       } else if (maskVal === 3) {
@@ -705,6 +720,7 @@ export function VirtualTryOnScene({
           transform: "translate(-50%, -50%) scaleX(-1)",
         }}
       />
+      {loadingModel && <ModelLoadingScreen progress={0} loadingMessage={loadingMessage} />}
       {/* Error Display */}
       {error && <ErrorOverlay message={error.message} />}
     </div>

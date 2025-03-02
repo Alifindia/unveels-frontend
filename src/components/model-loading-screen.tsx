@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 
-export function ModelLoadingScreen({ progress }: { progress: number }) {
+export function ModelLoadingScreen({ progress , loadingMessage}: { progress: number, loadingMessage?: string | null }) {
     const { t } = useTranslation();
-  
+
   const message =
     progress < 70
       ? "Loading Models..."
@@ -15,6 +15,7 @@ export function ModelLoadingScreen({ progress }: { progress: number }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
       <div className="text-center text-white">
+        {loadingMessage && <p className="mt-4 animate-pulse font-semibold">{loadingMessage}</p>}
         <p className="mb-4 animate-pulse text-lg font-semibold">
           {t("model_loading.label")}
         </p>

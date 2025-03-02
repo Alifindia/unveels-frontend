@@ -92,7 +92,6 @@ const colorList = [
   "#d9be95",
   "#784405",
   "#403007",
-  "#403007",
   "#181305",
   "#181305",
   "#b7a189",
@@ -104,11 +103,7 @@ function ColorSelector() {
   const { selectedColor, setSelectedColor } = useHairColorContext();
 
   function setColor(color: number) {
-    if (!showHair) {
-      setShowHair(true);
-    }
     setSelectedColor(color.toString());
-    setHairColor(colorList[color]);
   }
 
   return (
@@ -159,8 +154,12 @@ function ProductList() {
 
   useEffect(() => {
     if (selectedColor) {
-      console.log("SELECTED", hairColor)
-      setHairColor(selectedColor);
+      if (selectedColor.length == 7) {
+        setHairColor(selectedColor);
+      } else {
+        setHairColor(colorList[parseInt(selectedColor)]);
+        console.log(colorList[parseInt(selectedColor)]);
+      }
       setShowHair(true);
     }
   }, [selectedColor]);
