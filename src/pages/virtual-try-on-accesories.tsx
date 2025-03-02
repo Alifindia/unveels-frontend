@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { cloneElement, CSSProperties, Fragment, useState } from "react";
 import { Icons } from "../components/icons";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Footer } from "../components/footer";
 import { CameraProvider, useCamera } from "../context/recorder-context";
@@ -376,17 +376,28 @@ function BottomContent() {
 
 export function TopNavigation({}: {}) {
   const isDevelopment = process.env.NODE_ENV === "development";
-  const [backClickCount, setBackClickCount] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleBackClick = () => {
-    if (process.env.NODE_ENV === "production") {
-      if (backClickCount === 0) {
-        setBackClickCount(1);
-        window.location.href = "/virtual-try-on-accesories/accesories";
+    if (location.pathname !== "/virtual-try-on-accesories/accesories") {
+      navigate("/virtual-try-on-accesories/accesories");
+    } else {
+      if (isDevelopment) {
+        window.location.href = "/";
       } else {
         window.location.href =
           import.meta.env.VITE_API_BASE_URL + "/technologies";
       }
+    }
+  };
+
+  const handleCloseClick = () => {
+    if (process.env.NODE_ENV === "production") {
+      window.location.href =
+        import.meta.env.VITE_API_BASE_URL + "/technologies";
+    } else {
+      window.location.href = "/";
     }
   };
 
@@ -402,23 +413,13 @@ export function TopNavigation({}: {}) {
       </div>
 
       <div className="flex flex-col gap-4">
-        {isDevelopment ? (
-          <Link
-            type="button"
-            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            to="/"
-          >
-            <X className="size-6 text-white" />
-          </Link>
-        ) : (
-          <a
-            type="button"
-            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            href={import.meta.env.VITE_API_BASE_URL + "/technologies"}
-          >
-            <X className="size-6 text-white" />
-          </a>
-        )}
+        <button
+          type="button"
+          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          onClick={handleCloseClick}
+        >
+          <X className="size-6 text-white" />
+        </button>
 
         <div className="relative -m-0.5 p-0.5">
           <div

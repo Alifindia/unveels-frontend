@@ -19,7 +19,7 @@ import {
 } from "react";
 import { Icons } from "../components/icons";
 
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 
 import { Footer } from "../components/footer";
@@ -403,45 +403,41 @@ function BottomContent() {
 }
 
 export function TopNavigation({ cart = false }: { cart?: boolean }) {
-  const { flipCamera } = useCamera();
-  const [backClickCount, setBackClickCount] = useState(0);
+  const isDevelopment = process.env.NODE_ENV === "development";
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleBackClick = () => {
-    if (process.env.NODE_ENV === "production") {
-      if (backClickCount === 0) {
-        setBackClickCount(1);
-        navigate("/virtual-try-on/makeups");
+    if (location.pathname !== "/virtual-try-on-makeups/makeups") {
+      navigate("/virtual-try-on-makeups/makeups");
+    } else {
+      if (isDevelopment) {
+        window.location.href = "/";
       } else {
-        window.location.href = import.meta.env.VITE_API_BASE_URL + "/technologies";
+        window.location.href =
+          import.meta.env.VITE_API_BASE_URL + "/technologies";
       }
     }
   };
 
   const handleCloseClick = () => {
     if (process.env.NODE_ENV === "production") {
-      window.location.href = import.meta.env.VITE_API_BASE_URL + "/technologies";
+      window.location.href =
+        import.meta.env.VITE_API_BASE_URL + "/technologies";
+    } else {
+      window.location.href = "/";
     }
   };
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
       <div className="flex flex-col gap-3">
-        {process.env.NODE_ENV === "development" ? (
-          <Link
-            to="/virtual-try-on/accesories"
-            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-          >
-            <ChevronLeft className="size-4 text-white" />
-          </Link>
-        ) : (
-          <button
-            className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            onClick={handleBackClick}
-          >
-            <ChevronLeft className="size-4 text-white" />
-          </button>
-        )}
+        <button
+          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          onClick={handleBackClick}
+        >
+          <ChevronLeft className="size-4 text-white" />
+        </button>
       </div>
 
       <div className="flex flex-col gap-3">

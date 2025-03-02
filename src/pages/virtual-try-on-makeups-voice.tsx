@@ -19,7 +19,7 @@ import {
 } from "react";
 import { Icons } from "../components/icons";
 
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 
 import { Footer } from "../components/footer";
@@ -68,12 +68,21 @@ import { HeadbandProvider } from "./vto/head-accesories/headband/headband-contex
 import { HandwearProvider } from "./vto/hand-accessories/handwear/handwear-context";
 import { WatchesProvider } from "./vto/hand-accessories/watches/watches-context";
 import VoiceCommand from "../components/voice-command/voice-command";
-import { useVirtualTryOnMakeupsVoice, VirtualTryOnMakeupsVoiceProvider } from "../context/virtual-try-on-makeups-voice-context";
-import { SelecProductNumberProvider, useSelecProductNumberContext } from "./vto/select-product-context";
+import {
+  useVirtualTryOnMakeupsVoice,
+  VirtualTryOnMakeupsVoiceProvider,
+} from "../context/virtual-try-on-makeups-voice-context";
+import {
+  SelecProductNumberProvider,
+  useSelecProductNumberContext,
+} from "./vto/select-product-context";
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
 import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
-import { FindTheLookProvider, useFindTheLookContext } from "../context/find-the-look-context";
+import {
+  FindTheLookProvider,
+  useFindTheLookContext,
+} from "../context/find-the-look-context";
 import { CartProvider, useCartContext } from "../context/cart-context";
 import { FilterProvider } from "../context/filter-context";
 import { getCookie } from "../utils/other";
@@ -86,63 +95,63 @@ interface VirtualTryOnProvider {
 
 export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
   return (
-  <SelecProductNumberProvider>
-    <WatchesProvider>
-      <HandwearProvider>
-        <ScarvesProvider>
-          <NeckwearProvider>
-            <TiaraProvider>
-              <HeadbandProvider>
-                <HatsProvider>
-                  <GlassesProvider>
-                    <EarringsProvider>
-                      <HairColorProvider>
-                        <PressOnNailsProvider>
-                          <NailPolishProvider>
-                            <MascaraProvider>
-                              <LenseProvider>
-                                <LashesProvider>
-                                  <EyebrowsProvider>
-                                    <EyeShadowProvider>
-                                      <EyeLinerProvider>
-                                        <ConcealerProvider>
-                                          <ContourProvider>
-                                            <BronzerProvider>
-                                              <HighlighterProvider>
-                                                <FoundationProvider>
-                                                  <BlushProvider>
-                                                    <LipColorProvider>
-                                                      <LipLinerProvider>
-                                                        <LipPlumperProvider>
-                                                          {children}
-                                                        </LipPlumperProvider>
-                                                      </LipLinerProvider>
-                                                    </LipColorProvider>
-                                                  </BlushProvider>
-                                                </FoundationProvider>
-                                              </HighlighterProvider>
-                                            </BronzerProvider>
-                                          </ContourProvider>
-                                        </ConcealerProvider>
-                                      </EyeLinerProvider>
-                                    </EyeShadowProvider>
-                                  </EyebrowsProvider>
-                                </LashesProvider>
-                              </LenseProvider>
-                            </MascaraProvider>
-                          </NailPolishProvider>
-                        </PressOnNailsProvider>
-                      </HairColorProvider>
-                    </EarringsProvider>
-                  </GlassesProvider>
-                </HatsProvider>
-              </HeadbandProvider>
-            </TiaraProvider>
-          </NeckwearProvider>
-        </ScarvesProvider>
-      </HandwearProvider>
-    </WatchesProvider>
-  </SelecProductNumberProvider>
+    <SelecProductNumberProvider>
+      <WatchesProvider>
+        <HandwearProvider>
+          <ScarvesProvider>
+            <NeckwearProvider>
+              <TiaraProvider>
+                <HeadbandProvider>
+                  <HatsProvider>
+                    <GlassesProvider>
+                      <EarringsProvider>
+                        <HairColorProvider>
+                          <PressOnNailsProvider>
+                            <NailPolishProvider>
+                              <MascaraProvider>
+                                <LenseProvider>
+                                  <LashesProvider>
+                                    <EyebrowsProvider>
+                                      <EyeShadowProvider>
+                                        <EyeLinerProvider>
+                                          <ConcealerProvider>
+                                            <ContourProvider>
+                                              <BronzerProvider>
+                                                <HighlighterProvider>
+                                                  <FoundationProvider>
+                                                    <BlushProvider>
+                                                      <LipColorProvider>
+                                                        <LipLinerProvider>
+                                                          <LipPlumperProvider>
+                                                            {children}
+                                                          </LipPlumperProvider>
+                                                        </LipLinerProvider>
+                                                      </LipColorProvider>
+                                                    </BlushProvider>
+                                                  </FoundationProvider>
+                                                </HighlighterProvider>
+                                              </BronzerProvider>
+                                            </ContourProvider>
+                                          </ConcealerProvider>
+                                        </EyeLinerProvider>
+                                      </EyeShadowProvider>
+                                    </EyebrowsProvider>
+                                  </LashesProvider>
+                                </LenseProvider>
+                              </MascaraProvider>
+                            </NailPolishProvider>
+                          </PressOnNailsProvider>
+                        </HairColorProvider>
+                      </EarringsProvider>
+                    </GlassesProvider>
+                  </HatsProvider>
+                </HeadbandProvider>
+              </TiaraProvider>
+            </NeckwearProvider>
+          </ScarvesProvider>
+        </HandwearProvider>
+      </WatchesProvider>
+    </SelecProductNumberProvider>
   );
 }
 
@@ -221,41 +230,41 @@ function Main() {
     }
     return (
       <>
-      {criterias.screenshotImage && (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 10,
-          }}
-        >
-          <ScreenshotPreview />
-        </div>
-      )}
-      <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
-        <SuccessPopup product={dataItem} type={type} />
-        <div className="absolute inset-0">
-          <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
-          <div className="pointer-events-none absolute inset-0"></div>
-        </div>
-        <TopNavigation />
+        {criterias.screenshotImage && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 10,
+            }}
+          >
+            <ScreenshotPreview />
+          </div>
+        )}
+        <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
+          <SuccessPopup product={dataItem} type={type} />
+          <div className="absolute inset-0">
+            <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+            <div className="pointer-events-none absolute inset-0"></div>
+          </div>
+          <TopNavigation />
 
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-        <Sidebar
-          onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
-          setMediaFile={setMediaFile}
-          setMode={setMode}
-          setShowChangeModel={setShowChangeModel}
-        />
-        <div className="bg-black/10 pt-1 shadow-lg backdrop-blur-sm">
-          {isMainContentVisible && <MainContent />}
-          <Footer />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
+            <Sidebar
+              onExpandClick={() => setMainContentVisible(!isMainContentVisible)}
+              setMediaFile={setMediaFile}
+              setMode={setMode}
+              setShowChangeModel={setShowChangeModel}
+            />
+            <div className="bg-black/10 pt-1 shadow-lg backdrop-blur-sm">
+              {isMainContentVisible && <MainContent />}
+              <Footer />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
       </>
     );
   }
@@ -265,7 +274,7 @@ function Main() {
 
 function MainContent() {
   const [collapsed, setCollapsed] = useState(false);
-  const {setSelectedProductNumber} = useSelecProductNumberContext()
+  const { setSelectedProductNumber } = useSelecProductNumberContext();
   const { criterias } = useCamera();
   const navigate = useNavigate();
 
@@ -336,7 +345,7 @@ export function Makeups() {
   ];
 
   const [selectedMakeup, setSelectedMakeup] = useState<string | null>(null);
-  const { setSelectedProductNumber } = useSelecProductNumberContext()
+  const { setSelectedProductNumber } = useSelecProductNumberContext();
   return (
     <>
       <div className="flex flex-col items-start">
@@ -347,8 +356,8 @@ export function Makeups() {
               className="flex flex-col items-center space-y-2"
               data-selected={selectedMakeup === option.name}
               onClick={() => {
-                setSelectedMakeup(option.name)
-                setSelectedProductNumber(null)
+                setSelectedMakeup(option.name);
+                setSelectedProductNumber(null);
               }}
             >
               <div
@@ -406,16 +415,28 @@ function BottomContent() {
 
 export function TopNavigation({}: {}) {
   const isDevelopment = process.env.NODE_ENV === "development";
-  const [backClickCount, setBackClickCount] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleBackClick = () => {
-    if (process.env.NODE_ENV === "production") {
-      if (backClickCount === 0) {
-        setBackClickCount(1);
-        window.location.href = "/smart-beauty/makeups";
+    if (location.pathname !== "/smart-beauty/makeups") {
+      navigate("/smart-beauty/makeups");
+    } else {
+      if (isDevelopment) {
+        window.location.href = "/";
       } else {
-        window.location.href = import.meta.env.VITE_API_BASE_URL + "/technologies";
+        window.location.href =
+          import.meta.env.VITE_API_BASE_URL + "/technologies";
       }
+    }
+  };
+
+  const handleCloseClick = () => {
+    if (process.env.NODE_ENV === "production") {
+      window.location.href =
+        import.meta.env.VITE_API_BASE_URL + "/technologies";
+    } else {
+      window.location.href = "/";
     }
   };
 
@@ -431,23 +452,13 @@ export function TopNavigation({}: {}) {
       </div>
 
       <div className="flex flex-col gap-4">
-        {isDevelopment ? (
-          <Link
-            type="button"
-            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            to="/"
-          >
-            <X className="size-6 text-white" />
-          </Link>
-        ) : (
-          <a
-            type="button"
-            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            href={import.meta.env.VITE_API_BASE_URL + "/technologies"}
-          >
-            <X className="size-6 text-white" />
-          </a>
-        )}
+        <button
+          type="button"
+          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          onClick={handleCloseClick}
+        >
+          <X className="size-6 text-white" />
+        </button>
 
         <div className="relative -m-0.5 p-0.5">
           <div

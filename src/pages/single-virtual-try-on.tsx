@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { CSSProperties, useEffect, useState } from "react";
 import { Icons } from "../components/icons";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import clsx from "clsx";
 import {
@@ -512,25 +512,27 @@ function MainContent({ product }: { product: Product }) {
 }
 
 export function TopNavigation({ cart = false }: { cart?: boolean }) {
-  const { flipCamera } = useCamera();
-  const [backClickCount, setBackClickCount] = useState(0);
+  const isDevelopment = process.env.NODE_ENV === "development";
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleBackClick = () => {
-    if (process.env.NODE_ENV === "production") {
-      if (backClickCount === 0) {
-        setBackClickCount(1);
-        window.location.href = "/virtual-try-on/makeups";
-      } else {
-        window.location.href = import.meta.env.VITE_API_BASE_URL + "/technologies";
-      }
+    if (location.pathname !== "/virtual-try-on/makeups") {
+      navigate("/virtual-try-on/makeups");
     } else {
-      window.location.href = "/virtual-try-on/makeups";
+      if (isDevelopment) {
+        window.location.href = "/";
+      } else {
+        window.location.href =
+          import.meta.env.VITE_API_BASE_URL + "/technologies";
+      }
     }
   };
 
   const handleCloseClick = () => {
     if (process.env.NODE_ENV === "production") {
-      window.location.href = import.meta.env.VITE_API_BASE_URL + "/technologies";
+      window.location.href =
+        import.meta.env.VITE_API_BASE_URL + "/technologies";
     } else {
       window.location.href = "/";
     }

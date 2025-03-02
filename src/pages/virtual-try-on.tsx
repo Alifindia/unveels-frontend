@@ -19,7 +19,7 @@ import {
 } from "react";
 import { Icons } from "../components/icons";
 
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
 
 import { Footer } from "../components/footer";
@@ -289,7 +289,7 @@ function MainContent() {
 
   useEffect(() => {
     navigate("/virtual-try-on/makeups");
-  }, [])
+  }, []);
 
   return (
     <>
@@ -326,7 +326,7 @@ export function TryOnSelector() {
             <Fragment key={shadeTab}>
               <button
                 key={shadeTab}
-                className={`relative h-10 grow border-b font-luxury text-[10px] sm:text-[12px] lg:text-[14px]  ${
+                className={`relative h-10 grow border-b font-luxury text-[10px] sm:text-[12px] lg:text-[14px] ${
                   isActive
                     ? activeClassNames
                     : "border-transparent text-gray-500"
@@ -628,16 +628,18 @@ function RecorderStatus() {
 
 export function TopNavigation({}: {}) {
   const isDevelopment = process.env.NODE_ENV === "development";
-  const [backClickCount, setBackClickCount] = useState(0);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleBackClick = () => {
-    if (process.env.NODE_ENV === "production") {
-      if (backClickCount === 0) {
-        setBackClickCount(1);
-        navigate("/virtual-try-on/makeup");
+    if (location.pathname !== "/virtual-try-on/makeups") {
+      navigate("/virtual-try-on/makeups");
+    } else {
+      if (isDevelopment) {
+        window.location.href = "/";
       } else {
-        window.location.href = import.meta.env.VITE_API_BASE_URL + "/technologies";
+        window.location.href =
+          import.meta.env.VITE_API_BASE_URL + "/technologies";
       }
     }
   };
