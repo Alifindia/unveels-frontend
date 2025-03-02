@@ -102,7 +102,7 @@ export function ScreenshotPreview() {
       ></canvas>
       <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
         <div className="flex flex-col gap-4">
-          <button className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl">
+          <button className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl" onClick={closePreview}>
             <ChevronLeft className="size-6 text-white" />
           </button>
         </div>
