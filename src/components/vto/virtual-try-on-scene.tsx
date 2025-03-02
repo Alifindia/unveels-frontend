@@ -444,40 +444,6 @@ export function VirtualTryOnScene({
     detect();
   }, []);
 
-  const isDesktop =
-    /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) == false;
-  const [videoDimensions, setVideoDimensions] = useState({
-    width: 480,
-    height: 480,
-  });
-
-  const updateVideoDimensions = () => {
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-
-    const aspectRatio = screenWidth / screenHeight;
-
-    let width = Math.min(screenWidth, 480);
-    let height = width / aspectRatio;
-
-    if (height > 480) {
-      height = 480;
-      width = height * aspectRatio;
-    }
-
-    setVideoDimensions({
-      width: Math.round(width),
-      height: Math.round(height),
-    });
-  };
-
-  useEffect(() => {
-    updateVideoDimensions();
-
-    window.addEventListener("resize", updateVideoDimensions);
-    return () => window.removeEventListener("resize", updateVideoDimensions);
-  }, []);
-
   return (
     <div className={`justify-center"} fixed inset-0 flex items-center`}>
       {webcamRef.current &&
@@ -666,7 +632,7 @@ export function VirtualTryOnScene({
 
       {/* 3D Canvas */}
       <Canvas
-        className={`absolute left-0 top-0 h-full w-full ${mode == "LIVE" ? "" : "scale-x-[-1] transform"}`}
+        className={`absolute left-0 top-0 h-full w-full ${mode == "LIVE" && !criterias.flipped ? "" : "scale-x-[-1] transform"}`}
         style={{ zIndex: 50 }}
         orthographic
         camera={{ zoom: 1, position: [0, 0, 0], near: -1000, far: 1000 }}
@@ -717,7 +683,7 @@ export function VirtualTryOnScene({
           height: "100%",
           objectFit: "cover",
           transform:
-            mode == "LIVE"
+            mode == "LIVE" && !criterias.flipped
               ? "translate(-50%, -50%) scaleX(-1)"
               : "translate(-50%, -50%)",
         }}
