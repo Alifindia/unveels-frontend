@@ -284,7 +284,7 @@ function MainContent() {
         <button
           type="button"
           onClick={() => {
-            navigate("/smart-beauty/makeups");
+            setCollapsed(!collapsed);
           }}
           className="flex h-3 w-full items-center justify-center bg-transparent"
         >

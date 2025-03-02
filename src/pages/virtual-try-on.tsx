@@ -297,7 +297,7 @@ function MainContent() {
         <button
           type="button"
           onClick={() => {
-            navigate("/virtual-try-on/makeups");
+            setCollapsed(!collapsed);
           }}
           className="flex h-3 w-full items-center justify-center bg-transparent"
         >
