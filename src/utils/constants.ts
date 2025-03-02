@@ -1628,17 +1628,17 @@ export const LIPS_TEXTURE_OMBRE_INNER =
 
 //lipliner
 export const LIPLINER_TEXTURE_ONE =
-  "/media/unveels/vto-assets/texture/lipliner/lipliner-0.png";
-export const LIPLINER_TEXTURE_TWO =
   "/media/unveels/vto-assets/texture/lipliner/lipliner-1.png";
+export const LIPLINER_TEXTURE_TWO =
+  "/media/unveels/vto-assets/texture/lipliner/lipliner-2.png";
 export const LIPLINER_TEXTURE_THREE =
   "/media/unveels/vto-assets/texture/lipliner/lipliner-3.png";
 export const LIPLINER_TEXTURE_FOUR =
-  "/media/unveels/vto-assets/texture/lipliner/lipliner-0.png";
+  "/media/unveels/vto-assets/texture/lipliner/lipliner-4.png";
 export const LIPLINER_TEXTURE_FIVE =
-  "/media/unveels/vto-assets/texture/lipliner/lipliner-1.png";
+  "/media/unveels/vto-assets/texture/lipliner/lipliner-5.png";
 export const LIPLINER_TEXTURE_SIX =
-  "/media/unveels/vto-assets/texture/lipliner/lipliner-3.png";
+  "/media/unveels/vto-assets/texture/lipliner/lipliner-5.png";
 
 // lipsplumper
 export const LIP_PLUMPER_TEXTURE_ONE =
