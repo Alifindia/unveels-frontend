@@ -27,6 +27,7 @@ import { Rnd } from "react-rnd";
 import { BeforeAfterCanvas } from "./before-after-canvas";
 import { hexToRgb } from "../../utils/colorUtils";
 import { ModelLoadingScreen } from "../model-loading-screen";
+import { mod } from "three/webgpu";
 
 export function VirtualTryOnScene({
   mediaFile,
@@ -340,7 +341,7 @@ export function VirtualTryOnScene({
                         foundationColor.r,
                         foundationColor.g,
                         foundationColor.b,
-                        0.1,
+                        0.08,
                       ],
                     ];
 
@@ -364,11 +365,11 @@ export function VirtualTryOnScene({
                           const skinColor =
                             skinColorLegend[maskVal % hairLegend.length];
                           imageData[j] =
-                            skinColor[0] * 0.1 + imageData[j] * 0.9;
+                            skinColor[0] * 0.08 + imageData[j] * 0.9;
                           imageData[j + 1] =
-                            skinColor[1] * 0.1 + imageData[j + 1] * 0.9;
+                            skinColor[1] * 0.08 + imageData[j + 1] * 0.9;
                           imageData[j + 2] =
-                            skinColor[2] * 0.1 + imageData[j + 2] * 0.9;
+                            skinColor[2] * 0.08 + imageData[j + 2] * 0.9;
                           imageData[j + 3] = 255;
                         }
                       } else {
@@ -478,9 +479,7 @@ export function VirtualTryOnScene({
   }, []);
 
   return (
-    <div
-      className={`fixed inset-0 flex items-center justify-center ${mode === "LIVE" ? "" : "scale-x-[-1] transform"}`}
-    >
+    <div className={`justify-center"} fixed inset-0 flex items-center`}>
       {webcamRef.current &&
         webcamRef.current.video &&
         webcamRef.current.video.readyState === 4 &&
@@ -560,7 +559,7 @@ export function VirtualTryOnScene({
         >
           <canvas
             ref={beforeAfterCanvasRef}
-            className="pointer-events-none absolute left-0 top-0 h-full w-screen"
+            className="pointer-events-none absolute left-0 top-0 h-full w-screen scale-x-[-1] transform"
             style={{ zIndex: 50 }}
           >
             <BeforeAfterCanvas
@@ -604,7 +603,7 @@ export function VirtualTryOnScene({
         >
           <canvas
             ref={beforeAfterCanvasRef}
-            className="pointer-events-none absolute left-0 top-0 h-full w-screen"
+            className="pointer-events-none absolute left-0 top-0 h-full w-screen scale-x-[-1] transform"
             style={{ zIndex: 50 }}
           >
             <BeforeAfterCanvas
@@ -667,7 +666,7 @@ export function VirtualTryOnScene({
 
       {/* 3D Canvas */}
       <Canvas
-        className="absolute left-0 top-0 h-full w-full"
+        className={`absolute left-0 top-0 h-full w-full ${mode == "LIVE" ? "" : "scale-x-[-1] transform"}`}
         style={{ zIndex: 50 }}
         orthographic
         camera={{ zoom: 1, position: [0, 0, 0], near: -1000, far: 1000 }}
@@ -711,16 +710,21 @@ export function VirtualTryOnScene({
 
       <canvas
         ref={backgroundCanvasRef}
-        className={`pointer-events-none absolute left-1/2 top-1/2 scale-x-[-1] transform`}
+        className={`pointer-events-none absolute left-1/2 top-1/2`}
         style={{
           zIndex: 40,
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          transform: "translate(-50%, -50%) scaleX(-1)",
+          transform:
+            mode == "LIVE"
+              ? "translate(-50%, -50%) scaleX(-1)"
+              : "translate(-50%, -50%)",
         }}
       />
-      {loadingModel && <ModelLoadingScreen progress={0} loadingMessage={loadingMessage} />}
+      {loadingModel && (
+        <ModelLoadingScreen progress={0} loadingMessage={loadingMessage} />
+      )}
       {/* Error Display */}
       {error && <ErrorOverlay message={error.message} />}
     </div>

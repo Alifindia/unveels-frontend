@@ -46,7 +46,7 @@ const LiplinerInner: React.FC<LiplinerProps> = ({
     const materialOptions: Partial<MeshBasicMaterialParameters> = {
       color: new Color(liplinerColor),
       transparent: !!alphaMap,
-      opacity: 0.4,
+      opacity: 0.3,
     };
 
     if (alphaMap) {
