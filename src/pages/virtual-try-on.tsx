@@ -629,12 +629,13 @@ function RecorderStatus() {
 export function TopNavigation({}: {}) {
   const isDevelopment = process.env.NODE_ENV === "development";
   const [backClickCount, setBackClickCount] = useState(0);
+  const navigate = useNavigate();
 
   const handleBackClick = () => {
     if (process.env.NODE_ENV === "production") {
       if (backClickCount === 0) {
         setBackClickCount(1);
-        window.location.href = "/virtual-try-on/accesories";
+        navigate("/virtual-try-on/makeup");
       } else {
         window.location.href = import.meta.env.VITE_API_BASE_URL + "/technologies";
       }
