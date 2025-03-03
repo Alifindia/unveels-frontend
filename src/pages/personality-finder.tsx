@@ -1,4 +1,8 @@
-import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+import {
+  FaceLandmarker,
+  FilesetResolver,
+  ImageClassifier,
+} from "@mediapipe/tasks-vision";
 import * as tf from "@tensorflow/tfjs-core";
 import * as tflite from "@tensorflow/tfjs-tflite";
 import clsx from "clsx";
@@ -46,6 +50,7 @@ import { getCookie, getCurrencyAndRate } from "../utils/other";
 import { RecommendationsTab } from "../components/personality-analyzer/recomendations-tab";
 import SuccessPopup from "../components/popup-add-to-cart";
 import { useCartContext } from "../context/cart-context";
+import { use } from "i18next";
 
 export function PersonalityFinder() {
   const { i18n } = useTranslation();
@@ -58,22 +63,23 @@ export function PersonalityFinder() {
     i18n.changeLanguage(lang);
   }, [i18n]);
   const isArabic = i18n.language === "ar";
-  console.log(isArabic)
+  console.log(isArabic);
   return (
     <CameraProvider>
       <InferenceProvider>
         <div className="h-full min-h-dvh">
-          <MainContent isArabic={isArabic}/>
+          <MainContent isArabic={isArabic} />
         </div>
       </InferenceProvider>
     </CameraProvider>
   );
 }
 
-function MainContent({isArabic} : {isArabic?: boolean}) {
+function MainContent({ isArabic }: { isArabic?: boolean }) {
   const modelFaceShapeRef = useRef<tflite.TFLiteModel | null>(null);
   const modelPersonalityFinderRef = useRef<tflite.TFLiteModel | null>(null);
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
+  const imageClassifierRef = useRef<ImageClassifier | null>(null);
 
   const { criterias } = useCamera();
   const {
@@ -114,6 +120,20 @@ function MainContent({isArabic} : {isArabic?: boolean}) {
       faceLandmarkerRef.current = faceLandmarkerInstance;
     },
     async () => {
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+      );
+      const imageClassifier = await ImageClassifier.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath: `/media/unveels/models/personality-finder/hairdetection.tflite`,
+          delegate: "CPU",
+        },
+        runningMode: "IMAGE",
+      });
+      imageClassifierRef.current = imageClassifier;
+    },
+
+    async () => {
       const model = await loadTFLiteModel(
         "/media/unveels/models/personality-finder/face-analyzer.tflite",
       );
@@ -151,7 +171,8 @@ function MainContent({isArabic} : {isArabic?: boolean}) {
           if (
             modelFaceShapeRef.current &&
             modelPersonalityFinderRef.current &&
-            faceLandmarkerRef.current
+            faceLandmarkerRef.current &&
+            imageClassifierRef.current
           ) {
             // Preprocess gambar
             const preprocessedImage = await preprocessTFLiteImage(
@@ -178,6 +199,7 @@ function MainContent({isArabic} : {isArabic?: boolean}) {
               predFaceShape,
               predPersonality,
               criterias.capturedImage,
+              imageClassifierRef.current,
             );
             setInferenceResult(personalityResult);
             setIsInferenceFinished(true);
@@ -237,7 +259,13 @@ function MainContent({isArabic} : {isArabic?: boolean}) {
   );
 }
 
-function Result({ inferenceResult, isArabic }: { inferenceResult: Classifier[], isArabic?: boolean }) {
+function Result({
+  inferenceResult,
+  isArabic,
+}: {
+  inferenceResult: Classifier[];
+  isArabic?: boolean;
+}) {
   const { t } = useTranslation();
   const tabs = [
     {
@@ -271,7 +299,7 @@ function Result({ inferenceResult, isArabic }: { inferenceResult: Classifier[], 
           <div className="flex items-center justify-center rounded-full bg-gradient-to-b from-[#CA9C43] to-[#644D21] p-1">
             {criterias.capturedImage ? (
               <img
-                className="size-16 rounded-full object-fill sm:size-20 transform scale-x-[-1]"
+                className="size-16 scale-x-[-1] transform rounded-full object-fill sm:size-20"
                 src={criterias.capturedImage}
                 alt="Captured Profile"
               />
@@ -347,7 +375,13 @@ function Result({ inferenceResult, isArabic }: { inferenceResult: Classifier[], 
   );
 }
 
-function PersonalityTab({ data, isArabic }: { data: Classifier[] | null, isArabic?: boolean }) {
+function PersonalityTab({
+  data,
+  isArabic,
+}: {
+  data: Classifier[] | null;
+  isArabic?: boolean;
+}) {
   const { t } = useTranslation();
   if (!data) {
     return <div></div>;
@@ -552,12 +586,12 @@ function PersonalitySection({
   title,
   description,
   score,
-  isArabic
+  isArabic,
 }: {
   title: string;
   description: string;
   score: number;
-  isArabic?: boolean
+  isArabic?: boolean;
 }) {
   const { t } = useTranslation();
   const scoreType = score < 40 ? "Low" : score < 70 ? "Moderate" : "High";
@@ -592,7 +626,13 @@ function PersonalitySection({
   );
 }
 
-function AttributesTab({ data, isArabic }: { data: Classifier[] | null, isArabic?:boolean }) {
+function AttributesTab({
+  data,
+  isArabic,
+}: {
+  data: Classifier[] | null;
+  isArabic?: boolean;
+}) {
   const { t } = useTranslation();
   if (!data) {
     return <div></div>;
@@ -737,9 +777,7 @@ function AttributesTab({ data, isArabic }: { data: Classifier[] | null, isArabic
         features={[
           {
             name: t("attributepf.hair.hairattribute.haircolor"),
-            value: t(
-              `hairLabels.${data[10].outputLabel.toLowerCase().replace(" ", "_")}`,
-            ),
+            value: t(`hairLabels.${data[22].outputLabel.toLowerCase()}`),
           },
         ]}
       />
@@ -761,13 +799,15 @@ function FeatureSection({
     color?: boolean;
     hex?: string;
   }[];
-  isArabic?: boolean
+  isArabic?: boolean;
 }) {
   return (
     <div className="flex h-full flex-col border-white/50 md:py-4 md:even:border-l md:even:pl-4">
       <div className="flex flex-col space-y-2" dir={isArabic ? "rtl" : "ltr"}>
         {/* Section Title */}
-        <div className={`flex items-center space-x-3 pb-4 ${isArabic ? "flex-row-reverse justify-end" : "flex-row"}`}>
+        <div
+          className={`flex items-center space-x-3 pb-4 ${isArabic ? "flex-row-reverse justify-end" : "flex-row"}`}
+        >
           <span className="text-xl md:text-2xl">{icon}</span> {/* Icon size */}
           <h2 className="text-xl font-semibold md:text-2xl">{title}</h2>{" "}
           {/* Title size */}

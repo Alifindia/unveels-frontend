@@ -270,6 +270,12 @@
     "round_Cheeks": "خدود مستديرة"
   },
   "hairLabels": {
+    "short curly hair": "شعر قصير مجعد",
+    "short straight hair": "شعر قصير مستقيم",
+    "short wavy hair": "شعر قصير مموج",
+    "long Curly Hair": "شعر طويل مجعد",
+    "long Straight Hair": "شعر طويل مستقيم",
+    "long Wavy Hair": "شعر طويل مموج",
     "long": "طويل",
     "normal": "عادي",
     "short": "قصير"

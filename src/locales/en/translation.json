@@ -270,6 +270,12 @@
     "roun_cheeks": "Round Cheeks"
   },
   "hairLabels": {
+    "short curly hair": "Short Curly Hair",
+    "short straight hair": "Short Straight Hair",
+    "short wavy hair": "Short Wavy Hair",
+    "long Curly Hair": "Long Curly Hair",
+    "long Straight Hair": "Long Straight Hair",
+    "long Wavy Hair": "Long Wavy Hair",
     "long": "Long",
     "normal": "Normal",
     "short": "Short"

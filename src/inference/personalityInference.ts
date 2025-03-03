@@ -1,4 +1,4 @@
-import { FaceLandmarker } from "@mediapipe/tasks-vision";
+import { FaceLandmarker, ImageClassifier } from "@mediapipe/tasks-vision";
 import {
   thickNessLabels,
   cheeksbonesLabels,
@@ -289,6 +289,10 @@ function getHairColor(
   return rgbToHex(avgR, avgG, avgB); // Mengembalikan warna dalam format hex
 }
 
+function findClassifierHighestScore(data: {score: number, categoryName: string}[]) {
+  return data.reduce((max, item) => (item.score > max.score ? item : max), data[0]);
+}
+
 export const personalityInference = async (
   faceLandmarker: FaceLandmarker,
   pred: tf.Tensor<tf.Rank> | tf.Tensor<tf.Rank>[] | tf.NamedTensorMap,
@@ -297,6 +301,7 @@ export const personalityInference = async (
     | tf.Tensor<tf.Rank>[]
     | tf.NamedTensorMap,
   imageData: string,
+  imageClassifier: ImageClassifier
 ): Promise<Classifier[]> => {
   try {
     // Konversi base64 ke Image
@@ -320,6 +325,8 @@ export const personalityInference = async (
 
     // Deteksi landmark wajah
     const results = faceLandmarker.detect(imageDataCanvas);
+    const hairTypeResults = imageClassifier.classify(imageDataCanvas);
+    console.log(hairTypeResults.classifications[0].categories);
 
     classifiers.forEach(async (classifier) => {
       const classifierTensor = pred[classifier.outputName];
@@ -439,6 +446,14 @@ export const personalityInference = async (
       outputColor: "",
       imageData: imageData,
     });
+
+    classifiers.push({
+      name: "Hair Category",
+      outputName: "",
+      labels: [],
+      outputLabel: hairTypeResults.classifications[0].categories[0].categoryName,
+      outputColor: "",
+    })
 
     // Kembalikan hasil setelah semua classifier diproses, termasuk gambar landmark
     return classifiers;

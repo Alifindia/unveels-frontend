@@ -1853,6 +1853,9 @@ export const FACECAP = "/media/unveels/vto-assets/facecap/new.glb";
 //facecap
 export const NAILS = "/media/unveels/vto-assets/nails/nail.glb";
 
+//facecap
+export const PRESS_ON_NAILS_ONE = "/media/unveels/vto-assets/nails/press-on-nails-1.glb";
+
 // hdr acc
 export const HDR_ACCESORIES =
   "/media/unveels/vto-assets/light/hotel_room_1k.hdr";

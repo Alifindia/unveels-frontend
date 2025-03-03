@@ -1,4 +1,4 @@
-import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+import { FaceLandmarker, FilesetResolver, ImageClassifier } from "@mediapipe/tasks-vision";
 import * as tflite from "@tensorflow/tfjs-tflite";
 import clsx from "clsx";
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -65,6 +65,7 @@ function MainContent({ isArabic }: { isArabic?: boolean }) {
   const modelFaceShapeRef = useRef<tflite.TFLiteModel | null>(null);
   const modelPersonalityFinderRef = useRef<tflite.TFLiteModel | null>(null);
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
+  const imageClassifierRef = useRef<ImageClassifier | null>(null);
 
   const { criterias } = useCamera();
   const {
@@ -106,6 +107,23 @@ function MainContent({ isArabic }: { isArabic?: boolean }) {
       faceLandmarkerRef.current = faceLandmarkerInstance;
     },
     async () => {
+      const vision = await FilesetResolver.forVisionTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+      );
+      const imageClassifier = await ImageClassifier.createFromOptions(
+        vision,
+        {
+          baseOptions: {
+            modelAssetPath: `/media/unveels/models/personality-finder/hairdetection.tflite`,
+            delegate: "CPU",
+          },
+          runningMode: "IMAGE",
+        },
+      );
+      imageClassifierRef.current = imageClassifier
+    },
+
+    async () => {
       const model = await loadTFLiteModel(
         "/media/unveels/models/personality-finder/face-analyzer.tflite",
       );
@@ -143,7 +161,8 @@ function MainContent({ isArabic }: { isArabic?: boolean }) {
           if (
             modelFaceShapeRef.current &&
             modelPersonalityFinderRef.current &&
-            faceLandmarkerRef.current
+            faceLandmarkerRef.current &&
+            imageClassifierRef.current
           ) {
             // Preprocess gambar
             const preprocessedImage = await preprocessTFLiteImage(
@@ -169,6 +188,7 @@ function MainContent({ isArabic }: { isArabic?: boolean }) {
               predFaceShape,
               predPersonality,
               criterias.capturedImage,
+              imageClassifierRef.current
             );
             setInferenceResult(personalityResult);
             setIsInferenceFinished(true);
@@ -467,7 +487,7 @@ function AttributesTab({ data, isArabic }: { data: Classifier[] | null, isArabic
           {
             name: t("attributepf.hair.hairattribute.haircolor"),
             value: t(
-              `hairLabels.${data[10].outputLabel.toLowerCase().replace(" ", "_")}`,
+              `hairLabels.${data[22].outputLabel.toLowerCase()}`,
             ),
           },
         ]}
