@@ -40,79 +40,79 @@ const classifiers: Classifier[] = [
   },
   {
     name: "Eye Distance",
-    outputName: "StatefulPartitionedCall_1:2",
+    outputName: "StatefulPartitionedCall_1:7",
     labels: eyedistanceLabels,
     outputLabel: "",
   },
   {
     name: "Eye Shape",
-    outputName: "StatefulPartitionedCall_1:3",
+    outputName: "StatefulPartitionedCall_1:8",
     labels: eyeshapeLabels,
     outputLabel: "",
   },
   {
     name: "Eye Size",
-    outputName: "StatefulPartitionedCall_1:4",
+    outputName: "StatefulPartitionedCall_1:9",
     labels: eyesizeLabels,
     outputLabel: "",
   },
   {
     name: "Eyebrow Distance",
-    outputName: "StatefulPartitionedCall_1:5",
+    outputName: "StatefulPartitionedCall_1:10",
     labels: eyebrowDistanceLabels,
     outputLabel: "",
   },
   {
     name: "Eye Lid",
-    outputName: "StatefulPartitionedCall_1:6",
+    outputName: "StatefulPartitionedCall_1:11",
     labels: eyeLidLabels,
     outputLabel: "",
   },
   {
     name: "Lip",
-    outputName: "StatefulPartitionedCall_1:7",
+    outputName: "StatefulPartitionedCall_1:12",
     labels: lipLabels,
     outputLabel: "",
   },
   {
     name: "Nose Length",
-    outputName: "StatefulPartitionedCall_1:8",
+    outputName: "StatefulPartitionedCall_1:13",
     labels: noseLengthLabels,
     outputLabel: "",
   },
   {
     name: "Nose Width",
-    outputName: "StatefulPartitionedCall_1:9",
+    outputName: "StatefulPartitionedCall_1:14",
     labels: noseWidthLabels,
     outputLabel: "",
   },
   {
     name: "Shortness",
-    outputName: "StatefulPartitionedCall_1:10",
+    outputName: "StatefulPartitionedCall_1:2",
     labels: shortnessLabels,
     outputLabel: "",
   },
   {
     name: "Thickness",
-    outputName: "StatefulPartitionedCall_1:11",
+    outputName: "StatefulPartitionedCall_1:3",
     labels: thickNessLabels,
     outputLabel: "",
   },
   {
     name: "Thinness",
-    outputName: "StatefulPartitionedCall_1:12",
+    outputName: "StatefulPartitionedCall_1:4",
     labels: thinnessLabels,
     outputLabel: "",
   },
   {
     name: "Eyebrow Shape",
-    outputName: "StatefulPartitionedCall_1:13",
+    outputName: "StatefulPartitionedCall_1:5",
     labels: eyebrowShapeLabels,
     outputLabel: "",
   },
   {
     name: "Face Shape",
-    outputName: "StatefulPartitionedCall_1:14",
+    outputName: "StatefulPartitionedCall_1:6",
     labels: faceShapeLabels,
     outputLabel: "",
   },
@@ -128,11 +128,9 @@ const classifiers: Classifier[] = [
 
 const findMaxIndexFaceAanalyzer = (detect: number[]) => {
   const maxIndex = detect
-    .slice(0)
-    .reduce(
-      (maxIdx, currVal, currIdx) =>
-        currVal > detect[maxIdx] ? currIdx : maxIdx,
-      0,
+    .slice(1)
+    .reduce((maxIdx, val, idx, subArr) =>
+      val > subArr[maxIdx] ? idx : maxIdx, 0
     );
   return maxIndex;
 };

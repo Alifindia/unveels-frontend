@@ -639,13 +639,13 @@ function AttributesTab({ data, isArabic }: { data: Classifier[] | null, isArabic
           {
             name: t("attributepf.eyes.eyesattribute.eyedistance"),
             value: t(
-              `eyedistanceLabels.${data[2].outputLabel.toLowerCase().replace("-", "_")}`,
+              `eyedistanceLabels.${data[2].outputLabel.toLowerCase().replace(/-/g, "_")}`,
             ),
           },
           {
             name: t("attributepf.eyes.eyesattribute.eyelid"),
             value: t(
-              `eyelidLabels.${data[6].outputLabel.toLowerCase().replace("-", "_")}`,
+              `eyelidLabels.${data[6].outputLabel.toLowerCase().replace(/-/g, "_")}`,
             ),
           },
           {
@@ -664,7 +664,7 @@ function AttributesTab({ data, isArabic }: { data: Classifier[] | null, isArabic
           {
             name: t("attributepf.brows.browsattribute.eyebrowshape"),
             value: t(
-              `eyebrowshapelabels.${data[13].outputLabel.toLowerCase().replace("-", "_")}`,
+              `eyebrowshapelabels.${data[13].outputLabel.toLowerCase().replace(/-/g, "_")}`,
             ),
           },
           {
@@ -693,7 +693,7 @@ function AttributesTab({ data, isArabic }: { data: Classifier[] | null, isArabic
           {
             name: t("attributepf.lips.lipsattribute.lipshape"),
             value: t(
-              `liplabels.${data[7].outputLabel.toLowerCase().replace("-", "_")}`,
+              `liplabels.${data[7].outputLabel.toLowerCase().replace(/-/g, "_")}`,
             ),
           },
           {

@@ -212,8 +212,8 @@
   "liplabels": {
     "full_lips": "شفاه ممتلئة",
     "heart_lips": "شفاه على شكل قلب",
-    "heavylower_lips": "شفاه سفلية ثقيلة",
-    "heavyupper_lips": "شفاه علوية ثقيلة",
+    "heavy_lower_lips": "شفاه سفلية ثقيلة",
+    "heavy_upper_lips": "شفاه علوية ثقيلة",
     "round_lips": "شفاه مستديرة",
     "thin_lips": "شفاه رقيقة",
     "wide_lips": "شفاه عريضة"

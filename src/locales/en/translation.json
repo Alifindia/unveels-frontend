@@ -230,9 +230,9 @@
   },
   "eyebrowshapelabels": {
     "curved": "Curved",
-    "highArch": "High Arch",
-    "sShaped": "S-Shaped",
-    "softArch": "Soft Arch",
+    "high_arch": "High Arch",
+    "s_haped": "S-Shaped",
+    "soft_arch": "Soft Arch",
     "straight": "Straight",
     "upward": "Upward"
   },
