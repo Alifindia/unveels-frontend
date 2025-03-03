@@ -4,7 +4,7 @@ import { BackSide, Mesh, MeshStandardMaterial, Object3D } from "three";
 import { Landmark } from "../../../../types/landmark";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../../utils/calculateDistance";
-import { handQuaternion } from "../../../../utils/handOrientation";
+import { fingerTipQuaternion, FingerType, handQuaternion } from "../../../../utils/handOrientation";
 import { useAccesories } from "../../../../context/accesories-context";
 import { NAILS } from "../../../../utils/constants";
 import { useMakeup } from "../../../../context/makeup-context";
@@ -38,7 +38,7 @@ const NailThumbInner: React.FC<NailThumbProps> = React.memo(
                 mesh.material.color.set(nailsColor); // Set initial color
                 mesh.material.side = BackSide;
                 mesh.material.transparent = true;
-                mesh.material.opacity = 0.3;
+                mesh.material.opacity = 1;
                 mesh.material.needsUpdate = true;
               }
               child.renderOrder = 4;
@@ -81,7 +81,7 @@ const NailThumbInner: React.FC<NailThumbProps> = React.memo(
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
         nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-        const quaternion = handQuaternion(handLandmarks.current, 1, 5);
+        const quaternion = fingerTipQuaternion(handLandmarks.current, FingerType.THUMB);
 
         if (quaternion) {
           nailsRef.current.setRotationFromQuaternion(quaternion);

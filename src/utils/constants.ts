@@ -1851,7 +1851,7 @@ export const NECKLACE = "/media/unveels/vto-assets/necklace/neck.glb";
 export const FACECAP = "/media/unveels/vto-assets/facecap/new.glb";
 
 //facecap
-export const NAILS = "/media/unveels/vto-assets/nails/nails.glb";
+export const NAILS = "/media/unveels/vto-assets/nails/nail.glb";
 
 // hdr acc
 export const HDR_ACCESORIES =

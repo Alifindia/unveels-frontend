@@ -10,7 +10,7 @@ import {
 import { Landmark } from "../../../../types/landmark";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../../utils/calculateDistance";
-import { handQuaternion } from "../../../../utils/handOrientation";
+import { fingerTipQuaternion, FingerType, handQuaternion } from "../../../../utils/handOrientation";
 import { useAccesories } from "../../../../context/accesories-context";
 import { NAILS } from "../../../../utils/constants";
 import { useMakeup } from "../../../../context/makeup-context";
@@ -44,7 +44,7 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
                 mesh.material.color.set(nailsColor); // Set initial color
                 mesh.material.side = FrontSide;
                 mesh.material.transparent = true;
-                mesh.material.opacity = 0.3;
+                mesh.material.opacity = 1;
                 mesh.material.needsUpdate = true;
               }
               child.renderOrder = 4;
@@ -88,7 +88,7 @@ const NailMidlleInner: React.FC<NailMidlleProps> = React.memo(
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
         nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-        const quaternion = handQuaternion(handLandmarks.current, 15, 12);
+        const quaternion = fingerTipQuaternion(handLandmarks.current, FingerType.MIDDLE);
 
         if (quaternion) {
           nailsRef.current.setRotationFromQuaternion(quaternion);
