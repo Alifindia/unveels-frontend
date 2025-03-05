@@ -153,7 +153,7 @@ export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
   );
 }
 
-export function VirtualTryOn() {
+export function VirtualTryOnHand() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
@@ -288,7 +288,7 @@ function MainContent() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate("/virtual-try-on/makeups");
+    navigate("/virtual-try-on-hand/hand");
   }, []);
 
   return (
@@ -309,74 +309,86 @@ function MainContent() {
   );
 }
 
-export function TryOnSelector() {
+export function TryOnSelectorHand() {
   const { t } = useTranslation();
 
-  const [tab, setTab] = useState("makeup" as "makeup" | "accessories" | null);
+  const tabOptions = [
+    {
+      name: "Nails",
+      icon: <Icons.makeupNails />,
+    },
+    {
+      name: "Hand Accessories",
+      icon: <Icons.accessoryHand />,
+    },
+  ];
+  const [tab, setTab] = useState(
+    "Hand Accessories" as "Hand Accessories" | "Nails" | null,
+  );
 
   const activeClassNames =
     "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text text-transparent";
 
   return (
     <div className="mx-auto w-full max-w-lg space-y-2 px-4">
-      <div className="flex h-10 w-full items-center justify-between border-b border-gray-600 text-center">
-        {["makeup", "accessories"].map((shadeTab) => {
-          const isActive = tab === shadeTab;
+      <div className="flex w-full items-center justify-around border-b border-gray-600 text-center">
+        {tabOptions.map((shadeTab) => {
+          const isActive = tab === shadeTab.name;
           return (
-            <Fragment key={shadeTab}>
+            <Fragment key={shadeTab.name}>
               <button
-                key={shadeTab}
-                className={`relative h-10 grow border-b font-luxury text-[10px] sm:text-[12px] lg:text-[14px] ${
-                  isActive
-                    ? activeClassNames
-                    : "border-transparent text-gray-500"
-                }`}
-                onClick={() => setTab(shadeTab as "makeup" | "accessories")}
+                key={shadeTab.name}
+                className={`flex w-full flex-col items-center ${isActive ? "border-b border-gray-100 text-white" : "text-gray-500"} py-3`}
+                onClick={() =>
+                  setTab(shadeTab.name as "Hand Accessories" | "Nails")
+                }
               >
-                <span
+                <div
                   className={clsx(
-                    "capitalize",
-                    isActive ? "text-white/70 blur-sm" : "",
+                    "text-dm relative flex w-10 shrink-0 items-center justify-center rounded-3xl border border-transparent py-1 text-center text-xs text-white transition-all",
+                    {
+                      "bg-gradient-to-r from-[#CA9C43] via-[#916E2B] to-[#473209]":
+                        isActive,
+                    },
                   )}
                 >
-                  {t("vto." + shadeTab)}
-                </span>
-                {isActive ? (
-                  <>
-                    <div
-                      className={clsx(
-                        "absolute inset-0 flex items-center justify-center text-[10px] blur-sm sm:text-[12px] lg:text-[14px]",
-                        activeClassNames,
-                      )}
-                    >
-                      <span className="text-center text-[10px] capitalize sm:text-[12px] lg:text-[14px]">
-                        {t("vto." + shadeTab)}
-                      </span>
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-center text-[10px] capitalize text-white/70 sm:text-[12px] lg:text-[14px]">
-                        {t("vto." + shadeTab)}
-                      </span>
-                    </div>
-                  </>
-                ) : null}
+                  {cloneElement(shadeTab.icon, {
+                    className: "text-white size-5",
+                  })}
+
+                  <div
+                    className="absolute inset-0 rounded-3xl border-2 border-transparent p-1"
+                    style={
+                      {
+                        background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
+                        "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+                        mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
+                        "-webkit-mask-composite": "destination-out",
+                        "mask-composite": "exclude",
+                      } as CSSProperties
+                    }
+                  />
+                </div>
+                <div className="text-center text-[10px] !leading-4 lg:text-sm">
+                  {shadeTab.name}
+                </div>
               </button>
             </Fragment>
           );
         })}
       </div>
 
-      {tab === "makeup" ? (
-        <Makeups />
-      ) : tab === "accessories" ? (
-        <Accessories />
+      {tab === "Hand Accessories" ? (
+        <Hands />
+      ) : tab === "Nails" ? (
+        <Nails />
       ) : null}
       <Outlet />
     </div>
   );
 }
 
-export function Makeups() {
+export function Hands() {
   const { t } = useTranslation();
 
   const shadeOptions = [
@@ -422,97 +434,26 @@ export function Makeups() {
   return (
     <>
       <div className="flex flex-col items-start">
-        <div className="flex w-full min-w-0 justify-around gap-x-4 py-4 peer-has-[data-mode]:hidden">
-          {shadeOptions.map((option, index) => (
-            <button
-              key={index}
-              className="flex flex-col items-center space-y-2"
-              data-selected={selectedMakeup === option.name}
-              onClick={() => {
-                setSelectedMakeup(option.name);
-                setSelectedProductNumber(null);
-              }}
-            >
-              <div
-                className={clsx(
-                  "text-dm relative flex w-10 shrink-0 items-center justify-center rounded-3xl border border-transparent py-1 text-center text-xs text-white transition-all",
-                  {
-                    "bg-gradient-to-r from-[#CA9C43] via-[#916E2B] to-[#473209]":
-                      selectedMakeup === option.name,
-                  },
-                )}
-              >
-                {cloneElement(option.icon, {
-                  className: "text-white size-5", // Reduce icon size here
-                })}
-
-                <div
-                  className="absolute inset-0 rounded-3xl border-2 border-transparent p-1"
-                  style={
-                    {
-                      background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
-                      "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-                      mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-                      "-webkit-mask-composite": "destination-out",
-                      "mask-composite": "exclude",
-                    } as CSSProperties
-                  }
-                />
-              </div>
-              <div className="text-center text-[10px] !leading-4 text-white xl:text-xs 2xl:text-sm">
-                {t("vto." + option.name)} {/* Reduce text size here */}
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {selectedMakeup === "Lips" ? (
-          <LipsMode />
-        ) : selectedMakeup === "Eyes" ? (
-          <EyesMode />
-        ) : selectedMakeup === "Face" ? (
-          <FaceMode />
-        ) : selectedMakeup === "Nails" ? (
-          <NailsMode />
-        ) : selectedMakeup === "Hair" ? (
-          <HairMode />
-        ) : null}
+        <HandAccessoriesMode />
       </div>
     </>
   );
 }
 
-export function Accessories() {
+export function Nails() {
   const { t } = useTranslation();
 
   const shadeOptions = [
     {
-      name: "Head Accessories",
-      icon: <Icons.accessoryHead />,
-      items: [
-        "Sunglasses",
-        "Glasses",
-        "Earring",
-        "Hats",
-        "Tiaras",
-        "Headbands",
-      ],
+      name: "Hand Accessories",
+      icon: <Icons.accessoryHand />,
+      items: ["Watches", "Rings", "Bracelets", "Bangles"],
     },
     {
-      name: "Neck Accessories",
-      icon: <Icons.accessoryNeck />,
-      items: ["Pendants", "Necklaces", "Chokers", "Scarves"],
+      name: "Nails",
+      icon: <Icons.makeupNails />,
+      items: ["Nail Polish", "Press on Nails"],
     },
-    // {
-    //   name: "Hand Accessories",
-    //   icon: <Icons.accessoryHand />,
-    //   items: ["Watches", "Rings", "Bracelets", "Bangles"],
-    // },
-    // {
-    //   name: "Nails",
-    //   icon: <Icons.makeupNails />,
-    //   items: ["Nail Polish", "Press on Nails"],
-    // },
   ];
 
   const [selectedAccessory, setSelectedAccessory] = useState<string | null>(
@@ -522,56 +463,7 @@ export function Accessories() {
   return (
     <>
       <div className="flex flex-col items-start">
-        <div className="flex w-full min-w-0 justify-around gap-x-4 py-4 peer-has-[data-mode]:hidden">
-          {shadeOptions.map((option, index) => (
-            <button
-              key={index}
-              className="flex flex-col items-center justify-center space-y-2"
-              data-selected={selectedAccessory === option.name}
-              onClick={() => setSelectedAccessory(option.name)}
-            >
-              <div
-                className={clsx(
-                  "relative flex h-[30px] w-[36px] shrink-0 items-center justify-center rounded-3xl border border-transparent py-1 text-center text-xs text-white transition-all sm:h-[38px] sm:w-[46px]",
-                  {
-                    "bg-gradient-to-r from-[#CA9C43] via-[#916E2B] to-[#473209]":
-                      selectedAccessory === option.name,
-                  },
-                )}
-              >
-                {cloneElement(option.icon, {
-                  className: "text-white size-5", // Reduce icon size here
-                })}
-
-                <div
-                  className="absolute inset-0 rounded-3xl border-2 border-transparent p-1"
-                  style={
-                    {
-                      background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
-                      "-webkit-mask": `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-                      mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-                      "-webkit-mask-composite": "destination-out",
-                      "mask-composite": "exclude",
-                    } as CSSProperties
-                  }
-                />
-              </div>
-              <div className="text-center text-[10px] !leading-4 text-white xl:text-xs 2xl:text-sm">
-                {t("vto." + option.name)} {/* Reduce text size here */}
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {selectedAccessory === "Head Accessories" ? (
-          <HeadAccessoriesMode />
-        ) : selectedAccessory === "Neck Accessories" ? (
-          <NeckAccessoriesMode />
-        ) : selectedAccessory === "Hand Accessories" ? (
-          <HandAccessoriesMode />
-        ) : selectedAccessory === "Nails" ? (
-          <NailsMode />
-        ) : null}
+        <NailsMode />
       </div>
     </>
   );
@@ -632,8 +524,8 @@ export function TopNavigation({}: {}) {
   const location = useLocation();
 
   const handleBackClick = () => {
-    if (location.pathname !== "/virtual-try-on/makeups") {
-      navigate("/virtual-try-on/makeups");
+    if (location.pathname !== "/virtual-try-on-hand/hand") {
+      navigate("/virtual-try-on-hand/hand");
     } else {
       if (isDevelopment) {
         window.location.href = "/";

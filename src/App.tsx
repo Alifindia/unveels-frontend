@@ -71,6 +71,7 @@ import {
   VirtualTryOnAccesories,
 } from "./pages/virtual-try-on-accesories";
 import { VirtualTryOnProductProvider } from "./context/virtual-try-on-product-context";
+import { TryOnSelectorHand, VirtualTryOnHand } from "./pages/virtual-try-on-hand";
 
 // Define routes using object syntax
 const routes = [
@@ -259,6 +260,21 @@ const routes = [
           { path: "press-on-nails", element: <PressOnNailsSelector /> },
         ],
       },
+      {
+        path: "/virtual-try-on-hand",
+        element: <VirtualTryOnHand />,
+        children: [
+          { path: "hand", element: <TryOnSelectorHand /> },
+          { path: "rings", element: <HandwearSelector /> },
+          { path: "bracelets", element: <HandwearSelector /> },
+          { path: "bangles", element: <HandwearSelector /> },
+          { path: "watches", element: <WatchesSelector /> },
+          // Nails
+          { path: "nails", element: <NailsMode /> },
+          { path: "nail-polish", element: <NailPolishSelector /> },
+          { path: "press-on-nails", element: <PressOnNailsSelector /> },
+        ],
+      },
     ],
   },
 ];
@@ -290,6 +306,9 @@ function Home() {
       <LinkButton to="/smart-beauty/makeups">Smart Beauty</LinkButton>
       <LinkButton to="/virtual-try-on-accesories/accesories">
         Virtual Try On Accesories
+      </LinkButton>
+      <LinkButton to="/virtual-try-on-hand/hand">
+        Virtual Try On Hand
       </LinkButton>
       <LinkButton to="/virtual-try-on-product?sku=31012490021,FA1258222">
         Virtual Try On Product

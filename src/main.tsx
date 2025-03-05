@@ -44,6 +44,7 @@ const routes = [
   "virtual-assistant",
   "see-improvement",
   "virtual-try-on-accesories",
+  "virtual-try-on-hand",
   "virtual-try-on-makeup",
   "virtual-try-on-product",
   "virtual-avatar-web",

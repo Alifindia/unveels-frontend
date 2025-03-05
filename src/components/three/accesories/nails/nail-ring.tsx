@@ -6,7 +6,7 @@ import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../../utils/calculateDistance";
 import { fingerTipQuaternion, FingerType, handQuaternion } from "../../../../utils/handOrientation";
 import { useAccesories } from "../../../../context/accesories-context";
-import { NAILS } from "../../../../utils/constants";
+import { NAILS, PRESS_ON_NAILS_ONE } from "../../../../utils/constants";
 import { useMakeup } from "../../../../context/makeup-context";
 import { FrontSide } from "three";
 
@@ -28,7 +28,7 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
     useEffect(() => {
       const loader = new GLTFLoader();
       loader.load(
-        NAILS,
+        PRESS_ON_NAILS_ONE,
         (gltf) => {
           const ring = gltf.scene;
           ring.traverse((child) => {
@@ -36,7 +36,7 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
               const mesh = child as Mesh;
               if (mesh.material instanceof MeshStandardMaterial) {
                 mesh.material.envMap = envMapAccesories;
-                mesh.material.color.set(nailsColor); // Set initial color
+                // mesh.material.color.set(nailsColor); // Set initial color
                 mesh.material.side = FrontSide;
                 mesh.material.transparent = true;
                 mesh.material.opacity = 1;
@@ -98,7 +98,7 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
             if ((child as Mesh).isMesh) {
               const mesh = child as Mesh;
               if (mesh.material instanceof MeshStandardMaterial) {
-                mesh.material.color.set(nailsColor); // Dynamically update color
+                // mesh.material.color.set(nailsColor); // Dynamically update color
                 mesh.material.needsUpdate = true;
               }
             }

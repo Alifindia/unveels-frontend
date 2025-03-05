@@ -298,14 +298,6 @@ export function Accessories() {
       name: "Neck Accessories",
       icon: <Icons.accessoryNeck />,
     },
-    {
-      name: "Hand Accessories",
-      icon: <Icons.accessoryHand />,
-    },
-    {
-      name: "Nails",
-      icon: <Icons.makeupNails />,
-    },
   ];
 
   const [selectedAccessory, setSelectedAccessory] = useState<string | null>(
