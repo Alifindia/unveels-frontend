@@ -664,7 +664,7 @@ export function VirtualTryOnScene({
       <img
         className="hidden h-full w-full"
         ref={nailBackgroundRef}
-        src="media/unveels/vto-assets/nails/k.jpg"
+        src="/media/unveels/vto-assets/nails/k.jpg"
       />
 
       {mode == "IMAGE" && (mediaFile || modelImageSrc) && (
