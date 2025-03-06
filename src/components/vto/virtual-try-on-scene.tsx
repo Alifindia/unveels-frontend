@@ -232,6 +232,7 @@ export function VirtualTryOnScene({
     showHand,
     showFace,
     showNails,
+    showPressOnNails
   ]);
 
   useEffect(() => {

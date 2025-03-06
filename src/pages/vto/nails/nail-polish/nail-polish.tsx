@@ -31,7 +31,7 @@ export function NailPolishSelector() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
-  
+
   return (
     <div className="mx-auto w-full divide-y px-2">
       <div>
@@ -185,7 +185,7 @@ function ProductList() {
     selectedTexture,
   } = useNailPolishContext();
 
-  const { setShowNails, setNailsColor, setNailsTexture } = useMakeup();
+  const { setShowNails, setNailsColor, setNailsTexture, setShowPressOnNails } = useMakeup();
   const { data, isLoading } = useNailPolishQuery({
     color: colorFamily,
     texture: selectedTexture,
@@ -196,6 +196,7 @@ function ProductList() {
     if (selectedColor) {
       setNailsColor(selectedColor);
       setShowNails(selectedColor.length > 0);
+      setShowPressOnNails(false);
     }
   }, [selectedColor, selectedTexture]);
 

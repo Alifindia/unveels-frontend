@@ -20,6 +20,7 @@ import { useFindTheLookContext } from "../../../../context/find-the-look-context
 import { getNailsProductTypeIds } from "../../../../api/attributes/makeups";
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../../../../utils/other";
+import { useMakeup } from "../../../../context/makeup-context";
 
 export function PressOnNailsSelector() {
   const { i18n } = useTranslation();
@@ -31,7 +32,7 @@ export function PressOnNailsSelector() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
-  
+
   return (
     <div className="mx-auto w-full divide-y px-2">
       <div>
@@ -180,8 +181,10 @@ function ProductList() {
     colorFamilyToInclude,
     setColorFamilyToInclude,
     selectedShape,
+    selectedColor,
   } = usePressOnNailsContext();
 
+  const { setNailsColor, setShowPressOnNails, setShowNails } = useMakeup();
   const { data, isLoading } = usePressOnNailsQuery({
     color: colorFamily,
     shape: selectedShape,
@@ -210,11 +213,21 @@ function ProductList() {
     );
   };
 
+  useEffect(() => {
+    if (selectedColor && selectedProduct) {
+      setNailsColor(selectedColor);
+      setShowPressOnNails(true);
+      setShowNails(false);
+    } else {
+      setShowPressOnNails(false);
+    }
+  }, [selectedColor, selectedProduct]);
+
   return (
     <>
       <div className="w-full text-right">
         <button
-          className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
+          className="p-0 text-[0.550rem] text-white sm:py-0.5 2xl:text-[0.625rem]"
           onClick={() => {
             setMapTypes({
               Nail: {
@@ -241,7 +254,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
-                productNumber={index+1}
+                productNumber={index + 1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}
