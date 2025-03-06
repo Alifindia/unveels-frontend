@@ -183,6 +183,9 @@ interface MakeupContextProps {
   showNails: boolean;
   setShowNails: (show: boolean) => void;
 
+  showPressOnNails: boolean;
+  setShowPressOnNails: (show: boolean) => void;
+
   nailsColor: string;
   setNailsColor: (color: string) => void;
 
@@ -435,6 +438,8 @@ export const MakeupProvider: React.FC<MakeupProviderProps> = ({
   // nails
 
   const [showNails, setShowNails] = useState(initialValues?.showNails ?? false);
+  const [showPressOnNails, setShowPressOnNails] = useState(false);
+
   const [nailsColor, setNailsColor] = useState(
     initialValues?.nailsColor ?? "#FFFF",
   );
@@ -459,8 +464,7 @@ export const MakeupProvider: React.FC<MakeupProviderProps> = ({
     showEyebrows ||
     showEyeliner ||
     showLashes ||
-    showMascara ||
-    showNails;
+    showMascara;
 
   return (
     <MakeupContext.Provider
@@ -617,6 +621,9 @@ export const MakeupProvider: React.FC<MakeupProviderProps> = ({
 
         showNails,
         setShowNails,
+
+        showPressOnNails,
+        setShowPressOnNails,
 
         nailsColor,
         setNailsColor,

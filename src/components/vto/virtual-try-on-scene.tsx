@@ -84,7 +84,8 @@ export function VirtualTryOnScene({
     foundationColor,
     showMakeup,
     showNails,
-    nailsColor
+    nailsColor,
+    showPressOnNails,
   } = useMakeup();
   const { showHand, showFace } = useAccesories();
 
@@ -94,7 +95,7 @@ export function VirtualTryOnScene({
   const hairColorRef = useRef(hairColor);
   const nailColorRef = useRef(nailsColor);
   const showFaceRef = useRef(showMakeup || showFace);
-  const showHandRef = useRef(showHand || showHand);
+  const showHandRef = useRef(showHand || showPressOnNails);
   const showHairSegmenterRef = useRef(showHair || showFoundation);
   const showNailsRef = useRef(showNails);
   const [loadingModel, setLoadingModel] = useState(false);
@@ -191,7 +192,7 @@ export function VirtualTryOnScene({
           delegate: "GPU",
         },
         runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
-        outputConfidenceMasks: true,
+        outputCategoryMask: true,
       },
     );
 
@@ -207,7 +208,7 @@ export function VirtualTryOnScene({
     nailColorRef.current = nailsColor;
 
     showFaceRef.current = showMakeup || showFace;
-    showHandRef.current = showHand || showNails;
+    showHandRef.current = showHand || showPressOnNails;
     showHairSegmenterRef.current = showHair || showFoundation;
     showNailsRef.current = showNails;
     if (showFaceRef.current) {
@@ -413,8 +414,6 @@ export function VirtualTryOnScene({
                       sourceWidth,
                       sourceHeight,
                     );
-                  } else {
-                    console.log("nailBackgroundRef.current is null");
                   }
 
                   const nailResults =
@@ -425,10 +424,10 @@ export function VirtualTryOnScene({
                         )
                       : nailsSegmenterRef.current.segment(sourceElement);
 
-                  if (nailResults?.confidenceMasks) {
+                  if (nailResults?.categoryMask) {
                     const overlayColor = hexToRgb(nailColorRef.current);
-                    const confidenceMask =
-                      nailResults.confidenceMasks[0].getAsFloat32Array();
+                    const categoryMask =
+                      nailResults.categoryMask.getAsFloat32Array();
                     const textureData = bgCtx.getImageData(
                       0,
                       0,
@@ -441,13 +440,8 @@ export function VirtualTryOnScene({
                       canvas.width,
                       canvas.height,
                     );
-                    for (let i = 0; i < confidenceMask.length; i++) {
-                      const alpha =
-                        confidenceMask[i] > 0.5
-                          ? 1
-                          : confidenceMask[i] > 0.2
-                            ? confidenceMask[i]
-                            : 0;
+                    for (let i = 0; i < categoryMask.length; i++) {
+                      const alpha = categoryMask[i] == 1 ? 0 : 1;
 
                       const pixelIndex = i * 4;
 
@@ -474,11 +468,7 @@ export function VirtualTryOnScene({
                     }
                     ctx.putImageData(imageData, 0, 0);
                   }
-                } else {
-                  console.log("NailsSegmenter is not loaded yet.");
                 }
-              } else {
-                console.log("NOT SHOW NAIL");
               }
 
               if (showFaceRef.current) {
@@ -671,7 +661,7 @@ export function VirtualTryOnScene({
       )}
 
       <img
-        className="hidden w-full h-full"
+        className="hidden h-full w-full"
         ref={nailBackgroundRef}
         src="media/unveels/vto-assets/nails/k.jpg"
       />
@@ -777,7 +767,10 @@ export function VirtualTryOnScene({
           transform: mode == "LIVE" && !criterias.flipped ? "scaleX(-1)" : "",
         }}
       />
-      <canvas ref={backgroundCanvasRef} className={`pointer-events-none absolute`} />
+      <canvas
+        ref={backgroundCanvasRef}
+        className={`pointer-events-none absolute`}
+      />
       {loadingModel && (
         <ModelLoadingScreen progress={0} loadingMessage={loadingMessage} />
       )}
