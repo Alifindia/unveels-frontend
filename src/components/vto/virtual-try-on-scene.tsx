@@ -27,16 +27,24 @@ import { Rnd } from "react-rnd";
 import { BeforeAfterCanvas } from "./before-after-canvas";
 import { hexToRgb } from "../../utils/colorUtils";
 import { ModelLoadingScreen } from "../model-loading-screen";
-import { mod } from "three/webgpu";
+
+export enum VtoDefaultDetection {
+  FACE_LANDMARKER,
+  HAND_LANDMARKER,
+  HAIR_SEGMENTER,
+  NAIL_SEGMENTER
+}
 
 export function VirtualTryOnScene({
   mediaFile,
   mode = "LIVE",
   modelImageSrc,
+  defaultDetection
 }: {
   mediaFile: File | null;
   mode: "IMAGE" | "VIDEO" | "LIVE";
   modelImageSrc?: string | null;
+  defaultDetection?: VtoDefaultDetection;
 }) {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -197,7 +205,11 @@ export function VirtualTryOnScene({
     const startLandmarker = async () => {
       try {
         if (isMounted) {
-          initializeFaceLandmarker();
+          if (defaultDetection === VtoDefaultDetection.FACE_LANDMARKER) {
+            initializeFaceLandmarker();
+          } else if (defaultDetection === VtoDefaultDetection.HAND_LANDMARKER) {
+            initializeHandLandmarker();
+          }
           startDetection();
         }
       } catch (error) {

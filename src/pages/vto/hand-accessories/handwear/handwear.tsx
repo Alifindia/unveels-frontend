@@ -24,7 +24,7 @@ function useActiveHandwear(): "Rings" | "Bracelets" | "Bangles" {
 
   // Extract the neckwear type from the path
   const pathSegments = location.pathname.split("/");
-  const activeNeckwear = pathSegments.includes("virtual-try-on") || pathSegments.includes("virtual-try-on-accesories")
+  const activeNeckwear = pathSegments.includes("virtual-try-on") || pathSegments.includes("virtual-try-on-hand")
     ? pathSegments[2]
     : null;
 

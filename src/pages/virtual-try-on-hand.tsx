@@ -37,7 +37,10 @@ import { HeadAccessoriesMode } from "./vto/head-accesories/head-accessories";
 import { LipsMode } from "./vto/lips/lips-makeup";
 import { NailsMode } from "./vto/nails/nails-makeup";
 import { NeckAccessoriesMode } from "./vto/neck-accessories/neck-accessories";
-import { VirtualTryOnScene } from "../components/vto/virtual-try-on-scene";
+import {
+  VirtualTryOnScene,
+  VtoDefaultDetection,
+} from "../components/vto/virtual-try-on-scene";
 import { MakeupProvider } from "../context/makeup-context";
 import { AccesoriesProvider } from "../context/accesories-context";
 import { LipColorProvider } from "./vto/lips/lip-color/lip-color-context";
@@ -250,13 +253,22 @@ function Main() {
                 mediaFile={mediaFile}
                 mode={mode}
                 modelImageSrc={modelImageSrc}
+                defaultDetection={VtoDefaultDetection.HAND_LANDMARKER}
               />
             )}
             {mode === "VIDEO" && (
-              <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+              <VirtualTryOnScene
+                mediaFile={mediaFile}
+                mode={mode}
+                defaultDetection={VtoDefaultDetection.HAND_LANDMARKER}
+              />
             )}
             {mode === "LIVE" && (
-              <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+              <VirtualTryOnScene
+                mediaFile={mediaFile}
+                mode={mode}
+                defaultDetection={VtoDefaultDetection.HAND_LANDMARKER}
+              />
             )}
             <div className="pointer-events-none absolute inset-0"></div>
           </div>
@@ -284,12 +296,6 @@ function Main() {
 
 function MainContent() {
   const [collapsed, setCollapsed] = useState(false);
-  const { criterias } = useCamera();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate("/virtual-try-on-hand/hand");
-  }, []);
 
   return (
     <>
@@ -309,8 +315,9 @@ function MainContent() {
   );
 }
 
-export function TryOnSelectorHand() {
+export function TryOnSelectorHand({ path }: { path: string }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const tabOptions = [
     {
@@ -322,12 +329,18 @@ export function TryOnSelectorHand() {
       icon: <Icons.accessoryHand />,
     },
   ];
-  const [tab, setTab] = useState(
-    "Hand Accessories" as "Hand Accessories" | "Nails" | null,
-  );
+
+  const tab =
+    path == "hand"
+      ? "Hand Accessories"
+      : path == "nail"
+        ? "Nails"
+        : "Hand Accessories";
 
   const activeClassNames =
     "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text text-transparent";
+
+  const tabName = (name: string) => (name === "Nails" ? "nail" : "hand");
 
   return (
     <div className="mx-auto w-full max-w-lg space-y-2 px-4">
@@ -340,7 +353,7 @@ export function TryOnSelectorHand() {
                 key={shadeTab.name}
                 className={`flex w-full flex-col items-center ${isActive ? "border-b border-gray-100 text-white" : "text-gray-500"} py-3`}
                 onClick={() =>
-                  setTab(shadeTab.name as "Hand Accessories" | "Nails")
+                  navigate("/virtual-try-on-hand/" + tabName(shadeTab.name))
                 }
               >
                 <div
@@ -525,7 +538,7 @@ export function TopNavigation({}: {}) {
 
   const handleBackClick = () => {
     if (location.pathname !== "/virtual-try-on-hand/hand") {
-      navigate("/virtual-try-on-hand/hand");
+      navigate(-1);
     } else {
       if (isDevelopment) {
         window.location.href = "/";

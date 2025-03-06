@@ -264,7 +264,8 @@ const routes = [
         path: "/virtual-try-on-hand",
         element: <VirtualTryOnHand />,
         children: [
-          { path: "hand", element: <TryOnSelectorHand /> },
+          { path: "hand", element: <TryOnSelectorHand path="hand" /> },
+          { path: "nail", element: <TryOnSelectorHand path="nail"/> },
           { path: "rings", element: <HandwearSelector /> },
           { path: "bracelets", element: <HandwearSelector /> },
           { path: "bangles", element: <HandwearSelector /> },
