@@ -32,14 +32,14 @@ export enum VtoDefaultDetection {
   FACE_LANDMARKER,
   HAND_LANDMARKER,
   HAIR_SEGMENTER,
-  NAIL_SEGMENTER
+  NAIL_SEGMENTER,
 }
 
 export function VirtualTryOnScene({
   mediaFile,
   mode = "LIVE",
   modelImageSrc,
-  defaultDetection
+  defaultDetection,
 }: {
   mediaFile: File | null;
   mode: "IMAGE" | "VIDEO" | "LIVE";
@@ -49,6 +49,8 @@ export function VirtualTryOnScene({
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
+  const nailBackgroundRef = useRef<HTMLImageElement>(null);
+
   const beforeAfterCanvasRef = useRef<HTMLCanvasElement>(null);
   const imageUploadRef = useRef<HTMLImageElement>(null);
   const videoUploadRef = useRef<HTMLVideoElement>(null);
@@ -63,7 +65,7 @@ export function VirtualTryOnScene({
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
   const handLandmarkerRef = useRef<HandLandmarker | null>(null);
   const hairSegmenterRef = useRef<ImageSegmenter | null>(null);
-  // const nailsSegmenterRef = useRef<ImageSegmenter | null>(null);
+  const nailsSegmenterRef = useRef<ImageSegmenter | null>(null);
 
   const hairRef = useRef<Float32Array | null>(null);
   const hairMaskRef = useRef<ImageData | null>(null);
@@ -82,6 +84,7 @@ export function VirtualTryOnScene({
     foundationColor,
     showMakeup,
     showNails,
+    nailsColor
   } = useMakeup();
   const { showHand, showFace } = useAccesories();
 
@@ -89,9 +92,11 @@ export function VirtualTryOnScene({
   const showFoundationRef = useRef(showFoundation);
   const foundationColorRef = useRef(foundationColor);
   const hairColorRef = useRef(hairColor);
+  const nailColorRef = useRef(nailsColor);
   const showFaceRef = useRef(showMakeup || showFace);
   const showHandRef = useRef(showHand || showHand);
   const showHairSegmenterRef = useRef(showHair || showFoundation);
+  const showNailsRef = useRef(showNails);
   const [loadingModel, setLoadingModel] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
 
@@ -163,11 +168,33 @@ export function VirtualTryOnScene({
         },
         runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
         outputCategoryMask: true,
-        outputConfidenceMasks: false,
       },
     );
 
     hairSegmenterRef.current = hairSegmenter;
+    setLoadingModel(false);
+  };
+
+  const initializeNailSegmenter = async () => {
+    if (nailsSegmenterRef.current) return;
+    setLoadingModel(true);
+    setLoadingMessage("Loading for nail detector...");
+    const filesetResolver = await FilesetResolver.forVisionTasks(
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.17/wasm",
+    );
+
+    nailsSegmenterRef.current = await ImageSegmenter.createFromOptions(
+      filesetResolver,
+      {
+        baseOptions: {
+          modelAssetPath: "/media/unveels/models/nails/nails.tflite",
+          delegate: "GPU",
+        },
+        runningMode: mode === "IMAGE" ? "IMAGE" : "VIDEO",
+        outputConfidenceMasks: true,
+      },
+    );
+
     setLoadingModel(false);
   };
 
@@ -177,9 +204,12 @@ export function VirtualTryOnScene({
     showFoundationRef.current = showFoundation;
     foundationColorRef.current = foundationColor;
     hairColorRef.current = hairColor;
+    nailColorRef.current = nailsColor;
+
     showFaceRef.current = showMakeup || showFace;
     showHandRef.current = showHand || showNails;
     showHairSegmenterRef.current = showHair || showFoundation;
+    showNailsRef.current = showNails;
     if (showFaceRef.current) {
       initializeFaceLandmarker();
     }
@@ -188,6 +218,9 @@ export function VirtualTryOnScene({
     }
     if (showHairSegmenterRef.current) {
       initializeImageSegmenter();
+    }
+    if (showNails) {
+      initializeNailSegmenter();
     }
   }, [
     showHair,
@@ -249,12 +282,6 @@ export function VirtualTryOnScene({
           willReadFrequently: true,
         });
         if (ctx && bgCtx) {
-          const { innerWidth: width, innerHeight: height } = window;
-          const dpr = window.devicePixelRatio || 1;
-          canvas.width = width * dpr;
-          canvas.height = height * dpr;
-          ctx.scale(dpr, dpr);
-
           let sourceElement: HTMLVideoElement | HTMLImageElement | null = null;
 
           if (
@@ -283,45 +310,16 @@ export function VirtualTryOnScene({
                 ? sourceElement.videoHeight
                 : sourceElement.naturalHeight;
 
+            canvas.width = sourceWidth;
+            canvas.height = sourceHeight;
             bgCanvas.width = sourceWidth;
             bgCanvas.height = sourceHeight;
-
-            const imgAspect =
-              sourceElement instanceof HTMLVideoElement
-                ? sourceElement.videoWidth / sourceElement.videoHeight
-                : sourceElement.naturalWidth / sourceElement.naturalHeight;
-            const canvasAspect = width / height;
-
-            let drawWidth: number;
-            let drawHeight: number;
-            let offsetX: number;
-            let offsetY: number;
-
-            if (imgAspect < canvasAspect) {
-              drawWidth = width;
-              drawHeight = width / imgAspect;
-              offsetX = 0;
-              offsetY = (height - drawHeight) / 2;
-            } else {
-              drawWidth = height * imgAspect;
-              drawHeight = height;
-              offsetX = (width - drawWidth) / 2;
-              offsetY = 0;
-            }
-
-            ctx.clearRect(0, 0, width, height);
 
             const startTimeMs = performance.now();
             try {
               if (showHairSegmenterRef.current) {
                 if (hairSegmenterRef.current != null) {
-                  ctx.drawImage(
-                    sourceElement,
-                    0,
-                    0,
-                    sourceWidth / dpr,
-                    sourceHeight / dpr,
-                  );
+                  ctx.drawImage(sourceElement, 0, 0, sourceWidth, sourceHeight);
 
                   const hairResults =
                     sourceElement instanceof HTMLVideoElement
@@ -398,10 +396,89 @@ export function VirtualTryOnScene({
                       sourceWidth,
                       sourceHeight,
                     );
-                    bgCtx?.putImageData(hairMaskRef.current, 0, 0);
+                    ctx?.putImageData(hairMaskRef.current, 0, 0);
                     hairResults.close();
                   }
                 }
+              }
+
+              if (showNailsRef.current) {
+                if (nailsSegmenterRef.current != null) {
+                  ctx.drawImage(sourceElement, 0, 0, sourceWidth, sourceHeight);
+                  if (nailBackgroundRef.current) {
+                    bgCtx.drawImage(
+                      nailBackgroundRef.current,
+                      0,
+                      0,
+                      sourceWidth,
+                      sourceHeight,
+                    );
+                  } else {
+                    console.log("nailBackgroundRef.current is null");
+                  }
+
+                  const nailResults =
+                    sourceElement instanceof HTMLVideoElement
+                      ? nailsSegmenterRef.current.segmentForVideo(
+                          sourceElement,
+                          startTimeMs,
+                        )
+                      : nailsSegmenterRef.current.segment(sourceElement);
+
+                  if (nailResults?.confidenceMasks) {
+                    const overlayColor = hexToRgb(nailColorRef.current);
+                    const confidenceMask =
+                      nailResults.confidenceMasks[0].getAsFloat32Array();
+                    const textureData = bgCtx.getImageData(
+                      0,
+                      0,
+                      canvas.width,
+                      canvas.height,
+                    );
+                    const imageData = ctx.getImageData(
+                      0,
+                      0,
+                      canvas.width,
+                      canvas.height,
+                    );
+                    for (let i = 0; i < confidenceMask.length; i++) {
+                      const alpha =
+                        confidenceMask[i] > 0.5
+                          ? 1
+                          : confidenceMask[i] > 0.2
+                            ? confidenceMask[i]
+                            : 0;
+
+                      const pixelIndex = i * 4;
+
+                      // Blend texture with color
+                      const textureR = textureData.data[pixelIndex];
+                      const textureG = textureData.data[pixelIndex + 1];
+                      const textureB = textureData.data[pixelIndex + 2];
+
+                      // Apply color tint to texture
+                      const coloredTextureR = (textureR * overlayColor.r) / 255;
+                      const coloredTextureG = (textureG * overlayColor.g) / 255;
+                      const coloredTextureB = (textureB * overlayColor.b) / 255;
+
+                      // Blend with video
+                      imageData.data[pixelIndex] =
+                        imageData.data[pixelIndex] * (1 - alpha) +
+                        coloredTextureR * alpha;
+                      imageData.data[pixelIndex + 1] =
+                        imageData.data[pixelIndex + 1] * (1 - alpha) +
+                        coloredTextureG * alpha;
+                      imageData.data[pixelIndex + 2] =
+                        imageData.data[pixelIndex + 2] * (1 - alpha) +
+                        coloredTextureB * alpha;
+                    }
+                    ctx.putImageData(imageData, 0, 0);
+                  }
+                } else {
+                  console.log("NailsSegmenter is not loaded yet.");
+                }
+              } else {
+                console.log("NOT SHOW NAIL");
               }
 
               if (showFaceRef.current) {
@@ -593,6 +670,12 @@ export function VirtualTryOnScene({
         </Rnd>
       )}
 
+      <img
+        className="hidden w-full h-full"
+        ref={nailBackgroundRef}
+        src="media/unveels/vto-assets/nails/k.jpg"
+      />
+
       {mode == "IMAGE" && (mediaFile || modelImageSrc) && (
         <img
           className="hidden"
@@ -682,24 +765,19 @@ export function VirtualTryOnScene({
       {/* Overlay Canvas */}
       <canvas
         ref={canvasRef}
-        className={`pointer-events-none absolute left-0 top-0 hidden h-full w-full`}
-        style={{ zIndex: 40 }}
-      />
-
-      <canvas
-        ref={backgroundCanvasRef}
-        className={`pointer-events-none absolute left-1/2 top-1/2`}
+        className={`pointer-events-none absolute`}
         style={{
           zIndex: 40,
-          width: "100%",
-          height: "100%",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
           objectFit: "cover",
-          transform:
-            mode == "LIVE" && !criterias.flipped
-              ? "translate(-50%, -50%) scaleX(-1)"
-              : "translate(-50%, -50%)",
+          transform: mode == "LIVE" && !criterias.flipped ? "scaleX(-1)" : "",
         }}
       />
+      <canvas ref={backgroundCanvasRef} className={`pointer-events-none absolute`} />
       {loadingModel && (
         <ModelLoadingScreen progress={0} loadingMessage={loadingMessage} />
       )}

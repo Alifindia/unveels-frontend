@@ -344,7 +344,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
               </mesh>
             )}
           </> */}
-          {!showHair && !showFoundation && (
+          {!showHair && !showFoundation && !showNails && (
             <mesh position={[0, 0, -500]} {...props} renderOrder={0}>
               <planeGeometry args={[planeSize[0], planeSize[1]]} />
               <shaderMaterial
@@ -553,7 +553,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
               <Ring planeSize={planeSize} handLandmarks={handlandmarks} />
             )}
 
-            {showNails && (
+            {/* {showNails && (
               <>
                 <NailThumb
                   planeSize={planeSize}
@@ -573,7 +573,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
                   handLandmarks={handlandmarks}
                 />
               </>
-            )}
+            )} */}
             {showBracelet && (
               <Bangle planeSize={planeSize} handLandmarks={handlandmarks} />
             )}
