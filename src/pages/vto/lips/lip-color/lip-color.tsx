@@ -16,6 +16,9 @@ import { useEffect, useState } from "react";
 import { Product } from "../../../../api/shared";
 import { useSelecProductNumberContext } from "../../select-product-context";
 import { useCartContext } from "../../../../context/cart-context";
+import { useFindTheLookContext } from "../../../../context/find-the-look-context";
+import { getLipsMakeupProductTypeIds } from "../../../../api/attributes/makeups";
+import { useTranslation } from "react-i18next";
 
 export function LipColorSelector() {
   console.log("render LipColorSelector");
@@ -386,24 +389,51 @@ function ProductList() {
     );
   };
 
+  const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
+    useFindTheLookContext();
+  const { t } = useTranslation();
+
   return (
-    <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
-      {isLoading ? (
-        <LoadingProducts />
-      ) : (
-        data?.items.map((product, index) => {
-          return (
-            <VTOProductCard
-              product={product}
-              productNumber={index + 1}
-              key={product.id}
-              selectedProduct={selectedProduct}
-              setSelectedProduct={setSelectedProduct}
-              onClick={() => handleProductClick(product)}
-            />
-          );
-        })
-      )}
-    </div>
+    <>
+      <div className="w-full text-right">
+        <button
+          className="p-0 text-[0.550rem] text-white sm:py-0.5 2xl:text-[0.625rem]"
+          onClick={() => {
+            setMapTypes({
+              Lipcolors: {
+                attributeName: "lips_makeup_product_type",
+                values: "5726,5727,5728,5731".split(","),
+              },
+            });
+            setGroupedItemsData({
+              makeup: [{ label: "Lipcolors", section: "makeup" }],
+              accessories: [],
+            });
+            setSectionName("Lip Color");
+            setView("all_categories");
+          }}
+        >
+          {t("view_all")}
+        </button>
+      </div>
+      <div className="flex w-full gap-2 overflow-x-auto pb-2 pt-4 no-scrollbar active:cursor-grabbing sm:gap-4">
+        {isLoading ? (
+          <LoadingProducts />
+        ) : (
+          data?.items.map((product, index) => {
+            return (
+              <VTOProductCard
+                product={product}
+                productNumber={index + 1}
+                key={product.id}
+                selectedProduct={selectedProduct}
+                setSelectedProduct={setSelectedProduct}
+                onClick={() => handleProductClick(product)}
+              />
+            );
+          })
+        )}
+      </div>
+    </>
   );
 }

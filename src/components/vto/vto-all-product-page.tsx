@@ -227,7 +227,7 @@ function ProductHorizontalList({
         ) : (
           data?.items.map((product) => {
             const imageUrl =
-              mediaUrl(product.media_gallery_entries[0].file) ??
+              mediaUrl(product.media_gallery_entries[0]?.file) ??
               "https://picsum.photos/id/237/200/300";
 
             return (
@@ -235,7 +235,7 @@ function ProductHorizontalList({
                 key={product.id}
                 className="rounded-xl shadow"
               >
-                <div 
+                <div
                   className="cursor-pointer"
                   onClick={() => {
                     window.open(
