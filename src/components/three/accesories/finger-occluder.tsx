@@ -82,7 +82,7 @@ const FingerOccluderInner: React.FC<FingerOccluderProps> = React.memo(
 
         const screenX = (1 - x - 0.5) * outputWidth;
         const screenY = -(y - 0.5) * outputHeight;
-        const screenZ = -z * outputWidth;
+        const screenZ = -z * Math.max(outputHeight, outputWidth);
 
         const scaleFactor = (fingerSize * outputWidth) / 6.5;
 

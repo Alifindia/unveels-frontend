@@ -69,9 +69,9 @@ const HandOccluderInner: React.FC<HandOccluderProps> = React.memo(
 
         const wristX = (1 - wrist.x - 0.5) * outputWidth;
         const wristY = -(wrist.y - 0.5) * outputHeight;
-        const wristZ = -wrist.z * outputWidth;
+        const wristZ = -wrist.z * Math.max(outputHeight, outputWidth);
 
-        const scaleFactor = (wristSize * outputWidth) / 3.5;
+        const scaleFactor = (wristSize * Math.max(outputHeight, outputWidth)) / 3.5;
 
         occluderRef.current.position.set(wristX, wristY, wristZ);
         occluderRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);

@@ -81,7 +81,7 @@ const BangleInner: React.FC<BangleProps> = React.memo(
         const wristX = (1 - wrist.x - 0.5) * outputWidth;
         const wristY = -(wrist.y - 0.5) * outputHeight;
         const wristZ = -wrist.z * Math.max(outputHeight, outputWidth);
-        const scaleFactor = wristSize * outputWidth;
+        const scaleFactor = wristSize * Math.max(outputHeight, outputWidth);
 
         bangleRef.current.position.set(wristX, wristY, wristZ);
         bangleRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
