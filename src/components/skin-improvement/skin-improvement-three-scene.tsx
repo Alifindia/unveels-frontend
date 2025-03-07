@@ -14,7 +14,6 @@ import {
 import { computeConvexHull } from "../../utils/imageProcessing";
 import { useSkinImprovement } from "../../context/see-improvement-context";
 
-// Komponen untuk menampilkan gambar menggunakan React Three Fiber
 interface SkinImprovementThreeSceneProps extends MeshProps {
   imageSrc: string;
   landmarks: Landmark[];
@@ -26,7 +25,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
   ...props
 }) => {
   const texture = useTexture(imageSrc);
-  const { viewport } = useThree();
+  const { viewport, size } = useThree();
   const [planeSize, setPlaneSize] = useState<[number, number]>([1, 1]);
 
   const filterRef = useRef<ShaderMaterial>(null);
@@ -35,7 +34,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
   const { sigmaSpatial, sigmaColor, smoothingStrength, setSmoothingStrength } =
     useSkinImprovement();
 
-  // State for window size and DPR
+  // Handle window resize to update windowSize state
   const [windowSize, setWindowSize] = useState<{
     width: number;
     height: number;
@@ -46,7 +45,6 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     dpr: window.devicePixelRatio || 1,
   });
 
-  // Handle window resize to update windowSize state
   useEffect(() => {
     const handleResize = () => {
       setWindowSize({
@@ -69,14 +67,9 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
   useEffect(() => {
     // Handler untuk menerima pesan dari Flutter atau browser
     const handleMessage = (event: MessageEvent) => {
-      console.log("Message received:", event); // Tambahkan log untuk event itu sendiri
-
-      // Periksa data yang diterima
       if (event.data) {
         try {
           const data = JSON.parse(event.data);
-          console.log("Parsed data:", data); // Log data setelah parsing
-
           // Memperbarui smoothingStrength jika data yang diterima valid
           if (data.smoothingStrength !== undefined) {
             updateSmoothingStrength(data.smoothingStrength);
@@ -84,21 +77,17 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
         } catch (error) {
           console.error("Error parsing message:", error);
         }
-      } else {
-        console.warn("No data received in message event");
       }
     };
 
-    // Menambahkan event listener untuk mendengarkan pesan
     window.addEventListener("message", handleMessage);
-
-    // Membersihkan event listener saat komponen unmount
     return () => {
       window.removeEventListener("message", handleMessage);
     };
   }, []);
 
   // Calculate plane size based on image aspect ratio and viewport
+  // Using object-cover style (may crop parts of image to fill screen)
   useEffect(() => {
     if (!texture.image) return;
 
@@ -110,58 +99,48 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
 
     if (imageAspect > viewportAspect) {
       // Image is wider than viewport
+      // For object-cover, we need to match the height and allow width to be cropped
       planeHeight = viewport.height;
       planeWidth = viewport.height * imageAspect;
     } else {
-      // Image is taller or same aspect as viewport
+      // Image is taller than viewport
+      // For object-cover, we need to match the width and allow height to be cropped
       planeWidth = viewport.width;
       planeHeight = viewport.width / imageAspect;
     }
 
+    // For object-cover, we want the plane to be at least as large as viewport in both dimensions
+    planeWidth = Math.max(planeWidth, viewport.width);
+    planeHeight = Math.max(planeHeight, viewport.height);
+
     setPlaneSize([planeWidth, planeHeight]);
   }, [texture, viewport]);
 
-  // Create mask texture based on landmarks and window size
+  // Create mask texture based on landmarks directly using texture coordinates
   const maskTexture = useMemo(() => {
-    if (!texture.image) return null;
+    if (!texture.image || landmarks.length === 0) return null;
 
-    const { width, height, dpr } = windowSize;
+    // Get original image dimensions
+    const imgWidth = texture.image.width;
+    const imgHeight = texture.image.height;
 
-    // Create an off-screen canvas for the mask
+    // Create canvas with same dimensions as the original image
     const canvas = document.createElement("canvas");
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
+    canvas.width = imgWidth;
+    canvas.height = imgHeight;
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    // Scale the context based on DPR
-    ctx.scale(dpr, dpr);
+    // Fill with black (represents areas NOT to apply filter to)
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, imgWidth, imgHeight);
 
-    // Calculate aspect ratios
-    const imgAspect = texture.image.width / texture.image.height;
-    const canvasAspect = width / height;
-
-    let drawWidth: number;
-    let drawHeight: number;
-    let offsetX: number;
-    let offsetY: number;
-
-    if (imgAspect < canvasAspect) {
-      drawWidth = width;
-      drawHeight = width / imgAspect;
-      offsetX = 0;
-      offsetY = (height - drawHeight) / 2;
-    } else {
-      drawWidth = height * imgAspect;
-      drawHeight = height;
-      offsetX = (width - drawWidth) / 2;
-      offsetY = 0;
-    }
-
-    // Convert landmarks to pixel coordinates relative to the mask canvas
+    // Convert normalized landmarks to image pixel coordinates
+    // IMPORTANT: We need to maintain the same proportions as the displayed image
     const points: [number, number][] = landmarks.map((landmark) => [
-      landmark.x * drawWidth + offsetX,
-      landmark.y * drawHeight + offsetY,
+      landmark.x * imgWidth,
+      landmark.y * imgHeight
     ]);
 
     // Compute Convex Hull
@@ -186,16 +165,16 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     mask.format = RedFormat;
     mask.needsUpdate = true;
     return mask;
-  }, [landmarks, texture.image, windowSize]);
+  }, [landmarks, texture.image]);
 
   // Reference to the ShaderMaterial to update uniforms dynamically
   useEffect(() => {
-    if (filterRef.current) {
+    if (filterRef.current && maskTexture) {
       filterRef.current.uniforms.imageTexture.value = texture;
       filterRef.current.uniforms.maskTexture.value = maskTexture;
       filterRef.current.uniforms.resolution.value.set(
-        maskTexture?.image.width,
-        maskTexture?.image.height,
+        texture.image.width,
+        texture.image.height
       );
       filterRef.current.uniforms.sigmaSpatial.value = sigmaSpatial;
       filterRef.current.uniforms.sigmaColor.value = sigmaColor;
@@ -221,8 +200,8 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
                   maskTexture: { value: maskTexture },
                   resolution: {
                     value: new Vector2(
-                      maskTexture.image.width,
-                      maskTexture.image.height,
+                      texture.image.width,
+                      texture.image.height
                     ),
                   },
                   sigmaSpatial: { value: sigmaSpatial },
