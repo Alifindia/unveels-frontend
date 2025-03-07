@@ -413,18 +413,7 @@ export function TopNavigation({}: {}) {
           <X className="size-6 text-white" />
         </button>
 
-        <div className="relative -m-0.5 p-0.5">
-          <div
-            className="absolute inset-0 rounded-full border-2 border-transparent"
-            style={{
-              background: `linear-gradient(148deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.77) 100%) border-box`,
-              WebkitMask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-              mask: `linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)`,
-              WebkitMaskComposite: "destination-out",
-              maskComposite: "exclude",
-            }}
-          />
-        </div>
+
       </div>
     </div>
   );
