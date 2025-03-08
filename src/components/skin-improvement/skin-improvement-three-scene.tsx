@@ -2,7 +2,10 @@ import React, { useEffect, useRef, useMemo, useState } from "react";
 import { MeshProps, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { Landmark } from "../../types/landmark";
-import { BilateralFilterShader } from "../../shaders/BilateralFilterShader";
+import {
+  BilateralFilterShader,
+  CustomBilateralShader,
+} from "../../shaders/BilateralFilterShader";
 import {
   Vector2,
   ShaderMaterial,
@@ -11,8 +14,9 @@ import {
   DoubleSide,
   RedFormat,
 } from "three";
-import { computeConvexHull } from "../../utils/imageProcessing";
+// Removed the computeConvexHull import since we're not using hull anymore
 import { useSkinImprovement } from "../../context/see-improvement-context";
+import { applyStretchedLandmarks } from "../../utils/scannerUtils";
 
 interface SkinImprovementThreeSceneProps extends MeshProps {
   imageSrc: string;
@@ -27,6 +31,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
   const texture = useTexture(imageSrc);
   const { viewport, size } = useThree();
   const [planeSize, setPlaneSize] = useState<[number, number]>([1, 1]);
+  // const landmarks = applyStretchedLandmarks(landmarking);
 
   const filterRef = useRef<ShaderMaterial>(null);
 
@@ -87,7 +92,6 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
   }, []);
 
   // Calculate plane size based on image aspect ratio and viewport
-  // Using object-cover style (may crop parts of image to fill screen)
   useEffect(() => {
     if (!texture.image) return;
 
@@ -99,12 +103,10 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
 
     if (imageAspect > viewportAspect) {
       // Image is wider than viewport
-      // For object-cover, we need to match the height and allow width to be cropped
       planeHeight = viewport.height;
       planeWidth = viewport.height * imageAspect;
     } else {
       // Image is taller than viewport
-      // For object-cover, we need to match the width and allow height to be cropped
       planeWidth = viewport.width;
       planeHeight = viewport.width / imageAspect;
     }
@@ -132,31 +134,95 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    // Fill with black (represents areas NOT to apply filter to)
+    // Fill with black (represents areas to apply blur to)
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, imgWidth, imgHeight);
 
-    // Convert normalized landmarks to image pixel coordinates
-    // IMPORTANT: We need to maintain the same proportions as the displayed image
-    const points: [number, number][] = landmarks.map((landmark) => [
-      landmark.x * imgWidth,
-      landmark.y * imgHeight
-    ]);
+    const pipiKanan = [
+      127, 34, 143, 35, 226, 31, 228, 229, 230, 231, 232, 233, 245, 188, 174,
+      236, 198, 209, 129, 203, 206, 216, 172, 58, 132, 93, 234,
+    ];
 
-    // Compute Convex Hull
-    const hull = computeConvexHull(points);
+    const pipiKiri = [
+      356, 448, 449, 450, 451, 417, 429, 426, 436, 432, 434, 367, 361, 323,
+    ];
 
-    if (hull.length < 3) return null; // Not enough points to form a polygon
+    const dahi = [
+      54, 103, 67, 109, 10, 338, 297, 332, 284, 298, 293, 334, 296, 9, 107, 66,
+      105, 63, 68,
+    ];
 
-    ctx.beginPath();
-    hull.forEach(([x, y], index) => {
-      if (index === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
+    const dagu = [
+      43, 106, 182, 83, 18, 313, 406, 335, 422, 430, 394, 379, 378, 400, 377,
+      152, 148, 176, 149, 150, 169, 210, 202,
+    ];
 
-    ctx.closePath();
-    ctx.fillStyle = "white"; // White face area
-    ctx.fill();
+    const kantungMataKananAtas = [
+      463, 286, 258, 257, 259, 260, 467, 359, 263, 466, 388, 387, 386, 385, 398,
+    ];
+
+    const kantungMataKiriAtas = [
+      130, 33, 246, 160, 159, 158, 157, 173, 243, 190, 56, 28, 27, 29, 30, 247,
+    ];
+
+    const kantungMataKananBawah = [
+      362, 382, 381, 380, 374, 373, 390, 249, 263, 359, 446, 265, 372, 345, 352,
+      280, 330, 329, 277, 357,
+    ];
+    const kantungMataKiriBawah = [
+      130, 33, 7, 163, 144, 145, 153, 154, 155, 133, 243, 244, 188, 114, 47, 100, 101, 117, 34, 35,
+    ];
+
+    // Create a temporary canvas for the feathered mask
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = imgWidth;
+    tempCanvas.height = imgHeight;
+    const tempCtx = tempCanvas.getContext("2d");
+    if (!tempCtx) return null;
+
+    // Set shadow properties for feathering (10px blur)
+    tempCtx.shadowColor = "white";
+    tempCtx.shadowBlur = 15;
+    tempCtx.fillStyle = "white";
+
+    // Function to draw feature as a closed path with feathering
+    const drawFeaturePath = (indices) => {
+      // Check if we have enough valid landmarks
+      const validPoints = indices.filter((index) => landmarks[index]);
+      if (validPoints.length < 3) return; // Need at least 3 points for a path
+
+      tempCtx.beginPath();
+      indices.forEach((index, i) => {
+        if (landmarks[index]) {
+          const x = landmarks[index].x * imgWidth;
+          const y = landmarks[index].y * imgHeight;
+
+          if (i === 0) {
+            tempCtx.moveTo(x, y);
+          } else {
+            tempCtx.lineTo(x, y);
+          }
+        }
+      });
+
+      // Close the path back to the first point
+      tempCtx.closePath();
+      tempCtx.fill();
+    };
+
+    // Draw eyes and mouth as white filled shapes on temp canvas
+    // drawFeaturePath(pipiKanan);
+    // drawFeaturePath(rightEye);
+    // drawFeaturePath(mouth);
+    drawFeaturePath(dahi);
+    drawFeaturePath(dagu);
+    // drawFeaturePath(kantungMataKananAtas);
+    // drawFeaturePath(kantungMataKiriAtas);
+    // drawFeaturePath(pipiKiri);
+    drawFeaturePath(kantungMataKananBawah);
+    drawFeaturePath(kantungMataKiriBawah);
+    // Transfer the feathered mask to the main canvas
+    ctx.drawImage(tempCanvas, 0, 0);
 
     // Create a Three.js texture from the canvas
     const mask = new CanvasTexture(canvas);
@@ -174,7 +240,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
       filterRef.current.uniforms.maskTexture.value = maskTexture;
       filterRef.current.uniforms.resolution.value.set(
         texture.image.width,
-        texture.image.height
+        texture.image.height,
       );
       filterRef.current.uniforms.sigmaSpatial.value = sigmaSpatial;
       filterRef.current.uniforms.sigmaColor.value = sigmaColor;
@@ -192,8 +258,8 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
             ref={filterRef}
             args={[
               {
-                vertexShader: BilateralFilterShader.vertexShader,
-                fragmentShader: BilateralFilterShader.fragmentShader,
+                vertexShader: CustomBilateralShader.vertexShader,
+                fragmentShader: CustomBilateralShader.fragmentShader,
                 side: DoubleSide,
                 uniforms: {
                   imageTexture: { value: texture },
@@ -201,7 +267,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
                   resolution: {
                     value: new Vector2(
                       texture.image.width,
-                      texture.image.height
+                      texture.image.height,
                     ),
                   },
                   sigmaSpatial: { value: sigmaSpatial },
