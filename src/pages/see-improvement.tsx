@@ -32,6 +32,7 @@ import { useTranslation } from "react-i18next";
 import { getCookie, getCurrencyAndRate } from "../utils/other";
 import { useSearchParams } from "react-router-dom";
 import SuccessPopup from "../components/popup-add-to-cart";
+import { FacialFeatureType } from "../components/skin-improvement/skin-improvement-three-scene";
 
 export function SeeImprovement() {
   const { i18n } = useTranslation();
@@ -50,7 +51,7 @@ export function SeeImprovement() {
       <SkinAnalysisProvider>
         <SkinImprovementProvider>
           <div className="h-full min-h-dvh">
-            <Main isArabic={isArabic}/>
+            <Main isArabic={isArabic} />
           </div>
         </SkinImprovementProvider>
       </SkinAnalysisProvider>
@@ -112,7 +113,11 @@ function Main({ isArabic }: { isArabic?: boolean }) {
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
           <div className="bg-black/10 p-2 shadow-lg backdrop-blur-sm">
-            <MainContent collapsed={collapsed} setCollapsed={setCollapsed} isArabic={isArabic} />
+            <MainContent
+              collapsed={collapsed}
+              setCollapsed={setCollapsed}
+              isArabic={isArabic}
+            />
             <Footer />
           </div>
         </div>
@@ -124,7 +129,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
 interface MainContentProps {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
-  isArabic?: boolean
+  isArabic?: boolean;
 }
 
 function MainContent({ collapsed, setCollapsed, isArabic }: MainContentProps) {
@@ -141,7 +146,9 @@ function MainContent({ collapsed, setCollapsed, isArabic }: MainContentProps) {
           <div className="h-1 w-10 rounded-full bg-gray-400" />
         </button>
       </div>
-      {collapsed ? null : <BottomContent setCollapsed={setCollapsed} isArabic={isArabic} />}
+      {collapsed ? null : (
+        <BottomContent setCollapsed={setCollapsed} isArabic={isArabic} />
+      )}
     </>
   );
 }
@@ -169,15 +176,21 @@ const tabs = [
 function SkinProblems({
   onClose,
   setCollapsed,
-  skinConcerns
+  skinConcerns,
 }: {
   onClose: () => void;
   setCollapsed: (collapsed: boolean) => void;
-  skinConcerns?: string | null
+  skinConcerns?: string | null;
 }) {
   const { tab, setTab, getTotalScoreByLabel } = useSkinAnalysis();
+  const { setFeatureType } = useSkinImprovement();
+
   useEffect(() => {
-    if(skinConcerns) setTab(skinConcerns)
+    setFeatureType(tab as FacialFeatureType);
+  }, [tab]);
+
+  useEffect(() => {
+    if (skinConcerns) setTab(skinConcerns);
   }, [skinConcerns]);
   return (
     <>
@@ -244,8 +257,8 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
-      setType("unit")
-      setDataItem(dataProduct)
+      setType("unit");
+      setDataItem(dataProduct);
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -288,7 +301,8 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                 </p>
                 <div className="flex flex-wrap items-center justify-end gap-x-1">
                   <span className="text-[0.625rem] font-bold text-white">
-                    {currencySymbol}{(product.price * rate).toFixed(3)}
+                    {currencySymbol}
+                    {(product.price * rate).toFixed(3)}
                   </span>
                   {/* <span className="text-[0.5rem] text-white/50 line-through">
                 ${product.originalPrice.toFixed(2)}
@@ -304,7 +318,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                     handleAddToCart(
                       product.id.toString(),
                       `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                      product
+                      product,
                     );
                   }}
                 >
@@ -332,7 +346,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
 
 interface BottomContentProps {
   setCollapsed: (collapsed: boolean) => void;
-  isArabic?: boolean
+  isArabic?: boolean;
 }
 
 function BottomContent({ setCollapsed, isArabic }: BottomContentProps) {

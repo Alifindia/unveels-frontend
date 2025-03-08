@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { FacialFeatureType } from "../components/skin-improvement/skin-improvement-three-scene";
 
 interface SkinImprovementContextValue {
   sigmaSpatial: number;
@@ -7,6 +8,8 @@ interface SkinImprovementContextValue {
   setSigmaColor: (value: number) => void;
   smoothingStrength: number;
   setSmoothingStrength: (value: number) => void;
+  featureType: FacialFeatureType;
+  setFeatureType: (value: FacialFeatureType) => void;
 }
 
 const SkinImprovementContext = createContext<
@@ -19,6 +22,7 @@ export const SkinImprovementProvider: React.FC<{
   const [sigmaSpatial, setSigmaSpatial] = useState(500.0);
   const [sigmaColor, setSigmaColor] = useState(0.08);
   const [smoothingStrength, setSmoothingStrength] = useState(0.5);
+  const [featureType, setFeatureType] = useState<FacialFeatureType>("acne");
 
   return (
     <SkinImprovementContext.Provider
@@ -29,6 +33,8 @@ export const SkinImprovementProvider: React.FC<{
         setSigmaColor,
         smoothingStrength,
         setSmoothingStrength,
+        featureType,
+        setFeatureType
       }}
     >
       {children}

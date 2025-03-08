@@ -14,9 +14,32 @@ import {
   DoubleSide,
   RedFormat,
 } from "three";
-// Removed the computeConvexHull import since we're not using hull anymore
 import { useSkinImprovement } from "../../context/see-improvement-context";
-import { applyStretchedLandmarks } from "../../utils/scannerUtils";
+
+// Define facial feature regions
+export type FacialFeatureType =
+  | "acne"
+  | "blackhead"
+  | "dark circle"
+  | "droopy eyelid lower"
+  | "droopy eyelid upper"
+  | "dry"
+  | "eyebag"
+  | "firmness"
+  | "moistures"
+  | "oily"
+  | "pore"
+  | "radiance"
+  | "skinredness"
+  | "spots"
+  | "texture"
+  | "whitehead"
+  | "wrinkles";
+
+// Define facial regions mapping type
+export type FacialRegionsMap = {
+  [key: string]: number[];
+};
 
 interface SkinImprovementThreeSceneProps extends MeshProps {
   imageSrc: string;
@@ -31,13 +54,78 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
   const texture = useTexture(imageSrc);
   const { viewport, size } = useThree();
   const [planeSize, setPlaneSize] = useState<[number, number]>([1, 1]);
-  // const landmarks = applyStretchedLandmarks(landmarking);
 
   const filterRef = useRef<ShaderMaterial>(null);
 
   // State for shader parameters
-  const { sigmaSpatial, sigmaColor, smoothingStrength, setSmoothingStrength } =
-    useSkinImprovement();
+  const {
+    sigmaSpatial,
+    sigmaColor,
+    smoothingStrength,
+    setSmoothingStrength,
+    featureType,
+    setFeatureType,
+  } = useSkinImprovement();
+
+  // Define facial regions landmarks indices
+  const facialRegions: FacialRegionsMap = useMemo(
+    () => ({
+      pipiKanan: [
+        127, 34, 143, 35, 226, 31, 228, 229, 230, 231, 232, 233, 245, 188, 174,
+        236, 198, 209, 129, 203, 206, 216, 172, 58, 132, 93, 234,
+      ],
+      pipiKiri: [
+        356, 448, 449, 450, 451, 417, 429, 426, 436, 432, 434, 367, 361, 323,
+      ],
+      dahi: [
+        54, 103, 67, 109, 10, 338, 297, 332, 284, 298, 293, 334, 296, 9, 107,
+        66, 105, 63, 68,
+      ],
+      dagu: [
+        43, 106, 182, 83, 18, 313, 406, 335, 422, 430, 394, 379, 378, 400, 377,
+        152, 148, 176, 149, 150, 169, 210, 202,
+      ],
+      kantungMataKananAtas: [
+        463, 286, 258, 257, 259, 260, 467, 359, 263, 466, 388, 387, 386, 385,
+        398,
+      ],
+      kantungMataKiriAtas: [
+        130, 33, 246, 160, 159, 158, 157, 173, 243, 190, 56, 28, 27, 29, 30,
+        247,
+      ],
+      kantungMataKananBawah: [
+        362, 382, 381, 380, 374, 373, 390, 249, 263, 359, 446, 265, 372, 345,
+        352, 280, 330, 329, 277, 357,
+      ],
+      kantungMataKiriBawah: [
+        130, 33, 7, 163, 144, 145, 153, 154, 155, 133, 243, 244, 188, 114, 47,
+        100, 101, 117, 34, 35,
+      ],
+    }),
+    [],
+  );
+
+  // Function to get active regions based on featureType
+  const getActiveRegions = (
+    type: FacialFeatureType,
+  ): Array<keyof FacialRegionsMap> => {
+    switch (type) {
+      case "eyebag":
+        return ["kantungMataKananBawah", "kantungMataKiriBawah"];
+      case "acne":
+        return ["pipiKanan", "pipiKiri", "dahi", "dagu"];
+      case "dark circle":
+        return ["kantungMataKananBawah", "kantungMataKiriBawah"];
+      case "droopy eyelid lower":
+        return ["kantungMataKananAtas", "kantungMataKiriAtas"];
+      case "droopy eyelid upper":
+        return ["kantungMataKananAtas", "kantungMataKiriAtas"];
+      case "wrinkles":
+        return ["dahi", "pipiKanan", "pipiKiri"];
+      default:
+        return Object.keys(facialRegions);
+    }
+  };
 
   // Handle window resize to update windowSize state
   const [windowSize, setWindowSize] = useState<{
@@ -63,21 +151,25 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Fungsi untuk mengupdate smoothingStrength berdasarkan pesan yang diterima
+  // Function to update smoothingStrength based on received message
   const updateSmoothingStrength = (newSmoothingStrength: number) => {
     console.log("Smoothing Strength updated to:", newSmoothingStrength);
     setSmoothingStrength(newSmoothingStrength);
   };
 
   useEffect(() => {
-    // Handler untuk menerima pesan dari Flutter atau browser
+    // Handler to receive messages from Flutter or browser
     const handleMessage = (event: MessageEvent) => {
       if (event.data) {
         try {
           const data = JSON.parse(event.data);
-          // Memperbarui smoothingStrength jika data yang diterima valid
+          // Update smoothingStrength if received
           if (data.smoothingStrength !== undefined) {
-            updateSmoothingStrength(data.smoothingStrength);
+            updateSmoothingStrength(data.smoothingStrength as number);
+          }
+          // Update featureType if received
+          if (data.featureType !== undefined) {
+            setFeatureType(data.featureType as FacialFeatureType);
           }
         } catch (error) {
           console.error("Error parsing message:", error);
@@ -138,41 +230,6 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, imgWidth, imgHeight);
 
-    const pipiKanan = [
-      127, 34, 143, 35, 226, 31, 228, 229, 230, 231, 232, 233, 245, 188, 174,
-      236, 198, 209, 129, 203, 206, 216, 172, 58, 132, 93, 234,
-    ];
-
-    const pipiKiri = [
-      356, 448, 449, 450, 451, 417, 429, 426, 436, 432, 434, 367, 361, 323,
-    ];
-
-    const dahi = [
-      54, 103, 67, 109, 10, 338, 297, 332, 284, 298, 293, 334, 296, 9, 107, 66,
-      105, 63, 68,
-    ];
-
-    const dagu = [
-      43, 106, 182, 83, 18, 313, 406, 335, 422, 430, 394, 379, 378, 400, 377,
-      152, 148, 176, 149, 150, 169, 210, 202,
-    ];
-
-    const kantungMataKananAtas = [
-      463, 286, 258, 257, 259, 260, 467, 359, 263, 466, 388, 387, 386, 385, 398,
-    ];
-
-    const kantungMataKiriAtas = [
-      130, 33, 246, 160, 159, 158, 157, 173, 243, 190, 56, 28, 27, 29, 30, 247,
-    ];
-
-    const kantungMataKananBawah = [
-      362, 382, 381, 380, 374, 373, 390, 249, 263, 359, 446, 265, 372, 345, 352,
-      280, 330, 329, 277, 357,
-    ];
-    const kantungMataKiriBawah = [
-      130, 33, 7, 163, 144, 145, 153, 154, 155, 133, 243, 244, 188, 114, 47, 100, 101, 117, 34, 35,
-    ];
-
     // Create a temporary canvas for the feathered mask
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = imgWidth;
@@ -180,13 +237,13 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     const tempCtx = tempCanvas.getContext("2d");
     if (!tempCtx) return null;
 
-    // Set shadow properties for feathering (10px blur)
+    // Set shadow properties for feathering (15px blur)
     tempCtx.shadowColor = "white";
     tempCtx.shadowBlur = 15;
     tempCtx.fillStyle = "white";
 
     // Function to draw feature as a closed path with feathering
-    const drawFeaturePath = (indices) => {
+    const drawFeaturePath = (indices: number[]) => {
       // Check if we have enough valid landmarks
       const validPoints = indices.filter((index) => landmarks[index]);
       if (validPoints.length < 3) return; // Need at least 3 points for a path
@@ -210,17 +267,16 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
       tempCtx.fill();
     };
 
-    // Draw eyes and mouth as white filled shapes on temp canvas
-    // drawFeaturePath(pipiKanan);
-    // drawFeaturePath(rightEye);
-    // drawFeaturePath(mouth);
-    drawFeaturePath(dahi);
-    drawFeaturePath(dagu);
-    // drawFeaturePath(kantungMataKananAtas);
-    // drawFeaturePath(kantungMataKiriAtas);
-    // drawFeaturePath(pipiKiri);
-    drawFeaturePath(kantungMataKananBawah);
-    drawFeaturePath(kantungMataKiriBawah);
+    // Get active regions based on current feature type
+    const activeRegions = getActiveRegions(featureType);
+
+    // Draw only the active regions
+    activeRegions.forEach((region: keyof FacialRegionsMap) => {
+      if (facialRegions[region]) {
+        drawFeaturePath(facialRegions[region]);
+      }
+    });
+
     // Transfer the feathered mask to the main canvas
     ctx.drawImage(tempCanvas, 0, 0);
 
@@ -231,7 +287,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     mask.format = RedFormat;
     mask.needsUpdate = true;
     return mask;
-  }, [landmarks, texture.image]);
+  }, [landmarks, texture.image, featureType, facialRegions]);
 
   // Reference to the ShaderMaterial to update uniforms dynamically
   useEffect(() => {
