@@ -1,22 +1,28 @@
 import React, { useEffect, useRef, useMemo, useState } from "react";
-import { MeshProps, useThree } from "@react-three/fiber";
+import { MeshProps, useThree, useLoader, useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { Landmark } from "../../types/landmark";
-import {
-  BilateralFilterShader,
-  CustomBilateralShader,
-} from "../../shaders/BilateralFilterShader";
 import {
   Vector2,
   ShaderMaterial,
   LinearFilter,
-  CanvasTexture,
   DoubleSide,
-  RedFormat,
+  TextureLoader,
+  CanvasTexture,
+  BufferGeometry,
+  Float32BufferAttribute,
+  Uint16BufferAttribute,
+  Mesh,
+  WebGLRenderer,
+  Scene,
+  OrthographicCamera,
+  MeshBasicMaterial
 } from "three";
 import { useSkinImprovement } from "../../context/see-improvement-context";
+import { BilateralFilterShader, CustomBilateralShader, } from "../../shaders/BilateralFilterShader";
+import { faces, uvs, positions, CONCEALER_TEXTURE, CONTOUR_TEXTURE_ONE, LIPLINER_TEXTURE_TWO, BLUSH_TEXTURE_ONE_ONE, DARK_CIRCLE_ALPHA, MOISTURES_ALPHA, REDNESS_ALPHA, LASHES_ONE, DROPY_ALPHA, WRINKLE_ALPHA, LIPS_TEXTURE_ONE, LIPLINER_TEXTURE_ONE } from "../../utils/constants";
 
-// Define facial feature regions
+// Define facial feature types
 export type FacialFeatureType =
   | "acne"
   | "blackhead"
@@ -36,15 +42,31 @@ export type FacialFeatureType =
   | "whitehead"
   | "wrinkles";
 
-// Define facial regions mapping type
-export type FacialRegionsMap = {
-  [key: string]: number[];
-};
-
 interface SkinImprovementThreeSceneProps extends MeshProps {
   imageSrc: string;
   landmarks: Landmark[];
 }
+
+// Apply stretched landmarks for forehead
+const applyStretchedLandmarks = (faceLandmarks: Landmark[]) => {
+  return faceLandmarks.map((landmark, index) => {
+    const isForehead = [54, 103, 67, 109, 10, 338, 297, 332, 284].includes(
+      index,
+    );
+
+    if (isForehead) {
+      const foreheadShiftY = 0.06;
+      const foreheadShiftZ = 0.1;
+
+      return {
+        x: landmark.x,
+        y: landmark.y - foreheadShiftY,
+        z: landmark.z + foreheadShiftZ,
+      };
+    }
+    return landmark;
+  });
+};
 
 const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
   imageSrc,
@@ -52,136 +74,28 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
   ...props
 }) => {
   const texture = useTexture(imageSrc);
-  const { viewport, size } = useThree();
+  const { viewport } = useThree();
   const [planeSize, setPlaneSize] = useState<[number, number]>([1, 1]);
-
   const filterRef = useRef<ShaderMaterial>(null);
+  const [maskTexture, setMaskTexture] = useState<CanvasTexture | null>(null);
 
-  // State for shader parameters
+  // Get parameters from skin improvement context
   const {
     sigmaSpatial,
     sigmaColor,
     smoothingStrength,
-    setSmoothingStrength,
     featureType,
-    setFeatureType,
   } = useSkinImprovement();
 
-  // Define facial regions landmarks indices
-  const facialRegions: FacialRegionsMap = useMemo(
-    () => ({
-      pipiKanan: [
-        127, 34, 143, 35, 226, 31, 228, 229, 230, 231, 232, 233, 245, 188, 174,
-        236, 198, 209, 129, 203, 206, 216, 172, 58, 132, 93, 234,
-      ],
-      pipiKiri: [
-        356, 448, 449, 450, 451, 417, 429, 426, 436, 432, 434, 367, 361, 323,
-      ],
-      dahi: [
-        54, 103, 67, 109, 10, 338, 297, 332, 284, 298, 293, 334, 296, 9, 107,
-        66, 105, 63, 68,
-      ],
-      dagu: [
-        43, 106, 182, 83, 18, 313, 406, 335, 422, 430, 394, 379, 378, 400, 377,
-        152, 148, 176, 149, 150, 169, 210, 202,
-      ],
-      kantungMataKananAtas: [
-        463, 286, 258, 257, 259, 260, 467, 359, 263, 466, 388, 387, 386, 385,
-        398,
-      ],
-      kantungMataKiriAtas: [
-        130, 33, 246, 160, 159, 158, 157, 173, 243, 190, 56, 28, 27, 29, 30,
-        247,
-      ],
-      kantungMataKananBawah: [
-        362, 382, 381, 380, 374, 373, 390, 249, 263, 359, 446, 265, 372, 345,
-        352, 280, 330, 329, 277, 357,
-      ],
-      kantungMataKiriBawah: [
-        130, 33, 7, 163, 144, 145, 153, 154, 155, 133, 243, 244, 188, 114, 47,
-        100, 101, 117, 34, 35,
-      ],
-    }),
-    [],
-  );
+  // Load alphamap texture for the specific feature
+  const alphaMapPath = useMemo(() => {
+    // Change paths to your actual PNG alphamaps for each feature
 
-  // Function to get active regions based on featureType
-  const getActiveRegions = (
-    type: FacialFeatureType,
-  ): Array<keyof FacialRegionsMap> => {
-    switch (type) {
-      case "eyebag":
-        return ["kantungMataKananBawah", "kantungMataKiriBawah"];
-      case "acne":
-        return ["pipiKanan", "pipiKiri", "dahi", "dagu"];
-      case "dark circle":
-        return ["kantungMataKananBawah", "kantungMataKiriBawah"];
-      case "droopy eyelid lower":
-        return ["kantungMataKananAtas", "kantungMataKiriAtas"];
-      case "droopy eyelid upper":
-        return ["kantungMataKananAtas", "kantungMataKiriAtas"];
-      case "wrinkles":
-        return ["dahi", "pipiKanan", "pipiKiri"];
-      default:
-        return Object.keys(facialRegions);
-    }
-  };
+    return "/media/unveels/vto-assets/texture/skin-problem.png";
+  }, [featureType]);
 
-  // Handle window resize to update windowSize state
-  const [windowSize, setWindowSize] = useState<{
-    width: number;
-    height: number;
-    dpr: number;
-  }>({
-    width: window.innerWidth,
-    height: window.innerHeight,
-    dpr: window.devicePixelRatio || 1,
-  });
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-        dpr: window.devicePixelRatio || 1,
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Function to update smoothingStrength based on received message
-  const updateSmoothingStrength = (newSmoothingStrength: number) => {
-    console.log("Smoothing Strength updated to:", newSmoothingStrength);
-    setSmoothingStrength(newSmoothingStrength);
-  };
-
-  useEffect(() => {
-    // Handler to receive messages from Flutter or browser
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data) {
-        try {
-          const data = JSON.parse(event.data);
-          // Update smoothingStrength if received
-          if (data.smoothingStrength !== undefined) {
-            updateSmoothingStrength(data.smoothingStrength as number);
-          }
-          // Update featureType if received
-          if (data.featureType !== undefined) {
-            setFeatureType(data.featureType as FacialFeatureType);
-          }
-        } catch (error) {
-          console.error("Error parsing message:", error);
-        }
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, []);
+  // We'll load the PNG texture directly
+  const alphaMap = useLoader(TextureLoader, alphaMapPath);
 
   // Calculate plane size based on image aspect ratio and viewport
   useEffect(() => {
@@ -210,86 +124,99 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     setPlaneSize([planeWidth, planeHeight]);
   }, [texture, viewport]);
 
-  // Create mask texture based on landmarks directly using texture coordinates
-  const maskTexture = useMemo(() => {
-    if (!texture.image || landmarks.length === 0) return null;
+  // Create a temporary face mesh and render it to a canvas with the alphamap
+  useEffect(() => {
+    if (!texture.image || !alphaMap || !alphaMap.image || landmarks.length === 0) return;
 
-    // Get original image dimensions
-    const imgWidth = texture.image.width;
-    const imgHeight = texture.image.height;
+    // Create offscreen renderer
+    const renderer = new WebGLRenderer({
+      antialias: true,
+      alpha: true
+    });
+    renderer.setSize(texture.image.width, texture.image.height);
 
-    // Create canvas with same dimensions as the original image
-    const canvas = document.createElement("canvas");
-    canvas.width = imgWidth;
-    canvas.height = imgHeight;
+    // Create a scene
+    const scene = new Scene();
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return null;
+    // Create a camera
+    const camera = new OrthographicCamera(
+      -texture.image.width / 2,
+      texture.image.width / 2,
+      texture.image.height / 2,
+      -texture.image.height / 2,
+      0.1,
+      1000
+    );
+    camera.position.z = 10;
 
-    // Fill with black (represents areas to apply blur to)
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, imgWidth, imgHeight);
+    // Create a geometry for the face mesh
+    const geometry = new BufferGeometry();
 
-    // Create a temporary canvas for the feathered mask
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = imgWidth;
-    tempCanvas.height = imgHeight;
-    const tempCtx = tempCanvas.getContext("2d");
-    if (!tempCtx) return null;
+    // Apply landmark positions - exactly like in FaceMesh
+    const outputWidth = texture.image.width;
+    const outputHeight = texture.image.height;
 
-    // Set shadow properties for feathering (15px blur)
-    tempCtx.shadowColor = "white";
-    tempCtx.shadowBlur = 15;
-    tempCtx.fillStyle = "white";
+    // Apply stretched landmarks
+    const modifiedLandmarks = applyStretchedLandmarks(landmarks);
 
-    // Function to draw feature as a closed path with feathering
-    const drawFeaturePath = (indices: number[]) => {
-      // Check if we have enough valid landmarks
-      const validPoints = indices.filter((index) => landmarks[index]);
-      if (validPoints.length < 3) return; // Need at least 3 points for a path
+    // Create vertices array
+    const vertices = new Float32Array(positions.length * 3);
+    for (let i = 0; i < Math.min(modifiedLandmarks.length, positions.length); i++) {
+      const landmark = modifiedLandmarks[i];
+      const x = (landmark.x - 0.5) * outputWidth;
+      const y = -(landmark.y - 0.5) * outputHeight;
+      const z = 0;
 
-      tempCtx.beginPath();
-      indices.forEach((index, i) => {
-        if (landmarks[index]) {
-          const x = landmarks[index].x * imgWidth;
-          const y = landmarks[index].y * imgHeight;
+      vertices[i * 3] = x;
+      vertices[i * 3 + 1] = y;
+      vertices[i * 3 + 2] = z;
+    }
 
-          if (i === 0) {
-            tempCtx.moveTo(x, y);
-          } else {
-            tempCtx.lineTo(x, y);
-          }
-        }
-      });
+    // Set up UV coordinates - exactly like in your face mesh
+    const uvArray = new Float32Array(uvs.length * 2);
+    for (let i = 0; i < uvs.length; i++) {
+      uvArray[i * 2] = uvs[i][0];
+      uvArray[i * 2 + 1] = uvs[i][1];
+    }
 
-      // Close the path back to the first point
-      tempCtx.closePath();
-      tempCtx.fill();
-    };
+    // Set attributes and indices
+    geometry.setAttribute("position", new Float32BufferAttribute(vertices, 3));
+    geometry.setAttribute("uv", new Float32BufferAttribute(uvArray, 2));
+    geometry.setIndex(new Uint16BufferAttribute(faces, 1));
+    geometry.computeVertexNormals();
 
-    // Get active regions based on current feature type
-    const activeRegions = getActiveRegions(featureType);
-
-    // Draw only the active regions
-    activeRegions.forEach((region: keyof FacialRegionsMap) => {
-      if (facialRegions[region]) {
-        drawFeaturePath(facialRegions[region]);
-      }
+    // Create a material with the alphamap
+    const material = new MeshBasicMaterial({
+      alphaMap: alphaMap,
+      transparent: true,
+      opacity: 1.0
     });
 
-    // Transfer the feathered mask to the main canvas
-    ctx.drawImage(tempCanvas, 0, 0);
+    // Create the mesh and add to scene
+    const mesh = new Mesh(geometry, material);
+    scene.add(mesh);
 
-    // Create a Three.js texture from the canvas
-    const mask = new CanvasTexture(canvas);
-    mask.minFilter = LinearFilter;
-    mask.magFilter = LinearFilter;
-    mask.format = RedFormat;
-    mask.needsUpdate = true;
-    return mask;
-  }, [landmarks, texture.image, featureType, facialRegions]);
+    // Render the scene
+    renderer.render(scene, camera);
 
-  // Reference to the ShaderMaterial to update uniforms dynamically
+    // Create a texture from the renderer's canvas
+    const newMaskTexture = new CanvasTexture(renderer.domElement);
+    newMaskTexture.minFilter = LinearFilter;
+    newMaskTexture.magFilter = LinearFilter;
+    newMaskTexture.needsUpdate = true;
+
+    // Set as mask texture
+    setMaskTexture(newMaskTexture);
+
+    // Clean up resources
+    return () => {
+      geometry.dispose();
+      material.dispose();
+      renderer.dispose();
+    };
+  }, [landmarks, texture.image, alphaMap, featureType]);
+
+  // Update shader uniforms when parameters change
   useEffect(() => {
     if (filterRef.current && maskTexture) {
       filterRef.current.uniforms.imageTexture.value = texture;
