@@ -456,8 +456,21 @@ const legendColors = [
 
 const calculateMean = (arr: Float32Array<ArrayBufferLike>) => {
   if (arr.length === 0) return 0;
-  const sum = arr.reduce((acc, val) => acc + val, 0);
-  return sum / (arr.length * 0.15);
+
+  // Convert all values > 0.01 to 1.0, others to 0
+  let count = 0;
+  let total = 0;
+
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] > 0.001) {
+      total += 1.0; // Assign 1.0 to values above threshold
+      count++;
+    }
+  }
+
+  // Calculate average of these binary values
+  // This gives us the proportion of pixels above threshold
+  return count > 0 ? total / arr.length : 0;
 };
 
 const modelLabel1 = {
@@ -491,6 +504,7 @@ const modelLabel: { labels: string[], colors: number[][] }[] = [
   modelLabel2,
   modelLabel3,
 ]
+
 export const detectSegment = async (
   source: HTMLImageElement,
   canvasRef: HTMLCanvasElement,
@@ -500,6 +514,7 @@ export const detectSegment = async (
 ): Promise<[FaceResults[], SkinAnalysisResult[]]> => {
   const labels = modelLabel[labelId].labels;
   const colors = modelLabel[labelId].colors;
+  const CONFIDENCE_THRESHOLD = labelId === 0 ? 0.003 : 0.05; // Minimum confidence score to include in mask
 
   try {
     // Sesuaikan ukuran canvas utama jika ini adalah layer pertama
@@ -520,13 +535,24 @@ export const detectSegment = async (
       canvasCtx.clearRect(0, 0, canvasRef.width, canvasRef.height);
     }
 
-    // Get image data from offscreen canvas
-    let imageData = offscreenCtx.getImageData(0, 0, source.naturalWidth, source.naturalHeight).data;
+    // Gambar source image ke offscreen canvas untuk mendapatkan pixel data awal
+    // offscreenCtx.drawImage(source, 0, 0);
+    let imageData = offscreenCtx.getImageData(0, 0, source.naturalWidth, source.naturalHeight);
+    let pixels = imageData.data;
 
     // Perform segmentation
     const result = segmenter.segment(source);
-    if (result.categoryMask == null) throw "Category mask not found";
-    const mask = result.categoryMask.getAsFloat32Array();
+
+    // Check if confidenceMasks are available
+    if (!result.confidenceMasks || result.confidenceMasks.length === 0) {
+      throw "Confidence masks not available";
+    }
+
+    const width = source.naturalWidth;
+    const height = source.naturalHeight;
+
+    // We'll create our own combined mask based on confidence thresholds
+    const combinedMask = new Uint8Array(width * height);
 
     // Access confidence scores and calculate mean for each class
     const confidenceScores: { [key: number]: number } = {};
@@ -536,91 +562,101 @@ export const detectSegment = async (
     let texture = 100;
     let radiance = 100;
 
-    if (result.confidenceMasks) {
-      for (let numClass = 0; numClass < result.confidenceMasks.length; numClass++) {
-        const confidenceMask = result.confidenceMasks[numClass].getAsFloat32Array();
-        // Calculate mean score for this class
-        confidenceScores[numClass] = calculateMean(confidenceMask);
-        skinResult.push({
-          label: labels[numClass] ?? 'Unknown',
-          score: Math.ceil(confidenceScores[numClass] * 100),
-          class: numClass
-        });
-        if (labels[numClass] == "redness" || labels[numClass] == "pores" || labels[numClass] == "eyebags") {
-          firmness -= Math.ceil(confidenceScores[numClass] * 100);
-        }
-        if (labels[numClass] == "redness" || labels[numClass] == "pores" || labels[numClass] == "acne" || labels[numClass] == "dry" || labels[numClass] == "oily") {
-          moistures -= Math.ceil(confidenceScores[numClass] * 100);
-        }
-        if (labels[numClass] == "eyebags") {
-          radiance -= Math.ceil(confidenceScores[numClass] * 100);
-        }
-        texture -= 5;
+    // Process each confidence mask
+    for (let numClass = 0; numClass < result.confidenceMasks.length; numClass++) {
+      // Skip background class (index 0)
+      if (numClass === 0) continue;
+
+      const confidenceMask = result.confidenceMasks[numClass].getAsFloat32Array();
+
+      // Calculate mean score for this class
+      confidenceScores[numClass] = calculateMean(confidenceMask);
+
+      skinResult.push({
+        label: labels[numClass] ?? 'Unknown',
+        score: Math.ceil(confidenceScores[numClass] * 100),
+        class: numClass
+      });
+
+      // Adjust calculated skin metrics based on detected conditions
+      if (labels[numClass] == "redness" || labels[numClass] == "pores" || labels[numClass] == "eyebags") {
+        firmness -= Math.ceil(confidenceScores[numClass] * 100);
       }
-      skinResult.push({
-        label: 'firmness',
-        score: firmness,
-        class: 14
-      });
-      skinResult.push({
-        label: 'moisture',
-        score: moistures,
-        class: 15
-      });
-      skinResult.push({
-        label: 'radiance',
-        score: radiance - moistures - firmness,
-        class: 16
-      });
-      skinResult.push({
-        label: 'texture',
-        score: texture,
-        class: 17
-      });
+      if (labels[numClass] == "redness" || labels[numClass] == "pores" || labels[numClass] == "acne" || labels[numClass] == "dry" || labels[numClass] == "oily") {
+        moistures -= Math.ceil(confidenceScores[numClass] * 100);
+      }
+      if (labels[numClass] == "eyebags") {
+        radiance -= Math.ceil(confidenceScores[numClass] * 100);
+      }
+      texture -= 5;
+
+      // Create combined mask using confidence threshold
+      for (let i = 0; i < confidenceMask.length; i++) {
+        if (confidenceMask[i] >= CONFIDENCE_THRESHOLD) {
+          // If this pixel exceeds our threshold, mark it with the class number
+          // Only overwrite if this class has higher confidence than what's already there
+          if (combinedMask[i] === 0 || confidenceMask[i] > confidenceScores[combinedMask[i]]) {
+            combinedMask[i] = numClass;
+          }
+        }
+      }
     }
 
-    // Blend colors with image data on offscreen canvas
+    // Add derived skin metrics to results
+    skinResult.push({
+      label: 'firmness',
+      score: Math.max(0, firmness),
+      class: 14
+    });
+    skinResult.push({
+      label: 'moisture',
+      score: Math.max(0, moistures),
+      class: 15
+    });
+    skinResult.push({
+      label: 'radiance',
+      score: Math.max(0, radiance - moistures - firmness),
+      class: 16
+    });
+    skinResult.push({
+      label: 'texture',
+      score: Math.max(0, texture),
+      class: 17
+    });
+
+    // Blend colors with image data on offscreen canvas based on our combined mask
     let j = 0;
-    for (let i = 0; i < mask.length; ++i) {
-      const maskVal = Math.round(mask[i] * 255.0);
-      const legendColor = colors[(maskVal % colors.length)];
-      imageData[j] = (legendColor[0] + imageData[j]) / 2;
-      imageData[j + 1] = (legendColor[1] + imageData[j + 1]) / 2;
-      imageData[j + 2] = (legendColor[2] + imageData[j + 2]) / 2;
-      imageData[j + 3] = (legendColor[3] + imageData[j + 3]) / 2;
+    for (let i = 0; i < combinedMask.length; ++i) {
+      const maskVal = combinedMask[i];
+      if (maskVal > 0) { // Only apply color if not background
+        const legendColor = colors[(maskVal % colors.length)] || [0, 0, 0, 0];
+        pixels[j] = (legendColor[0] + pixels[j]) / 2;
+        pixels[j + 1] = (legendColor[1] + pixels[j + 1]) / 2;
+        pixels[j + 2] = (legendColor[2] + pixels[j + 2]) / 2;
+        pixels[j + 3] = (legendColor[3] + pixels[j + 3]) / 2;
+      }
       j += 4;
     }
 
     // Put modified image data back to offscreen canvas
-    const uint8Array = new Uint8ClampedArray(imageData.buffer);
-    const dataNew = new ImageData(uint8Array, source.naturalWidth, source.naturalHeight);
-    offscreenCtx.putImageData(dataNew, 0, 0);
+    offscreenCtx.putImageData(imageData, 0, 0);
 
-    // Get unique categories and use the mean confidence scores
+    // Get unique categories from our combined mask
     const uniqueCategories: Set<number> = new Set();
-    const categoryScores: { [key: number]: number } = {}; // Object to store category scores
-
-    for (let i = 0; i < mask.length; ++i) {
-      const maskVal = Math.round(mask[i] * 255.0);
-      if (maskVal > 0) { // Ignore background (usually 0)
+    for (let i = 0; i < combinedMask.length; ++i) {
+      const maskVal = combinedMask[i];
+      if (maskVal > 0) { // Ignore background (0)
         uniqueCategories.add(maskVal);
-        // Use the pre-calculated mean confidence score for this class
-        if (confidenceScores[maskVal] !== undefined) {
-          categoryScores[maskVal] = confidenceScores[maskVal];
-        }
       }
     }
-
-    const width = source.naturalWidth;
-    const height = source.naturalHeight;
 
     // Untuk setiap kategori, cari connected components
     const faceResults: FaceResults[] = [];
     uniqueCategories.forEach(category => {
       // Buat array boolean untuk mask dari kategori ini
       const categoryMask = new Array(width * height).fill(false);
-      for (let i = 0; i < mask.length; i++) {
-        if (Math.round(mask[i] * 255.0) === category) {
+      for (let i = 0; i < combinedMask.length; i++) {
+        if (combinedMask[i] === category) {
           categoryMask[i] = true;
         }
       }
@@ -688,8 +724,8 @@ export const detectSegment = async (
               }
             }
 
-            // Tambahkan score dari categoryScores
-            component.score = categoryScores[category] || 0;
+            // Tambahkan score dari confidenceScores
+            component.score = confidenceScores[category] || 0;
 
             components.push(component);
           }
@@ -803,26 +839,11 @@ export const detectSegment = async (
         mergedComponents.push(mergedComponent);
       }
 
-      // Gambar bounding box untuk setiap merged component
+      // Add each merged component to results
       const legendColor = legendColors[category % legendColors.length];
       mergedComponents.forEach((component, index) => {
-        // Gambar bounding box ke offscreen canvas
-        // offscreenCtx.strokeStyle = `rgba(${legendColor[0]}, ${legendColor[1]}, ${legendColor[2]}, 1.0)`;
-        // offscreenCtx.lineWidth = 2;
         const boxWidth = component.maxX - component.minX;
         const boxHeight = component.maxY - component.minY;
-        // offscreenCtx.strokeRect(component.minX, component.minY, boxWidth, boxHeight);
-
-        // // Format confidence score untuk ditampilkan
-        // const scorePercent = Math.ceil(component.score * 100);
-        // const scoreText = ` (${scorePercent}%)`;
-
-        // Label kategori dengan nomor component dan score
-        // offscreenCtx.fillStyle = `rgba(${legendColor[0]}, ${legendColor[1]}, ${legendColor[2]}, 0.7)`;
-        // offscreenCtx.fillRect(component.minX, component.minY - 20, 120, 20);
-        // offscreenCtx.fillStyle = "white";
-        // offscreenCtx.font = "12px Arial";
-        // offscreenCtx.fillText(`${labels[category]}#${index + 1}${scoreText}`, component.minX + 5, component.minY - 5);
 
         faceResults.push({
           box: [component.minY, component.minX, boxHeight, boxWidth],
@@ -856,7 +877,6 @@ export const detectSegment = async (
     throw new Error("Error in face detection");
   }
 };
-
 
 /**
  * Function to detect video from every source.
