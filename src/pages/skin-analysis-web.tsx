@@ -323,7 +323,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
               ref={canvasRef}
               className={`pointer-events-none absolute left-1/2 top-1/2 blur-[1px]`}
               style={{
-                zIndex: 40,
+                zIndex: 0,
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
@@ -332,7 +332,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
             />
             {!isLoading && inferenceResult != null ? (
               <>
-                <SkinAnalysisScene data={inferenceResult} />
+                <SkinAnalysisScene data={inferenceResult} maskCanvas={canvasRef}/>
               </>
             ) : (
               <>

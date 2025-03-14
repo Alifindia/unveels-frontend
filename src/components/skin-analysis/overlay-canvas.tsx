@@ -151,8 +151,8 @@ function OverlayCanvas({
           ctx.closePath();
 
           // Draw the label and line (not mirrored)
-          const labelX = centerX + 50;
-          const labelY = centerY + 50;
+          const labelX = centerX + 25;
+          const labelY = centerY + 25;
 
           ctx.beginPath();
           ctx.moveTo(centerX, centerY);
@@ -181,7 +181,7 @@ function OverlayCanvas({
 
           const textWidth = ctx.measureText(bbox.label).width;
           const underlineEndX = labelX + textWidth;
-          const underlineY = labelY + 5;
+          const underlineY = labelY;
 
           ctx.beginPath();
           ctx.moveTo(labelX, labelY);

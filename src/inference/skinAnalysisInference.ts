@@ -462,7 +462,7 @@ const calculateMean = (arr: Float32Array<ArrayBufferLike>) => {
   let total = 0;
 
   for (let i = 0; i < arr.length; i++) {
-    if (arr[i] > 0.001) {
+    if (arr[i] > 0.005) {
       total += 1.0; // Assign 1.0 to values above threshold
       count++;
     }
@@ -470,7 +470,7 @@ const calculateMean = (arr: Float32Array<ArrayBufferLike>) => {
 
   // Calculate average of these binary values
   // This gives us the proportion of pixels above threshold
-  return count > 0 ? total / arr.length : 0;
+  return count > 0 ? total / (arr.length * 0.15) : 0;
 };
 
 const modelLabel1 = {
@@ -514,7 +514,7 @@ export const detectSegment = async (
 ): Promise<[FaceResults[], SkinAnalysisResult[]]> => {
   const labels = modelLabel[labelId].labels;
   const colors = modelLabel[labelId].colors;
-  const CONFIDENCE_THRESHOLD = labelId === 0 ? 0.003 : 0.05; // Minimum confidence score to include in mask
+  const CONFIDENCE_THRESHOLD = labelId === 0 ? 0.005 : 0.05; // Minimum confidence score to include in mask
 
   try {
     // Sesuaikan ukuran canvas utama jika ini adalah layer pertama
