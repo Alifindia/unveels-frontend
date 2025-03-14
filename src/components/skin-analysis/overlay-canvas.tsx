@@ -106,9 +106,23 @@ function OverlayCanvas({
           "texture",
         ];
 
-        adjustedResults.forEach((bbox) => {
-          // if (!validLabels.includes(bbox.label)) return;
+        // Store occupied areas to check for overlaps
+        const occupiedAreas: Array<{
+          x: number;
+          y: number;
+          width: number;
+          height: number;
+        }> = [];
 
+        // Calculate all centers first to prepare for label placement
+        const centers: Array<{
+          centerX: number;
+          centerY: number;
+          label: string;
+          score: number;
+        }> = [];
+
+        adjustedResults.forEach((bbox) => {
           const [leftIndex, topIndex, rightIndex, bottomIndex] = bbox.box;
           if (
             leftIndex === null ||
@@ -119,7 +133,7 @@ function OverlayCanvas({
             return;
           }
 
-          // Calculate center positions without mirroring for landmarks and labels
+          // Calculate center positions
           const centerX =
             ((landmarks[leftIndex].x + landmarks[rightIndex].x) / 2) *
               drawWidth +
@@ -129,8 +143,32 @@ function OverlayCanvas({
               drawHeight +
             offsetY;
 
-          const rgbColor = featureColors[bbox.label] || "255, 255, 255";
+          centers.push({
+            centerX,
+            centerY,
+            label: bbox.label,
+            score: bbox.score,
+          });
+        });
 
+        // Sort centers from top to bottom, left to right to handle placement better
+        centers.sort((a, b) => {
+          if (Math.abs(a.centerY - b.centerY) > 30) {
+            return a.centerY - b.centerY;
+          }
+          return a.centerX - b.centerX;
+        });
+
+        // Font settings for measurement
+        ctx.font = "12px Arial";
+        const textHeight = 20; // Approximate text height
+        const padding = 5; // Padding around labels
+
+        // Draw all centers and labels with collision avoidance
+        centers.forEach(({ centerX, centerY, label, score }) => {
+          const rgbColor = featureColors[label] || "255, 255, 255";
+
+          // Draw the highlight gradient
           const gradient = ctx.createRadialGradient(
             centerX,
             centerY,
@@ -150,36 +188,134 @@ function OverlayCanvas({
           ctx.fill();
           ctx.closePath();
 
-          // Draw the label and line (not mirrored)
-          const labelX = centerX + 25;
-          const labelY = centerY + 25;
+          // Measure text width for this label
+          const textWidth = ctx.measureText(`${label} ${score}%`).width;
 
+          // Starting position - always bottom right
+          const baseOffsetX = 25;
+          const baseOffsetY = 25;
+
+          // Initial position
+          let labelX = centerX + baseOffsetX;
+          let labelY = centerY + baseOffsetY;
+
+          // Find minimum vertical offset needed to avoid collisions
+          let minVerticalOffset = 0;
+          let horizontalOffset = 0;
+
+          // First, check if default position has collision
+          const checkCollision = (testX: number, testY: number) => {
+            const testArea = {
+              x: testX - padding,
+              y: testY - textHeight - padding,
+              width: textWidth + padding * 2,
+              height: textHeight + padding * 2,
+            };
+
+            for (const area of occupiedAreas) {
+              if (
+                testArea.x < area.x + area.width &&
+                testArea.x + testArea.width > area.x &&
+                testArea.y < area.y + area.height &&
+                testArea.y + testArea.height > area.y
+              ) {
+                return true; // Collision detected
+              }
+            }
+            return false; // No collision
+          };
+
+          // Check default position first
+          if (!checkCollision(labelX, labelY)) {
+            // No collision at default position - great!
+          } else {
+            // Try to find minimal vertical offset
+            // First try small increments to keep labels close
+            for (let offset = 5; offset <= 100; offset += 5) {
+              if (!checkCollision(labelX, centerY + baseOffsetY + offset)) {
+                minVerticalOffset = offset;
+                break;
+              }
+            }
+
+            // If still colliding, try horizontal offset
+            if (minVerticalOffset === 0) {
+              for (let hOffset = 10; hOffset <= 100; hOffset += 10) {
+                if (!checkCollision(labelX + hOffset, labelY)) {
+                  horizontalOffset = hOffset;
+                  break;
+                }
+
+                // Try combinations of horizontal and minimal vertical offsets
+                for (let vOffset = 5; vOffset <= 30; vOffset += 5) {
+                  if (
+                    !checkCollision(
+                      labelX + hOffset,
+                      centerY + baseOffsetY + vOffset,
+                    )
+                  ) {
+                    horizontalOffset = hOffset;
+                    minVerticalOffset = vOffset;
+                    break;
+                  }
+                }
+
+                if (horizontalOffset > 0) break;
+              }
+            }
+
+            // If all above fails, use more aggressive spacing as last resort
+            if (minVerticalOffset === 0 && horizontalOffset === 0) {
+              // Start with larger vertical jumps
+              for (let offset = 15; offset <= 200; offset += 15) {
+                if (!checkCollision(labelX, centerY + baseOffsetY + offset)) {
+                  minVerticalOffset = offset;
+                  break;
+                }
+              }
+
+              // If still no solution, combine larger horizontal and vertical offsets
+              if (minVerticalOffset === 0) {
+                horizontalOffset = 50;
+                minVerticalOffset = 10;
+              }
+            }
+          }
+
+          // Apply the calculated offsets
+          labelX += horizontalOffset;
+          labelY = centerY + baseOffsetY + minVerticalOffset;
+
+          // Add this label's area to occupied areas
+          occupiedAreas.push({
+            x: labelX - padding,
+            y: labelY - textHeight - padding,
+            width: textWidth + padding * 2,
+            height: textHeight + padding * 2,
+          });
+
+          // Draw the label and line
           ctx.beginPath();
           ctx.moveTo(centerX, centerY);
           ctx.lineTo(labelX, labelY);
           ctx.strokeStyle = "white";
           ctx.stroke();
 
-          ctx.font = "12px Arial";
-          ctx.fillStyle = "white";
-
+          // Draw text with shadow
           ctx.shadowColor = "black";
           ctx.shadowBlur = 4;
           ctx.shadowOffsetX = 1;
           ctx.shadowOffsetY = 1;
+          ctx.fillStyle = "white";
+          ctx.fillText(`${label} ${score}%`, labelX, labelY - 5);
 
-          ctx.fillText(
-            `${bbox.label} ${bbox.score}%`,
-            labelX,
-            labelY - 5,
-          );
-
+          // Reset shadow
           ctx.shadowColor = "transparent";
           ctx.shadowBlur = 0;
           ctx.shadowOffsetX = 0;
           ctx.shadowOffsetY = 0;
 
-          const textWidth = ctx.measureText(bbox.label).width;
+          // Draw underline
           const underlineEndX = labelX + textWidth;
           const underlineY = labelY;
 
@@ -189,86 +325,15 @@ function OverlayCanvas({
           ctx.strokeStyle = "white";
           ctx.stroke();
 
+          // Store label for click detection
           labelBoundingBoxesRef.current.push({
-            label: bbox.label,
+            label: label,
             x: labelX,
             y: labelY - 20,
             width: textWidth,
             height: 20,
           });
         });
-
-        // skinAnalysisDataItem.forEach((dataItem) => {
-        //   const rgbColor = featureColors[dataItem.label] || "255, 255, 255";
-
-        //   // Calculate center position for each landmark point
-        //   const centerX = landmarks[dataItem.point].x * drawWidth + offsetX;
-        //   const centerY = landmarks[dataItem.point].y * drawHeight + offsetY;
-
-        //   // Create a gradient for each data point
-        //   const gradient = ctx.createRadialGradient(
-        //     centerX,
-        //     centerY,
-        //     innerRadius,
-        //     centerX,
-        //     centerY,
-        //     outerRadius,
-        //   );
-
-        //   gradient.addColorStop(0, `rgba(${rgbColor}, 0.8)`);
-        //   gradient.addColorStop(1, `rgba(${rgbColor}, 0)`);
-
-        //   ctx.fillStyle = gradient;
-
-        //   // Draw outer circle
-        //   ctx.beginPath();
-        //   ctx.arc(centerX, centerY, outerRadius, 0, 2 * Math.PI);
-        //   ctx.fill();
-        //   ctx.closePath();
-
-        //   // Draw small white center dot
-        //   ctx.beginPath();
-        //   ctx.arc(centerX, centerY, 2, 0, 2 * Math.PI);
-        //   ctx.fillStyle = "white";
-        //   ctx.fill();
-        //   ctx.closePath();
-
-        //   // Position label text slightly offset from center position
-        //   const labelX = centerX + 50;
-        //   const labelY = centerY + 50;
-
-        //   // Draw line from center to label
-        //   ctx.beginPath();
-        //   ctx.moveTo(centerX, centerY);
-        //   ctx.lineTo(labelX, labelY);
-        //   ctx.strokeStyle = "white";
-        //   ctx.stroke();
-
-        //   // Draw label text
-        //   ctx.font = "12px Arial";
-        //   ctx.fillStyle = "white";
-        //   ctx.fillText(dataItem.label, labelX, labelY - 5);
-
-        //   // Draw underline for label text
-        //   const textWidth = ctx.measureText(dataItem.label).width;
-        //   const underlineEndX = labelX + textWidth;
-        //   const underlineY = labelY + 5;
-
-        //   ctx.beginPath();
-        //   ctx.moveTo(labelX, labelY);
-        //   ctx.lineTo(underlineEndX, underlineY);
-        //   ctx.strokeStyle = "white";
-        //   ctx.stroke();
-
-        //   // Store label bounding box for click detection
-        //   labelBoundingBoxesRef.current.push({
-        //     label: dataItem.label,
-        //     x: labelX,
-        //     y: labelY - 20,
-        //     width: textWidth,
-        //     height: 20,
-        //   });
-        // });
 
         console.log("Adjusted Results:", adjustedResults);
         console.log("Label Bounding Boxes:", labelBoundingBoxesRef.current);
