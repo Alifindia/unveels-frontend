@@ -97,23 +97,21 @@ export function SkinAnalysisScene({
     const processImage = async () => {
       if (imageLoaded && faceLandmarker && isLandmarkerReady) {
         const outerLipIndices = [
-          61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 185, 40, 39, 37, 0,
-          267, 269, 270, 409, 78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308,
-          191, 80, 81, 82, 13, 312, 311, 310, 415,
+          308, 415, 310, 311, 312, 13, 82, 81, 80, 191, 62, 78, 95, 88, 178, 87,
+          14, 317, 402, 319,
         ];
 
         const leftEyeIndices = [
-          263, 249, 390, 373, 374, 380, 381, 382, 362, 466, 388, 387, 386, 385,
-          384, 398,
+          246, 161, 160, 159, 158, 157, 173, 155, 154, 153, 145, 144, 163, 7,
         ];
         const rightEyeIndices = [
-          33, 7, 163, 144, 145, 153, 154, 155, 133, 246, 161, 160, 159, 158,
-          157, 173,
+          263, 466, 388, 387, 386, 385, 384, 398, 362, 382, 381, 380, 374, 373,
+          390, 249,
         ];
         const faceContourIndices = [
-          338, 297, 332, 284, 251, 389, 356, 454, 323, 361,
-          288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172,
-          58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109,
+          338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379,
+          378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234,
+          127, 162, 21, 54, 103, 67, 109,
         ];
 
         try {
@@ -131,11 +129,13 @@ export function SkinAnalysisScene({
             setLandmarks(normalizedLandmarks);
             landmarkRef.current = normalizedLandmarks; // Update the ref with the latest landmarks
 
-            const flippedLandmark = applyStretchedLandmarks(firstFace.map((landmark) => ({
-              x: 1 - landmark.x,
-              y: landmark.y,
-              z: landmark.z,
-            })));
+            const flippedLandmark = applyStretchedLandmarks(
+              firstFace.map((landmark) => ({
+                x: 1 - landmark.x,
+                y: landmark.y,
+                z: landmark.z,
+              })),
+            );
 
             const ctx = maskCanvas?.current?.getContext("2d");
             if (ctx) {
@@ -157,7 +157,7 @@ export function SkinAnalysisScene({
               if (flippedLandmark[faceContourIndices[0]]) {
                 ctx.moveTo(
                   flippedLandmark[faceContourIndices[0]].x * width,
-                  flippedLandmark[faceContourIndices[0]].y * height
+                  flippedLandmark[faceContourIndices[0]].y * height,
                 );
 
                 for (let i = 1; i < faceContourIndices.length; i++) {
@@ -165,7 +165,7 @@ export function SkinAnalysisScene({
                   if (flippedLandmark[idx]) {
                     ctx.lineTo(
                       flippedLandmark[idx].x * width,
-                      flippedLandmark[idx].y * height
+                      flippedLandmark[idx].y * height,
                     );
                   }
                 }
@@ -180,7 +180,7 @@ export function SkinAnalysisScene({
               if (flippedLandmark[outerLipIndices[0]]) {
                 ctx.moveTo(
                   flippedLandmark[outerLipIndices[0]].x * width,
-                  flippedLandmark[outerLipIndices[0]].y * height
+                  flippedLandmark[outerLipIndices[0]].y * height,
                 );
 
                 for (let i = 1; i < outerLipIndices.length; i++) {
@@ -188,7 +188,7 @@ export function SkinAnalysisScene({
                   if (flippedLandmark[idx]) {
                     ctx.lineTo(
                       flippedLandmark[idx].x * width,
-                      flippedLandmark[idx].y * height
+                      flippedLandmark[idx].y * height,
                     );
                   }
                 }
@@ -201,7 +201,7 @@ export function SkinAnalysisScene({
               if (flippedLandmark[leftEyeIndices[0]]) {
                 ctx.moveTo(
                   flippedLandmark[leftEyeIndices[0]].x * width,
-                  flippedLandmark[leftEyeIndices[0]].y * height
+                  flippedLandmark[leftEyeIndices[0]].y * height,
                 );
 
                 for (let i = 1; i < leftEyeIndices.length; i++) {
@@ -209,7 +209,7 @@ export function SkinAnalysisScene({
                   if (flippedLandmark[idx]) {
                     ctx.lineTo(
                       flippedLandmark[idx].x * width,
-                      flippedLandmark[idx].y * height
+                      flippedLandmark[idx].y * height,
                     );
                   }
                 }
@@ -222,7 +222,7 @@ export function SkinAnalysisScene({
               if (flippedLandmark[rightEyeIndices[0]]) {
                 ctx.moveTo(
                   flippedLandmark[rightEyeIndices[0]].x * width,
-                  flippedLandmark[rightEyeIndices[0]].y * height
+                  flippedLandmark[rightEyeIndices[0]].y * height,
                 );
 
                 for (let i = 1; i < rightEyeIndices.length; i++) {
@@ -230,7 +230,7 @@ export function SkinAnalysisScene({
                   if (flippedLandmark[idx]) {
                     ctx.lineTo(
                       flippedLandmark[idx].x * width,
-                      flippedLandmark[idx].y * height
+                      flippedLandmark[idx].y * height,
                     );
                   }
                 }
