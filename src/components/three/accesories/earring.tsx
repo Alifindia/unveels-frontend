@@ -151,10 +151,10 @@ const EarringInner: React.FC<EarringProps> = React.memo(
           }
 
           if (isFacingFront) {
-            leftEarringRef.current.translateY(-scaleFactor * 1.7);
-            rightEarringRef.current.translateY(-scaleFactor * 1.7);
-            leftEarringRef.current.translateX(scaleFactor * 1);
-            rightEarringRef.current.translateX(-scaleFactor * 1);
+            leftEarringRef.current.translateY(-scaleFactor * 1.5);
+            rightEarringRef.current.translateY(-scaleFactor * 1.5);
+            leftEarringRef.current.translateX(scaleFactor * 0.5);
+            rightEarringRef.current.translateX(-scaleFactor * 0.5);
           }
         } else {
           // Sembunyikan anting jika rotasi tidak dapat dihitung
