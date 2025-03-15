@@ -79,12 +79,15 @@ const EarringInner: React.FC<EarringProps> = React.memo(
 
     useFrame(() => {
       const currentLandmarks = landmarks.current;
-      if (
-        !currentLandmarks ||
-        !leftEarringRef.current ||
-        !rightEarringRef.current
-      )
+      if (!leftEarringRef.current || !rightEarringRef.current) return;
+      if (!currentLandmarks) {
+        leftEarringRef.current.visible = false;
+        rightEarringRef.current.visible = false;
         return;
+      } else {
+        leftEarringRef.current.visible = true;
+        rightEarringRef.current.visible = true;
+      }
 
       if (currentLandmarks.length > 0) {
         const leftEarLandmark = currentLandmarks[177]; // Landmark telinga kiri
@@ -95,20 +98,27 @@ const EarringInner: React.FC<EarringProps> = React.memo(
           rightEarringRef.current.visible = false;
           return;
         }
+        // Periksa apakah wajah menghadap langsung ke depan
+        const faceOrientationThreshold = 0.08; // Toleransi untuk orientasi wajah
+        const isFacingFront =
+          Math.abs(leftEarLandmark.z - rightEarLandmark.z) <
+          faceOrientationThreshold;
 
         // Transformasi posisi landmark ke koordinat dunia
         const leftEarX = (1 - leftEarLandmark.x - 0.5) * outputWidth;
         const leftEarY = -(leftEarLandmark.y - 0.5) * outputHeight;
-        const leftEarZ = -leftEarLandmark.z * Math.max(outputHeight, outputWidth);
+        const leftEarZ =
+          -leftEarLandmark.z * Math.max(outputHeight, outputWidth);
 
         const rightEarX = (1 - rightEarLandmark.x - 0.5) * outputWidth;
         const rightEarY = -(rightEarLandmark.y - 0.5) * outputHeight;
-        const rightEarZ = -rightEarLandmark.z * Math.max(outputHeight, outputWidth);;
+        const rightEarZ =
+          -rightEarLandmark.z * Math.max(outputHeight, outputWidth);
 
         // Hitung ukuran wajah untuk skala anting
         const faceSize = calculateDistance(
           currentLandmarks[447],
-          currentLandmarks[454]
+          currentLandmarks[454],
         );
         const scaleFactor = (faceSize * outputWidth) / 4.9;
 
@@ -118,14 +128,33 @@ const EarringInner: React.FC<EarringProps> = React.memo(
           // Update posisi, skala, dan rotasi anting jika terlihat
           if (leftEarringRef.current.visible) {
             leftEarringRef.current.position.set(leftEarX, leftEarY, leftEarZ);
-            leftEarringRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+            leftEarringRef.current.scale.set(
+              scaleFactor,
+              scaleFactor,
+              scaleFactor,
+            );
             leftEarringRef.current.setRotationFromQuaternion(quaternion);
           }
 
           if (rightEarringRef.current.visible) {
-            rightEarringRef.current.position.set(rightEarX, rightEarY, rightEarZ);
-            rightEarringRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
+            rightEarringRef.current.position.set(
+              rightEarX,
+              rightEarY,
+              rightEarZ,
+            );
+            rightEarringRef.current.scale.set(
+              scaleFactor,
+              scaleFactor,
+              scaleFactor,
+            );
             rightEarringRef.current.setRotationFromQuaternion(quaternion);
+          }
+
+          if (isFacingFront) {
+            leftEarringRef.current.translateY(-scaleFactor * 1.7);
+            rightEarringRef.current.translateY(-scaleFactor * 1.7);
+            leftEarringRef.current.translateX(scaleFactor * 1);
+            rightEarringRef.current.translateX(-scaleFactor * 1);
           }
         } else {
           // Sembunyikan anting jika rotasi tidak dapat dihitung
