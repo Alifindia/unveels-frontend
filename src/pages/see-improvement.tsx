@@ -5,7 +5,6 @@ import { useModelLoader } from "../hooks/useModelLoader";
 import { ModelLoadingScreen } from "../components/model-loading-screen";
 import { VideoStream } from "../components/recorder/video-stream";
 import { RecorderStatus } from "../components/assistant";
-import { TopNavigation } from "./virtual-try-on";
 import { Footer } from "../components/footer";
 import { Icons } from "../components/icons";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -33,6 +32,7 @@ import { getCookie, getCurrencyAndRate } from "../utils/other";
 import { useSearchParams } from "react-router-dom";
 import SuccessPopup from "../components/popup-add-to-cart";
 import { FacialFeatureType } from "../components/skin-improvement/skin-improvement-three-scene";
+import { TopNavigation } from "../components/top-navigation";
 
 export function SeeImprovement() {
   const { i18n } = useTranslation();

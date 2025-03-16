@@ -71,6 +71,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { getCurrencyAndRate } from "../utils/other";
 import { exchangeRates } from "../utils/constants";
+import { useCartContext } from "../context/cart-context";
 
 export const productTypeCheckers = {
   isLipColorProduct: (data: Product) => {
@@ -346,7 +347,8 @@ function Main({
           </button>
           <div className="w-full pl-3 sm:pl-4">
             <div className="text-[0.75rem] font-medium text-white sm:text-xs md:text-sm">
-              {currencySymbol}{(product.price * rate).toFixed(3)}
+              {currencySymbol}
+              {(product.price * rate).toFixed(3)}
             </div>
           </div>
         </div>
@@ -511,10 +513,11 @@ function MainContent({ product }: { product: Product }) {
   );
 }
 
-export function TopNavigation({ cart = false }: { cart?: boolean }) {
+export function TopNavigation({ cart = true }: { cart?: boolean }) {
   const isDevelopment = process.env.NODE_ENV === "development";
   const navigate = useNavigate();
   const location = useLocation();
+  const { summaryCount } = useCartContext();
 
   const handleBackClick = () => {
     if (location.pathname !== "/virtual-try-on/makeups") {
@@ -542,7 +545,7 @@ export function TopNavigation({ cart = false }: { cart?: boolean }) {
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
       <div className="flex flex-col gap-3">
         <button
-          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           onClick={handleBackClick}
         >
           <ChevronLeft className="size-4 text-white" />
@@ -552,11 +555,23 @@ export function TopNavigation({ cart = false }: { cart?: boolean }) {
       <div className="flex flex-col gap-3">
         <button
           type="button"
-          className="flex size-6 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
           onClick={handleCloseClick}
         >
           <X className="size-4 text-white" />
         </button>
+
+        {cart && (
+          <button
+            type="button"
+            className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+          >
+            <Icons.myCart className="size-6 text-white" />
+            <span className="absolute bottom-[5px] right-[5px] flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+              {summaryCount}
+            </span>
+          </button>
+        )}
       </div>
     </div>
   );
