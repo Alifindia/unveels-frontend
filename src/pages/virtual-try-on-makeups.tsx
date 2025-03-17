@@ -406,6 +406,7 @@ export function TopNavigation({ cart = false }: { cart?: boolean }) {
   const isDevelopment = process.env.NODE_ENV === "development";
   const navigate = useNavigate();
   const location = useLocation();
+  const { summaryCount } = useCartContext();
 
   const handleBackClick = () => {
     if (location.pathname !== "/virtual-try-on-makeups/makeups") {
@@ -456,6 +457,16 @@ export function TopNavigation({ cart = false }: { cart?: boolean }) {
             <X className="size-4 text-white" />
           </button>
         )}
+
+        <button
+          type="button"
+          className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
+        >
+          <Icons.myCart className="size-6 text-white" />
+          <span className="absolute bottom-[5px] right-[5px] flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+            {summaryCount}
+          </span>
+        </button>
       </div>
     </div>
   );
