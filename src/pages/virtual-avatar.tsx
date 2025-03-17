@@ -27,9 +27,10 @@ export function VirtualAvatar() {
     console.log("Data received from Flutter:", incomingText, incomingLanguage);
 
     const audioSrc = await makeSpeech(incomingText, incomingLanguage);
-
-    setBlendshape(audioSrc.data.blendData);
-    setAudioSource(`${talkingAvatarHost}${audioSrc.data.filename}`);
+    setTimeout(() => {
+      setBlendshape(audioSrc.data.blendData);
+      setAudioSource(`${talkingAvatarHost}${audioSrc.data.filename}`);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -47,7 +48,7 @@ export function VirtualAvatar() {
     setTimeout(() => {
       setSpeak(false);
       setPlaying(false);
-    }, 500);
+    }, 1500);
     console.log("FINISH TALKING", condition);
   };
 
