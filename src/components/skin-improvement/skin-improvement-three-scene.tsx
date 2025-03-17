@@ -16,11 +16,30 @@ import {
   WebGLRenderer,
   Scene,
   OrthographicCamera,
-  MeshBasicMaterial
+  MeshBasicMaterial,
 } from "three";
 import { useSkinImprovement } from "../../context/see-improvement-context";
-import { BilateralFilterShader, CustomBilateralShader, } from "../../shaders/BilateralFilterShader";
-import { faces, uvs, positions, CONCEALER_TEXTURE, CONTOUR_TEXTURE_ONE, LIPLINER_TEXTURE_TWO, BLUSH_TEXTURE_ONE_ONE, DARK_CIRCLE_ALPHA, MOISTURES_ALPHA, REDNESS_ALPHA, LASHES_ONE, DROPY_ALPHA, WRINKLE_ALPHA, LIPS_TEXTURE_ONE, LIPLINER_TEXTURE_ONE } from "../../utils/constants";
+import {
+  BilateralFilterShader,
+  CustomBilateralShader,
+} from "../../shaders/BilateralFilterShader";
+import {
+  faces,
+  uvs,
+  positions,
+  CONCEALER_TEXTURE,
+  CONTOUR_TEXTURE_ONE,
+  LIPLINER_TEXTURE_TWO,
+  BLUSH_TEXTURE_ONE_ONE,
+  DARK_CIRCLE_ALPHA,
+  MOISTURES_ALPHA,
+  REDNESS_ALPHA,
+  LASHES_ONE,
+  DROPY_ALPHA,
+  WRINKLE_ALPHA,
+  LIPS_TEXTURE_ONE,
+  LIPLINER_TEXTURE_ONE,
+} from "../../utils/constants";
 
 // Define facial feature types
 export type FacialFeatureType =
@@ -85,6 +104,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     sigmaColor,
     smoothingStrength,
     featureType,
+    setSmoothingStrength,
   } = useSkinImprovement();
 
   // Load alphamap texture for the specific feature
@@ -124,14 +144,58 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     setPlaneSize([planeWidth, planeHeight]);
   }, [texture, viewport]);
 
+  // Fungsi untuk mengupdate smoothingStrength berdasarkan pesan yang diterima
+  const updateSmoothingStrength = (newSmoothingStrength: number) => {
+    console.log("Smoothing Strength updated to:", newSmoothingStrength);
+    setSmoothingStrength(newSmoothingStrength);
+  };
+
+  useEffect(() => {
+    // Handler untuk menerima pesan dari Flutter atau browser
+    const handleMessage = (event: MessageEvent) => {
+      console.log("Message received:", event); // Tambahkan log untuk event itu sendiri
+
+      // Periksa data yang diterima
+      if (event.data) {
+        try {
+          const data = JSON.parse(event.data);
+          console.log("Parsed data:", data); // Log data setelah parsing
+
+          // Memperbarui smoothingStrength jika data yang diterima valid
+          if (data.smoothingStrength !== undefined) {
+            updateSmoothingStrength(data.smoothingStrength);
+          }
+        } catch (error) {
+          console.error("Error parsing message:", error);
+        }
+      } else {
+        console.warn("No data received in message event");
+      }
+    };
+
+    // Menambahkan event listener untuk mendengarkan pesan
+    window.addEventListener("message", handleMessage);
+
+    // Membersihkan event listener saat komponen unmount
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
   // Create a temporary face mesh and render it to a canvas with the alphamap
   useEffect(() => {
-    if (!texture.image || !alphaMap || !alphaMap.image || landmarks.length === 0) return;
+    if (
+      !texture.image ||
+      !alphaMap ||
+      !alphaMap.image ||
+      landmarks.length === 0
+    )
+      return;
 
     // Create offscreen renderer
     const renderer = new WebGLRenderer({
       antialias: true,
-      alpha: true
+      alpha: true,
     });
     renderer.setSize(texture.image.width, texture.image.height);
 
@@ -145,7 +209,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
       texture.image.height / 2,
       -texture.image.height / 2,
       0.1,
-      1000
+      1000,
     );
     camera.position.z = 10;
 
@@ -161,7 +225,11 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
 
     // Create vertices array
     const vertices = new Float32Array(positions.length * 3);
-    for (let i = 0; i < Math.min(modifiedLandmarks.length, positions.length); i++) {
+    for (
+      let i = 0;
+      i < Math.min(modifiedLandmarks.length, positions.length);
+      i++
+    ) {
       const landmark = modifiedLandmarks[i];
       const x = (landmark.x - 0.5) * outputWidth;
       const y = -(landmark.y - 0.5) * outputHeight;
@@ -189,7 +257,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     const material = new MeshBasicMaterial({
       alphaMap: alphaMap,
       transparent: true,
-      opacity: 1.0
+      opacity: 1.0,
     });
 
     // Create the mesh and add to scene
