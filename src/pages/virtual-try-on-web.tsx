@@ -71,6 +71,7 @@ function Main() {
     setNailsColor,
     setShowHair,
     setHairColor,
+    setShowPressOnNails,
   } = useMakeup();
 
   const {
@@ -353,6 +354,10 @@ function Main() {
           // nails
           if (data.showNails !== undefined) {
             setShowNails(data.showNails);
+          }
+
+          if (data.showPressOnNails !== undefined) {
+            setShowPressOnNails(data.showPressOnNails);
           }
 
           if (data.nailsColor !== undefined) {

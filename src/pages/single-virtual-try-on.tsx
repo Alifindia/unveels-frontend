@@ -29,8 +29,11 @@ import { Product } from "../api/shared";
 import { Footer } from "../components/footer";
 import { SkinColorProvider } from "../components/skin-tone-finder-scene/skin-color-context";
 import { VirtualTryOnScene } from "../components/vto/virtual-try-on-scene";
-import { AccesoriesProvider } from "../context/accesories-context";
-import { MakeupProvider } from "../context/makeup-context";
+import {
+  AccesoriesProvider,
+  useAccesories,
+} from "../context/accesories-context";
+import { MakeupProvider, useMakeup } from "../context/makeup-context";
 import { CameraProvider, useCamera } from "../context/recorder-context";
 import { useVirtualTryOnProduct } from "../context/virtual-try-on-product-context";
 import { getProductAttributes, mediaUrl } from "../utils/apiUtils";
@@ -72,6 +75,7 @@ import { useTranslation } from "react-i18next";
 import { getCurrencyAndRate } from "../utils/other";
 import { exchangeRates } from "../utils/constants";
 import { useCartContext } from "../context/cart-context";
+import { textures } from "../api/attributes/texture";
 
 export const productTypeCheckers = {
   isLipColorProduct: (data: Product) => {
@@ -203,11 +207,14 @@ export const productTypeCheckers = {
     return getProductAttributes(data, "hair_color_product_type");
   },
   isHandwearProduct: (data: Product) => {
-    return handAccessoriesProductTypeFilter([
-      "Rings",
-      "Bracelets",
-      "Bangles",
-    ]).includes(getProductAttributes(data, "hand_accessories_product_type"));
+    return handAccessoriesProductTypeFilter(["Bracelets", "Bangles"]).includes(
+      getProductAttributes(data, "hand_accessories_product_type"),
+    );
+  },
+  isRingProduct: (data: Product) => {
+    return handAccessoriesProductTypeFilter(["Rings"]).includes(
+      getProductAttributes(data, "hand_accessories_product_type"),
+    );
   },
 };
 
@@ -312,6 +319,257 @@ function Main({
   const { view, setView, sectionName, mapTypes, groupedItemsData } =
     useFindTheLookContext();
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
+
+  const {
+    setFoundationColor,
+    setShowFoundation,
+    setBlushColor,
+    setBlushPattern,
+    setBlushMaterial,
+    setShowBlush,
+    setBlushMode,
+    setEyeShadowColor,
+    setEyeShadowPattern,
+    setEyeShadowMaterial,
+    setShowEyeShadow,
+    setEyeShadowMode,
+    setShowEyeliner,
+    setEyelinerColor,
+    setEyelinerPattern,
+    setShowLashes,
+    setLashesColor,
+    setLashesPattern,
+    setShowMascara,
+    setMascaraColor,
+    setShowConcealer,
+    setConcealerColor,
+    setShowHighlighter,
+    setHighlighterPattern,
+    setHighlighterColor,
+    setHighlighterMaterial,
+    setShowContour,
+    setContourMode,
+    setContourColors,
+    setContourShape,
+    setShowLipliner,
+    setLiplinerColor,
+    setLiplinerPattern,
+    setShowLipplumper,
+    setLipplumperColor,
+    setShowLipColor,
+    setLipColorMode,
+    setLipColors,
+    setLipTexture,
+    setShowBronzer,
+    setBronzerColor,
+    setBronzerPattern,
+    setShowLens,
+    setLensPattern,
+    setShowEyebrows,
+    setEyebrowsPattern,
+    setEyebrowsVisibility,
+    setEyebrowsColor,
+    setShowHair,
+    setHairColor,
+    setShowNails,
+    setShowPressOnNails,
+    setNailsColor,
+    setNailsTexture,
+  } = useMakeup();
+  const {
+    setShowHat,
+    setShowGlasess,
+    setShowHeadband,
+    setShowEarring,
+    setShowNecklace,
+    setShowWatch,
+    setShowBracelet,
+    setShowRing,
+  } = useAccesories();
+
+  useEffect(() => {
+    skus.forEach((sku) => {
+      if (productTypeCheckers.isLipColorProduct(sku)) {
+        setShowLipColor(true);
+        setLipColors(getProductAttributes(sku, "hexacode").split(","));
+        setLipColorMode("One");
+        return;
+      }
+
+      if (productTypeCheckers.isLipLinerProduct(sku)) {
+        setShowLipliner(true);
+        setLiplinerColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        setLiplinerPattern(1);
+        return;
+      }
+
+      if (productTypeCheckers.isLipPlumperProduct(sku)) {
+        setShowLipplumper(true);
+        setLipplumperColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        const texture = textures.find(
+          (t) => t.value == getProductAttributes(sku, "texture"),
+        );
+        setLipTexture(
+          texture?.label as
+            | "Matte"
+            | "Shimmer"
+            | "Satin"
+            | "Sheer"
+            | "Gloss"
+            | "Metalic"
+            | "Holographic",
+        );
+        return;
+      }
+
+      if (productTypeCheckers.isBlushProduct(sku)) {
+        setShowBlush(true);
+        setBlushColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        setBlushPattern(1);
+        setBlushMaterial(0);
+        setBlushMode("One");
+        return;
+      }
+
+      if (productTypeCheckers.isEyeShadowProduct(sku)) {
+        setShowEyeShadow(true);
+        setEyeShadowColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        setEyeShadowPattern(1);
+        setEyeShadowMaterial(0);
+        setEyeShadowMode("One");
+        return;
+      }
+
+      if (productTypeCheckers.isEyeLinerProduct(sku)) {
+        setShowEyeliner(true);
+        setEyelinerColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        setEyelinerPattern(1);
+        return;
+      }
+
+      if (productTypeCheckers.isLashesProduct(sku)) {
+        setShowLashes(true);
+        setLashesColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        setLashesPattern(1);
+        return;
+      }
+
+      if (productTypeCheckers.isMascaraProduct(sku)) {
+        setShowMascara(true);
+        setMascaraColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        return;
+      }
+
+      if (productTypeCheckers.isFoundationProduct(sku)) {
+        setShowFoundation(true);
+        setFoundationColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        return;
+      }
+
+      if (productTypeCheckers.isConcealerProduct(sku)) {
+        setShowConcealer(true);
+        setConcealerColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        return;
+      }
+
+      if (productTypeCheckers.isHighlighterProduct(sku)) {
+        setShowHighlighter(true);
+        setHighlighterColor(
+          getProductAttributes(sku, "hexacode").split(",")[0],
+        );
+        setHighlighterPattern(1);
+        setHighlighterMaterial(0);
+        return;
+      }
+
+      if (productTypeCheckers.isContourProduct(sku)) {
+        setShowContour(true);
+        setContourMode("One");
+        setContourColors([getProductAttributes(sku, "hexacode").split(",")[0]]);
+        return;
+      }
+
+      if (productTypeCheckers.isBronzerProduct(sku)) {
+        setShowBronzer(true);
+        setBronzerColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        setBronzerPattern(1);
+        return;
+      }
+
+      if (productTypeCheckers.isLenseProduct(sku)) {
+        setShowLens(true);
+        setLensPattern(1);
+        return;
+      }
+
+      if (productTypeCheckers.isEyebrowsProduct(sku)) {
+        setShowEyebrows(true);
+        setEyebrowsPattern(1);
+        setEyebrowsVisibility(1);
+        setEyebrowsColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        return;
+      }
+
+      if (productTypeCheckers.isHairColorProduct(sku)) {
+        setShowHair(true);
+        setHairColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        return;
+      }
+
+      if (productTypeCheckers.isNailPolishProduct(sku)) {
+        setShowNails(true);
+        setNailsColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        return;
+      }
+
+      if (productTypeCheckers.isPressOnNailsProduct(sku)) {
+        setShowPressOnNails(true);
+        setNailsColor(getProductAttributes(sku, "hexacode").split(",")[0]);
+        return;
+      }
+
+      // Accessories
+      if (productTypeCheckers.isHatsProduct(sku)) {
+        setShowHat(true);
+        return;
+      }
+
+      if (productTypeCheckers.isGlassesProduct(sku)) {
+        setShowGlasess(true);
+        return;
+      }
+
+      if (productTypeCheckers.isHeadbandProduct(sku)) {
+        setShowHeadband(true);
+        return;
+      }
+
+      if (productTypeCheckers.isEarringsProduct(sku)) {
+        setShowEarring(true);
+        return;
+      }
+
+      if (productTypeCheckers.isNeckwearProduct(sku)) {
+        setShowNecklace(true);
+        return;
+      }
+
+      if (productTypeCheckers.isWatchesProduct(sku)) {
+        setShowWatch(true);
+        return;
+      }
+
+      if (productTypeCheckers.isHandwearProduct(sku)) {
+        setShowBracelet(true);
+        return;
+      }
+
+      if (productTypeCheckers.isRingProduct(sku)) {
+        setShowRing(true);
+        return;
+      }
+    });
+  }, [skus]);
 
   return (
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
@@ -528,6 +786,7 @@ export function TopNavigation({ cart = true }: { cart?: boolean }) {
       } else {
         window.location.href =
           import.meta.env.VITE_API_BASE_URL + "/technologies";
+        return;
       }
     }
   };

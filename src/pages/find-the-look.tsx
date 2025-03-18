@@ -860,7 +860,7 @@ function AllProductsPage({
       return values ? useProducts({ product_type_key: attributeName, type_ids: values }).data?.items || [] : [];
     }),
   ];
-  
+
   const handleAddAllItemTocart = async () => {
     try {
       if (!allProducts.length) {
@@ -1074,13 +1074,13 @@ function ProductHorizontalList({ category }: { category: string }) {
             return (
               <div
                 key={product.id}
-                className="w-[calc(50%-0.5rem)] shrink-0 rounded shadow lg:w-[calc(16.667%-0.5rem)]"
+                className="w-[calc(50%-0.5rem)] shrink-0 rounded shadow md:w-[calc(16.667%-0.5rem)]"
               >
                 <div className="relative aspect-square w-full overflow-hidden">
                   <img
                     src={imageUrl}
                     alt="Product"
-                    className="md:h-full md:w-full rounded object-cover h-28 w-28"
+                    className="h-full w-full rounded object-cover"
                   />
                 </div>
 
