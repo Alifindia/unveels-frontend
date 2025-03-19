@@ -17,12 +17,13 @@ const TopNavigation = ({ onBack }: { onBack?: () => void }) => {
       </div>
       <div className="flex flex-col gap-4">
         <button type="button">
-          <Link
+          <a
             className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            to="/"
+            href={import.meta.env.VITE_API_BASE_URL + "/"}
           >
             <X className="size-6 text-white" />
-        </Link></button>
+          </a>
+        </button>
       </div>
     </div>
   );
