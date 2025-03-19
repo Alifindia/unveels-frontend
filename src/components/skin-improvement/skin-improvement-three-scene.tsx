@@ -1,7 +1,84 @@
+// Add this custom hook to your component file
+import { useCallback } from 'react';
+
+interface UseSharedWebGLRendererReturn {
+  getRenderer: (width?: number, height?: number) => WebGLRenderer;
+  releaseRenderer: () => void;
+}
+
+// Shared WebGL renderer hook with TypeScript types
+const useSharedWebGLRenderer = (): UseSharedWebGLRendererReturn => {
+  // Use a ref to store the renderer instance
+  const rendererRef = useRef<WebGLRenderer | null>(null);
+
+  // Use a ref to track if we're currently using the renderer
+  const rendererInUseRef = useRef<boolean>(false);
+
+  // Function to get or create the renderer
+  const getRenderer = useCallback((width?: number, height?: number): WebGLRenderer => {
+    // Mark as in use
+    rendererInUseRef.current = true;
+
+    // Create if it doesn't exist
+    if (!rendererRef.current) {
+      console.log("Creating new WebGL renderer");
+      const renderer = new WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        preserveDrawingBuffer: true,
+        premultipliedAlpha: false
+      });
+
+      // Add context lost and restored handlers
+      renderer.domElement.addEventListener('webglcontextlost', (event: Event) => {
+        console.log("WebGL context lost - preventing default");
+        event.preventDefault();
+      }, false);
+
+      renderer.domElement.addEventListener('webglcontextrestored', () => {
+        console.log("WebGL context restored");
+      }, false);
+
+      rendererRef.current = renderer;
+    }
+
+    // Resize if needed
+    if (width && height) {
+      rendererRef.current.setSize(width, height);
+    }
+
+    return rendererRef.current;
+  }, []);
+
+  // Function to release the renderer (doesn't dispose, just marks as not in use)
+  const releaseRenderer = useCallback((): void => {
+    rendererInUseRef.current = false;
+  }, []);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      // Only dispose if it exists and there are no other components using it
+      if (rendererRef.current && !rendererInUseRef.current) {
+        console.log("Disposing WebGL renderer on unmount");
+        rendererRef.current.dispose();
+        rendererRef.current = null;
+      }
+    };
+  }, []);
+
+  return { getRenderer, releaseRenderer };
+};
+
+// Then update your component with TypeScript types:
 import React, { useEffect, useRef, useMemo, useState } from "react";
-import { MeshProps, useThree, useLoader, useFrame } from "@react-three/fiber";
+import {
+  MeshProps,
+  useThree,
+  useLoader,
+  useFrame
+} from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
-import { Landmark } from "../../types/landmark";
 import {
   Vector2,
   ShaderMaterial,
@@ -17,28 +94,15 @@ import {
   Scene,
   OrthographicCamera,
   MeshBasicMaterial,
+  NormalBlending,
 } from "three";
+import { Landmark } from "../../types/landmark";
 import { useSkinImprovement } from "../../context/see-improvement-context";
-import {
-  BilateralFilterShader,
-  CustomBilateralShader,
-} from "../../shaders/BilateralFilterShader";
+import { CustomBilateralShader } from "../../shaders/BilateralFilterShader";
 import {
   faces,
   uvs,
-  positions,
-  CONCEALER_TEXTURE,
-  CONTOUR_TEXTURE_ONE,
-  LIPLINER_TEXTURE_TWO,
-  BLUSH_TEXTURE_ONE_ONE,
-  DARK_CIRCLE_ALPHA,
-  MOISTURES_ALPHA,
-  REDNESS_ALPHA,
-  LASHES_ONE,
-  DROPY_ALPHA,
-  WRINKLE_ALPHA,
-  LIPS_TEXTURE_ONE,
-  LIPLINER_TEXTURE_ONE,
+  positions
 } from "../../utils/constants";
 
 // Define facial feature types
@@ -67,7 +131,7 @@ interface SkinImprovementThreeSceneProps extends MeshProps {
 }
 
 // Apply stretched landmarks for forehead
-const applyStretchedLandmarks = (faceLandmarks: Landmark[]) => {
+const applyStretchedLandmarks = (faceLandmarks: Landmark[]): Landmark[] => {
   return faceLandmarks.map((landmark, index) => {
     const isForehead = [54, 103, 67, 109, 10, 338, 297, 332, 284].includes(
       index,
@@ -95,8 +159,13 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
   const texture = useTexture(imageSrc);
   const { viewport } = useThree();
   const [planeSize, setPlaneSize] = useState<[number, number]>([1, 1]);
-  const filterRef = useRef<ShaderMaterial>(null);
+  const filterRef = useRef<ShaderMaterial | null>(null);
   const [maskTexture, setMaskTexture] = useState<CanvasTexture | null>(null);
+  const materialRef = useRef<MeshBasicMaterial | null>(null);
+  const geometryRef = useRef<BufferGeometry | null>(null);
+
+  // Get shared renderer functions
+  const { getRenderer, releaseRenderer } = useSharedWebGLRenderer();
 
   // Get parameters from skin improvement context
   const {
@@ -109,9 +178,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
 
   // Load alphamap texture for the specific feature
   const alphaMapPath = useMemo(() => {
-    // Change paths to your actual PNG alphamaps for each feature
-
-    return "/media/unveels/vto-assets/texture/skin-problem.png";
+    return "/media/unveels/vto-assets/texture/skin-problem/" + featureType + ".png";
   }, [featureType]);
 
   // We'll load the PNG texture directly
@@ -144,24 +211,25 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     setPlaneSize([planeWidth, planeHeight]);
   }, [texture, viewport]);
 
-  // Fungsi untuk mengupdate smoothingStrength berdasarkan pesan yang diterima
+  // Function to update smoothingStrength based on received message
   const updateSmoothingStrength = (newSmoothingStrength: number) => {
     console.log("Smoothing Strength updated to:", newSmoothingStrength);
     setSmoothingStrength(newSmoothingStrength);
   };
 
+  // Set up event listener for messages
   useEffect(() => {
-    // Handler untuk menerima pesan dari Flutter atau browser
+    // Handler for receiving messages from Flutter or browser
     const handleMessage = (event: MessageEvent) => {
-      console.log("Message received:", event); // Tambahkan log untuk event itu sendiri
+      console.log("Message received:", event);
 
-      // Periksa data yang diterima
+      // Check received data
       if (event.data) {
         try {
           const data = JSON.parse(event.data);
-          console.log("Parsed data:", data); // Log data setelah parsing
+          console.log("Parsed data:", data);
 
-          // Memperbarui smoothingStrength jika data yang diterima valid
+          // Update smoothingStrength if valid data is received
           if (data.smoothingStrength !== undefined) {
             updateSmoothingStrength(data.smoothingStrength);
           }
@@ -173,10 +241,10 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
       }
     };
 
-    // Menambahkan event listener untuk mendengarkan pesan
+    // Add event listener for messages
     window.addEventListener("message", handleMessage);
 
-    // Membersihkan event listener saat komponen unmount
+    // Clean up event listener on unmount
     return () => {
       window.removeEventListener("message", handleMessage);
     };
@@ -192,12 +260,25 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     )
       return;
 
-    // Create offscreen renderer
-    const renderer = new WebGLRenderer({
-      antialias: true,
-      alpha: true,
-    });
-    renderer.setSize(texture.image.width, texture.image.height);
+    console.log("Creating mask with shared WebGL renderer");
+
+    // Clean up previous resources
+    if (geometryRef.current) {
+      geometryRef.current.dispose();
+      geometryRef.current = null;
+    }
+
+    if (materialRef.current) {
+      materialRef.current.dispose();
+      materialRef.current = null;
+    }
+
+    // Get the shared renderer
+    const renderer = getRenderer(texture.image.width, texture.image.height);
+
+    // Clear with transparent black
+    renderer.setClearColor(0x000000, 0);
+    renderer.clear();
 
     // Create a scene
     const scene = new Scene();
@@ -215,8 +296,9 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
 
     // Create a geometry for the face mesh
     const geometry = new BufferGeometry();
+    geometryRef.current = geometry;
 
-    // Apply landmark positions - exactly like in FaceMesh
+    // Apply landmark positions
     const outputWidth = texture.image.width;
     const outputHeight = texture.image.height;
 
@@ -240,7 +322,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
       vertices[i * 3 + 2] = z;
     }
 
-    // Set up UV coordinates - exactly like in your face mesh
+    // Set up UV coordinates
     const uvArray = new Float32Array(uvs.length * 2);
     for (let i = 0; i < uvs.length; i++) {
       uvArray[i * 2] = uvs[i][0];
@@ -253,14 +335,23 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     geometry.setIndex(new Uint16BufferAttribute(faces, 1));
     geometry.computeVertexNormals();
 
-    // Create a material with the alphamap
+    // Create material with proper alpha settings
     const material = new MeshBasicMaterial({
       alphaMap: alphaMap,
       transparent: true,
       opacity: 1.0,
+      alphaTest: 0.0,
+      depthTest: false,
+      depthWrite: false,
+      blending: NormalBlending
     });
+    materialRef.current = material;
 
-    // Create the mesh and add to scene
+    // Ensure texture settings are correct
+    alphaMap.premultiplyAlpha = false;
+    alphaMap.needsUpdate = true;
+
+    // Create mesh and add to scene
     const mesh = new Mesh(geometry, material);
     scene.add(mesh);
 
@@ -276,17 +367,22 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     // Set as mask texture
     setMaskTexture(newMaskTexture);
 
-    // Clean up resources
+    // Release the renderer
+    releaseRenderer();
+
+    // Clean up scene resources
+    scene.remove(mesh);
+
     return () => {
-      geometry.dispose();
-      material.dispose();
-      renderer.dispose();
+      if (newMaskTexture) {
+        newMaskTexture.dispose();
+      }
     };
-  }, [landmarks, texture.image, alphaMap, featureType]);
+  }, [landmarks, texture.image, alphaMap, featureType, getRenderer, releaseRenderer]);
 
   // Update shader uniforms when parameters change
   useEffect(() => {
-    if (filterRef.current && maskTexture) {
+    if (filterRef.current && maskTexture && texture.image) {
       filterRef.current.uniforms.imageTexture.value = texture;
       filterRef.current.uniforms.maskTexture.value = maskTexture;
       filterRef.current.uniforms.resolution.value.set(
@@ -299,6 +395,25 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
       filterRef.current.needsUpdate = true;
     }
   }, [texture, maskTexture, sigmaSpatial, sigmaColor, smoothingStrength]);
+
+  // Component cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (geometryRef.current) {
+        geometryRef.current.dispose();
+        geometryRef.current = null;
+      }
+
+      if (materialRef.current) {
+        materialRef.current.dispose();
+        materialRef.current = null;
+      }
+
+      if (maskTexture) {
+        maskTexture.dispose();
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -317,8 +432,8 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
                   maskTexture: { value: maskTexture },
                   resolution: {
                     value: new Vector2(
-                      texture.image.width,
-                      texture.image.height,
+                      texture.image?.width || 1,
+                      texture.image?.height || 1,
                     ),
                   },
                   sigmaSpatial: { value: sigmaSpatial },

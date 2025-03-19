@@ -155,21 +155,9 @@ function MainContent({ collapsed, setCollapsed, isArabic }: MainContentProps) {
 
 const tabs = [
   "acne",
-  "blackhead",
   "dark circle",
-  "droopy eyelid lower",
-  "droopy eyelid upper",
-  "dry",
-  "eyebag",
-  "firmness",
-  "moistures",
-  "oily",
-  "pore",
-  "radiance",
-  "skinredness",
   "spots",
   "texture",
-  "whitehead",
   "wrinkles",
 ] as const;
 
