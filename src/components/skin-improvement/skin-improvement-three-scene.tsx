@@ -174,6 +174,7 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
     smoothingStrength,
     featureType,
     setSmoothingStrength,
+    setFeatureType
   } = useSkinImprovement();
 
   // Load alphamap texture for the specific feature
@@ -232,6 +233,11 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
           // Update smoothingStrength if valid data is received
           if (data.smoothingStrength !== undefined) {
             updateSmoothingStrength(data.smoothingStrength);
+          }
+
+          if (data.featureType !== undefined) {
+            setFeatureType(data.featureType);
+
           }
         } catch (error) {
           console.error("Error parsing message:", error);
