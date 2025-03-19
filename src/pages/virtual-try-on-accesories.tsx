@@ -10,7 +10,13 @@ import {
   StopCircle,
   X,
 } from "lucide-react";
-import { cloneElement, CSSProperties, Fragment, useState } from "react";
+import {
+  cloneElement,
+  CSSProperties,
+  Fragment,
+  useEffect,
+  useState,
+} from "react";
 import { Icons } from "../components/icons";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -62,6 +68,8 @@ import { FilterProvider } from "../context/filter-context";
 import { VTOAllProductsPage } from "../components/vto/vto-all-product-page";
 import ChangeModel from "../components/change-model";
 import { ScreenshotPreview } from "../components/screenshot-preview";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -128,6 +136,16 @@ export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
 }
 
 export function VirtualTryOnAccesories() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+
   return (
     <CameraProvider>
       <SkinColorProvider>
@@ -289,6 +307,7 @@ export function TryOnSelectorAccesories() {
 }
 
 export function Accessories() {
+  const { t } = useTranslation();
   const shadeOptions = [
     {
       name: "Head Accessories",
@@ -342,7 +361,7 @@ export function Accessories() {
                 />
               </div>
               <div className="text-center text-[10px] !leading-4 text-white sm:text-xs lg:text-sm">
-                {option.name}
+                {t("vto." + option.name)}
               </div>
             </button>
           ))}
@@ -423,7 +442,6 @@ export function TopNavigation({}: {}) {
             {summaryCount}
           </span>
         </button>
-
       </div>
     </div>
   );

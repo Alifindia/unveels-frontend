@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 const modes = [
@@ -10,6 +11,8 @@ const modes = [
 ];
 
 export function FaceMode() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar">
       {modes.map((mode, index) => (
@@ -18,7 +21,7 @@ export function FaceMode() {
             type="button"
             className="inline-flex shrink-0 items-center gap-x-2 whitespace-nowrap rounded-full border border-white/80 px-3 py-1 text-white/80"
           >
-            <span className="text-[9.8px] sm:text-sm">{mode.name}</span>
+            <span className="text-[9.8px] sm:text-sm">{t("vto." +mode.name)}</span>
           </button>
         </Link>
       ))}

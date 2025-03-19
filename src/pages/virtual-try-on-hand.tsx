@@ -383,7 +383,7 @@ export function TryOnSelectorHand({ path }: { path: string }) {
                   />
                 </div>
                 <div className="text-center text-[10px] !leading-4 lg:text-sm">
-                  {shadeTab.name}
+                  {t("vto." + shadeTab.name)}
                 </div>
               </button>
             </Fragment>

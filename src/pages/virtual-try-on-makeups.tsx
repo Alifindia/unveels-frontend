@@ -73,6 +73,8 @@ import { ScreenshotPreview } from "../components/screenshot-preview";
 import ChangeModel from "../components/change-model";
 import { SelecProductNumberProvider } from "./vto/select-product-context";
 import SuccessPopup from "../components/popup-add-to-cart";
+import { useTranslation } from "react-i18next";
+import { getCookie } from "../utils/other";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -141,6 +143,16 @@ export function VirtualTryOnProvider({ children }: VirtualTryOnProvider) {
 }
 
 export function VirtualTryOnMakeups() {
+    const { i18n } = useTranslation();
+
+    useEffect(() => {
+      const storeLang = getCookie("store");
+
+      const lang = storeLang === "ar" ? "ar" : "en";
+
+      i18n.changeLanguage(lang);
+    }, [i18n]);
+
   return (
     <CameraProvider>
       <SkinColorProvider>
@@ -316,6 +328,7 @@ export function TryOnSelectorMakeups() {
 }
 
 export function Makeups() {
+  const { t } = useTranslation();
   const shadeOptions = [
     {
       name: "Lips",
@@ -376,7 +389,7 @@ export function Makeups() {
                 />
               </div>
               <div className="text-center text-[10px] !leading-4 text-white lg:text-sm">
-                {option.name}
+                {t("vto." + option.name)}
               </div>
             </button>
           ))}
