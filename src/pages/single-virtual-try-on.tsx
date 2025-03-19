@@ -36,7 +36,7 @@ import {
 import { MakeupProvider, useMakeup } from "../context/makeup-context";
 import { CameraProvider, useCamera } from "../context/recorder-context";
 import { useVirtualTryOnProduct } from "../context/virtual-try-on-product-context";
-import { getProductAttributes, mediaUrl } from "../utils/apiUtils";
+import { baseApiUrl, getProductAttributes, mediaUrl } from "../utils/apiUtils";
 import { VirtualTryOnProvider } from "./virtual-try-on";
 import { SingleEyeLinerSelector } from "./vto/eyes/eye-liners/eye-liner-single";
 import { SingleEyeShadowSelector } from "./vto/eyes/eye-shadow/eye-shadow-single";
@@ -80,141 +80,128 @@ import { textures } from "../api/attributes/texture";
 export const productTypeCheckers = {
   isLipColorProduct: (data: Product) => {
     const lipColorsTypes = ["Lipsticks", "Lip Stains", "Lip Tints"];
-    return lipsMakeupProductTypesFilter(lipColorsTypes)
+    const productType = getProductAttributes(data, "lips_makeup_product_type");
+    return productType && lipsMakeupProductTypesFilter(lipColorsTypes)
       .split(",")
-      .includes(getProductAttributes(data, "lips_makeup_product_type"));
+      .includes(productType);
   },
   isLipLinerProduct: (data: Product) => {
-    return lipsMakeupProductTypesFilter(["Lip Liners"])
+    const productType = getProductAttributes(data, "lips_makeup_product_type");
+    return productType && lipsMakeupProductTypesFilter(["Lip Liners"])
       .split(",")
-      .includes(getProductAttributes(data, "lips_makeup_product_type"));
+      .includes(productType);
   },
   isContourProduct: (data: Product) => {
-    return getFaceMakeupProductTypeIds(["Contour"]).includes(
-      getProductAttributes(data, "face_makeup_product_type"),
-    );
+    const productType = getProductAttributes(data, "face_makeup_product_type");
+    return productType && getFaceMakeupProductTypeIds(["Contour"]).includes(productType);
   },
   isHighlighterProduct: (data: Product) => {
-    return getFaceMakeupProductTypeIds(["Highlighter"]).includes(
-      getProductAttributes(data, "face_makeup_product_type"),
-    );
+    const productType = getProductAttributes(data, "face_makeup_product_type");
+    return productType && getFaceMakeupProductTypeIds(["Highlighter"]).includes(productType);
   },
   isNailPolishProduct: (data: Product) => {
-    return getProductAttributes(data, "product_types").includes("Nail Polish");
+    const productTypes = getProductAttributes(data, "product_types");
+    return productTypes && productTypes.includes("Nail Polish");
   },
   isPressOnNailsProduct: (data: Product) => {
-    return getProductAttributes(data, "product_types").includes(
-      "Press-On Nails",
-    );
+    const productTypes = getProductAttributes(data, "product_types");
+    return productTypes && productTypes.includes("Press-On Nails");
   },
   isEarringsProduct: (data: Product) => {
-    return headAccessoriesProductTypeFilter(["Earrings"]).includes(
-      getProductAttributes(data, "head_accessories_product_type"),
-    );
+    const productType = getProductAttributes(data, "head_accessories_product_type");
+    return productType && headAccessoriesProductTypeFilter(["Earrings"]).includes(productType);
   },
   isScarvesProduct: (data: Product) => {
-    return neckAccessoriesProductTypeFilter(["Scarves"]).includes(
-      getProductAttributes(data, "neck_accessories_product_type"),
-    );
+    const productType = getProductAttributes(data, "neck_accessories_product_type");
+    return productType && neckAccessoriesProductTypeFilter(["Scarves"]).includes(productType);
   },
   isGlassesProduct: (data: Product) => {
-    return headAccessoriesProductTypeFilter(["Glasses"]).includes(
-      getProductAttributes(data, "head_accessories_product_type"),
-    );
+    const productType = getProductAttributes(data, "head_accessories_product_type");
+    return productType && headAccessoriesProductTypeFilter(["Glasses"]).includes(productType);
   },
   isTiarasProduct: (data: Product) => {
-    return headAccessoriesProductTypeFilter(["Tiaras"]).includes(
-      getProductAttributes(data, "head_accessories_product_type"),
-    );
+    const productType = getProductAttributes(data, "head_accessories_product_type");
+    return productType && headAccessoriesProductTypeFilter(["Tiaras"]).includes(productType);
   },
   isHatsProduct: (data: Product) => {
-    return headAccessoriesProductTypeFilter(["Hats"]).includes(
-      getProductAttributes(data, "head_accessories_product_type"),
-    );
+    const productType = getProductAttributes(data, "head_accessories_product_type");
+    return productType && headAccessoriesProductTypeFilter(["Hats"]).includes(productType);
   },
   isHeadbandProduct: (data: Product) => {
-    return headAccessoriesProductTypeFilter(["Head Bands"]).includes(
-      getProductAttributes(data, "head_accessories_product_type"),
-    );
+    const productType = getProductAttributes(data, "head_accessories_product_type");
+    return productType && headAccessoriesProductTypeFilter(["Head Bands"]).includes(productType);
   },
   isWatchesProduct: (data: Product) => {
-    return handAccessoriesProductTypeFilter(["Watches"]).includes(
-      getProductAttributes(data, "hand_accessories_product_type"),
-    );
+    const productType = getProductAttributes(data, "hand_accessories_product_type");
+    return productType && handAccessoriesProductTypeFilter(["Watches"]).includes(productType);
   },
   isNeckwearProduct: (data: Product) => {
-    return neckAccessoriesProductTypeFilter([
+    const productType = getProductAttributes(data, "neck_accessories_product_type");
+    return productType && neckAccessoriesProductTypeFilter([
       "Chokers",
       "Necklaces",
       "Pendants",
-    ]).includes(getProductAttributes(data, "neck_accessories_product_type"));
+    ]).includes(productType);
   },
   isLashesProduct: (data: Product) => {
-    return getLashMakeupProductTypeIds([
+    const productType = getProductAttributes(data, "lash_makeup_product_type");
+    return productType && getLashMakeupProductTypeIds([
       "Lash Curlers",
       "Individual False Lashes",
       "Full Line Lashes",
-    ]).includes(getProductAttributes(data, "lash_makeup_product_type"));
+    ]).includes(productType);
   },
   isMascaraProduct: (data: Product) => {
-    return getLashMakeupProductTypeIds(["Mascaras"]).includes(
-      getProductAttributes(data, "lash_makeup_product_type"),
-    );
+    const productType = getProductAttributes(data, "lash_makeup_product_type");
+    return productType && getLashMakeupProductTypeIds(["Mascaras"]).includes(productType);
   },
   isEyeLinerProduct: (data: Product) => {
-    return getEyeMakeupProductTypeIds(["Eyeliners"]).includes(
-      getProductAttributes(data, "eye_makeup_product_type"),
-    );
+    const productType = getProductAttributes(data, "eye_makeup_product_type");
+    return productType && getEyeMakeupProductTypeIds(["Eyeliners"]).includes(productType);
   },
   isEyeShadowProduct: (data: Product) => {
-    return getEyeMakeupProductTypeIds(["Eyeshadows"]).includes(
-      getProductAttributes(data, "eye_makeup_product_type"),
-    );
+    const productType = getProductAttributes(data, "eye_makeup_product_type");
+    return productType && getEyeMakeupProductTypeIds(["Eyeshadows"]).includes(productType);
   },
   isEyebrowsProduct: (data: Product) => {
-    return getProductAttributes(data, "brow_makeup_product_type");
+    return !!getProductAttributes(data, "brow_makeup_product_type");
   },
   isFoundationProduct: (data: Product) => {
-    return faceMakeupProductTypesFilter(["Foundations"]).includes(
-      getProductAttributes(data, "face_makeup_product_type"),
-    );
+    const productType = getProductAttributes(data, "face_makeup_product_type");
+    return productType && faceMakeupProductTypesFilter(["Foundations"]).includes(productType);
   },
   isBlushProduct: (data: Product) => {
-    return faceMakeupProductTypesFilter(["Blushes"]).includes(
-      getProductAttributes(data, "face_makeup_product_type"),
-    );
+    const productType = getProductAttributes(data, "face_makeup_product_type");
+    return productType && faceMakeupProductTypesFilter(["Blushes"]).includes(productType);
   },
   isBronzerProduct: (data: Product) => {
-    return faceMakeupProductTypesFilter(["Bronzers"]).includes(
-      getProductAttributes(data, "face_makeup_product_type"),
-    );
+    const productType = getProductAttributes(data, "face_makeup_product_type");
+    return productType && faceMakeupProductTypesFilter(["Bronzers"]).includes(productType);
   },
   isLipPlumperProduct: (data: Product) => {
-    return lipsMakeupProductTypesFilter([
+    const productType = getProductAttributes(data, "lips_makeup_product_type");
+    return productType && lipsMakeupProductTypesFilter([
       "Lip Plumpers",
       "Lip Glosses",
-    ]).includes(getProductAttributes(data, "lips_makeup_product_type"));
+    ]).includes(productType);
   },
   isConcealerProduct: (data: Product) => {
-    return getEyeMakeupProductTypeIds(["Concealers"]).includes(
-      getProductAttributes(data, "face_makeup_product_type"),
-    );
+    const productType = getProductAttributes(data, "face_makeup_product_type");
+    return productType && getEyeMakeupProductTypeIds(["Concealers"]).includes(productType);
   },
   isLenseProduct: (data: Product) => {
-    return getProductAttributes(data, "lenses_product_type");
+    return !!getProductAttributes(data, "lenses_product_type");
   },
   isHairColorProduct: (data: Product) => {
-    return getProductAttributes(data, "hair_color_product_type");
+    return !!getProductAttributes(data, "hair_color_product_type");
   },
   isHandwearProduct: (data: Product) => {
-    return handAccessoriesProductTypeFilter(["Bracelets", "Bangles"]).includes(
-      getProductAttributes(data, "hand_accessories_product_type"),
-    );
+    const productType = getProductAttributes(data, "hand_accessories_product_type");
+    return productType && handAccessoriesProductTypeFilter(["Bracelets", "Bangles"]).includes(productType);
   },
   isRingProduct: (data: Product) => {
-    return handAccessoriesProductTypeFilter(["Rings"]).includes(
-      getProductAttributes(data, "hand_accessories_product_type"),
-    );
+    const productType = getProductAttributes(data, "hand_accessories_product_type");
+    return productType && handAccessoriesProductTypeFilter(["Rings"]).includes(productType);
   },
 };
 
@@ -393,14 +380,12 @@ function Main({
         setShowLipColor(true);
         setLipColors(getProductAttributes(sku, "hexacode").split(","));
         setLipColorMode("One");
-        return;
       }
 
       if (productTypeCheckers.isLipLinerProduct(sku)) {
         setShowLipliner(true);
         setLiplinerColor(getProductAttributes(sku, "hexacode").split(",")[0]);
         setLiplinerPattern(1);
-        return;
       }
 
       if (productTypeCheckers.isLipPlumperProduct(sku)) {
@@ -419,7 +404,6 @@ function Main({
             | "Metalic"
             | "Holographic",
         );
-        return;
       }
 
       if (productTypeCheckers.isBlushProduct(sku)) {
@@ -428,7 +412,6 @@ function Main({
         setBlushPattern(1);
         setBlushMaterial(0);
         setBlushMode("One");
-        return;
       }
 
       if (productTypeCheckers.isEyeShadowProduct(sku)) {
@@ -437,39 +420,33 @@ function Main({
         setEyeShadowPattern(1);
         setEyeShadowMaterial(0);
         setEyeShadowMode("One");
-        return;
       }
 
       if (productTypeCheckers.isEyeLinerProduct(sku)) {
         setShowEyeliner(true);
         setEyelinerColor(getProductAttributes(sku, "hexacode").split(",")[0]);
         setEyelinerPattern(1);
-        return;
       }
 
       if (productTypeCheckers.isLashesProduct(sku)) {
         setShowLashes(true);
         setLashesColor(getProductAttributes(sku, "hexacode").split(",")[0]);
         setLashesPattern(1);
-        return;
       }
 
       if (productTypeCheckers.isMascaraProduct(sku)) {
         setShowMascara(true);
         setMascaraColor(getProductAttributes(sku, "hexacode").split(",")[0]);
-        return;
       }
 
       if (productTypeCheckers.isFoundationProduct(sku)) {
         setShowFoundation(true);
         setFoundationColor(getProductAttributes(sku, "hexacode").split(",")[0]);
-        return;
       }
 
       if (productTypeCheckers.isConcealerProduct(sku)) {
         setShowConcealer(true);
         setConcealerColor(getProductAttributes(sku, "hexacode").split(",")[0]);
-        return;
       }
 
       if (productTypeCheckers.isHighlighterProduct(sku)) {
@@ -479,27 +456,23 @@ function Main({
         );
         setHighlighterPattern(1);
         setHighlighterMaterial(0);
-        return;
       }
 
       if (productTypeCheckers.isContourProduct(sku)) {
         setShowContour(true);
         setContourMode("One");
         setContourColors([getProductAttributes(sku, "hexacode").split(",")[0]]);
-        return;
       }
 
       if (productTypeCheckers.isBronzerProduct(sku)) {
         setShowBronzer(true);
         setBronzerColor(getProductAttributes(sku, "hexacode").split(",")[0]);
         setBronzerPattern(1);
-        return;
       }
 
       if (productTypeCheckers.isLenseProduct(sku)) {
         setShowLens(true);
         setLensPattern(1);
-        return;
       }
 
       if (productTypeCheckers.isEyebrowsProduct(sku)) {
@@ -507,69 +480,69 @@ function Main({
         setEyebrowsPattern(1);
         setEyebrowsVisibility(1);
         setEyebrowsColor(getProductAttributes(sku, "hexacode").split(",")[0]);
-        return;
       }
 
       if (productTypeCheckers.isHairColorProduct(sku)) {
         setShowHair(true);
         setHairColor(getProductAttributes(sku, "hexacode").split(",")[0]);
-        return;
       }
 
       if (productTypeCheckers.isNailPolishProduct(sku)) {
         setShowNails(true);
         setNailsColor(getProductAttributes(sku, "hexacode").split(",")[0]);
-        return;
       }
 
       if (productTypeCheckers.isPressOnNailsProduct(sku)) {
         setShowPressOnNails(true);
         setNailsColor(getProductAttributes(sku, "hexacode").split(",")[0]);
-        return;
       }
 
       // Accessories
       if (productTypeCheckers.isHatsProduct(sku)) {
         setShowHat(true);
-        return;
       }
 
       if (productTypeCheckers.isGlassesProduct(sku)) {
         setShowGlasess(true);
-        return;
       }
 
       if (productTypeCheckers.isHeadbandProduct(sku)) {
         setShowHeadband(true);
-        return;
       }
 
       if (productTypeCheckers.isEarringsProduct(sku)) {
         setShowEarring(true);
-        return;
       }
 
       if (productTypeCheckers.isNeckwearProduct(sku)) {
         setShowNecklace(true);
-        return;
       }
 
       if (productTypeCheckers.isWatchesProduct(sku)) {
         setShowWatch(true);
-        return;
       }
 
       if (productTypeCheckers.isHandwearProduct(sku)) {
         setShowBracelet(true);
-        return;
       }
 
       if (productTypeCheckers.isRingProduct(sku)) {
         setShowRing(true);
-        return;
       }
     });
   }, [skus]);
+
+  const { addItemToCart, setDataItem, setType } = useCartContext();
+  const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
+    try {
+      await addItemToCart(id, url);
+      setType("unit");
+      setDataItem(dataProduct);
+      console.log(`Product ${id} added to cart!`);
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+    }
+  };
 
   return (
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
@@ -598,6 +571,17 @@ function Main({
 
         <div className="flex items-center">
           <button
+            onClick={() => {
+              handleAddToCart(
+                product.id.toString(),
+                `${baseApiUrl}/${
+                  product.custom_attributes.find(
+                    (attr) => attr.attribute_code === "url_key",
+                  )?.value as string
+                }.html`,
+                product,
+              );
+            }}
             type="button"
             className="flex size-[1.25rem] items-center justify-center rounded-full bg-black/25 backdrop-blur-3xl sm:size-[1.5rem]"
           >
