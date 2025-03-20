@@ -33,7 +33,6 @@ import {
 import { useModelLoader } from "../hooks/useModelLoader";
 import { FilesetResolver, ImageSegmenter } from "@mediapipe/tasks-vision";
 import { Scanner } from "../components/scanner";
-import { Landmark } from "../types/landmark";
 
 interface Model {
   net: tf.GraphModel;
@@ -74,7 +73,6 @@ function Main({ isArabic }: { isArabic?: boolean }) {
   const modelTwoRef = useRef<ImageSegmenter | null>(null);
   const modelThreeRef = useRef<ImageSegmenter | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const faceLandmarksRef = useRef<Landmark[] | null>(null);
 
   const {
     isLoading,
@@ -305,10 +303,6 @@ function Main({ isArabic }: { isArabic?: boolean }) {
     skinAnalysisInference();
   }, [criterias.isCaptured, criterias.capturedImage]);
 
-  const handleCapture = (imageData: string, landmarks: Landmark[]) => {
-    faceLandmarksRef.current = landmarks;
-  };
-
   return (
     <>
       {(!isVideoDetectorReady || modelLoading) && (
@@ -324,54 +318,40 @@ function Main({ isArabic }: { isArabic?: boolean }) {
           </div>
         )}
         <div className="absolute inset-0">
-          <canvas
-            ref={canvasRef}
-            className={`pointer-events-none absolute left-1/2 top-1/2 blur-[1px]`}
-            style={{
-              zIndex: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              transform: "translate(-50%, -50%)",
-            }}
-          />
-
-          {(() => {
-            if (!criterias.isCaptured && !criterias.capturedImage) {
-              return (
-                <VideoStream
-                  onCanvasReady={setIsVideoDetectorReady}
-                  onCapture={handleCapture}
-                />
-              );
-            }
-
-            if (
-              (criterias.isCaptured || criterias.capturedImage) &&
-              !isInferenceCompleted
-            ) {
-              return <Scanner landmarksRef={faceLandmarksRef} />;
-            }
-
-            // Step 3: After inference is completed - show results
-            if (isInferenceCompleted && inferenceResult != null) {
-              return (
-                <SkinAnalysisScene
-                  data={inferenceResult}
-                  maskCanvas={canvasRef}
-                  landmarksRef={faceLandmarksRef}
-                />
-              );
-            }
-
-            // Fallback - should not happen but added for safety
-            return (
-              <VideoStream
-                onCanvasReady={setIsVideoDetectorReady}
-                onCapture={handleCapture}
-              />
-            );
-          })()}
+          <>
+            <canvas
+              ref={canvasRef}
+              className={`pointer-events-none absolute left-1/2 top-1/2 blur-[1px]`}
+              style={{
+                zIndex: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                transform: "translate(-50%, -50%)",
+              }}
+            />
+            {!isLoading && inferenceResult != null ? (
+              <>
+                <SkinAnalysisScene data={inferenceResult} maskCanvas={canvasRef}/>
+              </>
+            ) : (
+              <>
+                {isInferenceCompleted ? (
+                  <>
+                    {/* {showScannerAfterInference || !isInferenceCompleted ? (
+                      <Scanner />
+                    ) : (
+                      <></>
+                    )} */}
+                  </>
+                ) : (
+                  <>
+                    <VideoStream onCanvasReady={setIsVideoDetectorReady} />
+                  </>
+                )}
+              </>
+            )}
+          </>
         </div>
 
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">

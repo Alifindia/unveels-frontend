@@ -14,20 +14,23 @@ import { applyStretchedLandmarks } from "../../utils/scannerUtils";
 interface SkinAnalysisSceneProps {
   data: FaceResults[];
   maskCanvas?: React.RefObject<HTMLCanvasElement> | null;
-  landmarksRef?: React.RefObject<Landmark[]> | null;
 }
 
 export function SkinAnalysisScene({
   data,
   maskCanvas,
-  landmarksRef,
 }: SkinAnalysisSceneProps) {
   const { criterias } = useCamera();
   const [imageLoaded, setImageLoaded] = useState<HTMLImageElement | null>(null);
   const { tab, setTab, setView, view } = useSkinAnalysis();
 
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [faceLandmarker, setFaceLandmarker] = useState<FaceLandmarker | null>(
+    null,
+  );
+  const [isLandmarkerReady, setIsLandmarkerReady] = useState<boolean>(false);
   const [landmarks, setLandmarks] = useState<Landmark[]>([]);
+  const landmarkRef = useRef<Landmark[]>([]);
 
   const [isReady, setIsReady] = useState<boolean>(false);
 
@@ -48,11 +51,51 @@ export function SkinAnalysisScene({
     }
   }, [criterias.capturedImage, data]);
 
+  // Inisialisasi FaceLandmarker
+  useEffect(() => {
+    let isMounted = true; // Untuk mencegah pembaruan state setelah unmount
+
+    const initializeFaceLandmarker = async () => {
+      try {
+        const filesetResolver = await FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm",
+        );
+        const landmarker = await FaceLandmarker.createFromOptions(
+          filesetResolver,
+          {
+            baseOptions: {
+              modelAssetPath:
+                "/media/unveels/models/face-landmarker/face_landmarker.task",
+              delegate: "CPU",
+            },
+            runningMode: "IMAGE",
+            numFaces: 1,
+          },
+        );
+        if (isMounted) {
+          setFaceLandmarker(landmarker);
+          setIsLandmarkerReady(true);
+        }
+      } catch (error) {
+        console.error("Gagal menginisialisasi FaceLandmarker:", error);
+      }
+    };
+
+    initializeFaceLandmarker();
+
+    // Cleanup pada unmount
+    return () => {
+      isMounted = false;
+      if (faceLandmarker) {
+        faceLandmarker.close();
+      }
+    };
+  }, []);
+
   // Memproses gambar dan mendeteksi landmark
   useEffect(() => {
     const processImage = async () => {
-      console.log("LANDMARKNYA BOS", landmarksRef?.current);
-      if (imageLoaded && landmarksRef?.current) {
+      if (imageLoaded && faceLandmarker && isLandmarkerReady) {
         const outerLipIndices = [
           308, 415, 310, 311, 312, 13, 82, 81, 80, 191, 62, 78, 95, 88, 178, 87,
           14, 317, 402, 319,
@@ -72,10 +115,10 @@ export function SkinAnalysisScene({
         ];
 
         try {
-          const results = landmarksRef.current;
-          if (results && results.length > 0) {
+          const results = await faceLandmarker.detect(imageLoaded);
+          if (results && results.faceLandmarks.length > 0) {
             // Asumsikan wajah pertama
-            const firstFace = results;
+            const firstFace = results.faceLandmarks[0];
 
             // Konversi landmark ke koordinat normal dengan z
             const normalizedLandmarks = firstFace.map((landmark) => ({
@@ -84,6 +127,7 @@ export function SkinAnalysisScene({
               z: landmark.z,
             }));
             setLandmarks(normalizedLandmarks);
+            landmarkRef.current = normalizedLandmarks; // Update the ref with the latest landmarks
 
             const flippedLandmark = applyStretchedLandmarks(
               firstFace.map((landmark) => ({
@@ -205,7 +249,7 @@ export function SkinAnalysisScene({
     };
 
     processImage();
-  }, [imageLoaded]);
+  }, [imageLoaded, faceLandmarker, isLandmarkerReady]);
 
   useEffect(() => {
     if (imageLoaded && landmarks.length > 0) {
