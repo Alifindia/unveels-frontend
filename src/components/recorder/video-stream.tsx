@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import Webcam from "react-webcam";
-import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+import { FaceLandmarker, FilesetResolver, Landmark } from "@mediapipe/tasks-vision";
 import { useCamera } from "../../context/recorder-context";
 import {
   BRIGHTNESS_THRESHOLD,
@@ -33,6 +33,7 @@ interface VideoStreamProps {
   isNeedDetectOrientation?: boolean;
   onVideoReady?: (ready: boolean | false) => void;
   faceScannerColor?: string | null;
+  onCapture?: (imageData: string, faceLandmarks: Landmark[]) => void; // Add callback for face landmarks
 }
 
 export function VideoStream({
@@ -41,11 +42,13 @@ export function VideoStream({
   isNeedDetectOrientation = true,
   onVideoReady,
   faceScannerColor = "255, 220, 0",
+  onCapture,
 }: VideoStreamProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<Error | null>(null);
   const isDetectingRef = useRef<boolean>(false);
   const faceLandmarRef = useRef<FaceLandmarker | null>(null);
+  const currentLandmarksRef = useRef<any>(null); // Store current landmarks in a ref
 
   let glowOffset = 0;
   const glowSpeed = 0.03;
@@ -193,6 +196,9 @@ export function VideoStream({
             if (results.faceLandmarks && results.faceLandmarks.length > 0) {
               const landmarks = results.faceLandmarks[0];
 
+              // Store the current landmarks in the ref
+              currentLandmarksRef.current = landmarks;
+
               const faceLandmarks = applyStretchedLandmarks(landmarks);
               const gradient = ctx.createLinearGradient(canvas.width, 0, 0, 0);
 
@@ -239,6 +245,7 @@ export function VideoStream({
             } else {
               setPosition({ x: 0, y: 0 });
               setOrientation({ yaw: 0, pitch: 0 });
+              currentLandmarksRef.current = null;
             }
           } catch (error) {}
         }
@@ -317,6 +324,9 @@ export function VideoStream({
             if (results.faceLandmarks && results.faceLandmarks.length > 0) {
               const landmarks = results.faceLandmarks[0];
 
+              // Store the current landmarks in the ref
+              currentLandmarksRef.current = landmarks;
+
               const faceLandmarks = applyStretchedLandmarks(landmarks);
               const gradient = ctx.createLinearGradient(canvas.width, 0, 0, 0);
 
@@ -360,6 +370,7 @@ export function VideoStream({
             } else {
               setPosition({ x: 0, y: 0 });
               setOrientation({ yaw: 0, pitch: 0 });
+              currentLandmarksRef.current = null;
             }
           } catch (error) {}
         }
@@ -437,6 +448,9 @@ export function VideoStream({
             if (results.faceLandmarks && results.faceLandmarks.length > 0) {
               const landmarks = results.faceLandmarks[0];
 
+              // Store the current landmarks in the ref
+              currentLandmarksRef.current = landmarks;
+
               const faceLandmarks = applyStretchedLandmarks(landmarks);
 
               // Update glowOffset for animation
@@ -487,6 +501,7 @@ export function VideoStream({
               setPosition({ x: 0, y: 0 });
               setOrientation({ yaw: 0, pitch: 0 });
               setLighting(0);
+              currentLandmarksRef.current = null;
             }
           } catch (err) {
             console.error("Detection error:", err);
@@ -602,6 +617,11 @@ export function VideoStream({
           captureImage(imageSrc);
           setCapturedImageSrc(imageSrc);
           stopDetection();
+
+          // Pass the face landmarks data to parent component
+          if (onCapture && currentLandmarksRef.current) {
+            onCapture(imageSrc, currentLandmarksRef.current);
+          }
         } catch (error) {
           console.error("Error cropping image:", error);
         }
@@ -614,6 +634,11 @@ export function VideoStream({
           captureImage(imageSrc);
           setCapturedImageSrc(imageSrc); // Set the captured image
           stopDetection(); // Optionally stop detection after capture
+
+          // Pass the face landmarks data to parent component
+          if (onCapture && currentLandmarksRef.current) {
+            onCapture(imageSrc, currentLandmarksRef.current);
+          }
         } catch (error) {
           console.error("Error cropping image:", error);
         }
@@ -637,13 +662,18 @@ export function VideoStream({
             captureImage(imageSrc); // Simpan full image yang di-capture
             setCapturedImageSrc(imageSrc); // Set full captured image
             stopDetection(); // Optionally stop detection after capture
+
+            // Pass the face landmarks data to parent component
+            if (onCapture && currentLandmarksRef.current) {
+              onCapture(imageSrc, currentLandmarksRef.current);
+            }
           } catch (error) {
             console.error("Error cropping image:", error);
           }
         }
       }
     }
-  }, [captureImage, criterias.lastBoundingBox]);
+  }, [captureImage, criterias.lastBoundingBox, onCapture]);
 
   // Initialize useCountdown hook
   const {
