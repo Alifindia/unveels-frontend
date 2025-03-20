@@ -76,6 +76,7 @@ import { getCurrencyAndRate } from "../utils/other";
 import { exchangeRates } from "../utils/constants";
 import { useCartContext } from "../context/cart-context";
 import { textures } from "../api/attributes/texture";
+import SuccessPopup from "../components/popup-add-to-cart";
 
 export const productTypeCheckers = {
   isLipColorProduct: (data: Product) => {
@@ -532,7 +533,8 @@ function Main({
     });
   }, [skus]);
 
-  const { addItemToCart, setDataItem, setType } = useCartContext();
+  const { addItemToCart, setDataItem, setType, dataItem, type} = useCartContext();
+
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
@@ -547,6 +549,7 @@ function Main({
   return (
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
       <div className="absolute inset-0">
+        <SuccessPopup product={dataItem} type={type} />
         <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
       </div>
       <TopNavigation />
