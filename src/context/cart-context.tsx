@@ -171,10 +171,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Mengupdate jumlah item di cart ketika guestCartId berubah
   useEffect(() => {
-    console.log("GETTING CART ID");
     if (guestCartId) {
-      console.log("UPDATTING CART ITEMS");
       updateCartItemCount();
+      reloadMiniCart()
     }
   }, [guestCartId]);
 

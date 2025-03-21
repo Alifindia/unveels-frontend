@@ -325,11 +325,9 @@ function App() {
 
   useEffect(() => {
     const initializeCart = async () => {
-      console.log("Guest Cart ID ALREADY:", guestCartId);
       if (!guestCartId) {
         try {
           const cartId = await createGuestCart();
-          console.log("CART ID ",  cartId);
           setGuestCartId(cartId);
         } catch (error) {
           console.error("Failed to initialize guest cart:", error);
