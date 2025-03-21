@@ -39,6 +39,7 @@ export function MascaraSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useMascaraContext();
 
   return (

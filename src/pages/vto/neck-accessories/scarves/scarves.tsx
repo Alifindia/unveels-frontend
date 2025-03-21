@@ -27,7 +27,7 @@ export function ScarvesSelector() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
-  
+
   return (
     <div className="mx-auto w-full divide-y px-2">
       <FamilyColorSelector />
@@ -39,6 +39,7 @@ export function ScarvesSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily, colorFamilyToInclude } =
     useScarvesContext();
 
@@ -68,7 +69,7 @@ function FamilyColorSelector() {
                 background: item.hex,
               }}
             />
-            <span className="text-[0.625rem]">{item.label}</span>
+            <span className="text-[0.625rem]">{t("color." + item.label)}</span>
           </button>
         ))}
     </div>

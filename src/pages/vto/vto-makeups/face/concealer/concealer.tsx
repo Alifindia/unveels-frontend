@@ -24,6 +24,7 @@ export function ConcealerSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useConcealerContext();
 
   return (

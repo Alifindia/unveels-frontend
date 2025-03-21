@@ -129,6 +129,7 @@ function ColorSelector() {
 
 const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
 function TextureSelector() {
+  const { t } = useTranslation()
   const { selectedTexture, setSelectedTexture } = useBlushContext();
   const { setBlushMaterial } = useMakeup();
 
@@ -160,7 +161,7 @@ function TextureSelector() {
             )}
             onClick={() => setMaterial(index, texture)}
           >
-            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] sm:text-sm">{t("texture."+texture.label)}</span>
           </button>
         ))}
       </div>

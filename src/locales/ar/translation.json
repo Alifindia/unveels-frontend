@@ -415,7 +415,29 @@
     "Shimmer": "بريق",
     "Glossy": "براق",
     "Satin": "ساتان",
+    "Metallic": "معدني",
     "Metalic": "معدني",
     "Sheer": "شفاف"
+  },
+  "color": {
+    "White": "أبيض",
+    "Black": "أسود",
+    "Red": "أحمر",
+    "Blue": "أزرق",
+    "Green": "أخضر",
+    "Beige": "بيج",
+    "Brass": "نحاسي",
+    "Brown": "بني",
+    "Gold": "ذهبي",
+    "Grey": "رمادي",
+    "Multicolor": "متعدد الألوان",
+    "Orange": "برتقالي",
+    "Pink": "وردي",
+    "Purple": "أرجواني",
+    "Silver": "فضي",
+    "Transparent": "شفاف",
+    "Yellow": "أصفر",
+    "Bronze": "برونز",
+    "Nude": "لحمي"
   }
 }

@@ -62,6 +62,7 @@ export function LashesSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useLashesContext();
 
   return (

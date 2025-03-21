@@ -48,6 +48,7 @@ export function NailPolishSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily, colorFamilyToInclude } =
     useNailPolishContext();
 
@@ -77,7 +78,7 @@ function FamilyColorSelector() {
                 background: item.hex,
               }}
             />
-            <span className="text-[0.625rem]">{item.label}</span>
+            <span className="text-[0.625rem]">{t("color." + item.label)}</span>
           </button>
         ))}
     </div>
@@ -137,6 +138,7 @@ function ColorSelector() {
 const textures = filterTextures(["Glossy", "Matte", "Shimmer"]);
 
 function TextureSelector() {
+  const { t } = useTranslation()
   const { selectedTexture, setSelectedTexture } = useNailPolishContext();
   return (
     <div className="mx-auto w-full py-2">
@@ -160,7 +162,7 @@ function TextureSelector() {
               }
             }}
           >
-            <span className="text-[9.8px] lg:text-xs">{texture.label}</span>
+            <span className="text-[9.8px] lg:text-xs">{t("texture." + texture.label)}</span>
           </button>
         ))}
       </div>

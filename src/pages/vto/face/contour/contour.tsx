@@ -228,6 +228,7 @@ function ShapeSelector() {
 const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
 
 function TextureSelector() {
+  const { t } = useTranslation()
   const { selectedTexture, setSelectedTexture } = useContourContext();
   const { highlighterMaterial, setHighlighterMaterial } = useMakeup();
 
@@ -259,7 +260,7 @@ function TextureSelector() {
             )}
             onClick={() => setMaterial(index, texture)}
           >
-            <span className="text-[9.8px] lg:text-xs">{texture.label}</span>
+            <span className="text-[9.8px] lg:text-xs">{t("texture." + texture.label)}</span>
           </button>
         ))}
       </div>

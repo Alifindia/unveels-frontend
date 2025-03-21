@@ -49,6 +49,7 @@ export function PressOnNailsSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily, colorFamilyToInclude } =
     usePressOnNailsContext();
 
@@ -78,7 +79,7 @@ function FamilyColorSelector() {
                 background: item.hex,
               }}
             />
-            <span className="text-[0.625rem]">{item.label}</span>
+            <span className="text-[0.625rem]">{t("color." + item.label)}</span>
           </button>
         ))}
     </div>

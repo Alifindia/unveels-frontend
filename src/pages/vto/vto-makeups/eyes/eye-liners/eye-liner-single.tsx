@@ -23,6 +23,7 @@ export function SingleEyeLinerSelector({ product }: { product: Product }) {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useEyeLinerContext();
 
   return (

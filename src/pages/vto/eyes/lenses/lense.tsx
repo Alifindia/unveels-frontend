@@ -29,7 +29,7 @@ export function LenseSelector() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
-  
+
   return (
     <div className="mx-auto w-full divide-y px-2">
       <FamilyColorSelector />
@@ -42,6 +42,7 @@ export function LenseSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily, colorFamilyToInclude } =
     useLenseContext();
 
@@ -75,7 +76,7 @@ function FamilyColorSelector() {
                 background: item.hex,
               }}
             />
-            <span className="text-[0.625rem]">{item.label}</span>
+            <span className="text-[0.625rem]">{t("color." + item.label)}</span>
           </button>
         ))}
     </div>
@@ -199,7 +200,7 @@ function ProductList() {
         const adjustedIndex = addCartProductNumber - 1;
         const matchedProduct = data.items[adjustedIndex];
         console.log(matchedProduct);
-  
+
         if (matchedProduct) {
           const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
           const id = matchedProduct.id.toString();
@@ -215,10 +216,10 @@ function ProductList() {
         }
       }
     };
-  
+
     handleAddToCart();
   }, [data, addCartProductNumber]);
-  
+
   const handleProductClick = (product: Product) => {
     if (selectedProduct?.id === product.id) {
       setShowLens(false);

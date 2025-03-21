@@ -13,6 +13,7 @@ import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { filterTextures } from "../../../../api/attributes/texture";
 import { LoadingProducts } from "../../../../components/loading";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
+import { useTranslation } from "react-i18next";
 
 export function NailPolishSelector() {
   return (
@@ -31,6 +32,7 @@ export function NailPolishSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useNailPolishContext();
 
   return (
@@ -117,6 +119,7 @@ function ColorSelector() {
 const textures = filterTextures(["Glossy", "Matte", "Shimmer"]);
 
 function TextureSelector() {
+  const { t } = useTranslation()
   const { selectedTexture, setSelectedTexture } = useNailPolishContext();
   return (
     <div className="mx-auto w-full py-2">
@@ -140,7 +143,7 @@ function TextureSelector() {
               }
             }}
           >
-            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] sm:text-sm">{t("texture."+texture.label)}</span>
           </button>
         ))}
       </div>

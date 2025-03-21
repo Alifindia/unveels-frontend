@@ -33,6 +33,7 @@ export function EyebrowsSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useEyebrowsContext();
   return (
     <div

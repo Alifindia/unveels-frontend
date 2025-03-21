@@ -22,6 +22,7 @@ export function HairColorSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useHairColorContext();
 
   return (

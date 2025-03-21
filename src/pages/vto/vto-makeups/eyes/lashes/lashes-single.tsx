@@ -22,6 +22,7 @@ export function SingleLashesSelector({ product }: { product: Product }) {
 const colorFamilies = [{ name: "Black", value: "#000000" }];
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useLashesContext();
 
   return (

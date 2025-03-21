@@ -28,7 +28,7 @@ export function TiaraSelector() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
-  
+
   return (
     <div className="mx-auto w-full divide-y px-4">
       <FamilyColorSelector />
@@ -40,6 +40,7 @@ export function TiaraSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily, colorFamilyToInclude } =
     useTiaraContext();
 
@@ -69,7 +70,7 @@ function FamilyColorSelector() {
                 background: item.hex,
               }}
             />
-            <span className="text-[0.625rem]">{item.label}</span>
+            <span className="text-[0.625rem]">{t("color." + item.label)}</span>
           </button>
         ))}
     </div>

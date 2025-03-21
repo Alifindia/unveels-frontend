@@ -19,6 +19,7 @@ export function SingleLenseSelector({ product }: { product: Product }) {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useLenseContext();
 
   return (

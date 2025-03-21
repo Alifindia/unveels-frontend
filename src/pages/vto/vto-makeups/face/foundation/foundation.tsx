@@ -28,6 +28,7 @@ export function FoundationSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useFoundationContext();
 
   return (
@@ -116,6 +117,7 @@ function ColorSelector() {
 }
 
 function TextureSelector() {
+  const { t } = useTranslation()
   const { selectedTexture, setSelectedTexture } = useFoundationContext();
   const { setBlushMaterial } = useMakeup();
 
@@ -147,7 +149,7 @@ function TextureSelector() {
             )}
             onClick={() => setMaterial(index, texture)}
           >
-            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] sm:text-sm">{t("texture."+texture.label)}</span>
           </button>
         ))}
       </div>

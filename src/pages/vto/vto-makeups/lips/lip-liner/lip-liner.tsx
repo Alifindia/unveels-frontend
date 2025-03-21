@@ -26,6 +26,7 @@ export function LipLinerSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useLipLinerContext();
   return (
     <div

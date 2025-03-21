@@ -21,6 +21,7 @@ export function SingleMascaraSelector({ product }: { product: Product }) {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useMascaraContext();
 
   return (

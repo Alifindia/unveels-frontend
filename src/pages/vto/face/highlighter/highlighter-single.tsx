@@ -104,7 +104,7 @@ function TextureSelector({ product }: { product: Product }) {
               }
             }}
           >
-            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] sm:text-sm">{t("texture."+texture.label)}</span>
           </button>
         ))}
       </div>

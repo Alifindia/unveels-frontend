@@ -32,7 +32,7 @@ export function EyebrowsSelector() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
-  
+
   return (
     <div className="mx-auto w-full divide-y px-2">
       <div>
@@ -51,6 +51,7 @@ export function EyebrowsSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useEyebrowsContext();
   return (
     <div
@@ -261,7 +262,7 @@ function ProductList() {
         const adjustedIndex = addCartProductNumber - 1;
         const matchedProduct = data.items[adjustedIndex];
         console.log(matchedProduct);
-  
+
         if (matchedProduct) {
           const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
           const id = matchedProduct.id.toString();
@@ -277,7 +278,7 @@ function ProductList() {
         }
       }
     };
-  
+
     handleAddToCart();
   }, [data, addCartProductNumber]);
 

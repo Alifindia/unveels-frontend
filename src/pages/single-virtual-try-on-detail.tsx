@@ -1,15 +1,25 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { textures } from "../api/attributes/texture";
 import data from "../assets/message.json";
 import { ColorPalette } from "../components/color-palette";
 import { Icons } from "../components/icons";
 import { LoadingProducts } from "../components/loading";
-import { getCurrencyAndRate } from "../utils/other";
+import { getCookie, getCurrencyAndRate } from "../utils/other";
 import { exchangeRates } from "../utils/constants";
+import { useTranslation } from "react-i18next";
 
 export function SingleVirtualTryOnDetail() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const storeLang = getCookie("store");
+
+    const lang = storeLang === "ar" ? "ar" : "en";
+
+    i18n.changeLanguage(lang);
+  }, [i18n]);
   const {} = useParams();
   return (
     <div className="mx-auto w-full divide-y px-4">
@@ -49,7 +59,7 @@ function ColorSelector() {
 
   return (
     <div className="mx-auto w-full py-2 lg:max-w-xl">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar py-2.5">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
         <button
           type="button"
           className="inline-flex size-[1.875rem] shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
@@ -72,6 +82,7 @@ function ColorSelector() {
 }
 
 function TextureSelector() {
+  const { t } = useTranslation();
   const { sku } = useParams();
   const productConfigurable = data.items.filter((i) => i.sku === sku);
   const textureAttribute = productConfigurable[0].custom_attributes.find(
@@ -104,7 +115,7 @@ function TextureSelector() {
               }
             }}
           >
-            <span className="text-sm">{texture.label}</span>
+            <span className="text-sm">{t("texture," + texture.label)}</span>
           </button>
         ))}
       </div>
@@ -129,7 +140,7 @@ function ShapeSelector() {
 
   return (
     <div className="mx-auto w-full py-2 lg:max-w-xl">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar py-2.5">
+      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2.5 no-scrollbar">
         {blushes.map((path, index) => (
           <button
             key={index}
@@ -230,7 +241,8 @@ function ProductList() {
               </p>
               <div className="flex items-end justify-between space-x-1 pt-1">
                 <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.625rem] text-transparent">
-                  {currencySymbol}{(product.price * rate).toFixed(3)}
+                  {currencySymbol}
+                  {(product.price * rate).toFixed(3)}
                 </div>
                 <button
                   type="button"

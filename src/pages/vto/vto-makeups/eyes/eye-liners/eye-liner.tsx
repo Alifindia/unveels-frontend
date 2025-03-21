@@ -26,6 +26,7 @@ export function EyeLinerSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useEyeLinerContext();
 
   return (

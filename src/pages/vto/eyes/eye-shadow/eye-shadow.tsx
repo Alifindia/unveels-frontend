@@ -185,6 +185,7 @@ function ColorSelector() {
 const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
 
 function TextureSelector() {
+  const { t } = useTranslation()
   const { selectedTexture, setSelectedTexture } = useEyeShadowContext();
   return (
     <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
@@ -208,7 +209,7 @@ function TextureSelector() {
               }
             }}
           >
-            <span className="text-[9.8px] lg:text-xs">{texture.label}</span>
+            <span className="text-[9.8px] lg:text-xs">{t("texture." + texture.label)}</span>
           </button>
         ))}
       </div>

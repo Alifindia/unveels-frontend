@@ -44,7 +44,7 @@ export function HighlighterSelector() {
 
     i18n.changeLanguage(lang);
   }, [i18n]);
-  
+
   return (
     <div className="mx-auto w-full px-2">
       <ColorSelector />
@@ -125,6 +125,7 @@ function ColorSelector() {
 const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
 
 function TextureSelector() {
+  const { t } = useTranslation()
   const { selectedTexture, setSelectedTexture } = useHighlighterContext();
   const { highlighterMaterial, setHighlighterMaterial } = useMakeup();
 
@@ -156,7 +157,7 @@ function TextureSelector() {
             )}
             onClick={() => setMaterial(index, texture)}
           >
-            <span className="text-[9.8px] lg:text-xs">{texture.label}</span>
+            <span className="text-[9.8px] lg:text-xs">{t("texture." + texture.label)}</span>
           </button>
         ))}
       </div>
@@ -275,7 +276,7 @@ function ProductList() {
         const adjustedIndex = addCartProductNumber - 1;
         const matchedProduct = data.items[adjustedIndex];
         console.log(matchedProduct);
-  
+
         if (matchedProduct) {
           const url = `${baseApiUrl}/${matchedProduct.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`;
           const id = matchedProduct.id.toString();
@@ -291,7 +292,7 @@ function ProductList() {
         }
       }
     };
-  
+
     handleAddToCart();
   }, [data, addCartProductNumber]);
 

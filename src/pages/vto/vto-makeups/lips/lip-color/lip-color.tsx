@@ -30,6 +30,7 @@ export function LipColorSelector() {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = useLipColorContext();
 
   return (
@@ -146,6 +147,7 @@ function ColorSelector() {
 }
 
 function TextureSelector() {
+  const { t } = useTranslation()
   const { selectedTexture, setSelectedTexture } = useLipColorContext();
   return (
     <div className="mx-auto w-full py-1 sm:py-2">
@@ -169,7 +171,7 @@ function TextureSelector() {
               }
             }}
           >
-            <span className="text-[9.8px] sm:text-sm">{texture.label}</span>
+            <span className="text-[9.8px] sm:text-sm">{t("texture."+texture.label)}</span>
           </button>
         ))}
       </div>

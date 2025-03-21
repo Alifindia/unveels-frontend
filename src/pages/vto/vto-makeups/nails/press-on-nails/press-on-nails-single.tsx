@@ -22,6 +22,7 @@ export function SinglePressOnNailsSelector({ product }: { product: Product }) {
 }
 
 function FamilyColorSelector() {
+  const { t } = useTranslation()
   const { colorFamily, setColorFamily } = usePressOnNailsContext();
 
   return (

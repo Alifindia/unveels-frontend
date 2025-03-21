@@ -415,7 +415,29 @@
     "Shimmer": "Shimmer",
     "Glossy": "Glossy",
     "Satin": "Satin",
+    "Metallic": "Metallic",
     "Metalic": "Metalic",
     "Sheer": "Sheer"
+  },
+  "color": {
+    "White": "White",
+    "Black": "Black",
+    "Red": "Red",
+    "Blue": "Blue",
+    "Green": "Green",
+    "Beige": "Beige",
+    "Brass": "Brass",
+    "Brown": "Brown",
+    "Gold": "Gold",
+    "Grey": "Grey",
+    "Multicolor": "Multicolor",
+    "Orange": "Orange",
+    "Pink": "Pink",
+    "Purple": "Purple",
+    "Silver": "Silver",
+    "Transparent": "Transparent",
+    "Yellow": "Yellow",
+    "Bronze": "Bronze",
+    "Nude": "Nude"
   }
 }
