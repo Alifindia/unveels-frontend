@@ -370,54 +370,95 @@ function SkinToneFinderInnerScene({
       }
       return inside;
     };
+
+    // Update this part of the changeColor function
+
     const changeColor = () => {
       if (!imageLoaded) return;
 
       const bgCanvas = backgroundCanvasRef.current;
       const canvas = canvasRef.current;
-      const ctx = canvas?.getContext("2d", { willReadFrequently: true });
-      const bgCtx = bgCanvas?.getContext("2d", {
-        willReadFrequently: true,
-      });
 
-      if (!canvas) return;
-      if (!bgCanvas) return;
+      if (!canvas || !bgCanvas) return;
+
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      const bgCtx = bgCanvas.getContext("2d", { willReadFrequently: true });
+
+      if (!ctx || !bgCtx) return;
+
+      // Get window dimensions and device pixel ratio
       const { innerWidth: width, innerHeight: height } = window;
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      bgCanvas.width = imageLoaded.naturalHeight;
-      bgCanvas.height = imageLoaded.naturalHeight;
-      ctx?.scale(dpr, dpr);
 
-      ctx?.drawImage(
-        imageLoaded,
-        0,
-        0,
-        imageLoaded.naturalWidth / dpr,
-        imageLoaded.naturalHeight / dpr,
-      );
+      // Set canvas dimensions to match image dimensions for processing
+      canvas.width = imageLoaded.naturalWidth;
+      canvas.height = imageLoaded.naturalHeight;
 
-      let imageData = ctx?.getImageData(
-        0,
-        0,
-        imageLoaded.naturalWidth,
-        imageLoaded.naturalHeight,
-      ).data;
+      // Set background canvas to match window dimensions for display
+      bgCanvas.width = width * dpr;
+      bgCanvas.height = height * dpr;
 
-      if (!imageData) return;
+      // Draw unmirrored image on the main canvas for processing
+      ctx.drawImage(imageLoaded, 0, 0);
+
+      // Calculate how to draw image to fill the background canvas properly
+      const imgAspect = imageLoaded.naturalWidth / imageLoaded.naturalHeight;
+      const canvasAspect = width / height;
+
+      let drawWidth, drawHeight, offsetX, offsetY;
+
+      // Determine dimensions to fill (cover) the canvas while maintaining aspect ratio
+      if (imgAspect < canvasAspect) {
+        // Image is taller than canvas (relative to width)
+        drawWidth = width * dpr;
+        drawHeight = (width * dpr) / imgAspect;
+        offsetX = 0;
+        offsetY = (height * dpr - drawHeight) / 2;
+      } else {
+        // Image is wider than canvas (relative to height)
+        drawHeight = height * dpr;
+        drawWidth = height * dpr * imgAspect;
+        offsetX = (width * dpr - drawWidth) / 2;
+        offsetY = 0;
+      }
+
+      if (
+        !categoryMask.current ||
+        !firstFaceRef.current ||
+        foundationColor === ""
+      ) {
+        // If we don't have mask data yet, still draw the original image on background canvas
+        bgCtx.save();
+        bgCtx.scale(-1, 1); // Mirror the image
+        bgCtx.drawImage(
+          imageLoaded,
+          -offsetX - drawWidth, // Adjust x-coordinate for mirroring
+          offsetY,
+          drawWidth,
+          drawHeight,
+        );
+        bgCtx.restore();
+        return;
+      }
+
+      // Process the image data for foundation application
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
       const colorRgb = hexToRgb(foundationColor);
-      const skinColorLegend = [[colorRgb.r, colorRgb.g, colorRgb.b, 0.08]];
 
-      let j = 0;
-      if (!categoryMask.current) return;
-      if (!firstFaceRef.current) return;
-      if (foundationColor != "") {
-        for (let i = 0; i < categoryMask.current.length; ++i) {
-          const x = i % imageLoaded.naturalWidth;
-          const y = Math.floor(i / imageLoaded.naturalWidth);
-          const maskVal = Math.round(categoryMask.current[i] * 255.0);
+      // Process each pixel in the original image dimensions
+      for (let y = 0; y < imageLoaded.naturalHeight; y++) {
+        for (let x = 0; x < imageLoaded.naturalWidth; x++) {
+          // Calculate index in the mask array (which matches image dimensions)
+          const maskIndex = y * imageLoaded.naturalWidth + x;
 
+          // Check if this pixel is outside the mask bounds
+          if (maskIndex >= categoryMask.current.length) continue;
+
+          // Get mask value (3 indicates face skin)
+          const maskVal = Math.round(categoryMask.current[maskIndex] * 255.0);
+
+          // Check if point is inside eye or mouth areas
           const insideLeftEye = isInsideEyeArea(
             x,
             y,
@@ -426,6 +467,7 @@ function SkinToneFinderInnerScene({
             imageLoaded.naturalWidth,
             imageLoaded.naturalHeight,
           );
+
           const insideRightEye = isInsideEyeArea(
             x,
             y,
@@ -434,7 +476,8 @@ function SkinToneFinderInnerScene({
             imageLoaded.naturalWidth,
             imageLoaded.naturalHeight,
           );
-          const insideMounth = isInsideEyeArea(
+
+          const insideMouth = isInsideEyeArea(
             x,
             y,
             firstFaceRef.current,
@@ -443,36 +486,45 @@ function SkinToneFinderInnerScene({
             imageLoaded.naturalHeight,
           );
 
-          if (insideLeftEye || insideRightEye || insideMounth) {
-            // Jika dalam area mata, buat transparan
-          } else {
-            if (maskVal === 3) {
-              const skinColor = skinColorLegend[0];
-              imageData[j] = skinColor[0] * 0.08 + imageData[j] * 0.9;
-              imageData[j + 1] = skinColor[1] * 0.08 + imageData[j + 1] * 0.9;
-              imageData[j + 2] = skinColor[2] * 0.08 + imageData[j + 2] * 0.9;
-              imageData[j + 3] = 255;
-            } else {
-              // imageData[j] = 0;
-              // imageData[j + 1] = 0;
-              // imageData[j + 2] = 0;
-              // imageData[j + 3] = 0;
-            }
+          // Calculate index in the image data array (4 bytes per pixel - RGBA)
+          const dataIndex = (y * imageLoaded.naturalWidth + x) * 4;
+
+          // Only apply foundation to face skin areas that aren't eyes or mouth
+          if (
+            maskVal === 3 &&
+            !insideLeftEye &&
+            !insideRightEye &&
+            !insideMouth
+          ) {
+            // Blend foundation color with original pixel
+            data[dataIndex] = colorRgb.r * 0.08 + data[dataIndex] * 0.92; // R
+            data[dataIndex + 1] =
+              colorRgb.g * 0.08 + data[dataIndex + 1] * 0.92; // G
+            data[dataIndex + 2] =
+              colorRgb.b * 0.08 + data[dataIndex + 2] * 0.92; // B
+            // Alpha remains unchanged
           }
-          j += 4;
         }
       }
 
-      const image = new ImageData(
-        new Uint8ClampedArray(imageData.buffer),
-        imageLoaded.naturalWidth,
-        imageLoaded.naturalHeight,
-      );
+      // Put modified image data onto the processing canvas
+      ctx.putImageData(imageData, 0, 0);
 
-      bgCtx?.putImageData(image, 0, 0);
+      // Now draw the processed image onto the background canvas with proper scaling and mirroring
+      bgCtx.save();
+      bgCtx.scale(-1, 1); // Mirror the image
+      bgCtx.drawImage(
+        canvas, // Source is the processed canvas
+        -offsetX - drawWidth, // Adjust x-coordinate for mirroring
+        offsetY,
+        drawWidth,
+        drawHeight,
+      );
+      bgCtx.restore();
     };
     changeColor();
   }, [showFoundation, foundationColor, imageLoaded, isInferenceCompleted]);
+
   // Jika tidak ada gambar yang ditangkap, render hanya canvas overlay
   if (!criterias.capturedImage || !imageLoaded) {
     return null;
@@ -485,7 +537,7 @@ function SkinToneFinderInnerScene({
           {showScannerAfterInference || !isInferenceCompleted ? (
             <Scanner />
           ) : (
-            <div className="fixed inset-0 flex" style={{zIndex: 1}}>
+            <div className="fixed inset-0 flex" style={{ zIndex: 1 }}>
               {/* Render kondisional overlay canvas */}
               {/* Overlay Canvas */}
               <Rnd
@@ -555,22 +607,31 @@ function SkinToneFinderInnerScene({
       ) : (
         <></>
       )}
+      {/* Update these canvas elements in your return statement */}
 
       <canvas
         ref={canvasRef}
-        className={`pointer-events-none absolute left-0 top-0 hidden h-full w-full`}
-        style={{ zIndex: 0 }}
+        className="pointer-events-none absolute"
+        style={{
+          zIndex: 0,
+          opacity: 0, // Hide the processing canvas
+          position: "absolute",
+          left: 0,
+          top: 0,
+        }}
       />
 
       <canvas
         ref={backgroundCanvasRef}
-        className={`pointer-events-none absolute left-1/2 top-1/2 scale-x-[-1] transform`}
+        className="pointer-events-none"
         style={{
-          zIndex: 0,
-          width: "100%",
-          height: "100%",
+          zIndex: 1,
+          position: "fixed",
+          left: 0,
+          top: 0,
+          width: "100vw",
+          height: "100vh",
           objectFit: "cover",
-          transform: "translate(-50%, -50%) scaleX(-1)",
         }}
       />
     </>
