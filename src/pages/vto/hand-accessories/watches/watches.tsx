@@ -23,6 +23,7 @@ import { getCookie } from "../../../../utils/other";
 
 export function WatchesSelector() {
   const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
 
   useEffect(() => {
     const storeLang = getCookie("store");
@@ -33,7 +34,7 @@ export function WatchesSelector() {
   }, [i18n]);
 
   return (
-    <div className="mx-auto w-full divide-y px-2">
+    <div className="mx-auto w-full divide-y px-2" dir={isRTL ? "rtl" : "ltr"}>
       <FamilyColorSelector />
       <ColorSelector />
       <ModeSelector />
@@ -43,14 +44,19 @@ export function WatchesSelector() {
 }
 
 function FamilyColorSelector() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { colorFamily, setColorFamily, colorFamilyToInclude } =
     useWatchesContext();
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar"
+      className={clsx(
+        "flex w-full items-center overflow-x-auto py-1 2xl:py-2 no-scrollbar",
+        isRTL ? "space-x-reverse space-x-2" : "space-x-2"
+      )}
       data-mode="lip-color"
+      dir={isRTL ? "rtl" : "ltr"}
     >
       {colors
         .filter((c) => colorFamilyToInclude?.includes(c.value))
@@ -58,10 +64,11 @@ function FamilyColorSelector() {
           <button
             type="button"
             className={clsx(
-              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-white/80",
+              "inline-flex h-5 shrink-0 items-center rounded-full border border-transparent px-2 py-1 text-white/80",
               {
                 "border-white/80": colorFamily === item.value,
               },
+              isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2"
             )}
             onClick={() =>
               setColorFamily(colorFamily == item.value ? null : item.value)
@@ -81,6 +88,8 @@ function FamilyColorSelector() {
 }
 
 function ColorSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { colorFamily, selectedColor, setSelectedColor } = useWatchesContext();
   const { setShowWatch } = useAccesories();
 
@@ -112,11 +121,17 @@ function ColorSelector() {
     extractHexa.length > 0 ? extractHexa : extractSubColor;
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-0.5 no-scrollbar sm:space-x-4">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1" dir={isRTL ? "rtl" : "ltr"}>
+      <div className={clsx(
+        "flex w-full items-center overflow-x-auto py-0.5 no-scrollbar",
+        isRTL ? "space-x-reverse space-x-3 sm:space-x-reverse sm:space-x-4" : "space-x-3 sm:space-x-4"
+      )}>
         <button
           type="button"
-          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
+          className={clsx(
+            "inline-flex shrink-0 items-center rounded-full border border-transparent text-white/80",
+            isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2"
+          )}
           onClick={() => setSelectedColor(null)}
         >
           <Icons.empty className="size-5 sm:size-[1rem] 2xl:size-6" />
@@ -136,18 +151,20 @@ function ColorSelector() {
 }
 
 function ModeSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { selectedMode, setSelectedMode } = useWatchesContext();
 
   return (
     <>
-      <div className="flex h-[30px] w-full items-center justify-between text-center sm:h-[35px]">
+      <div className="flex h-[30px] w-full items-center justify-between text-center sm:h-[35px]" dir={isRTL ? "rtl" : "ltr"}>
         <button
           className={clsx(
             "relative grow text-[10.4px] sm:text-base lg:text-[20px]",
             {
               "text-white": selectedMode === "shapes",
               "text-white/60": selectedMode !== "shapes",
-            },
+            }
           )}
           onClick={() => setSelectedMode("shapes")}
         >
@@ -160,7 +177,7 @@ function ModeSelector() {
             {
               "text-white": selectedMode === "material",
               "text-white/60": selectedMode !== "material",
-            },
+            }
           )}
           onClick={() => setSelectedMode("material")}
         >
@@ -192,20 +209,26 @@ const shapeIcons: { [key: string]: JSX.Element } = {
 };
 
 function ShapeSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { selectedShape, setSelectedShape } = useWatchesContext();
 
   return (
-    <div className="flex w-full items-center space-x-2 overflow-x-auto !border-t-0 py-2 no-scrollbar">
+    <div className={clsx(
+      "flex w-full items-center overflow-x-auto !border-t-0 py-2 no-scrollbar",
+      isRTL ? "space-x-reverse space-x-2" : "space-x-2"
+    )} dir={isRTL ? "rtl" : "ltr"}>
       {shapes.map((shape, index) => (
         <button
           key={shape.value}
           type="button"
           className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
+            "inline-flex shrink-0 items-center rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
             {
               "selectedShape-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                 selectedShape === shape.value,
             },
+            isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2"
           )}
           onClick={() => setSelectedShape(shape.value)}
         >
@@ -228,20 +251,26 @@ const materials = filterMaterials([
 ]);
 
 function MaterialSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { selectedMaterial, setSelectedMaterial } = useWatchesContext();
 
   return (
-    <div className="flex w-full items-center space-x-2 overflow-x-auto !border-t-0 py-2 no-scrollbar">
+    <div className={clsx(
+      "flex w-full items-center overflow-x-auto !border-t-0 py-2 no-scrollbar",
+      isRTL ? "space-x-reverse space-x-2" : "space-x-2"
+    )} dir={isRTL ? "rtl" : "ltr"}>
       {materials.map((material, index) => (
         <button
           key={material.value}
           type="button"
           className={clsx(
-            "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
+            "inline-flex shrink-0 items-center rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
             {
               "selectedShape-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                 selectedMaterial === material.value,
             },
+            isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2"
           )}
           onClick={() =>
             setSelectedMaterial(
@@ -257,7 +286,8 @@ function MaterialSelector() {
 }
 
 function WatchesProductList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
@@ -321,7 +351,7 @@ function WatchesProductList() {
 
   return (
     <>
-      <div className="w-full text-right">
+      <div className={clsx("w-full", isRTL ? "text-left" : "text-right")} dir={isRTL ? "rtl" : "ltr"}>
         <button
           className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
@@ -342,7 +372,10 @@ function WatchesProductList() {
           {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className={clsx(
+        "flex w-full overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing",
+        isRTL ? "gap-2 sm:gap-4" : "gap-2 sm:gap-4"
+      )} dir={isRTL ? "rtl" : "ltr"}>
         {isLoading ? (
           <LoadingProducts />
         ) : (

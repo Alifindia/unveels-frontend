@@ -632,6 +632,10 @@ export function TopNavigation({}: {}) {
   const location = useLocation();
   const { summaryCount } = useCartContext();
 
+  useEffect(() => {
+    console.log("SUMMARY COUNT FROM TOPNAV", summaryCount);
+  }, [summaryCount])
+
   const handleBackClick = () => {
     if (location.pathname !== "/virtual-try-on/makeups") {
       navigate("/virtual-try-on/makeups");

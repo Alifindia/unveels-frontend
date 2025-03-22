@@ -18,6 +18,7 @@ import { baseApiUrl } from "../../../../utils/apiUtils";
 
 export function HairColorSelector() {
   const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
 
   useEffect(() => {
     const storeLang = getCookie("store");
@@ -28,7 +29,7 @@ export function HairColorSelector() {
   }, [i18n]);
 
   return (
-    <div className="mx-auto w-full divide-y px-2">
+    <div className="mx-auto w-full divide-y px-2" dir={isRTL ? "rtl" : "ltr"}>
       <div>
         <FamilyColorSelector />
 
@@ -41,14 +42,19 @@ export function HairColorSelector() {
 }
 
 function FamilyColorSelector() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { colorFamily, setColorFamily, colorFamilyToInclude } =
     useHairColorContext();
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
+      className={clsx(
+        "flex w-full items-center overflow-x-auto no-scrollbar",
+        isRTL ? "space-x-reverse space-x-2" : "space-x-2"
+      )}
       data-mode="lip-color"
+      dir={isRTL ? "rtl" : "ltr"}
     >
       {colors
         .filter((c) => colorFamilyToInclude?.includes(c.value))
@@ -56,10 +62,11 @@ function FamilyColorSelector() {
           <button
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent px-3 py-1 text-sm text-white/80",
+              "inline-flex shrink-0 items-center rounded-full border border-transparent px-3 py-1 text-sm text-white/80",
               {
                 "border-white/80": colorFamily === item.value,
               },
+              isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2"
             )}
             onClick={() =>
               setColorFamily(colorFamily === item.value ? null : item.value)
@@ -100,6 +107,8 @@ const colorList = [
 ];
 
 function ColorSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { hairColor, setHairColor, showHair, setShowHair } = useMakeup();
   const { selectedColor, setSelectedColor } = useHairColorContext();
 
@@ -108,8 +117,11 @@ function ColorSelector() {
   }
 
   return (
-    <div className="mx-auto w-full">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-0.5 no-scrollbar sm:space-x-4">
+    <div className="mx-auto w-full" dir={isRTL ? "rtl" : "ltr"}>
+      <div className={clsx(
+        "flex w-full items-center overflow-x-auto py-0.5 no-scrollbar",
+        isRTL ? "space-x-reverse space-x-3 sm:space-x-reverse sm:space-x-4" : "space-x-3 sm:space-x-4"
+      )}>
         {haircolors.map((path, index) => (
           <button
             key={index}
@@ -118,7 +130,7 @@ function ColorSelector() {
               "inline-flex shrink-0 items-center rounded-sm border border-transparent text-white/80",
               {
                 "border-white/80": selectedColor === index.toString(),
-              },
+              }
             )}
             onClick={() => setColor(index)}
           >
@@ -135,7 +147,8 @@ function ColorSelector() {
 }
 
 function ProductList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
   const { addItemToCart, setDataItem, setType } = useCartContext();
@@ -249,7 +262,7 @@ function ProductList() {
 
   return (
     <>
-      <div className="w-full text-right">
+      <div className={clsx("w-full", isRTL ? "text-left" : "text-right")} dir={isRTL ? "rtl" : "ltr"}>
         <button
           className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
@@ -274,7 +287,10 @@ function ProductList() {
           {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className={clsx(
+        "flex w-full overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing",
+        isRTL ? "gap-2 sm:gap-4" : "gap-2 sm:gap-4"
+      )} dir={isRTL ? "rtl" : "ltr"}>
         {isLoading ? (
           <LoadingProducts />
         ) : (

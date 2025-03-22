@@ -33,6 +33,7 @@ import { useCartContext } from "../../../../context/cart-context";
 
 export function ContourSelector() {
   const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
 
   useEffect(() => {
     const storeLang = getCookie("store");
@@ -43,7 +44,7 @@ export function ContourSelector() {
   }, [i18n]);
 
   return (
-    <div className="mx-auto w-full divide-y px-2">
+    <div className="mx-auto w-full divide-y px-2" dir={isRTL ? "rtl" : "ltr"}>
       <ColorSelector />
       <ModeSelector />
       <ShapeSelector />
@@ -53,6 +54,8 @@ export function ContourSelector() {
 }
 
 function ColorSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const {
     setContourColors,
     setContourMode,
@@ -106,11 +109,17 @@ function ColorSelector() {
   };
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1" dir={isRTL ? "rtl" : "ltr"}>
+      <div className={clsx(
+        "flex w-full items-center overflow-x-auto py-1 2xl:py-2.5 no-scrollbar",
+        isRTL ? "space-x-reverse space-x-4" : "space-x-4"
+      )}>
         <button
           type="button"
-          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
+          className={clsx(
+            "inline-flex shrink-0 items-center rounded-full border border-transparent text-white/80",
+            isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2"
+          )}
           onClick={handleClearSelection}
         >
           <Icons.empty className="size-5 sm:size-[1rem] 2xl:size-6" />
@@ -133,6 +142,8 @@ function ColorSelector() {
 const modes = ["One", "Dual"];
 
 function ModeSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { selectedMode, setSelectedMode, selectedColors, setSelectedColors } =
     useContourContext();
   const { setContourMode, contourColors, setContourColors } = useMakeup();
@@ -150,18 +161,22 @@ function ModeSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1" dir={isRTL ? "rtl" : "ltr"}>
+      <div className={clsx(
+        "flex w-full items-center overflow-x-auto no-scrollbar",
+        isRTL ? "space-x-reverse space-x-4" : "space-x-4"
+      )}>
         {modes.map((mode) => (
           <button
             key={mode}
             type="button"
             className={clsx(
-              "relative inline-flex items-center gap-x-2 rounded-full px-1 py-1 text-center text-sm transition-transform",
+              "relative inline-flex items-center rounded-full px-1 py-1 text-center text-sm transition-transform",
               {
                 "-translate-y-0.5 text-white": selectedMode === mode,
                 "text-white/80": selectedMode !== mode,
               },
+              isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2"
             )}
             onClick={() => setMode(mode)}
           >
@@ -190,6 +205,8 @@ const contours = [
 ];
 
 function ShapeSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { selectedShape, setSelectedShape } = useContourContext();
   const { setContourShape } = useMakeup();
 
@@ -199,8 +216,11 @@ function ShapeSelector() {
   }
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1" dir={isRTL ? "rtl" : "ltr"}>
+      <div className={clsx(
+        "flex w-full items-center overflow-x-auto py-1 2xl:py-2.5 no-scrollbar",
+        isRTL ? "space-x-reverse space-x-4" : "space-x-4"
+      )}>
         {contours.map((path, index) => (
           <button
             key={index}
@@ -209,7 +229,7 @@ function ShapeSelector() {
               "inline-flex shrink-0 items-center rounded-sm border border-transparent text-white/80",
               {
                 "border-white/80": selectedShape === index.toString(),
-              },
+              }
             )}
             onClick={() => setShape(index.toString())}
           >
@@ -228,7 +248,8 @@ function ShapeSelector() {
 const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
 
 function TextureSelector() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { selectedTexture, setSelectedTexture } = useContourContext();
   const { highlighterMaterial, setHighlighterMaterial } = useMakeup();
 
@@ -245,18 +266,22 @@ function TextureSelector() {
   }
 
   return (
-    <div className="mx-auto w-full">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-2 no-scrollbar">
+    <div className="mx-auto w-full" dir={isRTL ? "rtl" : "ltr"}>
+      <div className={clsx(
+        "flex w-full items-center overflow-x-auto py-2 no-scrollbar",
+        isRTL ? "space-x-reverse space-x-4" : "space-x-4"
+      )}>
         {textures.map((texture, index) => (
           <button
             key={texture.value}
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
+              "inline-flex shrink-0 items-center rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
               {
                 "border-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                   selectedTexture === texture.value,
               },
+              isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2"
             )}
             onClick={() => setMaterial(index, texture)}
           >
@@ -269,7 +294,8 @@ function TextureSelector() {
 }
 
 function ProductList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
   const { addItemToCart, setDataItem, setType } = useCartContext();
@@ -367,7 +393,7 @@ function ProductList() {
 
   return (
     <>
-      <div className="w-full text-right">
+      <div className={clsx("w-full", isRTL ? "text-left" : "text-right")} dir={isRTL ? "rtl" : "ltr"}>
         <button
           className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
@@ -388,7 +414,10 @@ function ProductList() {
           {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className={clsx(
+        "flex w-full overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing",
+        isRTL ? "gap-2 sm:gap-4" : "gap-2 sm:gap-4"
+      )} dir={isRTL ? "rtl" : "ltr"}>
         {isLoading ? (
           <LoadingProducts />
         ) : (

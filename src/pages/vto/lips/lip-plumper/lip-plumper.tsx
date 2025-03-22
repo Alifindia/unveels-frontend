@@ -20,6 +20,7 @@ import { useCartContext } from "../../../../context/cart-context";
 
 export function LipPlumperSelector() {
   const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
 
   useEffect(() => {
     const storeLang = getCookie("store");
@@ -30,7 +31,7 @@ export function LipPlumperSelector() {
   }, [i18n]);
 
   return (
-    <div className="mx-auto w-full divide-y px-2">
+    <div className="mx-auto w-full divide-y px-2" dir={isRTL ? "rtl" : "ltr"}>
       <div>
         <ColorSelector />
       </div>
@@ -43,6 +44,8 @@ export function LipPlumperSelector() {
 }
 
 function ColorSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { selectedColor, setSelectedColor } = useLipPlumperContext();
 
   const { setLipplumperColor, showLipplumper, setShowLipplumper } = useMakeup();
@@ -79,11 +82,17 @@ function ColorSelector() {
   });
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1 sm:py-2" dir={isRTL ? "rtl" : "ltr"}>
+      <div className={clsx(
+        "flex w-full items-center overflow-x-auto py-1 2xl:py-2.5 no-scrollbar",
+        isRTL ? "space-x-reverse space-x-4" : "space-x-4"
+      )}>
         <button
           type="button"
-          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
+          className={clsx(
+            "inline-flex shrink-0 items-center rounded-full border border-transparent text-white/80",
+            isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2"
+          )}
           onClick={() => {
             resetColor();
           }}
@@ -106,21 +115,26 @@ function ColorSelector() {
 }
 
 function TextureSelector() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { selectedTexture, setSelectedTexture } = useLipPlumperContext();
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1 sm:py-2">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1 sm:py-2" dir={isRTL ? "rtl" : "ltr"}>
+      <div className={clsx(
+        "flex w-full items-center overflow-x-auto no-scrollbar",
+        isRTL ? "space-x-reverse space-x-4" : "space-x-4"
+      )}>
         {textures.map((texture, index) => (
           <button
             key={texture.label}
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
+              "inline-flex shrink-0 items-center rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
               {
                 "border-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                   selectedTexture === texture.value,
               },
+              isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2"
             )}
             onClick={() => {
               if (selectedTexture === texture.value) {
@@ -139,7 +153,8 @@ function TextureSelector() {
 }
 
 function ProductList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
   const { addItemToCart, setDataItem, setType } = useCartContext();
@@ -238,7 +253,7 @@ function ProductList() {
 
   return (
     <>
-      <div className="w-full text-right">
+      <div className={clsx("w-full", isRTL ? "text-left" : "text-right")} dir={isRTL ? "rtl" : "ltr"}>
         <button
           className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
@@ -262,7 +277,10 @@ function ProductList() {
           {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className={clsx(
+        "flex w-full overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing",
+        isRTL ? "gap-2 sm:gap-4" : "gap-2 sm:gap-4"
+      )} dir={isRTL ? "rtl" : "ltr"}>
         {isLoading ? (
           <LoadingProducts />
         ) : (

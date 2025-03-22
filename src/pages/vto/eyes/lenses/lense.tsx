@@ -21,6 +21,7 @@ import { baseApiUrl } from "../../../../utils/apiUtils";
 
 export function LenseSelector() {
   const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
 
   useEffect(() => {
     const storeLang = getCookie("store");
@@ -31,7 +32,7 @@ export function LenseSelector() {
   }, [i18n]);
 
   return (
-    <div className="mx-auto w-full divide-y px-2">
+    <div className="mx-auto w-full divide-y px-2" dir={isRTL ? "rtl" : "ltr"}>
       <FamilyColorSelector />
 
       <ColorSelector />
@@ -42,14 +43,19 @@ export function LenseSelector() {
 }
 
 function FamilyColorSelector() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { colorFamily, setColorFamily, colorFamilyToInclude } =
     useLenseContext();
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto py-1 2xl:py-2 no-scrollbar"
+      className={clsx(
+        "flex w-full items-center overflow-x-auto py-1 2xl:py-2 no-scrollbar",
+        isRTL ? "space-x-reverse space-x-2" : "space-x-2"
+      )}
       data-mode="lip-color"
+      dir={isRTL ? "rtl" : "ltr"}
     >
       {colors
         .filter((c) => colorFamilyToInclude?.includes(c.value))
@@ -57,10 +63,11 @@ function FamilyColorSelector() {
           <button
             type="button"
             className={clsx(
-              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-white/80",
+              "inline-flex h-5 shrink-0 items-center rounded-full border border-transparent px-2 py-1 text-white/80",
               {
                 "border-white/80": colorFamily === item.value,
               },
+              isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2"
             )}
             onClick={() => {
               if (colorFamily === item.value) {
@@ -92,6 +99,8 @@ const lenses = [
 ];
 
 function ColorSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const { selectedColor, setSelectedColor } = useLenseContext();
   const { showLens, setShowLens, setLensPattern } = useMakeup();
 
@@ -109,8 +118,11 @@ function ColorSelector() {
   }
 
   return (
-    <div className="lg:max-w-full-xl mx-auto w-full !border-b-0">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
+    <div className="lg:max-w-full-xl mx-auto w-full !border-b-0" dir={isRTL ? "rtl" : "ltr"}>
+      <div className={clsx(
+        "flex w-full items-center overflow-x-auto py-1 2xl:py-2.5 no-scrollbar",
+        isRTL ? "space-x-reverse space-x-4" : "space-x-4"
+      )}>
         <button
           type="button"
           className="inline-flex size-[1.875rem] shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80 sm:size-10"
@@ -129,7 +141,7 @@ function ColorSelector() {
               {
                 "scale-[1.3] border-white/80":
                   selectedColor === index.toString(),
-              },
+              }
             )}
             onClick={() => setPattern(index, index.toString())}
           >
@@ -142,7 +154,8 @@ function ColorSelector() {
 }
 
 function ProductList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
   const { addItemToCart, setDataItem, setType } = useCartContext();
@@ -244,7 +257,7 @@ function ProductList() {
 
   return (
     <>
-      <div className="w-full text-right">
+      <div className={clsx("w-full", isRTL ? "text-left" : "text-right")} dir={isRTL ? "rtl" : "ltr"}>
         <button
           className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
           onClick={() => {
@@ -268,7 +281,10 @@ function ProductList() {
           {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div className={clsx(
+        "flex w-full overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing",
+        isRTL ? "gap-2 sm:gap-4" : "gap-2 sm:gap-4"
+      )} dir={isRTL ? "rtl" : "ltr"}>
         {isLoading ? (
           <LoadingProducts />
         ) : (

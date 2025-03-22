@@ -8,7 +8,10 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { useEyeLinerContext } from "../eye-liners/eye-liner-context";
 import { useEyebrowsQuery } from "./eyebrows-query";
 import { getPatternByIndex } from "../../../../api/attributes/pattern";
-import { baseApiUrl, extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import {
+  baseApiUrl,
+  extractUniqueCustomAttributes,
+} from "../../../../utils/apiUtils";
 import { filterColors } from "../../../../api/attributes/color";
 import { ColorPalette } from "../../../../components/color-palette";
 import { useEffect, useState } from "react";
@@ -24,6 +27,7 @@ const colorFamilies = filterColors(["Brown", "Black"]);
 
 export function EyebrowsSelector() {
   const { i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
 
   useEffect(() => {
     const storeLang = getCookie("store");
@@ -34,7 +38,7 @@ export function EyebrowsSelector() {
   }, [i18n]);
 
   return (
-    <div className="mx-auto w-full divide-y px-2">
+    <div className="mx-auto w-full divide-y px-2" dir={isRTL ? "rtl" : "ltr"}>
       <div>
         <FamilyColorSelector />
 
@@ -51,21 +55,27 @@ export function EyebrowsSelector() {
 }
 
 function FamilyColorSelector() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const { colorFamily, setColorFamily } = useEyebrowsContext();
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
+      className={clsx(
+        "flex w-full items-center overflow-x-auto no-scrollbar",
+        isRTL ? "space-x-2 space-x-reverse" : "space-x-2",
+      )}
       data-mode="lip-color"
+      dir={isRTL ? "rtl" : "ltr"}
     >
       {colorFamilies.map((item, index) => (
         <button
           type="button"
           className={clsx(
-            "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-white/80",
+            "inline-flex h-5 shrink-0 items-center rounded-full border border-transparent px-2 py-1 text-white/80",
             {
               "border-white/80": colorFamily === item.value,
             },
+            isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2",
           )}
           onClick={() =>
             setColorFamily(colorFamily === item.value ? null : item.value)
@@ -85,6 +95,8 @@ function FamilyColorSelector() {
 }
 
 function ColorSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const { colorFamily, selectedColor, setSelectedColor } = useEyebrowsContext();
   const { setEyebrowsColor, showEyebrows, setShowEyebrows } = useMakeup();
 
@@ -114,11 +126,19 @@ function ColorSelector() {
   ).flatMap((item) => item.split(","));
 
   return (
-    <div className="mx-auto w-full py-2">
-      <div className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-2" dir={isRTL ? "rtl" : "ltr"}>
+      <div
+        className={clsx(
+          "flex w-full items-center overflow-x-auto no-scrollbar",
+          isRTL ? "space-x-2 space-x-reverse" : "space-x-2",
+        )}
+      >
         <button
           type="button"
-          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
+          className={clsx(
+            "inline-flex shrink-0 items-center rounded-full border border-transparent text-white/80",
+            isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2",
+          )}
           onClick={() => {
             reset();
           }}
@@ -141,6 +161,8 @@ function ColorSelector() {
 }
 
 function PatternSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const { selectedPattern, setSelectedPattern } = useEyebrowsContext();
   const { setEyebrowsPattern } = useMakeup();
 
@@ -151,17 +173,23 @@ function PatternSelector() {
     setEyebrowsPattern(pattern);
   }
   return (
-    <div className="mx-auto w-full py-2">
-      <div className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-2" dir={isRTL ? "rtl" : "ltr"}>
+      <div
+        className={clsx(
+          "flex w-full items-center overflow-x-auto no-scrollbar",
+          isRTL ? "space-x-2 space-x-reverse" : "space-x-2",
+        )}
+      >
         {[...Array(14)].map((_, index) => (
           <button
             key={index}
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80",
+              "inline-flex shrink-0 items-center rounded-full border border-transparent text-white/80",
               {
                 "border-white/80": selectedPattern === index.toString(),
               },
+              isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2",
             )}
             onClick={() => setPattern(index, index.toString())}
           >
@@ -178,9 +206,11 @@ function PatternSelector() {
 }
 
 function BrightnessSlider() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const { setEyebrowsVisibility, eyebrowsVisibility } = useMakeup();
   return (
-    <div className="py-2">
+    <div className="py-2" dir={isRTL ? "rtl" : "ltr"}>
       <input
         id="minmax-range"
         type="range"
@@ -193,12 +223,17 @@ function BrightnessSlider() {
         }}
         value={eyebrowsVisibility}
       />
-      <div className="flex justify-between text-[0.5rem]">
+      <div
+        className={clsx(
+          "flex justify-between text-[0.5rem]",
+          isRTL ? "flex-row-reverse" : "",
+        )}
+      >
         <label htmlFor="minmax-range" className="text-white/80">
-          Light
+          {isRTL ? t("dark") : t("light")}
         </label>
         <label htmlFor="minmax-range" className="text-white/80">
-          Dark
+          {isRTL ? t("light") : t("dark")}
         </label>
       </div>
     </div>
@@ -206,9 +241,15 @@ function BrightnessSlider() {
 }
 
 function ProductList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
+  const {
+    selectedProductNumber,
+    setSelectedProductNumber,
+    addCartProductNumber,
+    setAddCartProductNumber,
+  } = useSelecProductNumberContext();
   const { addItemToCart, setDataItem, setType } = useCartContext();
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
@@ -239,18 +280,18 @@ function ProductList() {
     if (data?.items && selectedProductNumber) {
       const adjustedIndex = selectedProductNumber - 1;
       const matchedProduct = data.items[adjustedIndex];
-      console.log(selectedProductNumber)
+      console.log(selectedProductNumber);
       if (matchedProduct) {
         setSelectedProduct(matchedProduct);
         setSelectedColor(
           matchedProduct.custom_attributes.find(
             (item) => item.attribute_code === "hexacode",
-          )?.value || null
+          )?.value || null,
         );
         setColorFamily(
           matchedProduct.custom_attributes.find(
             (item) => item.attribute_code === "color",
-          )?.value || null
+          )?.value || null,
         );
       }
     }
@@ -268,9 +309,9 @@ function ProductList() {
           const id = matchedProduct.id.toString();
           try {
             await addItemToCart(id, url);
-            setType("unit")
+            setType("unit");
             setDataItem(matchedProduct);
-            setAddCartProductNumber(null)
+            setAddCartProductNumber(null);
             console.log(`Product ${id} added to cart!`);
           } catch (error) {
             console.error("Failed to add product to cart:", error);
@@ -288,7 +329,7 @@ function ProductList() {
       setSelectedProductNumber(null);
       setColorFamily(null);
       setSelectedColor(null);
-      return
+      return;
     }
     setSelectedProduct(product);
     setColorFamily(
@@ -304,9 +345,12 @@ function ProductList() {
 
   return (
     <>
-      <div className="w-full text-right">
+      <div
+        className={clsx("w-full", isRTL ? "text-left" : "text-right")}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         <button
-          className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
+          className="p-0 text-[0.550rem] text-white sm:py-0.5 2xl:text-[0.625rem]"
           onClick={() => {
             setMapTypes({
               Eyebrows: {
@@ -326,10 +370,16 @@ function ProductList() {
             setView("all_categories");
           }}
         >
-        {t("view_all")}
+          {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div
+        className={clsx(
+          "flex w-full overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing",
+          isRTL ? "gap-2 sm:gap-4" : "gap-2 sm:gap-4",
+        )}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         {isLoading ? (
           <LoadingProducts />
         ) : (
@@ -337,7 +387,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
-                productNumber={index+1}
+                productNumber={index + 1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

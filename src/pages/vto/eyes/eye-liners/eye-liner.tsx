@@ -4,7 +4,10 @@ import { Icons } from "../../../../components/icons";
 import { EyeLinerProvider, useEyeLinerContext } from "./eye-liner-context";
 import { colors } from "../../../../api/attributes/color";
 import { useEyelinerQuery } from "./eye-liner-query";
-import { baseApiUrl, extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import {
+  baseApiUrl,
+  extractUniqueCustomAttributes,
+} from "../../../../utils/apiUtils";
 import { patterns } from "../../../../api/attributes/pattern";
 import { LoadingProducts } from "../../../../components/loading";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
@@ -20,6 +23,7 @@ import { useCartContext } from "../../../../context/cart-context";
 
 export function EyeLinerSelector() {
   const { i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
 
   useEffect(() => {
     const storeLang = getCookie("store");
@@ -30,7 +34,7 @@ export function EyeLinerSelector() {
   }, [i18n]);
 
   return (
-    <div className="mx-auto w-full divide-y px-2">
+    <div className="mx-auto w-full divide-y px-2" dir={isRTL ? "rtl" : "ltr"}>
       <div>
         <FamilyColorSelector />
 
@@ -45,14 +49,19 @@ export function EyeLinerSelector() {
 }
 
 function FamilyColorSelector() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const { colorFamily, setColorFamily, colorFamilyToInclude } =
     useEyeLinerContext();
 
   return (
     <div
-      className="flex w-full items-center space-x-2 overflow-x-auto no-scrollbar"
+      className={clsx(
+        "flex w-full items-center overflow-x-auto no-scrollbar",
+        isRTL ? "space-x-2 space-x-reverse" : "space-x-2",
+      )}
       data-mode="lip-color"
+      dir={isRTL ? "rtl" : "ltr"}
     >
       {colors
         .filter((c) => colorFamilyToInclude?.includes(c.value))
@@ -60,10 +69,11 @@ function FamilyColorSelector() {
           <button
             type="button"
             className={clsx(
-              "inline-flex h-5 shrink-0 items-center gap-x-2 rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
+              "inline-flex h-5 shrink-0 items-center rounded-full border border-transparent px-2 py-1 text-[0.625rem] text-white/80",
               {
                 "border-white/80": colorFamily === item.value,
               },
+              isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2",
             )}
             onClick={() =>
               setColorFamily(colorFamily === item.value ? null : item.value)
@@ -83,6 +93,8 @@ function FamilyColorSelector() {
 }
 
 function ColorSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const { colorFamily, selectedColor, setSelectedColor } = useEyeLinerContext();
   const { data } = useEyelinerQuery({
     color: colorFamily,
@@ -95,11 +107,22 @@ function ColorSelector() {
   ).flatMap((item) => item.split(","));
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto py-1 2xl:py-2.5 no-scrollbar">
+    <div
+      className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div
+        className={clsx(
+          "flex w-full items-center overflow-x-auto py-1 no-scrollbar 2xl:py-2.5",
+          isRTL ? "space-x-4 space-x-reverse" : "space-x-4",
+        )}
+      >
         <button
           type="button"
-          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
+          className={clsx(
+            "inline-flex shrink-0 items-center rounded-full border border-transparent text-white/80",
+            isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2",
+          )}
           onClick={() => {
             setSelectedColor(null);
           }}
@@ -139,10 +162,17 @@ const eyeliners = [
 ];
 
 function ShapeSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const { selectedShape, setSelectedShape } = useEyeLinerContext();
   return (
-    <div className="mx-auto w-full py-2">
-      <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
+    <div className="mx-auto w-full py-2" dir={isRTL ? "rtl" : "ltr"}>
+      <div
+        className={clsx(
+          "flex w-full items-center overflow-x-auto no-scrollbar",
+          isRTL ? "space-x-4 space-x-reverse" : "space-x-4",
+        )}
+      >
         {patterns.eyeliners.map((pattern, index) => (
           <button
             key={index}
@@ -174,10 +204,16 @@ function ShapeSelector() {
 }
 
 function ProductList() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const { selectedProductNumber, setSelectedProductNumber, addCartProductNumber, setAddCartProductNumber } = useSelecProductNumberContext()
+  const {
+    selectedProductNumber,
+    setSelectedProductNumber,
+    addCartProductNumber,
+    setAddCartProductNumber,
+  } = useSelecProductNumberContext();
   const { addItemToCart, setDataItem, setType } = useCartContext();
-  const { t } = useTranslation();
   const { setView, setSectionName, setMapTypes, setGroupedItemsData } =
     useFindTheLookContext();
 
@@ -211,18 +247,18 @@ function ProductList() {
     if (data?.items && selectedProductNumber) {
       const adjustedIndex = selectedProductNumber - 1;
       const matchedProduct = data.items[adjustedIndex];
-      console.log(selectedProductNumber)
+      console.log(selectedProductNumber);
       if (matchedProduct) {
         setSelectedProduct(matchedProduct);
         setSelectedColor(
           matchedProduct.custom_attributes.find(
             (item) => item.attribute_code === "hexacode",
-          )?.value || null
+          )?.value || null,
         );
         setColorFamily(
           matchedProduct.custom_attributes.find(
             (item) => item.attribute_code === "color",
-          )?.value || null
+          )?.value || null,
         );
       }
     }
@@ -240,9 +276,9 @@ function ProductList() {
           const id = matchedProduct.id.toString();
           try {
             await addItemToCart(id, url);
-            setType("unit")
+            setType("unit");
             setDataItem(matchedProduct);
-            setAddCartProductNumber(null)
+            setAddCartProductNumber(null);
             console.log(`Product ${id} added to cart!`);
           } catch (error) {
             console.error("Failed to add product to cart:", error);
@@ -269,7 +305,7 @@ function ProductList() {
       setSelectedProductNumber(null);
       setColorFamily(null);
       setSelectedColor(null);
-      return
+      return;
     }
     console.log(product);
     setSelectedProduct(product);
@@ -286,9 +322,12 @@ function ProductList() {
 
   return (
     <>
-      <div className="w-full text-right">
+      <div
+        className={clsx("w-full", isRTL ? "text-left" : "text-right")}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         <button
-          className="p-0 text-[0.550rem] 2xl:text-[0.625rem] text-white sm:py-0.5"
+          className="p-0 text-[0.550rem] text-white sm:py-0.5 2xl:text-[0.625rem]"
           onClick={() => {
             setMapTypes({
               Eyeliners: {
@@ -307,7 +346,13 @@ function ProductList() {
           {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div
+        className={clsx(
+          "flex w-full overflow-x-auto border-none pb-2 pt-2 no-scrollbar active:cursor-grabbing",
+          isRTL ? "gap-2 sm:gap-4" : "gap-2 sm:gap-4",
+        )}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         {isLoading ? (
           <LoadingProducts />
         ) : (
@@ -315,7 +360,7 @@ function ProductList() {
             return (
               <VTOProductCard
                 product={product}
-                productNumber={index+1}
+                productNumber={index + 1}
                 key={product.id}
                 selectedProduct={selectedProduct}
                 setSelectedProduct={setSelectedProduct}

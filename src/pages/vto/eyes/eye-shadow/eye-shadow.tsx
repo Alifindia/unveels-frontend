@@ -23,6 +23,7 @@ import { useCartContext } from "../../../../context/cart-context";
 
 export function EyeShadowSelector() {
   const { i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
 
   useEffect(() => {
     const storeLang = getCookie("store");
@@ -32,7 +33,7 @@ export function EyeShadowSelector() {
     i18n.changeLanguage(lang);
   }, [i18n]);
   return (
-    <div className="mx-auto w-full divide-y px-2">
+    <div className="mx-auto w-full divide-y px-2" dir={isRTL ? "rtl" : "ltr"}>
       <div>
         <ColorSelector />
       </div>
@@ -57,6 +58,8 @@ const maxColorsMap: {
 };
 
 function ColorSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const { selectedMode, colorFamily, selectedColors, setSelectedColors } =
     useEyeShadowContext();
 
@@ -84,7 +87,7 @@ function ColorSelector() {
   });
 
   const extracted_sub_colors =
-    selectedMode == "One" || selectedMode == "Penta"
+    selectedMode == "One"
       ? extractUniqueCustomAttributes(data?.items ?? [], "hexacode").flatMap(
           (item) => item.split(","),
         )
@@ -144,19 +147,31 @@ function ColorSelector() {
   }, [selectedMode, selectedColors, setSelectedColors]);
 
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
-      <div className="flex w-full items-center space-x-3 overflow-x-auto py-0.5 no-scrollbar sm:space-x-4">
+    <div
+      className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div
+        className={clsx(
+          "flex w-full items-center overflow-x-auto py-0.5 no-scrollbar",
+          isRTL
+            ? "space-x-3 space-x-reverse sm:space-x-4 sm:space-x-reverse"
+            : "space-x-3 sm:space-x-4",
+        )}
+      >
         <button
           type="button"
-          className="inline-flex shrink-0 items-center gap-x-2 rounded-full border border-transparent text-white/80"
+          className={clsx(
+            "inline-flex shrink-0 items-center rounded-full border border-transparent text-white/80",
+            isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2",
+          )}
           onClick={() => {
             setSelectedColors([]);
           }}
         >
           <Icons.empty className="size-5 sm:size-[1rem] 2xl:size-6" />
         </button>
-        {(selectedMode == "One" || selectedMode == "Penta") &&
-        extracted_sub_colors
+        {selectedMode == "One" && extracted_sub_colors
           ? extracted_sub_colors.map((color, index) => (
               <ColorPalette
                 key={color}
@@ -185,21 +200,33 @@ function ColorSelector() {
 const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
 
 function TextureSelector() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const { selectedTexture, setSelectedTexture } = useEyeShadowContext();
   return (
-    <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
-      <div className="flex w-full items-center space-x-1 overflow-x-auto py-1 no-scrollbar xl:space-x-2">
+    <div
+      className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div
+        className={clsx(
+          "flex w-full items-center overflow-x-auto py-1 no-scrollbar",
+          isRTL
+            ? "space-x-1 space-x-reverse xl:space-x-2 xl:space-x-reverse"
+            : "space-x-1 xl:space-x-2",
+        )}
+      >
         {textures.map((texture, index) => (
           <button
             key={texture.value}
             type="button"
             className={clsx(
-              "inline-flex shrink-0 items-center gap-x-2 rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
+              "inline-flex shrink-0 items-center rounded-full border border-white/80 px-1 py-[1px] text-white/80 sm:px-2 sm:py-0.5",
               {
                 "border-white/80 bg-gradient-to-r from-[#CA9C43] to-[#473209]":
                   selectedTexture === texture.value,
               },
+              isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2",
             )}
             onClick={() => {
               if (selectedTexture === texture.value) {
@@ -209,7 +236,9 @@ function TextureSelector() {
               }
             }}
           >
-            <span className="text-[9.8px] lg:text-xs">{t("texture." + texture.label)}</span>
+            <span className="text-[9.8px] lg:text-xs">
+              {t("texture." + texture.label)}
+            </span>
           </button>
         ))}
       </div>
@@ -226,6 +255,8 @@ const modes = [
 ];
 
 function ModeSelector() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const { setMode, selectedMode, modeIndex, setSelectModeIndex } =
     useEyeShadowContext();
 
@@ -233,18 +264,27 @@ function ModeSelector() {
 
   return (
     <>
-      <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
-        <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
+      <div
+        className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1"
+        dir={isRTL ? "rtl" : "ltr"}
+      >
+        <div
+          className={clsx(
+            "flex w-full items-center overflow-x-auto no-scrollbar",
+            isRTL ? "space-x-4 space-x-reverse" : "space-x-4",
+          )}
+        >
           {modes.map((mode, index) => (
             <button
               key={mode.name}
               type="button"
               className={clsx(
-                "relative inline-flex items-center gap-x-2 rounded-full px-1 py-1 text-center text-sm transition-transform",
+                "relative inline-flex items-center rounded-full px-1 py-1 text-center text-sm transition-transform",
                 {
                   "-translate-y-0.5 text-white": selectedMode === mode.name,
                   "text-white/80": selectedMode !== mode.name,
                 },
+                isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2",
               )}
               onClick={() => setMode(mode.name)}
             >
@@ -263,18 +303,27 @@ function ModeSelector() {
         </div>
       </div>
       {currentMode ? (
-        <div className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1">
-          <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">
+        <div
+          className="mx-auto w-full py-[1px] lg:py-0.5 2xl:py-1"
+          dir={isRTL ? "rtl" : "ltr"}
+        >
+          <div
+            className={clsx(
+              "flex w-full items-center overflow-x-auto no-scrollbar",
+              isRTL ? "space-x-4 space-x-reverse" : "space-x-4",
+            )}
+          >
             {[...Array(currentMode.count)].map((_, index) => (
               <button
                 key={index}
                 type="button"
                 className={clsx(
-                  "inline-flex shrink-0 items-center gap-x-2 border border-transparent text-white/80",
+                  "inline-flex shrink-0 items-center border border-transparent text-white/80",
                   {
                     "border-white/80":
                       modeIndex.toString() === index.toString(),
                   },
+                  isRTL ? "gap-x-reverse gap-x-2" : "gap-x-2",
                 )}
                 onClick={() => setSelectModeIndex(index)}
               >
@@ -293,7 +342,8 @@ function ModeSelector() {
 }
 
 function ProductList() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const {
     selectedProductNumber,
@@ -415,7 +465,10 @@ function ProductList() {
 
   return (
     <>
-      <div className="w-full text-right">
+      <div
+        className={clsx("w-full", isRTL ? "text-left" : "text-right")}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         <button
           className="p-0 text-[0.550rem] text-white sm:py-0.5 2xl:text-[0.625rem]"
           onClick={() => {
@@ -436,7 +489,13 @@ function ProductList() {
           {t("view_all")}
         </button>
       </div>
-      <div className="flex w-full gap-2 overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing sm:gap-4">
+      <div
+        className={clsx(
+          "flex w-full overflow-x-auto border-none pb-2 pt-1 no-scrollbar active:cursor-grabbing",
+          isRTL ? "gap-2 sm:gap-4" : "gap-2 sm:gap-4",
+        )}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         {isLoading ? (
           <LoadingProducts />
         ) : (

@@ -141,17 +141,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       const data = await response.json();
       const updatedCart = data.cart;
-      console.log("CART SUMMARY COUNT", updatedCart.summary_count);
+
       if (updatedCart) {
-        console.log("IN UPDATE CART SUMMARY COUNT", updatedCart.summary_count);
         setCartItemCount(updatedCart.items_count);
         setSummaryCount(updatedCart.summary_count);
         updateLocalStorage(updatedCart);
       }
-      setTimeout(() => {
-        console.log("CART SUMMARY COUNT IN TIMEOUT", updatedCart.summary_count);
-        setSummaryCount(updatedCart.summary_count);
-      }, 1000);
     } catch (error) {
       console.error("Error reloading mini cart:", error);
     }
@@ -181,9 +176,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (guestCartId) {
       updateCartItemCount();
-      reloadMiniCart();
     }
   }, [guestCartId]);
+
+  useEffect(() => {
+    reloadMiniCart();
+  }, [])
 
   return (
     <CartContext.Provider
