@@ -195,7 +195,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
             left: 0,
             right: 0,
             bottom: 0,
-            zIndex: 10,
+            zIndex: 100,
           }}
         >
           <AllProductsPage
@@ -265,14 +265,15 @@ function MainContent({ collapsed, setCollapsed }: MainContentProps) {
 }
 
 function ShadesSelector() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [tab, setTab] = useState("matched" as "matched" | "other");
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
 
   const activeClassNames =
     "border-white inline-block text-transparent bg-[linear-gradient(90deg,#CA9C43_0%,#916E2B_27.4%,#6A4F1B_59.4%,#473209_100%)] bg-clip-text";
 
   return (
-    <div className="space-y-2 px-4">
+    <div className="space-y-2 px-4" dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex h-10 w-full items-center justify-between border-b border-gray-600 text-center">
         {["matched", "other"].map((shadeTab) => {
           const isActive = tab === shadeTab;
@@ -308,7 +309,7 @@ function ShadesSelector() {
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="text-center text-sm capitalize text-white/70 md:text-lg">
-                        {t("tabOptions.other")}
+                        {t(`tabOptions.${shadeTab}`)}
                       </span>
                     </div>
                   </>
@@ -335,7 +336,7 @@ const isShadeSelected = (product: Product, selectedShade: string) => {
 };
 
 function MatchedShades() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedTne, setSelectedTone] = useState(tone_types[0]);
   const { skinType, hexSkin } = useSkinColor();
   const { setView } = useFindTheLookContext();
@@ -360,7 +361,7 @@ function MatchedShades() {
           </span>
         </div>
         <div className="flex w-full justify-center pt-2">
-          <div className="flex w-full max-w-md">
+          <div className="flex w-full max-w-md" dir="ltr">
             {tone_types.map((option, index) => (
               <button
                 key={option.id}
@@ -615,7 +616,10 @@ interface SidebarProps {
 function Sidebar({ setCollapsed }: SidebarProps) {
   const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
   return (
-    <div className="flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto"  style={{zIndex: 10}}>
+    <div
+      className="flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto"
+      style={{ zIndex: 10 }}
+    >
       <div className="relative p-0.5">
         <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 
