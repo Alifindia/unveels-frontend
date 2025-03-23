@@ -23,7 +23,7 @@ type RecommendationsTabProps = {
 export function RecommendationsTab({
   personality,
   faceShape,
-  isArabic
+  isArabic,
 }: RecommendationsTabProps) {
   const { t } = useTranslation();
 
@@ -40,25 +40,30 @@ export function RecommendationsTab({
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
   const handleAddAllToCart = (profiles: any) => {
-    console.log(profiles)
-    profiles.products.forEach((product: { custom_attributes: any[]; id: { toString: () => string; }; }) => {
-      const urlKey = product.custom_attributes.find(
-        (attr) => attr.attribute_code === "url_key"
-      )?.value;
+    console.log(profiles);
+    profiles.products.forEach(
+      (product: {
+        custom_attributes: any[];
+        id: { toString: () => string };
+      }) => {
+        const urlKey = product.custom_attributes.find(
+          (attr) => attr.attribute_code === "url_key",
+        )?.value;
 
-      handleAddToCart(
-        product.id.toString(),
-        `${baseApiUrl}/${urlKey}.html`,
-        profiles
-      );
-    });
+        handleAddToCart(
+          product.id.toString(),
+          `${baseApiUrl}/${urlKey}.html`,
+          profiles,
+        );
+      },
+    );
   };
 
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
-      setType("unit")
-      setDataItem(dataProduct)
+      setType("unit");
+      setDataItem(dataProduct);
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -66,8 +71,11 @@ export function RecommendationsTab({
   };
 
   return (
-    <div className="w-full overflow-auto px-4 py-8">
-      <div className="pb-14" dir={isArabic ? "rtl" : "ltr"}>
+    <div
+      className="w-full overflow-auto px-4 py-8"
+      dir={isArabic ? "rtl" : "ltr"}
+    >
+      <div className="pb-14">
         <h2 className="pb-4 text-xl font-bold lg:text-2xl">
           {t("viewpersonality.perfumerec")}
         </h2>
@@ -84,12 +92,15 @@ export function RecommendationsTab({
                   className="w-[150px] rounded"
                   onClick={() => {
                     window.open(
-                      `${baseApiUrl}/${product.custom_attributes.find(
-                        (attr) => attr.attribute_code === "url_key"
-                      )?.value as string}.html`,
-                      "_blank"
+                      `${baseApiUrl}/${
+                        product.custom_attributes.find(
+                          (attr) => attr.attribute_code === "url_key",
+                        )?.value as string
+                      }.html`,
+                      "_blank",
                     );
                   }}
+                  dir="ltr"
                 >
                   <div className="relative h-[150px] w-[150px] overflow-hidden">
                     <img
@@ -114,7 +125,8 @@ export function RecommendationsTab({
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="truncate text-[0.625rem] font-bold text-white">
-                        {currencySymbol}{(product.price * rate).toFixed(3)}
+                        {currencySymbol}
+                        {(product.price * rate).toFixed(3)}
                       </span>
                     </div>
                   </div>
@@ -129,10 +141,12 @@ export function RecommendationsTab({
                         event.stopPropagation();
                         handleAddToCart(
                           product.id.toString(),
-                          `${baseApiUrl}/${product.custom_attributes.find(
-                            (attr) => attr.attribute_code === "url_key"
-                          )?.value as string}.html`,
-                          product
+                          `${baseApiUrl}/${
+                            product.custom_attributes.find(
+                              (attr) => attr.attribute_code === "url_key",
+                            )?.value as string
+                          }.html`,
+                          product,
                         );
                       }}
                     >
@@ -147,7 +161,7 @@ export function RecommendationsTab({
           <LoadingProducts />
         )}
       </div>
-      <div className="pb-14" dir={isArabic ? "rtl" : "ltr"}>
+      <div className="pb-14">
         <h2 className="text-xl font-bold">{t("viewpersonality.lookrec")}</h2>
         <p className="pb-4 text-sm font-bold">{t("viewpersonality.lookdec")}</p>
         {items ? (
@@ -155,7 +169,7 @@ export function RecommendationsTab({
             {items.profiles.map((profile, index) => {
               const imageUrl = baseApiUrl + "/media/" + profile.image;
               return (
-                <div key={profile.identifier} className="w-[150px] rounded">
+                <div key={profile.identifier} className="w-[150px] rounded" dir="ltr">
                   <div className="relative h-[150px] w-[150px] overflow-hidden">
                     <img
                       src={imageUrl}
@@ -209,7 +223,7 @@ export function RecommendationsTab({
           <LoadingProducts />
         )}
       </div>
-      <div className="pb-14" dir={isArabic ? "rtl" : "ltr"}>
+      <div className="pb-14">
         <h2 className="text-xl font-bold">
           {t("viewpersonality.lipcolorrec")}
         </h2>
@@ -229,12 +243,15 @@ export function RecommendationsTab({
                   className="w-[150px] rounded"
                   onClick={() => {
                     window.open(
-                      `${baseApiUrl}/${product.custom_attributes.find(
-                        (attr) => attr.attribute_code === "url_key"
-                      )?.value as string}.html`,
-                      "_blank"
+                      `${baseApiUrl}/${
+                        product.custom_attributes.find(
+                          (attr) => attr.attribute_code === "url_key",
+                        )?.value as string
+                      }.html`,
+                      "_blank",
                     );
                   }}
+                  dir="ltr"
                 >
                   <div className="relative h-[150px] w-[150px] overflow-hidden">
                     <img
@@ -259,7 +276,8 @@ export function RecommendationsTab({
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-x-1 pt-1">
                       <span className="truncate text-[0.625rem] font-bold text-white">
-                        {currencySymbol}{(product.price * rate).toFixed(3)}
+                        {currencySymbol}
+                        {(product.price * rate).toFixed(3)}
                       </span>
                     </div>
                   </div>
@@ -274,10 +292,12 @@ export function RecommendationsTab({
                         event.stopPropagation();
                         handleAddToCart(
                           product.id.toString(),
-                          `${baseApiUrl}/${product.custom_attributes.find(
-                            (attr) => attr.attribute_code === "url_key"
-                          )?.value as string}.html`,
-                          product
+                          `${baseApiUrl}/${
+                            product.custom_attributes.find(
+                              (attr) => attr.attribute_code === "url_key",
+                            )?.value as string
+                          }.html`,
+                          product,
                         );
                       }}
                     >

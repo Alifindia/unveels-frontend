@@ -294,7 +294,10 @@ function Result({
       </div>
 
       {/* Profile Section */}
-      <div className="flex items-start space-x-1 px-3 py-4">
+      <div
+        className="flex items-start space-x-1 px-3 py-4"
+        dir={isArabic ? "rtl" : "ltr"}
+      >
         <div className="shrink-0 px-3">
           <div className="flex items-center justify-center rounded-full bg-gradient-to-b from-[#CA9C43] to-[#644D21] p-1">
             {criterias.capturedImage ? (
@@ -337,7 +340,10 @@ function Result({
 
       {/* Tabs */}
 
-      <div className="mx-auto w-full max-w-[400px] px-3">
+      <div
+        className="mx-auto w-full max-w-[400px] px-3"
+        dir={isArabic ? "rtl" : "ltr"}
+      >
         <div className="flex border-b-2 border-white/50">
           {tabs.map((tab, index) => (
             <button
@@ -388,7 +394,10 @@ function PersonalityTab({
   }
 
   return (
-    <div className="flex-1 space-y-6 overflow-auto px-5 py-6 md:px-5">
+    <div
+      className="flex-1 space-y-6 overflow-auto px-5 py-6 md:px-5"
+      dir={isArabic ? "rtl" : "ltr"}
+    >
       <h2 className="text-center text-lg font-medium md:text-xl">
         {t("viewpersonality.personality_traits")}
       </h2>
@@ -552,7 +561,6 @@ function PersonalityTab({
                 ? parseFloat((data[15].outputData[index] * 100).toFixed(1))
                 : 0
             }
-            isArabic={isArabic}
           />
         ))}
       </div>
@@ -597,7 +605,11 @@ function PersonalitySection({
   const scoreType = score < 40 ? "Low" : score < 70 ? "Moderate" : "High";
   return (
     <div className="py-5" dir={isArabic ? "rtl" : "ltr"}>
-      <div className="flex items-center gap-x-3 pb-6">
+      <div
+        className="flex items-center gap-x-3 pb-6"
+        dir="ltr"
+        style={{ justifyContent: isArabic ? "justify-end" : "justify-start" }}
+      >
         <Icons.personalityTriangle className="size-8" />
         <h2 className="text-lg font-bold text-white md:text-3xl">{title}</h2>
       </div>
@@ -639,9 +651,11 @@ function AttributesTab({
   }
 
   return (
-    <div className="grid flex-1 grid-cols-1 gap-2 space-y-4 overflow-auto px-10 py-3 text-xs md:grid-cols-2 md:gap-4 md:space-y-0 md:px-40 md:py-6 md:text-base">
+    <div
+      className="grid flex-1 grid-cols-1 gap-2 space-y-4 overflow-auto px-10 py-3 text-xs md:grid-cols-2 md:gap-4 md:space-y-0 md:px-40 md:py-6 md:text-base"
+      dir={isArabic ? "rtl" : "ltr"}
+    >
       <FeatureSection
-        isArabic={isArabic}
         icon={<Icons.face className="size-6 md:size-12" />}
         title={t("attributepf.face.title")}
         features={[
@@ -660,7 +674,6 @@ function AttributesTab({
         ]}
       />
       <FeatureSection
-        isArabic={isArabic}
         icon={<Icons.eye className="size-6 md:size-12" />}
         title={t("attributepf.eyes.title")}
         features={[
@@ -697,7 +710,6 @@ function AttributesTab({
         ]}
       />
       <FeatureSection
-        isArabic={isArabic}
         icon={<Icons.brows className="size-6 md:size-12" />}
         title={t("attributepf.brows.title")}
         features={[
@@ -726,7 +738,6 @@ function AttributesTab({
         ]}
       />
       <FeatureSection
-        isArabic={isArabic}
         icon={<Icons.lips className="size-6 md:size-12" />}
         title={t("attributepf.lips.title")}
         features={[
@@ -745,7 +756,6 @@ function AttributesTab({
         ]}
       />
       <FeatureSection
-        isArabic={isArabic}
         icon={<Icons.cheekbones className="size-6 md:size-12" />}
         title={t("attributepf.cheekbones.title")}
         features={[
@@ -758,7 +768,6 @@ function AttributesTab({
         ]}
       />
       <FeatureSection
-        isArabic={isArabic}
         icon={<Icons.nose className="size-6 md:size-12" />}
         title={t("attributepf.nose.title")}
         features={[
@@ -771,7 +780,6 @@ function AttributesTab({
         ]}
       />
       <FeatureSection
-        isArabic={isArabic}
         icon={<Icons.hair className="size-6 md:size-12" />}
         title={t("attributepf.hair.title")}
         features={[
@@ -803,7 +811,7 @@ function FeatureSection({
 }) {
   return (
     <div className="flex h-full flex-col border-white/50 md:py-4 md:even:border-l md:even:pl-4">
-      <div className="flex flex-col space-y-2" dir={isArabic ? "rtl" : "ltr"}>
+      <div className="flex flex-col space-y-2">
         {/* Section Title */}
         <div
           className={`flex items-center space-x-3 pb-4 ${isArabic ? "flex-row-reverse justify-end" : "flex-row"}`}
