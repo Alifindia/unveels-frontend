@@ -4,6 +4,7 @@ import { BboxLandmark } from "../../types/bboxLandmark";
 import { adjustBoundingBoxes } from "../../utils/boundingBoxUtils";
 import { skinAnalysisDataItem } from "../../utils/constants";
 import { FaceResults } from "../../types/faceResults";
+import { useTranslation } from "react-i18next";
 
 interface OverlayCanvasProps {
   image: HTMLImageElement;
@@ -39,6 +40,8 @@ function OverlayCanvas({
   const outerRadius = 10;
 
   const labelBoundingBoxesRef = useRef<LabelBoundingBox[]>([]);
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
 
   useEffect(() => {
     const drawImage = () => {
@@ -307,7 +310,10 @@ function OverlayCanvas({
           ctx.shadowOffsetX = 1;
           ctx.shadowOffsetY = 1;
           ctx.fillStyle = "white";
-          ctx.fillText(`${label} ${score}%`, labelX, labelY - 5);
+          const text = t("skinlabel." + label);
+          const displayText = isArabic ? `${score}% ${text}` : `${text} ${score}%`;
+
+          ctx.fillText(displayText, labelX, labelY - 5);
 
           // Reset shadow
           ctx.shadowColor = "transparent";

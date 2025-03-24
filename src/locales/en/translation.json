@@ -363,7 +363,8 @@
     "oily": "oily",
     "firmness": "firmness",
     "dark circles": "dark circles",
-    "dry": "dry"
+    "dry": "dry",
+    "dark circle": "dark circle"
   },
   "model_loading": { "label": "Powered By Unveels" },
   "vto": {

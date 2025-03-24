@@ -153,13 +153,7 @@ function MainContent({ collapsed, setCollapsed, isArabic }: MainContentProps) {
   );
 }
 
-const tabs = [
-  "acne",
-  "dark circle",
-  "spots",
-  "texture",
-  "wrinkles",
-] as const;
+const tabs = ["acne", "dark circle", "spots", "texture", "wrinkles"] as const;
 
 function SkinProblems({
   onClose,
@@ -180,6 +174,10 @@ function SkinProblems({
   useEffect(() => {
     if (skinConcerns) setTab(skinConcerns);
   }, [skinConcerns]);
+
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language == "ar";
+
   return (
     <>
       <div className="relative space-y-2 px-4">
@@ -194,7 +192,7 @@ function SkinProblems({
             <div className="h-1 w-10 rounded-full bg-gray-400" />
           </button>
         </div>
-        <div className="flex w-full items-center space-x-3.5 overflow-x-auto overflow-y-visible no-scrollbar">
+        <div className="flex w-full items-center space-x-3.5 overflow-x-auto overflow-y-visible no-scrollbar" dir={isArabic ? "rtl" : "ltr"}>
           {tabs.map((problemTab) => {
             const isActive = tab === problemTab;
             return (
@@ -210,7 +208,7 @@ function SkinProblems({
                   )}
                   onClick={() => setTab(problemTab)}
                 >
-                  {problemTab}
+                  {t("skinlabel." + problemTab)}
 
                   <div
                     className={clsx(

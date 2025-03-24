@@ -83,7 +83,7 @@ export function RecommendationsTab({
           <div className="flex w-full gap-4 overflow-x-auto no-scrollbar lg:gap-x-14">
             {fragrances.items.map((product, index) => {
               const imageUrl =
-                mediaUrl(product.media_gallery_entries[0].file) ??
+                mediaUrl(product.media_gallery_entries[0]?.file) ??
                 "https://picsum.photos/id/237/200/300";
 
               return (
@@ -234,7 +234,7 @@ export function RecommendationsTab({
           <div className="flex w-full gap-4 overflow-x-auto no-scrollbar">
             {lips.items.map((product, index) => {
               const imageUrl =
-                mediaUrl(product.media_gallery_entries[0].file) ??
+                mediaUrl(product.media_gallery_entries[0]?.file) ??
                 "https://picsum.photos/id/237/200/300";
 
               return (

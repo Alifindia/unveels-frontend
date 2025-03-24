@@ -63,6 +63,7 @@ import {
 import { useModelLoader } from "../hooks/useModelLoader";
 import SuccessPopup from "../components/popup-add-to-cart";
 import { FilesetResolver, ImageSegmenter } from "@mediapipe/tasks-vision";
+import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
 
 interface Model {
   net: tf.GraphModel;
@@ -456,7 +457,10 @@ function Main({ isArabic }: { isArabic: boolean }) {
             />
             {!isLoading && inferenceResult != null ? (
               <>
-                <SkinAnalysisScene data={inferenceResult} maskCanvas={canvasRef} />
+                <SkinAnalysisScene
+                  data={inferenceResult}
+                  maskCanvas={canvasRef}
+                />
               </>
             ) : (
               <>
@@ -548,8 +552,10 @@ const tabs = [
 
 function SkinProblems({ onClose }: { onClose: () => void }) {
   const { tab, setTab, getTotalScoreByLabel, setView } = useSkinAnalysis();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+
+  const isRTL = i18n.language === "ar" || i18n.dir() === "rtl";
 
   useEffect(() => {
     if (tabRefs.current[tab]) {
@@ -562,7 +568,10 @@ function SkinProblems({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <div className="relative space-y-1 bg-black/10 p-2 px-4 pb-2 shadow-lg backdrop-blur-sm sm:space-y-2">
+      <div
+        className="relative space-y-1 bg-black/10 p-2 px-4 pb-2 shadow-lg backdrop-blur-sm sm:space-y-2"
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         <div className="flex justify-center">
           <button
             type="button"
@@ -684,7 +693,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
       {data ? (
         data.items.map((product, index) => {
           const imageUrl =
-            mediaUrl(product.media_gallery_entries[0].file) ??
+            mediaUrl(product.media_gallery_entries[0]?.file) ??
             "https://picsum.photos/id/237/200/300";
 
           return (
@@ -697,6 +706,7 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                   "_blank",
                 );
               }}
+              dir="ltr"
             >
               <div className="relative h-[53.9px] w-[88.55px] overflow-hidden sm:h-[70px] sm:w-[115px]">
                 <img
@@ -850,7 +860,7 @@ function AnalysisResults({
       className={clsx(
         "fixed inset-0 flex h-dvh flex-col bg-black font-sans text-white",
       )}
-      style={{zIndex: 9999}}
+      style={{ zIndex: 9999 }}
     >
       {/* Navigation */}
       <div className="flex items-center justify-between px-4 py-2">
@@ -874,7 +884,10 @@ function AnalysisResults({
       </div>
 
       {/* Profile Section */}
-      <div className="flex items-center space-x-1 px-5 py-2">
+      <div
+        className="flex items-center space-x-1 px-5 py-2"
+        dir={isArabic ? "rtl" : "ltr"}
+      >
         <div className="shrink-0 px-5">
           <div className="flex items-center justify-center rounded-full bg-gradient-to-b from-[#CA9C43] to-[#644D21] p-1">
             {criterias.capturedImage ? (
@@ -950,7 +963,7 @@ function AnalysisResults({
 
           <div className="flex items-center justify-between space-x-4 bg-black px-10 capitalize text-white">
             {/* Left Column */}
-            <div className="space-y-4">
+            <div className="space-y-4" dir={isArabic ? "rtl" : "ltr"}>
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#00FF38] text-sm font-bold text-white">
                   {getTotalScoreByLabel("texture")}%
@@ -973,7 +986,7 @@ function AnalysisResults({
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4" dir={isArabic ? "rtl" : "ltr"}>
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0F38CC] text-sm font-bold text-white">
                   {getTotalScoreByLabel("wrinkles")}%
@@ -1146,7 +1159,7 @@ function AnalysisResults({
 
           <div className="flex items-center justify-between space-x-4 bg-black px-10 text-white">
             {/* Left Column */}
-            <div className="space-y-4">
+            <div className="space-y-4" dir={isArabic ? "rtl" : "ltr"}>
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#F1B902] text-sm font-bold text-white">
                   {getTotalScoreByLabel("firmness")}%
@@ -1169,7 +1182,7 @@ function AnalysisResults({
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4" dir={isArabic ? "rtl" : "ltr"}>
               <div className="flex items-center space-x-2.5">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#5DD400] text-sm font-bold text-white">
                   {getTotalScoreByLabel("moisture")}%
@@ -1201,7 +1214,7 @@ function AnalysisResults({
           </div>
         </div>
 
-        <div className="mx-auto hidden w-full max-w-3xl items-center gap-x-4 capitalize md:flex">
+        <div className="mx-auto hidden w-full max-w-3xl items-center gap-x-4 capitalize md:flex" dir={isArabic ? "rtl" : "ltr"}>
           <div className="flex flex-1 items-start justify-between space-x-4 bg-black px-10 text-white">
             <div className="space-y-4">
               <div className="flex items-center space-x-2.5">
@@ -1426,7 +1439,7 @@ function ProblemSection({
   const scoreType = score < 40 ? "Low" : score < 70 ? "Moderate" : "High";
   return (
     <div className="py-5" dir={isArabic ? "rtl" : "ltr"}>
-      <div className="flex items-center gap-x-3 pb-6">
+      <div className="flex items-center gap-x-3 pb-6" dir="ltr">
         <Icons.personalityTriangle className="size-8 shrink-0" />
 
         <h2 className="text-3xl font-bold capitalize text-white">

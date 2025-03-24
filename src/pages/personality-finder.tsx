@@ -50,7 +50,7 @@ import { getCookie, getCurrencyAndRate } from "../utils/other";
 import { RecommendationsTab } from "../components/personality-analyzer/recomendations-tab";
 import SuccessPopup from "../components/popup-add-to-cart";
 import { useCartContext } from "../context/cart-context";
-import { use } from "i18next";
+import { dir, use } from "i18next";
 
 export function PersonalityFinder() {
   const { i18n } = useTranslation();
@@ -604,11 +604,11 @@ function PersonalitySection({
   const { t } = useTranslation();
   const scoreType = score < 40 ? "Low" : score < 70 ? "Moderate" : "High";
   return (
-    <div className="py-5" dir={isArabic ? "rtl" : "ltr"}>
+    <div className="py-5">
       <div
         className="flex items-center gap-x-3 pb-6"
+        style={{ justifyContent: isArabic ? "start" : "end" }}
         dir="ltr"
-        style={{ justifyContent: isArabic ? "justify-end" : "justify-start" }}
       >
         <Icons.personalityTriangle className="size-8" />
         <h2 className="text-lg font-bold text-white md:text-3xl">{title}</h2>
