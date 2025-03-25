@@ -79,7 +79,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
           baseOptions: {
             modelAssetPath:
               "/media/unveels/models/hair/selfie_multiclass.tflite",
-            delegate: "GPU",
+            delegate: "CPU",
           },
           runningMode: "IMAGE",
           outputCategoryMask: true,
