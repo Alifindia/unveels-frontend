@@ -195,6 +195,7 @@ interface MakeupContextProps {
   envMapMakeup: Texture | null;
   setEnvMapMakeup: (texture: Texture | null) => void;
   showMakeup: boolean;
+  resetMakeup: () => void;
 }
 
 const MakeupContext = createContext<MakeupContextProps | undefined>(undefined);
@@ -449,6 +450,26 @@ export const MakeupProvider: React.FC<MakeupProviderProps> = ({
 
   const [envMapMakeup, setEnvMapMakeup] = useState<Texture | null>(null);
 
+  const resetMakeup = () => {
+    setShowBlush(false);
+    setShowEyeShadow(false);
+    setShowEyeliner(false);
+    setShowLashes(false);
+    setShowMascara(false);
+    setShowConcealer(false);
+    setShowHighlighter(false);
+    setShowContour(false);
+    setShowLipliner(false);
+    setShowLipplumper(false);
+    setShowLipColor(false);
+    setShowHair(false);
+    setShowBronzer(false);
+    setShowLens(false);
+    setShowEyebrows(false);
+    setShowNails(false);
+    setShowPressOnNails(false);
+  };
+
   const showMakeup =
     showFoundation ||
     showBlush ||
@@ -635,6 +656,7 @@ export const MakeupProvider: React.FC<MakeupProviderProps> = ({
         setEnvMapMakeup,
 
         showMakeup,
+        resetMakeup,
       }}
     >
       {children}

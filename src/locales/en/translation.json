@@ -440,5 +440,12 @@
     "Yellow": "Yellow",
     "Bronze": "Bronze",
     "Nude": "Nude"
+  },
+  "general": {
+    "cancel": "Cancel",
+    "remove": "Remove"
+  },
+  "message" : {
+    "resetVto": "Are you sure you want reset and remove all current makeup?"
   }
 }
