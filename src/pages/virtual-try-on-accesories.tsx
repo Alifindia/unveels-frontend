@@ -30,8 +30,11 @@ import { HeadAccessoriesMode } from "./vto/vto-accesories/head-accesories/head-a
 import { NailsMode } from "./vto/vto-accesories/nails/nails-makeup";
 import { NeckAccessoriesMode } from "./vto/vto-accesories/neck-accessories/neck-accessories";
 import { VirtualTryOnScene } from "../components/vto/virtual-try-on-scene";
-import { MakeupProvider } from "../context/makeup-context";
-import { AccesoriesProvider } from "../context/accesories-context";
+import { MakeupProvider, useMakeup } from "../context/makeup-context";
+import {
+  AccesoriesProvider,
+  useAccesories,
+} from "../context/accesories-context";
 import { LipColorProvider } from "./vto/lips/lip-color/lip-color-context";
 import { LipLinerProvider } from "./vto/lips/lip-liner/lip-liner-context";
 import { LipPlumperProvider } from "./vto/lips/lip-plumper/lip-plumper-context";
@@ -70,6 +73,7 @@ import ChangeModel from "../components/change-model";
 import { ScreenshotPreview } from "../components/screenshot-preview";
 import { useTranslation } from "react-i18next";
 import { getCookie } from "../utils/other";
+import DialogPopup from "../components/dialog-popup";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -395,16 +399,14 @@ export function TopNavigation({}: {}) {
     if (location.pathname !== "/virtual-try-on-accesories/accesories") {
       navigate("/virtual-try-on-accesories/accesories");
     } else {
-      if (isDevelopment) {
-        window.location.href = "/";
-      } else {
-        window.location.href =
-          import.meta.env.VITE_API_BASE_URL + "/technologies";
-      }
+      setShowExitDialog(true);
     }
   };
 
   const handleCloseClick = () => {
+    setShowExitDialog(true);
+  };
+  const handleExitClick = () => {
     if (process.env.NODE_ENV === "production") {
       window.location.href =
         import.meta.env.VITE_API_BASE_URL + "/technologies";
@@ -413,8 +415,20 @@ export function TopNavigation({}: {}) {
     }
   };
 
+  const [showExitDialog, setShowExitDialog] = useState(false);
+
+  const { t } = useTranslation();
+
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <DialogPopup
+        isOpen={showExitDialog}
+        onClose={() => setShowExitDialog(false)}
+        onConfirm={() => handleExitClick()}
+        title={t("message.exitVto")}
+        positiveButtonText={t("general.exit")}
+        negativeButtonText={t("general.cancel")}
+      />
       <div className="flex flex-col gap-4">
         <button
           className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
@@ -461,9 +475,26 @@ function Sidebar({
   setShowChangeModel,
 }: SidebarProps) {
   const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
+  const { t } = useTranslation();
+  const { resetAccessories } = useAccesories();
+  const { resetMakeup } = useMakeup();
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+
+  const handleResetConfirm = () => {
+    resetAccessories();
+    resetMakeup();
+  };
 
   return (
     <div className="pointer-events-none flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
+      <DialogPopup
+        isOpen={isResetDialogOpen}
+        onClose={() => setIsResetDialogOpen(false)}
+        onConfirm={handleResetConfirm}
+        title={t("message.resetVto")}
+        positiveButtonText={t("general.remove")}
+        negativeButtonText={t("general.cancel")}
+      />
       <div className="relative p-0.5">
         <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 
@@ -479,6 +510,9 @@ function Sidebar({
           </button>
           <button className="" onClick={compareCapture}>
             <Icons.compare className="size-4 text-white sm:size-6" />
+          </button>
+          <button className="" onClick={() => setIsResetDialogOpen(true)}>
+            <Icons.reset className="size-4 text-white sm:size-6" />
           </button>
           <UploadMediaDialog
             setMediaFile={setMediaFile}

@@ -88,6 +88,7 @@ import { FilterProvider } from "../context/filter-context";
 import { getCookie } from "../utils/other";
 import { useTranslation } from "react-i18next";
 import SuccessPopup from "../components/popup-add-to-cart";
+import DialogPopup from "../components/dialog-popup";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -423,16 +424,15 @@ export function TopNavigation({}: {}) {
     if (location.pathname !== "/smart-beauty/makeups") {
       navigate("/smart-beauty/makeups");
     } else {
-      if (isDevelopment) {
-        window.location.href = "/";
-      } else {
-        window.location.href =
-          import.meta.env.VITE_API_BASE_URL + "/technologies";
-      }
+      setShowExitDialog(true)
     }
   };
 
   const handleCloseClick = () => {
+    setShowExitDialog(true)
+  }
+
+  const handleExitClick = () => {
     if (process.env.NODE_ENV === "production") {
       window.location.href =
         import.meta.env.VITE_API_BASE_URL + "/technologies";
@@ -441,8 +441,20 @@ export function TopNavigation({}: {}) {
     }
   };
 
+  const [showExitDialog, setShowExitDialog] = useState(false);
+
+  const { t } = useTranslation();
+
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <DialogPopup
+        isOpen={showExitDialog}
+        onClose={() => setShowExitDialog(false)}
+        onConfirm={() => handleExitClick()}
+        title={t("message.exitVto")}
+        positiveButtonText={t("general.exit")}
+        negativeButtonText={t("general.cancel")}
+      />
       <div className="flex flex-col gap-4">
         <button
           className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"

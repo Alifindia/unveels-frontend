@@ -77,6 +77,7 @@ import { exchangeRates } from "../utils/constants";
 import { useCartContext } from "../context/cart-context";
 import { textures } from "../api/attributes/texture";
 import SuccessPopup from "../components/popup-add-to-cart";
+import DialogPopup from "../components/dialog-popup";
 
 export const productTypeCheckers = {
   isLipColorProduct: (data: Product) => {
@@ -882,9 +883,26 @@ function Sidebar({
   setShowChangeModel,
 }: SidebarProps) {
   const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
+  const { t } = useTranslation();
+  const { resetAccessories } = useAccesories();
+  const { resetMakeup } = useMakeup();
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+
+  const handleResetConfirm = () => {
+    resetAccessories();
+    resetMakeup();
+  };
 
   return (
-    <div className="pointer-events-none flex flex-col items-end justify-end place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
+    <div className="pointer-events-none flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
+      <DialogPopup
+        isOpen={isResetDialogOpen}
+        onClose={() => setIsResetDialogOpen(false)}
+        onConfirm={handleResetConfirm}
+        title={t("message.resetVto")}
+        positiveButtonText={t("general.remove")}
+        negativeButtonText={t("general.cancel")}
+      />
       <div className="relative p-0.5">
         <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 
@@ -898,6 +916,9 @@ function Sidebar({
           </button>
           <button className="" onClick={compareCapture}>
             <Icons.compare className="size-4 text-white sm:size-6" />
+          </button>
+          <button className="" onClick={() => setIsResetDialogOpen(true)}>
+            <Icons.reset className="size-3 text-white xl:size-4 2xl:size-5" />
           </button>
         </div>
       </div>

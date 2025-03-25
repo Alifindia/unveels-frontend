@@ -443,9 +443,11 @@
   },
   "general": {
     "cancel": "Cancel",
-    "remove": "Remove"
+    "remove": "Remove",
+    "exit": "Exit"
   },
   "message" : {
-    "resetVto": "Are you sure you want reset and remove all current makeup?"
+    "resetVto": "Are you sure you want reset and remove all current makeup?",
+    "exitVto": "Are you sure you want exit virtual try-on?"
   }
 }

@@ -41,8 +41,11 @@ import {
   VirtualTryOnScene,
   VtoDefaultDetection,
 } from "../components/vto/virtual-try-on-scene";
-import { MakeupProvider } from "../context/makeup-context";
-import { AccesoriesProvider } from "../context/accesories-context";
+import { MakeupProvider, useMakeup } from "../context/makeup-context";
+import {
+  AccesoriesProvider,
+  useAccesories,
+} from "../context/accesories-context";
 import { LipColorProvider } from "./vto/lips/lip-color/lip-color-context";
 import { LipLinerProvider } from "./vto/lips/lip-liner/lip-liner-context";
 import { LipPlumperProvider } from "./vto/lips/lip-plumper/lip-plumper-context";
@@ -89,6 +92,7 @@ import { useTranslation } from "react-i18next";
 import { getCookie } from "../utils/other";
 import UploadMediaDialog from "../components/vto/upload-media-dialog";
 import SuccessPopup from "../components/popup-add-to-cart";
+import DialogPopup from "../components/dialog-popup";
 
 interface VirtualTryOnProvider {
   children: React.ReactNode;
@@ -541,17 +545,32 @@ export function TopNavigation({}: {}) {
     if (location.pathname !== "/virtual-try-on-hand/hand") {
       navigate(-1);
     } else {
-      if (isDevelopment) {
-        window.location.href = "/";
-      } else {
-        window.location.href =
-          import.meta.env.VITE_API_BASE_URL + "/technologies";
-      }
+      setShowExitDialog(true);
+    }
+  };
+  const handleExitClick = () => {
+    if (process.env.NODE_ENV === "production") {
+      window.location.href =
+        import.meta.env.VITE_API_BASE_URL + "/technologies";
+    } else {
+      window.location.href = "/";
     }
   };
 
+  const [showExitDialog, setShowExitDialog] = useState(false);
+
+  const { t } = useTranslation();
+
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <DialogPopup
+        isOpen={showExitDialog}
+        onClose={() => setShowExitDialog(false)}
+        onConfirm={() => handleExitClick()}
+        title={t("message.exitVto")}
+        positiveButtonText={t("general.exit")}
+        negativeButtonText={t("general.cancel")}
+      />
       <div className="flex flex-col gap-4">
         <button
           className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
@@ -571,13 +590,13 @@ export function TopNavigation({}: {}) {
             <X className="size-6 text-white" />
           </Link>
         ) : (
-          <a
+          <button
             type="button"
             className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            href={import.meta.env.VITE_API_BASE_URL + "/technologies"}
+            onClick={() => setShowExitDialog(true)}
           >
             <X className="size-6 text-white" />
-          </a>
+          </button>
         )}
 
         <button
@@ -608,9 +627,26 @@ function Sidebar({
   setShowChangeModel,
 }: SidebarProps) {
   const { flipCamera, compareCapture, resetCapture, screenShoot } = useCamera();
+  const { t } = useTranslation();
+  const { resetAccessories } = useAccesories();
+  const { resetMakeup } = useMakeup();
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+
+  const handleResetConfirm = () => {
+    resetAccessories();
+    resetMakeup();
+  };
 
   return (
     <div className="pointer-events-none flex flex-col items-center justify-center place-self-end pb-4 pr-5 [&_button]:pointer-events-auto">
+      <DialogPopup
+        isOpen={isResetDialogOpen}
+        onClose={() => setIsResetDialogOpen(false)}
+        onConfirm={handleResetConfirm}
+        title={t("message.resetVto")}
+        positiveButtonText={t("general.remove")}
+        negativeButtonText={t("general.cancel")}
+      />
       <div className="relative p-0.5">
         <div className="absolute inset-0 rounded-full border-2 border-transparent" />
 
@@ -627,6 +663,9 @@ function Sidebar({
           </button>
           <button className="" onClick={compareCapture}>
             <Icons.compare className="size-3 text-white xl:size-4 2xl:size-5" />
+          </button>
+          <button className="" onClick={() => setIsResetDialogOpen(true)}>
+            <Icons.reset className="size-3 text-white xl:size-4 2xl:size-5" />
           </button>
           <UploadMediaDialog
             setMediaFile={setMediaFile}

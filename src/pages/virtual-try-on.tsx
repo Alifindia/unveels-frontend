@@ -636,25 +636,38 @@ export function TopNavigation({}: {}) {
   const location = useLocation();
   const { summaryCount } = useCartContext();
 
-  useEffect(() => {
-    console.log("SUMMARY COUNT FROM TOPNAV", summaryCount);
-  }, [summaryCount]);
-
   const handleBackClick = () => {
     if (location.pathname !== "/virtual-try-on/makeups") {
       navigate("/virtual-try-on/makeups");
     } else {
-      if (isDevelopment) {
-        window.location.href = "/";
-      } else {
-        window.location.href =
-          import.meta.env.VITE_API_BASE_URL + "/technologies";
-      }
+      setShowExitDialog(true);
     }
   };
 
+  const [showExitDialog, setShowExitDialog] = useState(false);
+
+  const { t } = useTranslation();
+  useEffect(() => {
+    console.log("SUMMARY COUNT FROM TOPNAV", summaryCount);
+  }, [summaryCount]);
+
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <DialogPopup
+        isOpen={showExitDialog}
+        onClose={() => setShowExitDialog(false)}
+        onConfirm={() => {
+          if (isDevelopment) {
+            window.location.href = "/";
+          } else {
+            window.location.href =
+              import.meta.env.VITE_API_BASE_URL + "/technologies";
+          }
+        }}
+        title={t("message.exitVto")}
+        positiveButtonText={t("general.exit")}
+        negativeButtonText={t("general.cancel")}
+      />
       <div className="flex flex-col gap-4">
         <button
           className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
@@ -674,13 +687,13 @@ export function TopNavigation({}: {}) {
             <X className="size-6 text-white" />
           </Link>
         ) : (
-          <a
+          <button
             type="button"
             className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-black/25 backdrop-blur-3xl"
-            href={import.meta.env.VITE_API_BASE_URL + "/technologies"}
+            onClick={() => setShowExitDialog(true)}
           >
             <X className="size-6 text-white" />
-          </a>
+          </button>
         )}
 
         <button
