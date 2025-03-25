@@ -252,7 +252,7 @@ function SkinToneFinderInnerScene({
         }
         try {
           // Tambahkan delay sebelum inferensi
-          await new Promise((resolve) => setTimeout(resolve, 2000));
+          await new Promise((resolve) => setTimeout(resolve, 3000));
 
           const results = await faceLandmarker.detect(imageLoaded);
           const hairResults = await imageSegmenter?.segment(imageLoaded);
@@ -632,6 +632,7 @@ function SkinToneFinderInnerScene({
           width: "100vw",
           height: "100vh",
           objectFit: "cover",
+          opacity: showScannerAfterInference || !isInferenceCompleted ? 0 : 1,
         }}
       />
     </>
