@@ -72,6 +72,7 @@ function Main() {
     setShowHair,
     setHairColor,
     setShowPressOnNails,
+    resetMakeup
   } = useMakeup();
 
   const {
@@ -83,6 +84,7 @@ function Main() {
     setShowNecklace,
     setShowRing,
     setShowWatch,
+    resetAccessories
   } = useAccesories();
 
   const { criterias, flipCamera, compareCapture, resetCapture, screenShoot } =
@@ -375,6 +377,11 @@ function Main() {
 
           if (data.hairColor !== undefined) {
             setHairColor(data.hairColor);
+          }
+
+          if (data.reset !== undefined) {
+            resetAccessories();
+            resetMakeup();
           }
 
           //handle add media
