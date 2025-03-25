@@ -625,14 +625,13 @@ function SkinToneFinderInnerScene({
         ref={backgroundCanvasRef}
         className="pointer-events-none"
         style={{
-          zIndex: 1,
+          zIndex: showScannerAfterInference || !isInferenceCompleted ? -1 : 1,
           position: "fixed",
           left: 0,
           top: 0,
           width: "100vw",
           height: "100vh",
           objectFit: "cover",
-          opacity: showScannerAfterInference || !isInferenceCompleted ? 0 : 1,
         }}
       />
     </>
