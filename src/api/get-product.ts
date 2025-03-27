@@ -204,7 +204,7 @@ export function useProductsVTOAll({
       console.log(minPrice);
       console.log(maxPrice);
 
-      if (selectedFormation !== "") {
+      if (selectedFormation !== "" && selectedFormation !== null) {
         filters.push({
           filters: [
             {
@@ -232,9 +232,9 @@ export function useProductsVTOAll({
         filters.push({
           filters: [
             {
-              field: "formation",
-              value: selectedFormation,
-              condition_type: "eq",
+              field: "made_in",
+              value: selectedCountry,
+              condition_type: "finset",
             },
           ],
         });
