@@ -179,7 +179,8 @@ const SkinImprovementThreeScene: React.FC<SkinImprovementThreeSceneProps> = ({
 
   // Load alphamap texture for the specific feature
   const alphaMapPath = useMemo(() => {
-    return "/media/unveels/vto-assets/texture/skin-problem/" + featureType + ".png";
+    const type = featureType == "dark circles" ? "dark circle" : featureType;
+    return "/media/unveels/vto-assets/texture/skin-problem/" + type + ".png";
   }, [featureType]);
 
   // We'll load the PNG texture directly
