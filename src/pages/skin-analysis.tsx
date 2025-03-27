@@ -752,13 +752,14 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                 <button
                   type="button"
                   className="flex h-4 w-full items-center justify-center border border-white bg-white text-[0.3465rem] font-semibold leading-none text-black sm:h-5 sm:text-[0.45rem]"
-                  onClick={(event) => {
-                    event.stopPropagation();
+                  onClick={() => {
+                    window.open(
+                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      "_blank",
+                    );
                   }}
                 >
-                  <Link to={`/see-improvement?skinConcern=${skinConcern}`}>
-                    {t("viewskinan.seeimprovement")}
-                  </Link>
+                  Detail
                 </button>
               </div>
             </div>

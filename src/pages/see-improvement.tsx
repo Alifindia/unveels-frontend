@@ -192,7 +192,10 @@ function SkinProblems({
             <div className="h-1 w-10 rounded-full bg-gray-400" />
           </button>
         </div>
-        <div className="flex w-full items-center space-x-3.5 overflow-x-auto overflow-y-visible no-scrollbar" dir={isArabic ? "rtl" : "ltr"}>
+        <div
+          className="flex w-full items-center space-x-3.5 overflow-x-auto overflow-y-visible no-scrollbar"
+          dir={isArabic ? "rtl" : "ltr"}
+        >
           {tabs.map((problemTab) => {
             const isActive = tab === problemTab;
             return (
@@ -313,11 +316,14 @@ function ProductList({ skinConcern }: { skinConcern: string }) {
                 <button
                   type="button"
                   className="flex h-7 w-full items-center justify-center border border-white bg-white text-[0.45rem] font-semibold text-black"
-                  onClick={(event) => {
-                    event.stopPropagation();
+                  onClick={() => {
+                    window.open(
+                      `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
+                      "_blank",
+                    );
                   }}
                 >
-                  SEE IMPROVEMENT
+                  Detail
                 </button>
               </div>
             </div>
