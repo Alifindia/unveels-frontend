@@ -501,69 +501,32 @@ export function VirtualTryOnScene({
                       canvas.height,
                     );
 
-                    // Membuat array untuk mask yang sudah di-smooth
-                    const smoothedMask = new Float32Array(categoryMask.length);
-                    const width = canvas.width;
-                    const height = canvas.height;
-
-                    // Kernel Gaussian blur 5x5
-                    const kernel = [
-                      [1, 4, 6, 4, 1],
-                      [4, 16, 24, 16, 4],
-                      [6, 24, 36, 24, 6],
-                      [4, 16, 24, 16, 4],
-                      [1, 4, 6, 4, 1],
-                    ];
-                    const kernelSum = 256; // Total bobot kernel
-
-                    // Terapkan Gaussian blur
-                    for (let y = 2; y < height - 2; y++) {
-                      for (let x = 2; x < width - 2; x++) {
-                        const i = y * width + x;
-                        let sum = 0;
-
-                        // Jumlahkan nilai berbobot dari semua tetangga dalam kernel 5x5
-                        for (let ky = 0; ky < 5; ky++) {
-                          for (let kx = 0; kx < 5; kx++) {
-                            const pixelY = y + (ky - 2);
-                            const pixelX = x + (kx - 2);
-                            sum +=
-                              categoryMask[pixelY * width + pixelX] *
-                              kernel[ky][kx];
-                          }
-                        }
-
-                        // Normalisasi hasil
-                        smoothedMask[i] = sum / kernelSum;
-                      }
-                    }
-
-                    // Threshold untuk menentukan tepian
+                    // Edge thresholds for mask boundary detection
                     const edgeThresholdLow = 0.3;
                     const edgeThresholdHigh = 0.7;
 
-                    // Terapkan hasil smoothing pada gambar
+                    // Apply masking directly without Gaussian blur
                     for (let i = 0; i < categoryMask.length; i++) {
-                      // Tentukan alpha berdasarkan smoothed mask
+                      // Determine alpha based on mask value
                       let alpha;
 
-                      // Untuk pixel di dalam mask
-                      if (smoothedMask[i] > edgeThresholdHigh) {
+                      // For pixels inside the mask
+                      if (categoryMask[i] > edgeThresholdHigh) {
                         alpha = 1.0;
                       }
-                      // Untuk pixel di tepian mask (anti-aliasing)
-                      else if (smoothedMask[i] > edgeThresholdLow) {
-                        // Normalisasi nilai menjadi 0-1 untuk tepian
+                      // For pixels at the edge of the mask (anti-aliasing)
+                      else if (categoryMask[i] > edgeThresholdLow) {
+                        // Normalize value to 0-1 for edges
                         alpha =
-                          (smoothedMask[i] - edgeThresholdLow) /
+                          (categoryMask[i] - edgeThresholdLow) /
                           (edgeThresholdHigh - edgeThresholdLow);
                       }
-                      // Untuk pixel di luar mask
+                      // For pixels outside the mask
                       else {
                         alpha = 0.0;
                       }
 
-                      // Inverse alpha untuk kode yang sudah ada
+                      // Inverse alpha for existing code (adjust if needed)
                       alpha = 1 - alpha;
 
                       const pixelIndex = i * 4;
