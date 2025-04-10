@@ -94,7 +94,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
           },
           runningMode: "IMAGE",
           maxResults: 20,
-          scoreThreshold: 0.2,
+          scoreThreshold: 0.07,
         },
       );
       modelsRef.current.accesoriesDetector = accesoriesDetectorInstance;
