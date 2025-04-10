@@ -80,9 +80,9 @@ const NailPinkyInner: React.FC<NailPinkyProps> = React.memo(
         // Scale coordinates proportionally with the viewport
         const nailsFingerX = (1 - nailsFingerDIP.x - 0.5) * outputWidth;
         const nailsFingerY = -(nailsFingerDIP.y - 0.5) * outputHeight;
-        const nailsFingerZ = 200;
+        const nailsFingerZ = -(nailsFingerDIP.y - 0.5) * Math.max(outputHeight, outputWidth);
 
-        const scaleFactor = (fingerSize * outputWidth) / 2.4;
+        const scaleFactor = (fingerSize * outputWidth) / 1.8;
 
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
         nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
