@@ -333,60 +333,14 @@ export function VirtualTryOnScene({
                       : hairSegmenterRef.current.segment(sourceElement);
 
                   if (hairResults?.categoryMask) {
-                    // Dapatkan mask asli
-                    const originalMask =
+                    hairRef.current =
                       hairResults.categoryMask.getAsFloat32Array();
-                    hairRef.current = new Float32Array(originalMask);
-
-                    // Buat array untuk menyimpan edge flags
-                    const isEdge = new Array(originalMask.length).fill(false);
-
-                    // Dapatkan dimensi untuk iterasi mask
-                    const width = sourceWidth;
-                    const height = sourceHeight;
-
-                    // 1. Deteksi tepian (edge detection)
-                    for (let y = 1; y < height - 1; y++) {
-                      for (let x = 1; x < width - 1; x++) {
-                        const i = y * width + x;
-
-                        // Ambil nilai asli untuk pixel saat ini (0, 1 untuk rambut, atau 3 untuk kulit)
-                        const origValue = Math.round(originalMask[i] * 255.0);
-
-                        // Hanya proses jika ini adalah bagian dari rambut (1) atau kulit (3)
-                        if (origValue === 1 || origValue === 3) {
-                          // Cek tetangga untuk deteksi tepian
-                          const neighbors = [
-                            Math.round(
-                              originalMask[(y - 1) * width + x] * 255.0,
-                            ),
-                            Math.round(
-                              originalMask[y * width + (x - 1)] * 255.0,
-                            ),
-                            Math.round(
-                              originalMask[y * width + (x + 1)] * 255.0,
-                            ),
-                            Math.round(
-                              originalMask[(y + 1) * width + x] * 255.0,
-                            ),
-                          ];
-
-                          // Jika ada tetangga yang berbeda, ini adalah tepian
-                          if (neighbors.some((val) => val !== origValue)) {
-                            isEdge[i] = true;
-                          }
-                        }
-                      }
-                    }
-
-                    // 2. Proses gambar berdasarkan mask dan informasi tepian
                     let imageData = ctx.getImageData(
                       0,
                       0,
                       sourceWidth,
                       sourceHeight,
-                    );
-                    let pixelData = imageData.data;
+                    ).data;
 
                     const hairColor = hexToRgb(hairColorRef.current);
                     const hairLegend = [
@@ -407,56 +361,44 @@ export function VirtualTryOnScene({
                     let j = 0;
                     for (let i = 0; i < hairRef.current.length; ++i) {
                       const maskVal = Math.round(hairRef.current[i] * 255.0);
-
                       if (maskVal === 1) {
                         if (showHairRef.current) {
                           const legendColor =
                             hairLegend[maskVal % hairLegend.length];
-                          // Untuk tepian, gunakan alpha yang lebih kecil untuk transisi halus
-                          const blendFactor = isEdge[i] ? 0.08 : 0.15;
-                          const preserveFactor = isEdge[i] ? 0.92 : 0.9;
-
-                          pixelData[j] =
-                            legendColor[0] * blendFactor +
-                            pixelData[j] * preserveFactor;
-                          pixelData[j + 1] =
-                            legendColor[1] * blendFactor +
-                            pixelData[j + 1] * preserveFactor;
-                          pixelData[j + 2] =
-                            legendColor[2] * blendFactor +
-                            pixelData[j + 2] * preserveFactor;
-                          pixelData[j + 3] = 255;
+                          imageData[j] =
+                            legendColor[0] * 0.15 + imageData[j] * 0.9;
+                          imageData[j + 1] =
+                            legendColor[1] * 0.15 + imageData[j + 1] * 0.9;
+                          imageData[j + 2] =
+                            legendColor[2] * 0.15 + imageData[j + 2] * 0.9;
+                          imageData[j + 3] = 255;
                         }
                       } else if (maskVal === 3) {
                         if (showFoundationRef.current) {
                           const skinColor =
                             skinColorLegend[maskVal % hairLegend.length];
-                          // Untuk tepian, gunakan alpha yang lebih kecil untuk transisi halus
-                          const blendFactor = isEdge[i] ? 0.04 : 0.08;
-                          const preserveFactor = isEdge[i] ? 0.96 : 0.9;
-
-                          pixelData[j] =
-                            skinColor[0] * blendFactor +
-                            pixelData[j] * preserveFactor;
-                          pixelData[j + 1] =
-                            skinColor[1] * blendFactor +
-                            pixelData[j + 1] * preserveFactor;
-                          pixelData[j + 2] =
-                            skinColor[2] * blendFactor +
-                            pixelData[j + 2] * preserveFactor;
-                          pixelData[j + 3] = 255;
+                          imageData[j] =
+                            skinColor[0] * 0.08 + imageData[j] * 0.9;
+                          imageData[j + 1] =
+                            skinColor[1] * 0.08 + imageData[j + 1] * 0.9;
+                          imageData[j + 2] =
+                            skinColor[2] * 0.08 + imageData[j + 2] * 0.9;
+                          imageData[j + 3] = 255;
                         }
+                      } else {
+                        // imageData[j] = 0;
+                        // imageData[j + 1] = 0;
+                        // imageData[j + 2] = 0;
+                        // imageData[j + 3] = 0;
                       }
                       j += 4;
                     }
 
-                    // Simpan dan tampilkan hasilnya
                     hairMaskRef.current = new ImageData(
-                      new Uint8ClampedArray(pixelData.buffer),
+                      new Uint8ClampedArray(imageData.buffer),
                       sourceWidth,
                       sourceHeight,
                     );
-
                     ctx?.putImageData(hairMaskRef.current, 0, 0);
                     hairResults.close();
                   }
@@ -500,34 +442,8 @@ export function VirtualTryOnScene({
                       canvas.width,
                       canvas.height,
                     );
-
-                    // Edge thresholds for mask boundary detection
-                    const edgeThresholdLow = 0.3;
-                    const edgeThresholdHigh = 0.7;
-
-                    // Apply masking directly without Gaussian blur
                     for (let i = 0; i < categoryMask.length; i++) {
-                      // Determine alpha based on mask value
-                      let alpha;
-
-                      // For pixels inside the mask
-                      if (categoryMask[i] > edgeThresholdHigh) {
-                        alpha = 1.0;
-                      }
-                      // For pixels at the edge of the mask (anti-aliasing)
-                      else if (categoryMask[i] > edgeThresholdLow) {
-                        // Normalize value to 0-1 for edges
-                        alpha =
-                          (categoryMask[i] - edgeThresholdLow) /
-                          (edgeThresholdHigh - edgeThresholdLow);
-                      }
-                      // For pixels outside the mask
-                      else {
-                        alpha = 0.0;
-                      }
-
-                      // Inverse alpha for existing code (adjust if needed)
-                      alpha = 1 - alpha;
+                      const alpha = categoryMask[i] == 1 ? 0 : 1;
 
                       const pixelIndex = i * 4;
 
@@ -552,7 +468,6 @@ export function VirtualTryOnScene({
                         imageData.data[pixelIndex + 2] * (1 - alpha) +
                         coloredTextureB * alpha;
                     }
-
                     ctx.putImageData(imageData, 0, 0);
                   }
                 }
@@ -861,8 +776,8 @@ export function VirtualTryOnScene({
           position: "absolute",
           top: 0,
           left: 0,
-          width: "100vw",
-          height: "100vh",
+          width: "100%",
+          height: "100%",
           objectFit: "cover",
           transform: mode == "LIVE" && !criterias.flipped ? "scaleX(-1)" : "",
         }}
