@@ -501,59 +501,48 @@ export function VirtualTryOnScene({
                       canvas.height,
                     );
 
-                    // Membuat array temporary untuk menyimpan mask yang sudah di-smooth
+                    // Membuat array untuk mask yang sudah di-smooth
                     const smoothedMask = new Float32Array(categoryMask.length);
                     const width = canvas.width;
                     const height = canvas.height;
 
-                    // 1. Aplikasikan Gaussian blur pada mask
-                    // Iterasi melalui setiap pixel (kecuali tepian)
-                    for (let y = 1; y < height - 1; y++) {
-                      for (let x = 1; x < width - 1; x++) {
+                    // Kernel Gaussian blur 5x5
+                    const kernel = [
+                      [1, 4, 6, 4, 1],
+                      [4, 16, 24, 16, 4],
+                      [6, 24, 36, 24, 6],
+                      [4, 16, 24, 16, 4],
+                      [1, 4, 6, 4, 1],
+                    ];
+                    const kernelSum = 256; // Total bobot kernel
+
+                    // Terapkan Gaussian blur
+                    for (let y = 2; y < height - 2; y++) {
+                      for (let x = 2; x < width - 2; x++) {
                         const i = y * width + x;
+                        let sum = 0;
 
-                        // Kernel Gaussian blur sederhana (3x3)
-                        // [1 2 1]
-                        // [2 4 2] / 16
-                        // [1 2 1]
+                        // Jumlahkan nilai berbobot dari semua tetangga dalam kernel 5x5
+                        for (let ky = 0; ky < 5; ky++) {
+                          for (let kx = 0; kx < 5; kx++) {
+                            const pixelY = y + (ky - 2);
+                            const pixelX = x + (kx - 2);
+                            sum +=
+                              categoryMask[pixelY * width + pixelX] *
+                              kernel[ky][kx];
+                          }
+                        }
 
-                        const topLeft =
-                          categoryMask[(y - 1) * width + (x - 1)] * 1;
-                        const top = categoryMask[(y - 1) * width + x] * 2;
-                        const topRight =
-                          categoryMask[(y - 1) * width + (x + 1)] * 1;
-
-                        const left = categoryMask[y * width + (x - 1)] * 2;
-                        const center = categoryMask[y * width + x] * 4;
-                        const right = categoryMask[y * width + (x + 1)] * 2;
-
-                        const bottomLeft =
-                          categoryMask[(y + 1) * width + (x - 1)] * 1;
-                        const bottom = categoryMask[(y + 1) * width + x] * 2;
-                        const bottomRight =
-                          categoryMask[(y + 1) * width + (x + 1)] * 1;
-
-                        // Hitung nilai rata-rata berbobot
-                        smoothedMask[i] =
-                          (topLeft +
-                            top +
-                            topRight +
-                            left +
-                            center +
-                            right +
-                            bottomLeft +
-                            bottom +
-                            bottomRight) /
-                          16;
+                        // Normalisasi hasil
+                        smoothedMask[i] = sum / kernelSum;
                       }
                     }
 
-                    // 2. Gunakan threshold untuk menentukan tepian
-                    // Bisa disesuaikan nilainya (0.3-0.7) untuk hasil yang berbeda
+                    // Threshold untuk menentukan tepian
                     const edgeThresholdLow = 0.3;
                     const edgeThresholdHigh = 0.7;
 
-                    // 3. Terapkan hasil smoothing pada gambar
+                    // Terapkan hasil smoothing pada gambar
                     for (let i = 0; i < categoryMask.length; i++) {
                       // Tentukan alpha berdasarkan smoothed mask
                       let alpha;
@@ -574,7 +563,7 @@ export function VirtualTryOnScene({
                         alpha = 0.0;
                       }
 
-                      // Inverse alpha untuk kode yang sudah ada (sesuaikan jika perlu)
+                      // Inverse alpha untuk kode yang sudah ada
                       alpha = 1 - alpha;
 
                       const pixelIndex = i * 4;
