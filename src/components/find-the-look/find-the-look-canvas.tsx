@@ -33,6 +33,33 @@ interface Hitbox {
   height: number;
 }
 
+const adjustCategoryName = (name: string) => {
+  if (name == "bracelet") {
+    return "Bracelet"
+  }
+  if (name == "cap") {
+    return "Cap"
+  }
+  if (name == "hat") {
+    return "Hat"
+  }
+  if (name == "watches") {
+    return "Watch"
+  }
+  if (name == "glasses" || name == "sunglasses") {
+    return "Glasses"
+  }
+  if (name == "necklaces") {
+    return "Necklaces"
+  }
+  if (name == "ring") {
+    return "rings"
+  }
+  if (name == "scarf") {
+    return "Scarf"
+  }
+  return name
+}
 export function FindTheLookCanvas({
   image,
   canvasRef,
@@ -108,7 +135,8 @@ export function FindTheLookCanvas({
       };
 
       detections.detections.forEach((detection: any) => {
-        const categoryName = detection.categories[0].categoryName;
+        const categoryName = adjustCategoryName(detection.categories[0].categoryName);
+        detection.categories[0].categoryName = categoryName;
         const score = detection.categories[0].score;
 
         // Periksa apakah skor lebih tinggi dari skor tertinggi yang sudah ditemukan untuk kategori tersebut

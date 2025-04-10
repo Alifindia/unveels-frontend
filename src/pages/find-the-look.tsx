@@ -20,6 +20,7 @@ import {
   neckAccessoriesProductTypeFilter,
 } from "../api/attributes/accessories";
 import {
+  getBrowMakeupProductTypeIds,
   getFaceMakeupProductTypeIds,
   getLashMakeupProductTypeIds,
   getLensesProductTypeIds,
@@ -74,7 +75,7 @@ export function FindTheLook() {
       <SkinAnalysisProvider>
         <FindTheLookProvider>
           <div className="h-full min-h-dvh">
-            <Main isArabic={isArabic}/>
+            <Main isArabic={isArabic} />
           </div>
         </FindTheLookProvider>
       </SkinAnalysisProvider>
@@ -96,8 +97,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
   const { criterias } = useCamera();
   const [selectionMade, setSelectionMade] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
-  const { view, setView, findTheLookItems, tab } =
-    useFindTheLookContext();
+  const { view, setView, findTheLookItems, tab } = useFindTheLookContext();
   const [groupedItemsData, setGroupedItemsData] = useState<{
     makeup: FindTheLookItems[];
     accessories: FindTheLookItems[];
@@ -177,7 +177,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
           },
           runningMode: "IMAGE",
           maxResults: 20,
-          scoreThreshold: 0.2,
+          scoreThreshold: 0.07,
         },
       );
       modelsRef.current.accesoriesDetector = accesoriesDetectorInstance;
@@ -251,7 +251,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
               <FindTheLookScene models={modelsRef.current} />
             ) : (
               <>
-                <VideoStream isNeedDetectOrientation={false}/>
+                <VideoStream isNeedDetectOrientation={false} />
               </>
             )}
           </div>
@@ -276,7 +276,7 @@ function Main({ isArabic }: { isArabic?: boolean }) {
             </div>
           )}
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-0">
-            <MainContent isArabic={isArabic}/>
+            <MainContent isArabic={isArabic} />
             {view == "face" && tab === null && <Footer />}
           </div>
         </div>
@@ -446,6 +446,20 @@ const mapTypes: {
     attributeName: "lash_makeup_product_type",
     values: getLashMakeupProductTypeIds(["Mascaras"]),
   },
+  Eyebrow: {
+    attributeName: "brow_makeup_product_type",
+    values: getBrowMakeupProductTypeIds([
+      "Brow Gels",
+      "Brow Pigments",
+      "Brow Pencils",
+      "Brow Powders",
+      "Brow Tools",
+      "Brow Setter",
+      "Brow Serums",
+      "Brow Waxes",
+      "Brow Pens",
+    ]),
+  },
   Blusher: {
     attributeName: "face_makeup_product_type",
     values: getFaceMakeupProductTypeIds(["Blushes"]),
@@ -488,6 +502,10 @@ const mapTypes: {
     attributeName: "head_accessories_product_type",
     values: headAccessoriesProductTypeFilter(["Earrings"]),
   },
+  Earring: {
+    attributeName: "head_accessories_product_type",
+    values: headAccessoriesProductTypeFilter(["Earrings"]),
+  },
   Necklace: {
     attributeName: "neck_accessories_product_type",
     values: headAccessoriesProductTypeFilter(["Necklaces"]),
@@ -519,8 +537,8 @@ function ProductList({ product_type }: { product_type: string }) {
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
-      setType("unit")
-      setDataItem(dataProduct)
+      setType("unit");
+      setDataItem(dataProduct);
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -566,7 +584,8 @@ function ProductList({ product_type }: { product_type: string }) {
 
               <div className="flex items-end justify-between space-x-1 pt-1">
                 <div className="bg-gradient-to-r from-[#CA9C43] to-[#92702D] bg-clip-text text-[0.625rem] text-transparent">
-                  {currencySymbol}{(product.price * rate).toFixed(3)}
+                  {currencySymbol}
+                  {(product.price * rate).toFixed(3)}
                 </div>
                 <button
                   type="button"
@@ -576,7 +595,7 @@ function ProductList({ product_type }: { product_type: string }) {
                     handleAddToCart(
                       product.id.toString(),
                       `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                      product
+                      product,
                     );
                   }}
                 >
@@ -592,7 +611,6 @@ function ProductList({ product_type }: { product_type: string }) {
     </div>
   );
 }
-
 
 function BottomContent({ isArabic }: { isArabic?: boolean }) {
   const { criterias, setCriterias } = useCamera();
@@ -699,7 +717,7 @@ function BottomContent({ isArabic }: { isArabic?: boolean }) {
     // );
   }
 
-  return <VideoScene isArabic={isArabic}/>;
+  return <VideoScene isArabic={isArabic} />;
 }
 
 function InferenceResults({
@@ -853,11 +871,17 @@ function AllProductsPage({
   const allProducts = [
     ...groupedItemsData.makeup.flatMap((category) => {
       const { attributeName, values } = mapTypes[category.label] || {};
-      return values ? useProducts({ product_type_key: attributeName, type_ids: values }).data?.items || [] : [];
+      return values
+        ? useProducts({ product_type_key: attributeName, type_ids: values })
+            .data?.items || []
+        : [];
     }),
     ...groupedItemsData.accessories.flatMap((category) => {
       const { attributeName, values } = mapTypes[category.label] || {};
-      return values ? useProducts({ product_type_key: attributeName, type_ids: values }).data?.items || [] : [];
+      return values
+        ? useProducts({ product_type_key: attributeName, type_ids: values })
+            .data?.items || []
+        : [];
     }),
   ];
 
@@ -870,10 +894,10 @@ function AllProductsPage({
       for (const product of allProducts) {
         await addItemToCart(
           product.id.toString(),
-          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`
+          `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
         );
       }
-      setType("all")
+      setType("all");
       console.log("All products added to cart!");
     } catch (error) {
       console.error("Failed to add all products to cart:", error);
@@ -1051,8 +1075,8 @@ function ProductHorizontalList({ category }: { category: string }) {
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
-      setType("unit")
-      setDataItem(dataProduct)
+      setType("unit");
+      setDataItem(dataProduct);
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -1095,7 +1119,8 @@ function ProductHorizontalList({ category }: { category: string }) {
                   </p>
                   <div className="flex flex-wrap items-center justify-end gap-x-1">
                     <span className="text-[0.5rem] font-bold text-white md:text-[10px]">
-                      {currencySymbol}{(product.price * rate).toFixed(3)}
+                      {currencySymbol}
+                      {(product.price * rate).toFixed(3)}
                     </span>
                   </div>
                 </div>
@@ -1108,7 +1133,7 @@ function ProductHorizontalList({ category }: { category: string }) {
                       handleAddToCart(
                         product.id.toString(),
                         `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                        product
+                        product,
                       );
                     }}
                   >
@@ -1150,8 +1175,8 @@ function SingleCategoryView({
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
-      setType("unit")
-      setDataItem(dataProduct)
+      setType("unit");
+      setDataItem(dataProduct);
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -1210,7 +1235,8 @@ function SingleCategoryView({
                       </p>
                       <div className="flex flex-wrap items-center justify-end gap-x-1">
                         <span className="text-sm font-bold text-white">
-                        {currencySymbol}{(product.price * rate).toFixed(3)}
+                          {currencySymbol}
+                          {(product.price * rate).toFixed(3)}
                         </span>
                       </div>
                     </div>
@@ -1223,7 +1249,7 @@ function SingleCategoryView({
                           handleAddToCart(
                             product.id.toString(),
                             `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                            product
+                            product,
                           );
                         }}
                       >
