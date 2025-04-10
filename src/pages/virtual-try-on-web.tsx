@@ -96,6 +96,9 @@ function Main() {
   const [imageModelSrc, setModelImageSrc] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log(imageModelSrc);
+  }, [imageModelSrc])
+  useEffect(() => {
     if (sidebarData?.beforeAfter !== undefined) {
       compareCapture();
     }
@@ -462,6 +465,7 @@ function Main() {
 
   const handleChangeModel = (url: string) => {
     if (url) {
+      console.log("Model GANTI URL:", url);
       setMode("IMAGE");
       setModelImageSrc(url);
     }
@@ -488,7 +492,7 @@ function Main() {
           <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
         )}
         {mode === "IMAGE" && imageModelSrc != null && (
-          <VirtualTryOnScene mediaFile={mediaFile} mode={mode} modelImageSrc={imageModelSrc}/>
+          <VirtualTryOnScene mediaFile={mediaFile} mode={mode} modelImageSrc={imageModelSrc} key={imageModelSrc}/>
         )}
         {mode === "VIDEO" && (
           <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
