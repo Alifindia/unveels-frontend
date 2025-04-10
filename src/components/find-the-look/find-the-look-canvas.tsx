@@ -325,7 +325,7 @@ export function FindTheLookCanvas({
 
       ctx.clearRect(0, 0, width, height);
 
-      if (isFlip) {
+      if (!isFlip) {
         // Draw image normally
         ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
       } else {
@@ -546,16 +546,16 @@ export function FindTheLookCanvas({
             }
 
             if (
-              category.categoryName === "Eyebrow" &&
+              category.categoryName === "Eyebrown" &&
               faceLandmark &&
-              faceLandmark[225]
+              faceLandmark[52]
             ) {
               drawX = isFlip
                 ? width -
-                  (faceLandmark[225].x * image.naturalWidth * scaleX + offsetX)
-                : faceLandmark[225].x * image.naturalWidth * scaleX + offsetX;
+                  (faceLandmark[52].x * image.naturalWidth * scaleX + offsetX)
+                : faceLandmark[52].x * image.naturalWidth * scaleX + offsetX;
               drawY =
-                faceLandmark[225].y * image.naturalHeight * scaleY + offsetY;
+                faceLandmark[52].y * image.naturalHeight * scaleY + offsetY;
               label = "Eyebrow";
 
               const averageEyebrowsColor = extractSkinColor(
@@ -715,6 +715,85 @@ export function FindTheLookCanvas({
               drawY =
                 faceLandmark[257].y * image.naturalHeight * scaleY + offsetY;
               label = "Eyeshadow";
+
+              const averageEyeshadowColor = extractSkinColor(
+                image,
+                faceLandmark,
+                [29, 27],
+                2,
+              );
+
+              addFindTheLookItem({
+                label: label,
+                section: "makeup",
+                color: averageEyeshadowColor.hexColor,
+              });
+
+              // Draw landmark point
+              ctx.beginPath();
+              ctx.arc(drawX, drawY, 10, 0, 2 * Math.PI);
+              ctx.fillStyle = "white"; // Red color
+              ctx.fill();
+              ctx.closePath();
+
+              // Calculate label position
+              const labelX = calculateLabelX(drawX);
+              const labelY = drawY + 50;
+
+              // Draw a line from the center to the label
+              ctx.beginPath();
+              ctx.moveTo(drawX, drawY);
+              ctx.lineTo(labelX, labelY);
+              ctx.strokeStyle = "white";
+              ctx.stroke();
+
+              // Display the label
+              ctx.font = "12px Arial";
+              ctx.fillStyle = "white";
+              ctx.shadowColor = "black";
+              ctx.shadowBlur = 4;
+              ctx.shadowOffsetX = 1;
+              ctx.shadowOffsetY = 1;
+
+              ctx.fillText(label, labelX, labelY - 5);
+              ctx.shadowColor = "transparent";
+              ctx.shadowBlur = 0;
+              ctx.shadowOffsetX = 0;
+              ctx.shadowOffsetY = 0;
+
+              // Draw underline for label text
+              const textWidth = ctx.measureText(label).width;
+              const underlineEndX = labelX + textWidth;
+              const underlineY = labelY + 5;
+
+              ctx.beginPath();
+              ctx.moveTo(labelX, labelY);
+              ctx.lineTo(underlineEndX, underlineY);
+              ctx.strokeStyle = "white";
+              ctx.stroke();
+
+              hitboxesRef.current.push({
+                label: label,
+                section: "makeup",
+                x: labelX,
+                y: labelY - 20,
+                width: textWidth,
+                height: 20,
+              });
+            }
+
+            if (
+              category.categoryName === "Mascara" &&
+              faceLandmark &&
+              faceLandmark[386]
+            ) {
+              drawX = isFlip
+                ? width -
+                  (faceLandmark[386].x * image.naturalWidth * scaleX + offsetX)
+                : faceLandmark[386].x * image.naturalWidth * scaleX + offsetX;
+              drawY =
+                faceLandmark[386].y * image.naturalHeight * scaleY + offsetY;
+              label = "Mascara";
 
               const averageEyeshadowColor = extractSkinColor(
                 image,

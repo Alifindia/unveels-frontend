@@ -4,7 +4,7 @@ import { BackSide, Mesh, MeshStandardMaterial, Object3D } from "three";
 import { Landmark } from "../../../../types/landmark";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../../utils/calculateDistance";
-import { fingerTipQuaternion, FingerType, handQuaternion } from "../../../../utils/handOrientation";
+import { fingerTipQuaternion, FingerType, handQuaternion, HandType } from "../../../../utils/handOrientation";
 import { useAccesories } from "../../../../context/accesories-context";
 import { NAILS, PRESS_ON_NAILS_ONE } from "../../../../utils/constants";
 import { useMakeup } from "../../../../context/makeup-context";
@@ -13,10 +13,11 @@ import { FrontSide } from "three";
 interface NailRingProps extends MeshProps {
   handLandmarks: React.RefObject<Landmark[]>;
   planeSize: [number, number];
+  handedness: string;
 }
 
 const NailRingInner: React.FC<NailRingProps> = React.memo(
-  ({ handLandmarks, planeSize }) => {
+  ({ handLandmarks, planeSize, handedness }) => {
     const nailsRef = useRef<Object3D | null>(null);
     const { scene, viewport } = useThree();
     const { envMapAccesories } = useAccesories();
@@ -64,7 +65,11 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
     }, [scene, envMapAccesories, nailsColor]); // Adding nailsColor to the dependency array
 
     useFrame(() => {
-      if (!handLandmarks.current || !nailsRef.current) return;
+      if (!nailsRef.current) return;
+      if (!handLandmarks.current) {
+        nailsRef.current.visible = false;
+        return;
+      }
       if (handLandmarks.current.length > 0) {
         nailsRef.current.visible = true;
         const middleFingerMCP = handLandmarks.current[9];
@@ -86,7 +91,7 @@ const NailRingInner: React.FC<NailRingProps> = React.memo(
         nailsRef.current.position.set(nailsFingerX, nailsFingerY, nailsFingerZ);
         nailsRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-        const quaternion = fingerTipQuaternion(handLandmarks.current, FingerType.RING);
+        const quaternion = fingerTipQuaternion(handLandmarks.current, FingerType.RING, handedness as HandType);
 
         if (quaternion) {
           nailsRef.current.setRotationFromQuaternion(quaternion);

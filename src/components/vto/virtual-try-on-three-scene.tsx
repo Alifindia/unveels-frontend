@@ -59,6 +59,7 @@ interface VirtualTryOnThreeSceneProps extends MeshProps {
   blendshape: React.RefObject<Blendshape[]>;
   sourceType: "LIVE" | "VIDEO" | "IMAGE";
   hairMask: React.RefObject<ImageData> | null;
+  rightHandLandmarks: React.RefObject<Landmark[]>;
 }
 
 const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
@@ -69,6 +70,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
   blendshape,
   sourceType,
   hairMask,
+  rightHandLandmarks,
   ...props
 }) => {
   const { gl } = useThree();
@@ -103,7 +105,7 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
     showLashes,
     showNails,
     showMascara,
-    showPressOnNails
+    showPressOnNails,
   } = useMakeup();
 
   const {
@@ -540,18 +542,41 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
           </> */}
           {/* )} */}
           <>
-            <HandOccluder planeSize={planeSize} handLandmarks={handlandmarks} />
+            <HandOccluder
+              planeSize={planeSize}
+              handLandmarks={handlandmarks}
+            />
+            <HandOccluder
+              planeSize={planeSize}
+              handLandmarks={rightHandLandmarks}
+            />
             <FingerOccluder
               planeSize={planeSize}
               handLandmarks={handlandmarks}
             />
+            <FingerOccluder
+              planeSize={planeSize}
+              handLandmarks={rightHandLandmarks}
+            />
 
             {showWatch && (
-              <Watch planeSize={planeSize} handLandmarks={handlandmarks} />
+              <>
+                <Watch planeSize={planeSize} handLandmarks={handlandmarks} />
+                <Watch
+                  planeSize={planeSize}
+                  handLandmarks={rightHandLandmarks}
+                />
+              </>
             )}
 
             {showRing && (
-              <Ring planeSize={planeSize} handLandmarks={handlandmarks} />
+              <>
+                <Ring planeSize={planeSize} handLandmarks={handlandmarks} />
+                <Ring
+                  planeSize={planeSize}
+                  handLandmarks={rightHandLandmarks}
+                />
+              </>
             )}
 
             {showPressOnNails && (
@@ -559,24 +584,60 @@ const VirtualTryOnThreeScene: React.FC<VirtualTryOnThreeSceneProps> = ({
                 <NailThumb
                   planeSize={planeSize}
                   handLandmarks={handlandmarks}
+                  handedness="Left"
                 />
                 <NailMidlle
                   planeSize={planeSize}
                   handLandmarks={handlandmarks}
+                  handedness="Left"
                 />
                 <NailIndex
                   planeSize={planeSize}
                   handLandmarks={handlandmarks}
+                  handedness="Left"
                 />
-                <NailRing planeSize={planeSize} handLandmarks={handlandmarks} />
+                <NailRing
+                  planeSize={planeSize}
+                  handLandmarks={handlandmarks}
+                  handedness="Left"
+                />
                 <NailPinky
                   planeSize={planeSize}
                   handLandmarks={handlandmarks}
+                  handedness="Left"
+                />
+                <NailThumb
+                  planeSize={planeSize}
+                  handLandmarks={rightHandLandmarks}
+                  handedness="Right"
+                />
+                <NailMidlle
+                  planeSize={planeSize}
+                  handLandmarks={rightHandLandmarks}
+                  handedness="Right"
+                />
+                <NailIndex
+                  planeSize={planeSize}
+                  handLandmarks={rightHandLandmarks}
+                  handedness="Right"
+                />
+                <NailRing
+                  planeSize={planeSize}
+                  handLandmarks={rightHandLandmarks}
+                  handedness="Right"
+                />
+                <NailPinky
+                  planeSize={planeSize}
+                  handLandmarks={rightHandLandmarks}
+                  handedness="Right"
                 />
               </>
             )}
             {showBracelet && (
-              <Bangle planeSize={planeSize} handLandmarks={handlandmarks} />
+              <>
+                <Bangle planeSize={planeSize} handLandmarks={handlandmarks} />
+                <Bangle planeSize={planeSize} handLandmarks={rightHandLandmarks} />
+              </>
             )}
           </>
         </>

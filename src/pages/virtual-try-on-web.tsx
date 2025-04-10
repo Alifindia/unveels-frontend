@@ -72,7 +72,7 @@ function Main() {
     setShowHair,
     setHairColor,
     setShowPressOnNails,
-    resetMakeup
+    resetMakeup,
   } = useMakeup();
 
   const {
@@ -84,7 +84,7 @@ function Main() {
     setShowNecklace,
     setShowRing,
     setShowWatch,
-    resetAccessories
+    resetAccessories,
   } = useAccesories();
 
   const { criterias, flipCamera, compareCapture, resetCapture, screenShoot } =
@@ -93,6 +93,7 @@ function Main() {
   const [mode, setMode] = useState<"IMAGE" | "VIDEO" | "LIVE">("LIVE");
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [sidebarData, setSidebarData] = useState<any>(null);
+  const [imageModelSrc, setModelImageSrc] = useState<string | null>(null);
 
   useEffect(() => {
     if (sidebarData?.beforeAfter !== undefined) {
@@ -193,7 +194,7 @@ function Main() {
           // mascara
           if (data.showMascara !== undefined) {
             setShowMascara(data.showMascara);
-            setShowLashes(!data.showMascara)
+            setShowLashes(!data.showMascara);
           }
 
           if (data.mascaraColor !== undefined) {
@@ -384,6 +385,10 @@ function Main() {
             resetMakeup();
           }
 
+          if (data.modelUrl !== undefined) {
+            handleChangeModel(data.modelUrl);
+          }
+
           //handle add media
         } catch (error) {
           console.error("Error parsing message:", error); // Menampilkan error jika parsing gagal
@@ -455,6 +460,13 @@ function Main() {
     }
   };
 
+  const handleChangeModel = (url: string) => {
+    if (url) {
+      setMode("IMAGE");
+      setModelImageSrc(url);
+    }
+  };
+
   return (
     <div className="relative mx-auto h-full min-h-dvh w-full bg-black">
       <div className="absolute inset-0">
@@ -472,8 +484,11 @@ function Main() {
             onChange={handleUploadVideo}
           />
         </div>
-        {mode === "IMAGE" && (
+        {mode === "IMAGE" && imageModelSrc == null && (
           <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />
+        )}
+        {mode === "IMAGE" && imageModelSrc != null && (
+          <VirtualTryOnScene mediaFile={mediaFile} mode={mode} modelImageSrc={imageModelSrc}/>
         )}
         {mode === "VIDEO" && (
           <VirtualTryOnScene mediaFile={mediaFile} mode={mode} />

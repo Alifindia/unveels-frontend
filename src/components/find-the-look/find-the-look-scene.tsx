@@ -105,7 +105,7 @@ export function FindTheLookScene({ models }: FindTheLookSceneProps) {
               onLabelClick={handleLabelClick}
               onDetectDone={handleDetectDone} // Pass the callback
               models={models}
-              isFlip={runningMode !== "LIVE_CAMERA"}
+              isFlip={runningMode == "LIVE_CAMERA" && !criterias.flipped}
             />
           </canvas>
         </div>
