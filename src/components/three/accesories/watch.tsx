@@ -11,7 +11,7 @@ import { Landmark } from "../../../types/landmark";
 import { WATCH } from "../../../utils/constants";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { calculateDistance } from "../../../utils/calculateDistance";
-import { handQuaternion } from "../../../utils/handOrientation";
+import { handQuaternion, HandType } from "../../../utils/handOrientation";
 import { useAccesories } from "../../../context/accesories-context";
 
 interface WatchProps extends MeshProps {
@@ -42,7 +42,7 @@ const WatchInner: React.FC<WatchProps> = React.memo(
                 mesh.material.needsUpdate = true;
                 mesh.material.visible = showWatch;
               }
-              child.renderOrder = 4;
+              child.renderOrder = 5;
             }
           });
 
@@ -81,37 +81,19 @@ const WatchInner: React.FC<WatchProps> = React.memo(
         const wristX = (1 - wrist.x - 0.5) * outputWidth;
         const wristY = -(wrist.y - 0.5) * outputHeight;
         const wristZ = -wrist.z * Math.max(outputHeight, outputWidth);
-        let scaleFactor: number
-        if (isPalmFacingBack) {
-          scaleFactor = (wristSize * Math.max(outputHeight, outputWidth)) / 3.7;
-        } else {
-          scaleFactor = (wristSize * Math.max(outputHeight, outputWidth)) / 3.48;
-        }
+        const scaleFactor = (wristSize * outputWidth) * 0.37;
+
         watchRef.current.position.set(wristX, wristY, wristZ);
         watchRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-        const isRightHand = thumbBase.x < indexBase.x;
-
-        const quaternion = handQuaternion(handLandmarks.current);
+        const quaternion = handQuaternion(handLandmarks.current, undefined, undefined, HandType.RIGHT);
 
         if (quaternion) {
-          const adjustment = new Quaternion();
-
-          if (isPalmFacingBack) {
-            adjustment.setFromAxisAngle(new Vector3(1, 0, 0), Math.PI);
-          } else {
-            adjustment.setFromAxisAngle(new Vector3(1, 0, 0), 0);
-          }
-
-          if (!isRightHand) {
-            adjustment.multiply(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), Math.PI));
-          }
-
-          watchRef.current.quaternion.copy(quaternion).multiply(adjustment);
+          watchRef.current.setRotationFromQuaternion(quaternion);
         }
 
-        const isWristBent = wristSize < 0.1;
-        watchRef.current.visible = !isWristBent;
+        const isWristBent = wristSize < 0.2;
+        watchRef.current.visible = true;
       } else {
         watchRef.current.visible = false;
       }

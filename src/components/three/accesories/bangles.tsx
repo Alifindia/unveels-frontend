@@ -81,7 +81,7 @@ const BangleInner: React.FC<BangleProps> = React.memo(
         const wristX = (1 - wrist.x - 0.5) * outputWidth;
         const wristY = -(wrist.y - 0.5) * outputHeight;
         const wristZ = -wrist.z * Math.max(outputHeight, outputWidth);
-        const scaleFactor = wristSize * Math.max(outputHeight, outputWidth);
+        const scaleFactor = (wristSize * outputWidth) * 1.1;
 
         bangleRef.current.position.set(wristX, wristY, wristZ);
         bangleRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -92,8 +92,10 @@ const BangleInner: React.FC<BangleProps> = React.memo(
           bangleRef.current.setRotationFromQuaternion(quaternion);
         }
 
-        const isWristBent = wristSize < 0.1;
+        const isWristBent = wristSize < 0.2;
         bangleRef.current.visible = true;
+      } else {
+        bangleRef.current.visible = false;
       }
     });
 

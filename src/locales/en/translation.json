@@ -447,8 +447,20 @@
     "remove": "Remove",
     "exit": "Exit"
   },
-  "message" : {
+  "message": {
     "resetVto": "Are you sure you want reset and remove all current makeup?",
     "exitVto": "Are you sure you want exit virtual try-on?"
+  },
+  "common": {
+    "apply": "Apply"
+  },
+  "sort": {
+    "title": "Sort By",
+    "newest_first": "Newest First",
+    "oldest_first": "Oldest First",
+    "name_a_z": "Name A-Z",
+    "name_z_a": "Name Z-A",
+    "price_low_high": "Price Low-High",
+    "price_high_low": "Price High-Low"
   }
 }

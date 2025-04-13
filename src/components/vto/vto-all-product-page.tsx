@@ -18,6 +18,7 @@ import { useFilterContext } from "../../context/filter-context";
 import { getCurrencyAndRate } from "../../utils/other";
 import { exchangeRates } from "../../utils/constants";
 import SuccessPopup from "../popup-add-to-cart";
+import SortByComponent from "../all-product/sort-by";
 
 export function VTOAllProductsPage({
   onClose,
@@ -42,6 +43,7 @@ export function VTOAllProductsPage({
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [sorting, setSorting] = useState(false);
   const { sort, setSort } = useFilterContext();
+  const [isSortByVisible, setIsSortByVisible] = useState(false);
 
   const toggleFilter = () => {
     setIsFilterVisible((prev) => !prev);
@@ -51,10 +53,14 @@ export function VTOAllProductsPage({
     setIsFilterVisible(false);
   };
 
-  const toggleSorting = () => {
-    setSorting((prev) => !prev);
-    setSort(sorting);
+  const closeSortBy = () => {
+    setIsSortByVisible(false);
   };
+
+  const toggleSorting = () => {
+    setIsSortByVisible((prev) => !prev);
+  };
+
   const { dataItem, type } = useCartContext();
 
   return (
@@ -104,6 +110,7 @@ export function VTOAllProductsPage({
 
       {/* Filter Component */}
       {isFilterVisible && <FilterComponent closeFilter={closeFilter} />}
+      {isSortByVisible && <SortByComponent closeSortBy={closeSortBy} />}
 
       {/* Makeup Tab */}
       {tab === "makeup" ? (
@@ -166,6 +173,7 @@ function ProductHorizontalList({
     maxPrice,
     selectedFormation,
     sort,
+    sortBy
   } = useFilterContext();
 
   if (!mapTypes[category]) {
@@ -189,6 +197,7 @@ function ProductHorizontalList({
     selectedSizeTwo: selectedSizeTwo,
     maxPrice: maxPrice,
     minPrice: minPrice,
+    orderBy: sortBy,
   });
 
   // Whenever a filter context value changes, trigger refetch

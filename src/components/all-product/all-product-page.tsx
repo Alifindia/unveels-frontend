@@ -9,6 +9,7 @@ import {
   baseApiUrl,
   getProductAttributes,
   mediaUrl,
+  SortField,
 } from "../../utils/apiUtils";
 import { BrandName } from "../product/brand";
 import { Rating } from "../rating";
@@ -16,6 +17,7 @@ import { LoadingProducts } from "../loading";
 import { useFilterContext } from "../../context/filter-context";
 import { getCurrencyAndRate } from "../../utils/other";
 import { exchangeRates } from "../../utils/constants";
+import SortByComponent from "./sort-by";
 
 export function AllProductsPage({
   onClose,
@@ -40,6 +42,7 @@ export function AllProductsPage({
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [sorting, setSorting] = useState(false);
   const { sort, setSort } = useFilterContext();
+  const [isSortByVisible, setIsSortByVisible] = useState(false);
 
   const toggleFilter = () => {
     setIsFilterVisible((prev) => !prev);
@@ -49,9 +52,12 @@ export function AllProductsPage({
     setIsFilterVisible(false);
   };
 
+  const closeSortBy = () => {
+    setIsSortByVisible(false);
+  };
+
   const toggleSorting = () => {
-    setSorting((prev) => !prev);
-    setSort(sorting);
+    setIsSortByVisible((prev) => !prev);
   };
 
   return (
@@ -100,6 +106,7 @@ export function AllProductsPage({
 
       {/* Filter Component */}
       {isFilterVisible && <FilterComponent closeFilter={closeFilter} />}
+      {isSortByVisible && <SortByComponent closeSortBy={closeSortBy} />}
 
       {/* Makeup Tab */}
       {tab === "makeup" ? (
@@ -162,6 +169,7 @@ function ProductHorizontalList({
     maxPrice,
     selectedFormation,
     sort,
+    sortBy,
   } = useFilterContext();
 
   if (!mapTypes[category]) {
@@ -185,6 +193,7 @@ function ProductHorizontalList({
     selectedSizeTwo: selectedSizeTwo,
     maxPrice: maxPrice,
     minPrice: minPrice,
+    orderBy: sortBy,
   });
 
   // Whenever a filter context value changes, trigger refetch
@@ -207,8 +216,8 @@ function ProductHorizontalList({
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
-      setType("unit")
-      setDataItem(dataProduct)
+      setType("unit");
+      setDataItem(dataProduct);
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -256,7 +265,8 @@ function ProductHorizontalList({
                   </p>
                   <div className="flex flex-wrap items-center justify-end gap-x-1">
                     <span className="text-sm font-bold text-white">
-                      {currencySymbol}{(product.price * rate).toFixed(3)}
+                      {currencySymbol}
+                      {(product.price * rate).toFixed(3)}
                     </span>
                   </div>
                 </div>
@@ -269,7 +279,7 @@ function ProductHorizontalList({
                       handleAddToCart(
                         product.id.toString(),
                         `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                        product
+                        product,
                       );
                     }}
                   >
@@ -1367,10 +1377,12 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
           </div>
           <div className="my-4 flex justify-between text-sm">
             <span>
-              {currencySymbol}{minPrice}
+              {currencySymbol}
+              {minPrice}
             </span>
             <span>
-              {currencySymbol}{maxPrice}
+              {currencySymbol}
+              {maxPrice}
             </span>
           </div>
           <div className="relative h-6 w-full">

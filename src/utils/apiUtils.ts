@@ -277,7 +277,7 @@ export async function fetchAllProducts(
   };
 }
 
-type SortField = "id" | "name" | "price"; // Explicitly define the sort fields
+export type SortField = "id" | "name" | "price" | "created_at"; // Explicitly define the sort fields
 
 export async function fetchAllProductsWithSort(
   results: {

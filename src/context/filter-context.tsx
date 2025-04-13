@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { SortField } from "../utils/apiUtils";
 
 // Define the context type
 interface FilterContextType {
@@ -18,6 +19,8 @@ interface FilterContextType {
   setMaxPrice: (value: number) => void;
   sort: boolean;
   setSort: (value: boolean) => void;
+  sortBy: SortField;
+  setSortBy: (value: SortField) => void;
 }
 
 // Create the context with a default value
@@ -43,7 +46,8 @@ export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedFormation, setSelectedFormation] = useState<string>("");
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(1000);
-  const [sort, setSort] = useState<boolean>(false);
+  const [sort, setSort] = useState<boolean>(true);
+  const [sortBy, setSortBy] = useState<SortField>("name");
 
   return (
     <FilterContext.Provider
@@ -64,6 +68,8 @@ export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({
         setMaxPrice,
         sort,
         setSort,
+        sortBy,
+        setSortBy,
       }}
     >
       {children}

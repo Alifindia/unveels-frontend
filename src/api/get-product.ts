@@ -6,9 +6,9 @@ import {
   fetchAllProducts,
   fetchAllProductsWithSort,
   getProductTypeAndTexture,
+  SortField,
 } from "../utils/apiUtils";
 import { defaultHeaders, Product } from "./shared";
-import { result } from "lodash";
 
 const lipsKey = {
   product: ({ sku }: { sku: string }) => ["product", sku],
@@ -160,6 +160,7 @@ export function useProductsVTOAll({
   selectedSizeTwo,
   minPrice,
   maxPrice,
+  orderBy
 }: {
   product_type_key: string;
   type_ids: string[];
@@ -171,6 +172,7 @@ export function useProductsVTOAll({
   selectedSizeTwo: string;
   minPrice: number;
   maxPrice: number;
+  orderBy: SortField
 }) {
   return useQuery({
     queryKey: ["products", product_type_key, type_ids],
@@ -285,7 +287,7 @@ export function useProductsVTOAll({
           items: combinedResults,
         },
         [],
-        "name",
+        orderBy,
         sortOrder,
         maxPrice,
         minPrice,
