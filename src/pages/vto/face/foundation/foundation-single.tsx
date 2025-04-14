@@ -9,6 +9,7 @@ import { useMakeup } from "../../../../context/makeup-context";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useFoundationContext } from "./foundation-context";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export function SingleFoundationSelector({ product }: { product: Product }) {
   return (
@@ -77,7 +78,7 @@ function ColorSelector({ product }: { product: Product }) {
 function TextureSelector({ product }: { product: Product }) {
   const { selectedTexture, setSelectedTexture } = useFoundationContext();
   const { setBlushMaterial } = useMakeup();
-
+  const { t, i18n } = useTranslation();
   const productTextures = extractUniqueCustomAttributes([product], "texture");
 
   return (

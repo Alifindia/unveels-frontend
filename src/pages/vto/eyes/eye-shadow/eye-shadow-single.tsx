@@ -8,6 +8,7 @@ import { filterTextures } from "../../../../api/attributes/texture";
 import { Product } from "../../../../api/shared";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { ColorPalette } from "../../../../components/color-palette";
+import { useTranslation } from "react-i18next";
 
 export function SingleEyeShadowSelector({ product }: { product: Product }) {
   return (
@@ -97,7 +98,7 @@ function ColorSelector({ product }: { product: Product }) {
 function TextureSelector({ product }: { product: Product }) {
   const { selectedTexture, setSelectedTexture } = useEyeShadowContext();
   // const { setEyeshadowMaterial } = useMakeup();
-
+  const { t, i18n } = useTranslation();
   const productTextures = extractUniqueCustomAttributes([product], "texture");
   const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
 

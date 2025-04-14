@@ -11,6 +11,7 @@ import {
   filterTextures,
   filterTexturesByValue,
 } from "../../../../api/attributes/texture";
+import { useTranslation } from "react-i18next";
 
 export function SingleNailPolishSelector({ product }: { product: Product }) {
   return (
@@ -110,7 +111,7 @@ function TextureSelector({ product }: { product: Product }) {
 
   const productTextures = extractUniqueCustomAttributes([product], "texture");
   const filteredTextures = filterTexturesByValue(productTextures);
-
+  const { t, i18n } = useTranslation();
   return (
     <div className="mx-auto w-full py-1 sm:py-2">
       <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">

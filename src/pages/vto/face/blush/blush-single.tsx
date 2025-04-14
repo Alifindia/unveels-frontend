@@ -7,6 +7,7 @@ import { useBlushContext } from "./blush-context";
 import { Product } from "../../../../api/shared";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import { useTranslation } from "react-i18next";
 
 export function SingleBlushSelector({ product }: { product: Product }) {
   return (
@@ -96,7 +97,7 @@ function ColorSelector({ product }: { product: Product }) {
 function TextureSelector({ product }: { product: Product }) {
   const { selectedTexture, setSelectedTexture } = useBlushContext();
   const { setBlushMaterial } = useMakeup();
-
+  const { t, i18n } = useTranslation();
   const productTextures = extractUniqueCustomAttributes([product], "texture");
   const textures = filterTexturesByValue(productTextures);
 

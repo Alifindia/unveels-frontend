@@ -11,6 +11,7 @@ import { useLipPlumperContext } from "./lip-plumper-context";
 import { Product } from "../../../../api/shared";
 import { ColorPalette } from "../../../../components/color-palette";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export function SingleLipPlumperSelector({ product }: { product: Product }) {
   return (
@@ -85,7 +86,7 @@ function TextureSelector({ product }: { product: Product }) {
   const productTextures = extractUniqueCustomAttributes([product], "texture");
 
   const textures = filterTexturesByValue(productTextures);
-
+  const { t, i18n } = useTranslation();
   return (
     <div className="mx-auto w-full py-1 sm:py-2">
       <div className="flex w-full items-center space-x-4 overflow-x-auto no-scrollbar">

@@ -9,6 +9,7 @@ import { Product } from "../../../../api/shared";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export function SingleLipColorSelector({ product }: { product: Product }) {
   return (
@@ -101,6 +102,7 @@ function ColorSelector({ product }: { product: Product }) {
 }
 
 function TextureSelector({ product }: { product: Product }) {
+  const { t, i18n } = useTranslation();
   const { selectedTexture, setSelectedTexture } = useLipColorContext();
 
   const productTextures = extractUniqueCustomAttributes([product], "texture");

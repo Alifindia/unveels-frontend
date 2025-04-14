@@ -11,6 +11,7 @@ import { Product } from "../../../../api/shared";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export function SingleContourSelector({ product }: { product: Product }) {
   return (
@@ -186,7 +187,7 @@ function ShapeSelector() {
 function TextureSelector({ product }: { product: Product }) {
   const { selectedTexture, setSelectedTexture } = useContourContext();
   const { setHighlighterMaterial } = useMakeup();
-
+  const { t, i18n } = useTranslation();
   const productTextures = extractUniqueCustomAttributes([product], "texture");
 
   const textures = filterTexturesByValue(productTextures);

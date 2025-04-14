@@ -8,6 +8,7 @@ import { Product } from "../../../../api/shared";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export function SingleBronzerSelector({ product }: { product: Product }) {
   return (
@@ -121,7 +122,7 @@ const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
 function TextureSelector({ product }: { product: Product }) {
   const { selectedTexture, setSelectedTexture } = useBronzerContext();
   const { highlighterMaterial, setHighlighterMaterial } = useMakeup();
-
+  const { t, i18n } = useTranslation();
   function setMaterial(
     material: number,
     texture: { label: string; value: string },

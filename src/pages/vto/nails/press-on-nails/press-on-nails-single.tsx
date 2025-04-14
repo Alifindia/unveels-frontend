@@ -7,6 +7,7 @@ import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
 import { usePressOnNailsContext } from "./press-on-nails-context";
 import { ColorPalette } from "../../../../components/color-palette";
+import { useTranslation } from "react-i18next";
 
 export function SinglePressOnNailsSelector({ product }: { product: Product }) {
   return (

@@ -7,6 +7,7 @@ import { useHighlighterContext } from "./highlighter-context";
 import { Product } from "../../../../api/shared";
 import { VTOProductCard } from "../../../../components/vto/vto-product-card";
 import { extractUniqueCustomAttributes } from "../../../../utils/apiUtils";
+import { useTranslation } from "react-i18next";
 
 export function SingleHighlighterSelector({ product }: { product: Product }) {
   return (
@@ -80,7 +81,7 @@ function TextureSelector({ product }: { product: Product }) {
 
   const productTextures = extractUniqueCustomAttributes([product], "texture");
   const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
-
+  const { t, i18n } = useTranslation();
   return (
     <div className="mx-auto w-full">
       <div className="flex w-full items-center space-x-3 overflow-x-auto py-2 no-scrollbar sm:space-x-4">
