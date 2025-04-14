@@ -1,11 +1,11 @@
 export const textures = [
   {
-    label: "Matte",
-    value: "5625",
-  },
-  {
     label: "Shimmer",
     value: "5626",
+  },
+  {
+    label: "Matte",
+    value: "5625",
   },
   {
     label: "Glossy",

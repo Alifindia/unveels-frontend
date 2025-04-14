@@ -153,7 +153,7 @@ function ColorSelector() {
   );
 }
 
-const textures = filterTextures(["Metallic", "Matte", "Shimmer"]);
+const textures = filterTextures(["Glossy", "Matte", "Shimmer"]);
 function TextureSelector() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar' || i18n.dir() === 'rtl';
