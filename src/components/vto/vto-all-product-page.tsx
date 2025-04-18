@@ -173,7 +173,7 @@ function ProductHorizontalList({
     maxPrice,
     selectedFormation,
     sort,
-    sortBy
+    sortBy,
   } = useFilterContext();
 
   if (!mapTypes[category]) {
@@ -213,6 +213,7 @@ function ProductHorizontalList({
     selectedFormation,
     sort,
     refetch, // Ensure refetch is included to avoid stale closures
+    sortBy
   ]);
 
   const { addItemToCart, setDataItem, setType } = useCartContext();
@@ -220,8 +221,8 @@ function ProductHorizontalList({
   const handleAddToCart = async (id: string, url: string, dataProduct: any) => {
     try {
       await addItemToCart(id, url);
-      setType("unit")
-      setDataItem(dataProduct)
+      setType("unit");
+      setDataItem(dataProduct);
       console.log(`Product ${id} added to cart!`);
     } catch (error) {
       console.error("Failed to add product to cart:", error);
@@ -240,10 +241,7 @@ function ProductHorizontalList({
               "https://picsum.photos/id/237/200/300";
 
             return (
-              <div
-                key={product.id}
-                className="rounded-xl shadow"
-              >
+              <div key={product.id} className="rounded-xl shadow">
                 <div
                   className="cursor-pointer"
                   onClick={() => {
@@ -286,7 +284,7 @@ function ProductHorizontalList({
                       handleAddToCart(
                         product.id.toString(),
                         `${baseApiUrl}/${product.custom_attributes.find((attr) => attr.attribute_code === "url_key")?.value as string}.html`,
-                        product
+                        product,
                       );
                     }}
                   >
@@ -328,6 +326,34 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
     setSelectedFormation,
     selectedFormation,
   } = useFilterContext();
+
+  // Local state to store temporary filter values
+  const [localBrand, setLocalBrand] = useState("");
+  const [localCountry, setLocalCountry] = useState("");
+  const [localSizeOne, setLocalSizeOne] = useState("");
+  const [localSizeTwo, setLocalSizeTwo] = useState("");
+  const [localMinPrice, setLocalMinPrice] = useState(0);
+  const [localMaxPrice, setLocalMaxPrice] = useState(1000);
+  const [localFormation, setLocalFormation] = useState("");
+
+  // Initialize local state with context values on mount
+  useEffect(() => {
+    setLocalBrand(selectedBrand);
+    setLocalCountry(selectedCountry);
+    setLocalSizeOne(selectedSizeOne);
+    setLocalSizeTwo(selectedSizeTwo);
+    setLocalMinPrice(minPrice);
+    setLocalMaxPrice(maxPrice);
+    setLocalFormation(selectedFormation);
+  }, [
+    selectedBrand,
+    selectedCountry,
+    selectedSizeOne,
+    selectedSizeTwo,
+    minPrice,
+    maxPrice,
+    selectedFormation,
+  ]);
 
   const sizeOne = [
     {
@@ -1212,64 +1238,77 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
     label: string;
     value: string;
   }) => {
-    // Jika tombol formation yang sama diklik, hilangkan pilihan yang ada
-    if (selectedFormation === formation.value) {
-      setSelectedFormation(""); // Non-aktifkan filter jika sudah aktif
-      console.log("Formation deactivated");
+    // If the same formation button is clicked, remove the existing selection
+    if (localFormation === formation.value) {
+      setLocalFormation(""); // Deactivate filter if already active
+      console.log("Formation deactivated locally");
     } else {
-      setSelectedFormation(formation.value); // Aktifkan filter
-      console.log("Selected Formation Value:", formation.value);
+      setLocalFormation(formation.value); // Activate filter
+      console.log("Selected Formation Value locally:", formation.value);
     }
   };
 
-  // Handler untuk Brand Name
+  // Handler for Brand Name
   const handleBrandChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
-    setSelectedBrand(value);
-    console.log("Selected Brand Value:", value);
+    setLocalBrand(value);
+    console.log("Selected Brand Value locally:", value);
   };
 
-  // Handler untuk Country of Origin
+  // Handler for Country of Origin
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
-    setSelectedCountry(value);
-    console.log("Selected Country Value:", value);
+    setLocalCountry(value);
+    console.log("Selected Country Value locally:", value);
   };
 
   const handleMinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Number(e.target.value);
-    value = Math.max(0, Math.min(value, maxPrice - 1));
-    setMinPrice(value);
+    value = Math.max(0, Math.min(value, localMaxPrice - 1));
+    setLocalMinPrice(value);
   };
 
   const handleMaxInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Number(e.target.value);
-    value = Math.min(1000, Math.max(value, minPrice + 1));
-    setMaxPrice(value);
+    value = Math.min(1000, Math.max(value, localMinPrice + 1));
+    setLocalMaxPrice(value);
   };
 
   const handleMinSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Number(e.target.value);
-    value = Math.max(0, Math.min(value, maxPrice - 1));
-    setMinPrice(value);
+    value = Math.max(0, Math.min(value, localMaxPrice - 1));
+    setLocalMinPrice(value);
   };
 
   const handleMaxSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Number(e.target.value);
-    value = Math.min(1000, Math.max(value, minPrice + 1));
-    setMaxPrice(value);
+    value = Math.min(1000, Math.max(value, localMinPrice + 1));
+    setLocalMaxPrice(value);
   };
 
   const handleSizeOneChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
-    setSelectedSizeOne(value);
-    console.log("Selected Size One:", value);
+    setLocalSizeOne(value);
+    console.log("Selected Size One locally:", value);
   };
 
   const handleSizeTwoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
-    setSelectedSizeTwo(value);
-    console.log("Selected Size Two:", value);
+    setLocalSizeTwo(value);
+    console.log("Selected Size Two locally:", value);
+  };
+
+  // Function to apply all filter changes to the context
+  const applyFilters = () => {
+    setSelectedBrand(localBrand);
+    setSelectedCountry(localCountry);
+    setSelectedSizeOne(localSizeOne);
+    setSelectedSizeTwo(localSizeTwo);
+    setMinPrice(localMinPrice);
+    setMaxPrice(localMaxPrice);
+    setSelectedFormation(localFormation);
+    console.log("All filters applied to context");
+    closeFilter(); // Close the filter panel after applying
   };
 
   const { currency, rate, currencySymbol } = getCurrencyAndRate(exchangeRates);
@@ -1292,8 +1331,8 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
           <select
             className="w-full rounded-xl border border-white bg-[#09090b] p-2 text-white"
             id="brand"
-            value={selectedBrand} // Bind ke state
-            onChange={handleBrandChange} // Update state saat berubah
+            value={localBrand} // Bind to local state
+            onChange={handleBrandChange} // Update local state when changed
           >
             <option value="">Select Brand</option>
             {brands.map((brand) => (
@@ -1312,8 +1351,8 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
           <select
             className="w-full rounded-xl border border-white bg-[#09090b] p-2 text-white"
             id="country"
-            value={selectedCountry} // Bind ke state
-            onChange={handleCountryChange} // Update state saat berubah
+            value={localCountry} // Bind to local state
+            onChange={handleCountryChange} // Update local state when changed
           >
             <option value="">Made in</option>
             {madeIn.map((country) => (
@@ -1333,8 +1372,8 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
             <select
               className="rounded-xl border border-white bg-[#09090b] p-2 text-white"
               id="size-one"
-              value={selectedSizeOne} // Bind ke state sizeOne
-              onChange={handleSizeOneChange} // Update state saat nilai berubah
+              value={localSizeOne} // Bind to local state
+              onChange={handleSizeOneChange} // Update local state when value changes
             >
               <option value="">Select Size One</option>
               {sizeOne.map((size) => (
@@ -1346,8 +1385,8 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
             <select
               className="rounded-xl border border-white bg-[#09090b] p-2 text-white"
               id="size-two"
-              value={selectedSizeTwo} // Bind ke state sizeTwo
-              onChange={handleSizeTwoChange} // Update state saat nilai berubah
+              value={localSizeTwo} // Bind to local state
+              onChange={handleSizeTwoChange} // Update local state when value changes
             >
               <option value="">Select Size Two</option>
               {sizeTwo.map((size) => (
@@ -1370,7 +1409,7 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
               id="min-price"
               placeholder="Min"
               type="number"
-              value={minPrice}
+              value={localMinPrice}
               onChange={handleMinInputChange}
             />
             <input
@@ -1378,16 +1417,18 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
               id="max-price"
               placeholder="Max"
               type="number"
-              value={maxPrice}
+              value={localMaxPrice}
               onChange={handleMaxInputChange}
             />
           </div>
           <div className="my-4 flex justify-between text-sm">
             <span>
-              {currencySymbol}{minPrice}
+              {currencySymbol}
+              {localMinPrice}
             </span>
             <span>
-              {currencySymbol}{maxPrice}
+              {currencySymbol}
+              {localMaxPrice}
             </span>
           </div>
           <div className="relative h-6 w-full">
@@ -1406,7 +1447,7 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
               min="0"
               max="1000"
               step="1"
-              value={minPrice}
+              value={localMinPrice}
               className="absolute z-20 h-2 w-full appearance-none bg-transparent"
               style={{ top: "20%", transform: "translateY(-50%)" }} // Center the slider vertically
               onChange={handleMinSliderChange}
@@ -1419,7 +1460,7 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
               min="0"
               max="1000"
               step="1"
-              value={maxPrice}
+              value={localMaxPrice}
               className="absolute z-20 h-2 w-full appearance-none bg-transparent"
               style={{ top: "20%", transform: "translateY(-50%)" }} // Center the slider vertically
               onChange={handleMaxSliderChange}
@@ -1508,7 +1549,7 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
                 key={formation.value}
                 onClick={() => handleFormationClick(formation)} // Pass formation object to the handler
                 className={`-full mx-1 rounded-xl border px-3 py-1 text-xs ${
-                  selectedFormation === formation.value
+                  localFormation === formation.value
                     ? "border-white bg-white text-black"
                     : "border-white bg-transparent text-white"
                 }`}
@@ -1517,6 +1558,15 @@ function FilterComponent({ closeFilter }: { closeFilter: () => void }) {
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="mt-6">
+          <button
+            onClick={applyFilters}
+            className="w-full rounded-xl bg-white px-4 py-2 font-medium text-black"
+          >
+            Apply Filters
+          </button>
         </div>
       </div>
     </div>
