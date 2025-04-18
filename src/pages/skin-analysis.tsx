@@ -490,7 +490,7 @@ function Main({ isArabic }: { isArabic: boolean }) {
               left: 0,
               right: 0,
               bottom: 0,
-              zIndex: 100,
+              zIndex: 100000,
             }}
           >
             <AllProductsPage
@@ -1215,7 +1215,10 @@ function AnalysisResults({
           </div>
         </div>
 
-        <div className="mx-auto hidden w-full max-w-3xl items-center gap-x-4 capitalize md:flex" dir={isArabic ? "rtl" : "ltr"}>
+        <div
+          className="mx-auto hidden w-full max-w-3xl items-center gap-x-4 capitalize md:flex"
+          dir={isArabic ? "rtl" : "ltr"}
+        >
           <div className="flex flex-1 items-start justify-between space-x-4 bg-black px-10 text-white">
             <div className="space-y-4">
               <div className="flex items-center space-x-2.5">
@@ -1434,6 +1437,7 @@ function ProblemSection({
   isArabic?: boolean;
 }) {
   const { t } = useTranslation();
+  const { setView } = useSkinAnalysis();
   // High -> 70% - 100%
   // Moderate -> above 40% - 69%
   // low -> 0% - 39%
@@ -1467,9 +1471,14 @@ function ProblemSection({
       </div>
 
       <div className="py-8">
-        <h2 className="pb-4 text-xl font-bold lg:text-2xl">
-          {t("viewskinan.recomend")}
-        </h2>
+        <div className="flex items-center justify-between pb-4">
+          <h2 className="text-xl font-bold lg:text-2xl">
+            {t("viewskinan.recomend")}
+          </h2>
+          <button className="text-sm font-medium" onClick={() => setView("all_categories")}>
+            View All
+          </button>
+        </div>
 
         <ProductList skinConcern={title} />
       </div>
